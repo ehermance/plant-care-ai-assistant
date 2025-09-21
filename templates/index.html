@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Plant Care AI Assistant (Step 1)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 2rem; line-height: 1.4; }
+    form { display: grid; gap: 1rem; max-width: 700px; }
+    label { font-weight: 600; }
+    input[type="text"], textarea { width: 100%; padding: .6rem; border: 1px solid #ccc; border-radius: 8px; }
+    button { padding: .7rem 1rem; border: 0; border-radius: 10px; cursor: pointer; }
+    .primary { background: #0f766e; color: white; }
+    .card { margin-top: 1.5rem; padding: 1rem; border: 1px solid #e5e5e5; border-radius: 12px; background: #fafafa; }
+    .muted { color: #666; font-size: .95rem; }
+  </style>
+</head>
+<body>
+  <h1>Plant Care AI Assistant</h1>
+  <p class="muted">Step 1: a working form + rule-based tips (no external APIs yet).</p>
+
+  <form action="/ask" method="post">
+    <div>
+      <label for="plant">Plant (optional)</label>
+      <input id="plant" name="plant" type="text" placeholder="e.g., Monstera deliciosa"
+             value="{{ (form_values and form_values.plant) or '' }}">
+    </div>
+
+    <div>
+      <label for="city">City (optional)</label>
+      <input id="city" name="city" type="text" placeholder="e.g., Austin"
+             value="{{ (form_values and form_values.city) or '' }}">
+    </div>
+
+    <div>
+      <label for="question">Your question</label>
+      <textarea id="question" name="question" rows="4" placeholder="e.g., How often should I water?"
+      >{{ (form_values and form_values.question) or '' }}</textarea>
+    </div>
+
+    <div>
+      <button class="primary" type="submit">Ask</button>
+      <a class="muted" href="/healthz" target="_blank" style="margin-left: .75rem;">Health check</a>
+    </div>
+  </form>
+
+  {% if answer %}
+    <div class="card">
+      <h2>Answer</h2>
+      <p>{{ answer }}</p>
+    </div>
+  {% endif %}
+</body>
+</html>
