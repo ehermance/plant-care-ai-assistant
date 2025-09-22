@@ -108,3 +108,37 @@ def test_ai_advice_exception(monkeypatch):
 
     txt = app.ai_advice("Light needs?", "Snake Plant", weather=None)
     assert txt is None
+
+# --------------------------
+# weather_adjustment_tip() tests
+# --------------------------
+
+def test_weather_adjustment_tip_hot(monkeypatch):
+    import app; importlib.reload(app)
+    tip = app.weather_adjustment_tip({"temp_c": 33, "city": "Austin"}, "Monstera")
+    assert tip is not None
+    assert "hot" in tip.lower()
+    assert "33" in tip  # temperature echoed
+
+def test_weather_adjustment_tip_cold(monkeypatch):
+    import app; importlib.reload(app)
+    tip = app.weather_adjustment_tip({"temp_c": 4, "city": "Boston"}, "Pothos")
+    assert tip is not None
+    assert "cold" in tip.lower()
+    assert "draft" in tip.lower() or "away from" in tip.lower()
+
+def test_weather_adjustment_tip_mild(monkeypatch):
+    import app; importlib.reload(app)
+    tip = app.weather_adjustment_tip({"temp_c": 20, "city": "Dallas"}, "Snake Plant")
+    assert tip is not None
+    assert "mild" in tip.lower() or "maintain" in tip.lower()
+
+def test_weather_adjustment_tip_none_weather(monkeypatch):
+    import app; importlib.reload(app)
+    assert app.weather_adjustment_tip(None, "Monstera") is None
+
+def test_weather_adjustment_tip_missing_temp(monkeypatch):
+    import app; importlib.reload(app)
+    # No temp_c -> should gracefully return None
+    assert app.weather_adjustment_tip({"city": "Austin"}, "Monstera") is None
+
