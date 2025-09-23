@@ -4,219 +4,145 @@
   <meta charset="UTF-8" />
   <title>Plant Care AI Assistant</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 2rem; line-height: 1.4; }
-    form { display: grid; gap: 1rem; max-width: 820px; position: relative; }
-    label { font-weight: 600; }
-    input[type="text"], textarea { width: 100%; padding: .6rem; border: 1px solid #ccc; border-radius: 8px; }
-    button { padding: .7rem 1rem; border: 0; border-radius: 10px; cursor: pointer; }
-    .primary { background: #0f766e; color: white; }
-    .card { margin-top: 1.5rem; padding: 1rem; border: 1px solid #e5e5e5; border-radius: 12px; background: #fafafa; }
-    .muted { color: #666; font-size: .95rem; }
-    .row { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
-    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #e5f4f2; color: #0f766e; font-size: .8rem; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-    ul.history { list-style: none; padding: 0; margin: 0; display: grid; gap: .75rem; }
-    ul.history li { border: 1px solid #eee; border-radius: 10px; padding: .75rem; background: white; }
-    .small { font-size: .9rem; }
-    a.link { text-decoration: none; color: #0f766e; }
-    .notice { padding: .75rem 1rem; border: 1px solid #f3d2d2; background: #fff6f6; color: #7a1f1f; border-radius: 10px; }
-
-    /* Disabled state visuals */
-    .is-submitting input,
-    .is-submitting textarea,
-    .is-submitting button {
-      opacity: .6;
-      cursor: not-allowed !important;
-      pointer-events: none;
-    }
-
-    /* Overlay loader */
-    .loader-overlay {
-      position: absolute;
-      inset: -6px -6px -6px -6px; /* slightly outside to cover box shadows */
-      background: rgba(255,255,255,0.75);
-      backdrop-filter: blur(2px);
-      border-radius: 14px;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 2;
-    }
-    .is-submitting .loader-overlay { display: flex; }
-
-    .thinking {
-      display: inline-flex;
-      align-items: center;
-      gap: .6rem;
-      font-weight: 600;
-      color: #0f766e;
-    }
-    .dots {
-      display: inline-block;
-      width: 1.5rem;
-      text-align: left;
-    }
-    .dots::after {
-      content: "…";
-      animation: ellipsis 1.2s infinite steps(4,end);
-    }
-    @keyframes ellipsis {
-      0%   { content: "" }
-      25%  { content: "." }
-      50%  { content: ".." }
-      75%  { content: "..." }
-      100% { content: "" }
-    }
-
-    /* Visually hidden for screen readers (but announce updates) */
-    .sr-only {
-      position: absolute !important;
-      width: 1px; height: 1px;
-      padding: 0; margin: -1px; overflow: hidden;
-      clip: rect(0, 0, 1px, 1px); white-space: nowrap; border: 0;
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css', v=1) }}">
 </head>
 <body>
-  <h1>Plant Care AI Assistant</h1>
-  <p class="muted">Rule-based ➜ Weather-aware ➜ (optional) OpenAI, with graceful fallback.</p>
+  <a class="skip-link" href="#main">Skip to main content</a>
 
-  <form id="qa-form" action="/ask" method="post" novalidate>
-    <!-- Loading overlay -->
-    <div class="loader-overlay" aria-hidden="true">
-      <div class="thinking" aria-live="polite" aria-atomic="true" role="status">
-        thinking<span class="dots"></span>
-      </div>
-    </div>
+  <header>
+    <h1>Plant Care AI Assistant</h1>
+    <p class="muted">Rule-based ➜ Weather-aware ➜ (optional) OpenAI, with graceful fallback.</p>
+  </header>
 
-    <div class="row">
-      <div style="flex:1; min-width: 240px;">
-        <label for="plant">Plant (optional)</label>
-        <input id="plant" name="plant" type="text" placeholder="e.g., Monstera deliciosa"
-               value="{{ (form_values and form_values.plant) or '' }}">
+  <main id="main" role="main">
+    <form id="qa-form" action="/ask" method="post" novalidate aria-describedby="form-help" aria-live="polite" aria-busy="false">
+      <!-- Loading overlay -->
+      <div class="loader-overlay" aria-hidden="true">
+        <div class="thinking" aria-live="polite" aria-atomic="true" role="status">
+          thinking<span class="dots"></span>
+        </div>
       </div>
 
-      <div style="flex:1; min-width: 240px;">
-        <label for="city">City (optional)</label>
-        <input id="city" name="city" type="text" placeholder="e.g., Austin"
-               value="{{ (form_values and form_values.city) or '' }}">
+      <p id="form-help" class="sr-only">Enter a plant name and city (optional), and your question. The question is required.</p>
+
+      <div class="row">
+        <div style="flex:1; min-width: 240px;">
+          <label for="plant">Plant (optional)</label>
+          <input
+            id="plant" name="plant" type="text" inputmode="text" autocapitalize="words" autocomplete="off" spellcheck="false"
+            placeholder="e.g., Monstera deliciosa"
+            value="{{ (form_values and form_values.plant) or '' }}"
+            maxlength="80" pattern="[\w\s\-']{0,80}" aria-describedby="plant-help"
+          >
+          <div id="plant-help" class="sr-only">Letters, numbers, spaces, hyphens and apostrophes only, up to 80 characters.</div>
+        </div>
+
+        <div style="flex:1; min-width: 240px;">
+          <label for="city">City (optional)</label>
+          <input
+            id="city" name="city" type="text" inputmode="text" autocapitalize="words" autocomplete="address-level2" spellcheck="false"
+            placeholder="e.g., Austin"
+            value="{{ (form_values and form_values.city) or '' }}"
+            maxlength="80" pattern="[\w\s\-']{0,80}" aria-describedby="city-help"
+          >
+          <div id="city-help" class="sr-only">Letters, numbers, spaces, hyphens and apostrophes only, up to 80 characters.</div>
+        </div>
       </div>
-    </div>
 
-    <div>
-      <label for="question">Your question</label>
-      <textarea id="question" name="question" rows="4" placeholder="e.g., How often should I water?">{{ (form_values and form_values.question) or '' }}</textarea>
-    </div>
+      <div>
+        <label for="question">Your question <span aria-hidden="true">*</span></label>
+        <textarea
+          id="question" name="question" rows="4" placeholder="e.g., How do lilacs get their flower color?"
+          required maxlength="1200" aria-describedby="question-help"
+          autocomplete="off" spellcheck="true"
+        >{{ (form_values and form_values.question) or '' }}</textarea>
+        <div id="question-help" class="sr-only">Required. Maximum 1200 characters.</div>
+      </div>
 
-    <div>
-      <button id="submitBtn" class="primary" type="submit">Ask</button>
-      <a class="muted link" href="/healthz" target="_blank" style="margin-left: .75rem;">Health check</a>
-      <a class="muted link" href="/debug" target="_blank" style="margin-left: .75rem;">Debug info</a>
-    </div>
+      <div class="row j-between ai-center">
+        <button id="submitBtn" class="primary" type="submit" aria-label="Submit question">Ask</button>
+        <div>
+          <a class="muted" href="/healthz" target="_blank" rel="noopener noreferrer">Health check</a>
+          <span class="muted"> • </span>
+          <a class="muted" href="/debug" target="_blank" rel="noopener noreferrer">Debug info</a>
+        </div>
+      </div>
 
-    <!-- SR-only announcement area for assistive tech -->
-    <div id="sr-status" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
-  </form>
+      <!-- SR-only announcement area for assistive tech -->
+      <div id="sr-status" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
 
-  {% if weather %}
-    <div class="card">
-      <h2>Local Weather</h2>
-      <p>
-        <strong>{{ weather.city }}</strong> — {{ weather.conditions or 'N/A' }}<br>
-        Temp: {{ weather.temp_c }} °C • Humidity: {{ weather.humidity }}% • Wind: {{ weather.wind_mps }} m/s
+      <noscript>
+        <p class="notice small">JavaScript is disabled. Submissions will work, but you won’t see a loading indicator or form lock during processing.</p>
+      </noscript>
+    </form>
+
+    {% if weather %}
+      <section class="card" aria-labelledby="weather-heading">
+        <h2 id="weather-heading" class="m0">Local Weather</h2>
+        <p>
+          <strong>{{ weather.city }}</strong> — {{ weather.conditions or 'N/A' }}<br>
+          Temp: {{ weather.temp_c }} °C • Humidity: {{ weather.humidity }}% • Wind: {{ weather.wind_mps }} m/s
+        </p>
+      </section>
+    {% endif %}
+
+    {% if answer %}
+      {% if ai_error and source == 'rule' %}
+        <div class="notice small" role="alert">
+          <strong>AI unavailable</strong>: {{ ai_error }}<br>
+          The app fell back to rule-based advice. See <a href="/debug" target="_blank" rel="noopener noreferrer">/debug</a> for details.
+        </div>
+      {% endif %}
+
+      <section class="card" aria-labelledby="answer-heading">
+        <div class="row j-between ai-center">
+          <h2 id="answer-heading" class="m0">Answer</h2>
+          {% if source %}
+            <span class="pill" title="How this answer was generated">
+              {{ source == 'ai' and 'AI' or 'Rule' }}
+            </span>
+          {% endif %}
+        </div>
+        <div class="small">
+          <pre style="white-space: pre-wrap; margin: 0;">{{ answer }}</pre>
+        </div>
+      </section>
+      <p class="muted small mt075">
+        Generated by: <strong>{{ source == 'ai' and 'OpenAI (fallback-safe)' or 'Rule-based engine' }}</strong>
       </p>
-    </div>
-  {% endif %}
-
-  {% if answer %}
-    {% if ai_error and source == 'rule' %}
-      <div class="notice small">
-        <strong>AI unavailable</strong>: {{ ai_error }}<br>
-        The app fell back to rule-based advice. Check <a class="link" href="/debug" target="_blank">/debug</a> for details.
-      </div>
     {% endif %}
-    <div class="card">
-      <div class="row" style="justify-content: space-between; align-items: center;">
-        <h2 style="margin:0;">Answer</h2>
-        {% if source %}
-          <span class="pill" title="How this answer was generated">
-            {{ source == 'ai' and 'AI' or 'Rule' }}
-          </span>
-        {% endif %}
+
+    <section class="card" aria-labelledby="history-heading">
+      <div class="row j-between ai-center">
+        <h2 id="history-heading" class="m0">Recent Q&A</h2>
+        <a class="small" href="/history/clear" title="Clear in-memory history">Clear</a>
       </div>
-      <div class="small">
-        <pre style="white-space: pre-wrap; margin: 0;">{{ answer }}</pre>
-      </div>
-    </div>
-    <p class="muted small" style="margin-top:.75rem;">
-      Generated by: <strong>{{ source == 'ai' and 'OpenAI (fallback-safe)' or 'Rule-based engine' }}</strong>
-    </p>
-  {% endif %}
+      {% if history and history|length > 0 %}
+        <ul class="history">
+          {% for item in history %}
+            <li>
+              <div class="small muted mono">{{ item.ts }}</div>
+              <div class="small">
+                <span class="pill">{{ item.source == 'ai' and 'AI' or 'Rule' }}</span>
+                {% if item.plant %}<strong>Plant:</strong> {{ item.plant }} • {% endif %}
+                {% if item.city %}<strong>City:</strong> {{ item.city }}{% endif %}
+              </div>
+              <div class="small" style="margin-top: .4rem;">
+                <strong>Q:</strong> {{ item.question }}
+              </div>
+              <details style="margin-top: .4rem;">
+                <summary class="small">Show answer</summary>
+                <pre class="small" style="white-space: pre-wrap; margin-top: .4rem;">{{ item.answer }}</pre>
+              </details>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted small">No questions yet. Ask something above to populate the history.</p>
+      {% endif %}
+    </section>
+  </main>
 
-  <div class="card">
-    <div class="row" style="justify-content: space-between;">
-      <h2 style="margin: 0;">Recent Q&A</h2>
-      <a class="link small" href="/history/clear" title="Clear in-memory history">Clear</a>
-    </div>
-    {% if history and history|length > 0 %}
-      <ul class="history">
-        {% for item in history %}
-          <li>
-            <div class="small muted mono">{{ item.ts }}</div>
-            <div class="small">
-              <span class="pill">{{ item.source == 'ai' and 'AI' or 'Rule' }}</span>
-              {% if item.plant %}<strong>Plant:</strong> {{ item.plant }} • {% endif %}
-              {% if item.city %}<strong>City:</strong> {{ item.city }}{% endif %}
-            </div>
-            <div class="small" style="margin-top: .4rem;">
-              <strong>Q:</strong> {{ item.question }}
-            </div>
-            <details style="margin-top: .4rem;">
-              <summary class="small link">Show answer</summary>
-              <pre class="small" style="white-space: pre-wrap; margin-top: .4rem;">{{ item.answer }}</pre>
-            </details>
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p class="muted small">No questions yet. Ask something above to populate the history.</p>
-    {% endif %}
-  </div>
-
-  <script>
-    (function () {
-      const form = document.getElementById('qa-form');
-      const submitBtn = document.getElementById('submitBtn');
-      const srStatus = document.getElementById('sr-status');
-
-      function setSubmitting(isSubmitting) {
-        if (isSubmitting) {
-          form.classList.add('is-submitting');
-          // Disable all controls to prevent double-submit
-          Array.from(form.elements).forEach(el => {
-            if (el && 'disabled' in el) el.disabled = true;
-          });
-          if (srStatus) srStatus.textContent = 'Submitting, please wait…';
-        } else {
-          form.classList.remove('is-submitting');
-          Array.from(form.elements).forEach(el => {
-            if (el && 'disabled' in el) el.disabled = false;
-          });
-          if (srStatus) srStatus.textContent = '';
-        }
-      }
-
-      form.addEventListener('submit', function () {
-        // let the normal navigation happen, but show the loader instantly
-        setSubmitting(true);
-      });
-
-      // Safety: if page was restored from bfcache, clear disabled state
-      window.addEventListener('pageshow', function (e) {
-        if (e.persisted) setSubmitting(false);
-      });
-    })();
-  </script>
+  <script defer src="{{ url_for('static', filename='app.js', v=1) }}"></script>
 </body>
 </html>
