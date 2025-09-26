@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from dotenv import load_dotenv
-import os, re, requests, datetime
+import os, re, requests, datetime, unicodedata
 from collections import deque
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -10,13 +10,13 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-only-not-secret")
 
-# ---- Rate limiting (now with configurable storage & toggle) ----
-# Examples:
+# ---- Rate limiting (configurable storage & toggle) ----
+# ENV examples:
 #   RATE_LIMIT_DEFAULT="60 per minute;300 per hour"
 #   RATE_LIMIT_ASK="20 per minute;200 per day"
 #   RATE_LIMIT_STORAGE_URI="redis://localhost:6379/0"  (production)
 #   RATE_LIMIT_STORAGE_URI="memory://"                 (dev/tests; default)
-#   RATE_LIMIT_ENABLED=false                           (to disable during tests)
+#   RATE_LIMIT_ENABLED=false                           (disable in tests)
 RATE_LIMIT_DEFAULT = os.getenv("RATE_LIMIT_DEFAULT", "60 per minute;300 per hour")
 RATE_LIMIT_ASK = os.getenv("RATE_LIMIT_ASK", "20 per minute;200 per day")
 RATE_LIMIT_STORAGE_URI = os.getenv("RATE_LIMIT_STORAGE_URI", "memory://")
@@ -28,7 +28,7 @@ limiter = Limiter(
     default_limits=[RATE_LIMIT_DEFAULT],
     storage_uri=RATE_LIMIT_STORAGE_URI,
     enabled=RATE_LIMIT_ENABLED,
-    headers_enabled=True,  # adds X-RateLimit-* headers
+    headers_enabled=True,
 )
 
 # ---- Globals ----
@@ -45,13 +45,27 @@ def _mask(s: str, keep: int = 6) -> str:
 
 MAX_QUESTION_LEN = 1200
 MAX_SHORT_FIELD_LEN = 80
-SHORT_FIELD_RE = re.compile(r"^[\w\s\-\']+$", re.UNICODE)
-def validate_inputs(plant, city, question):
+ALLOWED_PUNCT = set(" -'(),./&×")  # space, hyphen, apostrophe, parentheses, comma, period, slash, ampersand, hybrid sign
+
+def is_safe_short_field(text: str | None) -> bool:
+    """Allow Unicode letters/digits/spaces + a small botany-safe punctuation set."""
+    if not text:
+        return True
+    if len(text) > MAX_SHORT_FIELD_LEN:
+        return False
+    s = unicodedata.normalize("NFKC", text)
+    for ch in s:
+        if ch.isalpha() or ch.isdigit() or ch.isspace() or ch in ALLOWED_PUNCT:
+            continue
+        return False
+    return True
+
+def validate_inputs(plant: str | None, city: str | None, question: str) -> tuple[bool, str]:
     if not question or len(question) > MAX_QUESTION_LEN:
         return False, "Question is required and must be under 1200 characters."
-    if plant and (len(plant) > MAX_SHORT_FIELD_LEN or not SHORT_FIELD_RE.match(plant)):
+    if not is_safe_short_field(plant):
         return False, "Plant name is invalid or too long."
-    if city and (len(city) > MAX_SHORT_FIELD_LEN or not SHORT_FIELD_RE.match(city)):
+    if not is_safe_short_field(city):
         return False, "City name is invalid or too long."
     return True, ""
 
@@ -66,6 +80,10 @@ def redact_pii(text: str) -> str:
     text = EMAIL_RE.sub("[email]", text)
     text = PHONE_RE.sub("[phone]", text)
     return text
+
+def display_sanitize_short(text: str | None) -> str | None:
+    if text is None: return None
+    return unicodedata.normalize("NFKC", text).strip()
 
 def _openai_client_and_version():
     try:
@@ -215,6 +233,7 @@ def ai_advice(question, plant, weather):
         AI_LAST_ERROR = str(e)[:300]
         return None
 
+# ---------- Advice engine ----------
 def generate_advice(q, p, c):
     weather = get_weather_for_city(c)
     ai = ai_advice(q, p, weather)
@@ -227,6 +246,67 @@ def generate_advice(q, p, c):
         city_name = weather.get("city") if weather else c
         answer += f"\n\nWeather tip for {city_name}: {w_tip}"
     return answer, weather, source
+
+# ---------- Region presets (simple, private) ----------
+def infer_region_from_latlon(lat: float, lon: float) -> str:
+    abslat = abs(lat)
+    if abslat < 23.5: return "tropical"
+    if abslat < 35:   return "warm"
+    if abslat < 45:   return "temperate"
+    return "cool"
+
+def infer_region_from_city(city: str | None) -> str:
+    if not city: return "temperate"
+    c = city.lower()
+    if any(k in c for k in ("miami","honolulu","hilo","key west")): return "tropical"
+    if any(k in c for k in ("los angeles","san diego","phoenix","austin","las vegas","orlando","tampa")): return "warm"
+    if any(k in c for k in ("seattle","portland","denver","kansas city","st louis","chicago","new york","boston")): return "temperate"
+    if any(k in c for k in ("minneapolis","anchorage","calgary","winnipeg")): return "cool"
+    return "temperate"
+
+PRESET_LIBRARY = {
+    "tropical": [
+        {"plant":"Monstera deliciosa","why":"Native-like humidity & warmth","starter_care":"Bright-indirect light; water when top 2–3 cm dry."},
+        {"plant":"Pothos (Epipremnum)","why":"Tolerant, thrives with warmth","starter_care":"Low-to-medium light; water when top 3–4 cm dry."},
+        {"plant":"Areca palm","why":"Enjoys warm humid air","starter_care":"Bright-indirect; keep evenly moist; avoid cold drafts."},
+    ],
+    "warm": [
+        {"plant":"Snake plant (Sansevieria)","why":"Handles heat & dry spells","starter_care":"Bright-to-medium light; let soil dry deeply."},
+        {"plant":"Aloe vera","why":"Loves heat & sun","starter_care":"Full sun; water sparingly; very fast-draining mix."},
+        {"plant":"ZZ plant (Zamioculcas)","why":"Forgiving in AC/heat","starter_care":"Low-to-medium light; water after soil fully dries."},
+    ],
+    "temperate": [
+        {"plant":"Spider plant","why":"Adaptable household temps","starter_care":"Bright-indirect; keep slightly moist; good drainage."},
+        {"plant":"Peace lily (Spathiphyllum)","why":"Blooming indoors, average temps","starter_care":"Medium light; water when leaves soften slightly."},
+        {"plant":"Philodendron hederaceum","why":"Tolerant & fast growing","starter_care":"Medium-bright indirect; water when top inch dry."},
+    ],
+    "cool": [
+        {"plant":"Chinese evergreen (Aglaonema)","why":"Tolerant of cooler rooms","starter_care":"Medium light; avoid overwatering; warm corners if possible."},
+        {"plant":"Cast iron plant (Aspidistra)","why":"Handles low temps & neglect","starter_care":"Low-to-medium light; water sparingly."},
+        {"plant":"Hoya carnosa","why":"Okay with cooler nights","starter_care":"Bright-indirect; let soil dry between waterings."},
+    ],
+}
+
+def region_presets(region: str) -> list[dict]:
+    return PRESET_LIBRARY.get(region, PRESET_LIBRARY["temperate"])
+
+@app.route("/presets")
+def presets_api():
+    try:
+        lat = request.args.get("lat", type=float)
+        lon = request.args.get("lon", type=float)
+        city = request.args.get("city", type=str)
+
+        if lat is not None and lon is not None:
+            region = infer_region_from_latlon(lat, lon)
+        elif city:
+            region = infer_region_from_city(city)
+        else:
+            region = "temperate"
+
+        return jsonify({"region": region, "items": region_presets(region)})
+    except Exception:
+        return jsonify({"region": "temperate", "items": region_presets("temperate")})
 
 # ---------- Routes ----------
 @app.route("/", methods=["GET"])
@@ -271,8 +351,8 @@ def ask():
 
     HISTORY.appendleft({
         "ts": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "plant": redact_pii(plant) if plant else plant,
-        "city": redact_pii(city) if city else city,
+        "plant": display_sanitize_short(redact_pii(plant)) if plant else plant,
+        "city": display_sanitize_short(redact_pii(city)) if city else city,
         "question": redact_pii(question),
         "answer": answer,
         "weather": weather,

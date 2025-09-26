@@ -25,27 +25,29 @@
 
       <p id="form-help" class="sr-only">Enter a plant name and city (optional), and your question. The question is required.</p>
 
-      <div class="row">
-        <div style="flex:1; min-width: 240px;">
+      <div class="row form-row">
+        <div class="input-col">
           <label for="plant">Plant (optional)</label>
           <input
             id="plant" name="plant" type="text" inputmode="text" autocapitalize="words" autocomplete="off" spellcheck="false"
             placeholder="e.g., Monstera deliciosa"
             value="{{ (form_values and form_values.plant) or '' }}"
-            maxlength="80" pattern="[\w\s\-']{0,80}" aria-describedby="plant-help"
+            maxlength="80"
+            aria-describedby="plant-help"
           >
-          <div id="plant-help" class="sr-only">Letters, numbers, spaces, hyphens and apostrophes only, up to 80 characters.</div>
+          <div id="plant-help" class="sr-only">Up to 80 characters. Letters/numbers plus common punctuation like spaces, hyphens, apostrophes, parentheses, commas, periods, slashes, ampersand.</div>
         </div>
 
-        <div style="flex:1; min-width: 240px;">
+        <div class="input-col">
           <label for="city">City (optional)</label>
           <input
             id="city" name="city" type="text" inputmode="text" autocapitalize="words" autocomplete="address-level2" spellcheck="false"
             placeholder="e.g., Austin"
             value="{{ (form_values and form_values.city) or '' }}"
-            maxlength="80" pattern="[\w\s\-']{0,80}" aria-describedby="city-help"
+            maxlength="80"
+            aria-describedby="city-help"
           >
-          <div id="city-help" class="sr-only">Letters, numbers, spaces, hyphens and apostrophes only, up to 80 characters.</div>
+          <div id="city-help" class="sr-only">Up to 80 characters. Letters/numbers plus common punctuation.</div>
         </div>
       </div>
 
@@ -68,13 +70,19 @@
         </div>
       </div>
 
-      <!-- SR-only announcement area for assistive tech -->
       <div id="sr-status" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
 
       <noscript>
         <p class="notice small">JavaScript is disabled. Submissions will work, but you won’t see a loading indicator or form lock during processing.</p>
       </noscript>
     </form>
+
+    <!-- Presets panel -->
+    <section id="presets-container" class="presets card" hidden aria-labelledby="presets-heading">
+      <h2 id="presets-heading" class="m0">Recommended for your area</h2>
+      <p class="muted">Region: <span id="presets-region">…</span>. Click a card to prefill the form.</p>
+      <ul id="presets-list"></ul>
+    </section>
 
     {% if weather %}
       <section class="card" aria-labelledby="weather-heading">
@@ -104,7 +112,7 @@
           {% endif %}
         </div>
         <div class="small">
-          <pre style="white-space: pre-wrap; margin: 0;">{{ answer }}</pre>
+          <pre class="m0">{{ answer }}</pre>
         </div>
       </section>
       <p class="muted small mt075">
@@ -127,12 +135,12 @@
                 {% if item.plant %}<strong>Plant:</strong> {{ item.plant }} • {% endif %}
                 {% if item.city %}<strong>City:</strong> {{ item.city }}{% endif %}
               </div>
-              <div class="small" style="margin-top: .4rem;">
+              <div class="small mt04">
                 <strong>Q:</strong> {{ item.question }}
               </div>
-              <details style="margin-top: .4rem;">
+              <details class="mt075">
                 <summary class="small">Show answer</summary>
-                <pre class="small" style="white-space: pre-wrap; margin-top: .4rem;">{{ item.answer }}</pre>
+                <pre class="small mt075">{{ item.answer }}</pre>
               </details>
             </li>
           {% endfor %}
@@ -143,6 +151,6 @@
     </section>
   </main>
 
-  <script defer src="{{ url_for('static', filename='app.js', v=1) }}"></script>
+  <script defer src="{{ url_for('static', filename='app.js', v=4) }}"></script>
 </body>
 </html>

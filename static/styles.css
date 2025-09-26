@@ -14,6 +14,18 @@
 body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 2rem; line-height: 1.5; color: var(--text); }
 a { color: var(--brand); }
 
+/* Utility classes */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.input-col {
+  flex: 1;
+  min-width: 240px;
+}
+
 /* Skip link */
 .skip-link {
   position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden;
@@ -100,3 +112,15 @@ ul.history li { border: 1px solid #eee; border-radius: 10px; padding: .75rem; ba
 .mt075 { margin-top: .75rem; }
 .j-between { justify-content: space-between; }
 .ai-center { align-items: center; }
+
+/* Presets panel */
+.presets { margin-top: 1.5rem; }
+.presets h2 { margin: 0 0 .25rem 0; }
+.presets .muted { margin: 0 0 .5rem 0; }
+#presets-list { list-style: none; padding: 0; margin: 0; display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); }
+.preset-card { border: 1px solid var(--border); border-radius: 12px; background: #fff; padding: .5rem; }
+.preset-btn { width: 100%; text-align: left; background: transparent; border: 0; cursor: pointer; padding: .5rem; border-radius: 10px; }
+.preset-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--focus); }
+.preset-plant { font-weight: 700; }
+.preset-why { color: var(--muted); font-size: .9rem; margin-top: .15rem; }
+.preset-care { font-size: .9rem; margin-top: .4rem; }
