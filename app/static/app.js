@@ -1,3 +1,9 @@
+/*
+Enhances the form UX: displays a loading overlay during submission, locks
+fields without removing them from the POST payload, and populates a presets
+panel by calling /presets using geolocation or the current city field.
+*/
+
 (function () {
   const form = document.getElementById('qa-form');
   if (!form) return;
@@ -5,18 +11,18 @@
   const srStatus = document.getElementById('sr-status');
   const submitBtn = document.getElementById('submitBtn');
 
-  // Loader/lock UX
+  // Toggle submitting UI: overlay, aria-busy, readOnly fields.
   function setSubmitting(isSubmitting) {
     form.classList.toggle('is-submitting', isSubmitting);
     form.setAttribute('aria-busy', isSubmitting ? 'true' : 'false');
 
-    // Disable only the submit button
+    // Avoid disabling inputs (disabled fields are dropped from POST),
+    // but disabling the submit button is safe.
     if (submitBtn) {
       submitBtn.disabled = isSubmitting;
       submitBtn.setAttribute('aria-disabled', isSubmitting ? 'true' : 'false');
     }
 
-    // Make fields read-only (remain in POST payload)
     form.querySelectorAll('input, textarea').forEach(el => {
       if ('readOnly' in el) el.readOnly = isSubmitting;
     });
@@ -25,20 +31,26 @@
     if (!isSubmitting && srStatus) srStatus.textContent = '';
   }
 
-  form.addEventListener('submit', function () { setSubmitting(true); });
-  window.addEventListener('pageshow', e => { if (e.persisted) setSubmitting(false); });
+  form.addEventListener('submit', function () {
+    setSubmitting(true);
+  });
 
-  // ---------- Presets panel ----------
+  // Handle bfcache restores.
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) setSubmitting(false);
+  });
+
+  // ---- Presets ----
   const presetsContainer = document.getElementById('presets-container');
   const presetsList = document.getElementById('presets-list');
 
   if (presetsContainer && presetsList) {
-    // Try geolocation first (user consent); fallback to city input; else default
     const cityInput = document.getElementById('city');
 
     function renderPresets(region, items) {
       presetsContainer.hidden = false;
-      document.getElementById('presets-region').textContent = region;
+      const regionEl = document.getElementById('presets-region');
+      if (regionEl) regionEl.textContent = region;
 
       presetsList.innerHTML = '';
       items.forEach(item => {
@@ -56,7 +68,6 @@
           const questionField = document.getElementById('question');
           if (plantField) plantField.value = item.plant;
           if (questionField) {
-            // Seed a useful default question
             questionField.value = `Care essentials for ${item.plant}?`;
             questionField.focus();
           }
@@ -67,14 +78,16 @@
 
     function fetchPresets(params) {
       const url = new URL('/presets', window.location.origin);
-      Object.entries(params || {}).forEach(([k, v]) => { if (v != null && v !== '') url.searchParams.set(k, v); });
+      Object.entries(params || {}).forEach(([k, v]) => {
+        if (v != null && v !== '') url.searchParams.set(k, v);
+      });
       fetch(url.toString(), { method: 'GET', credentials: 'same-origin' })
         .then(r => r.json())
         .then(data => renderPresets(data.region, data.items))
-        .catch(() => { /* fail silent; panel stays hidden */ });
+        .catch(() => { /* Silent failure: panel remains hidden */ });
     }
 
-    // Attempt geolocation (high accuracy not needed)
+    // Prefer geolocation; fall back to the City field; else default.
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         pos => {
@@ -87,7 +100,6 @@
             fetchPresets({});
           }
         },
-        // On error/denied, fallback
         () => {
           if (cityInput && cityInput.value) fetchPresets({ city: cityInput.value });
           else fetchPresets({});

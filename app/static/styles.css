@@ -1,0 +1,153 @@
+/* Base Styles */
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  margin: 0;
+  line-height: 1.5;
+  background: #fafafa;
+  color: #222;
+}
+
+/* Shared container with max width & consistent gutters */
+.container {
+  max-width: 1140px;
+  margin-inline: auto;
+  padding-inline: 2rem;
+}
+
+/* Header */
+.page-header {
+  padding-block: 2rem 1rem;
+}
+.page-header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+.page-header p {
+  margin: 0.3rem 0 0;
+}
+
+/* Cards & Layout Sections */
+.card {
+  background: #fff;
+  padding: 1.25rem;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  margin-block: 1rem;
+}
+
+/* Recommended presets */
+.recommended .preset-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.preset-btn {
+  padding: 0.5rem 0.75rem;
+  background: #e6f4f1;
+  border: 1px solid #b9e1db;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+.preset-btn:hover {
+  background: #d2ebe5;
+}
+
+/* Forms */
+form {
+  display: grid;
+  gap: 1rem;
+}
+.form-row label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+input[type="text"],
+textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+button.primary {
+  background: #0f766e;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+}
+button.primary:hover {
+  background: #0d5e58;
+}
+
+/* Answer Card */
+.answer-card .answer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.answer-text {
+  white-space: pre-wrap;
+  background: #f8f8f8;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+}
+
+/* Pills, Notice, and Utilities */
+.pill {
+  display: inline-block;
+  background: #e5f4f2;
+  color: #0f766e;
+  font-size: 0.8rem;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+.notice {
+  padding: 0.75rem;
+  background: #fff6f6;
+  border: 1px solid #f3d2d2;
+  color: #7a1f1f;
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
+}
+.muted {
+  color: #666;
+}
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.small {
+  font-size: 0.9rem;
+}
+
+/* History */
+ul.history {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+ul.history li {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 0.75rem;
+  background: white;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .preset-grid {
+    flex-direction: column;
+  }
+  .answer-card .answer-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+}
