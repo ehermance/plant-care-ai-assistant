@@ -4,127 +4,178 @@
   <meta charset="UTF-8" />
   <title>Plant Care AI Assistant</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-  <script defer src="{{ url_for('static', filename='app.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css', v=8) }}">
+  <script defer src="{{ url_for('static', filename='app.js', v=8) }}"></script>
 </head>
 <body>
-  <!-- Header with consistent left/right gutter -->
+  <!-- Header with concise summary -->
   <header class="page-header container">
     <h1>Plant Care AI Assistant</h1>
-    <p class="muted">
-      Rule-based ➜ Weather-aware ➜ (optional) OpenAI, with graceful fallback.
+    <p class="summary">
+      Ask care questions for houseplants, get tailored guidance, and see weather-aware tips for your city.
     </p>
   </header>
 
-  <!-- Main content container -->
   <main id="main" role="main" class="container">
-
-    <!-- Recommended Presets -->
-    <section class="recommended">
-      <h2>Recommended Presets</h2>
-      <div class="preset-grid">
-        <button type="button" data-plant="Monstera" class="preset-btn">Monstera</button>
-        <button type="button" data-plant="Fiddle Leaf Fig" class="preset-btn">Fiddle Leaf Fig</button>
-        <button type="button" data-plant="Snake Plant" class="preset-btn">Snake Plant</button>
-        <button type="button" data-plant="Peace Lily" class="preset-btn">Peace Lily</button>
+    <!-- Recommended presets (compact buttons) -->
+    <section class="card" aria-labelledby="presets-heading">
+      <h2 id="presets-heading" class="m0">Recommended</h2>
+      <p class="muted small m0">Click a preset to prefill the form.</p>
+      <div class="preset-grid mt06" id="presets">
+        <button type="button" class="preset-btn"
+                data-plant="Monstera"
+                data-question="How often should I water a Monstera?">
+          Monstera – Watering
+        </button>
+        <button type="button" class="preset-btn"
+                data-plant="Fiddle Leaf Fig"
+                data-question="What light does a Fiddle Leaf Fig need?">
+          Fiddle Leaf Fig – Light
+        </button>
+        <button type="button" class="preset-btn"
+                data-plant="Snake Plant"
+                data-question="How to avoid overwatering a Snake Plant?">
+          Snake Plant – Overwatering
+        </button>
+        <button type="button" class="preset-btn"
+                data-plant="Peace Lily"
+                data-question="Why does a Peace Lily droop and how to fix it?">
+          Peace Lily – Drooping
+        </button>
       </div>
     </section>
 
-    <!-- Q&A Form -->
-    <section aria-labelledby="ask-form-heading" class="card">
-      <h2 id="ask-form-heading">Ask a Plant Question</h2>
-      <form action="{{ url_for('web.ask') }}" method="post" id="ask-form">
-        <div class="form-row">
-          <label for="plant">Plant (optional)</label>
-          <input id="plant" name="plant" type="text"
-                 placeholder="e.g., Monstera deliciosa"
-                 value="{{ (form_values and form_values.plant) or '' }}">
-        </div>
+    <!-- Two-column layout: left = Form, right = Answer (+ Weather) -->
+    <section class="grid-2">
+      <!-- LEFT: Form -->
+      <div class="grid-col">
+        <section aria-labelledby="ask-form-heading" class="card">
+          <h2 id="ask-form-heading" class="m0">Ask a Plant Question</h2>
+          <form action="{{ url_for('web.ask') }}" method="post" id="ask-form" class="mt075" novalidate>
+            <!-- Loading overlay -->
+            <div class="loader-overlay" aria-hidden="true">
+              <div class="thinking" aria-live="polite" aria-atomic="true" role="status">
+                thinking<span class="dots"></span>
+              </div>
+            </div>
 
-        <div class="form-row">
-          <label for="city">City (optional)</label>
-          <input id="city" name="city" type="text"
-                 placeholder="e.g., Austin, TX"
-                 value="{{ (form_values and form_values.city) or '' }}">
-        </div>
+            <div class="form-row">
+              <label for="plant">Plant (optional)</label>
+              <input id="plant" name="plant" type="text"
+                     placeholder="e.g., Monstera deliciosa"
+                     value="{{ (form_values and form_values.plant) or '' }}"
+                     maxlength="80" autocomplete="off" spellcheck="false" />
+            </div>
 
-        <div class="form-row">
-          <label for="question">Your question</label>
-          <textarea id="question" name="question" rows="4"
-                    placeholder="e.g., How often should I water?">{{ (form_values and form_values.question) or '' }}</textarea>
-        </div>
+            <div class="form-row">
+              <label for="city">City (optional)</label>
+              <input id="city" name="city" type="text"
+                     placeholder="e.g., Austin, TX"
+                     value="{{ (form_values and form_values.city) or '' }}"
+                     maxlength="80" autocomplete="address-level2" spellcheck="false" />
+            </div>
 
-        <button class="primary" type="submit" id="submit-btn">Ask</button>
-        <span class="form-hint muted">
-          <a class="link" href="{{ url_for('web.healthz') }}" target="_blank">Health check</a> |
-          <a class="link" href="{{ url_for('web.debug_info') }}" target="_blank">Debug info</a>
-        </span>
-      </form>
-    </section>
+            <div class="form-row">
+              <label for="question">Your question <span aria-hidden="true">*</span></label>
+              <textarea id="question" name="question" rows="4"
+                        placeholder="e.g., How often should I water? (max 1200 chars)"
+                        required maxlength="1200"
+                        autocomplete="off" spellcheck="true">{{ (form_values and form_values.question) or '' }}</textarea>
+            </div>
 
-    <!-- Answer -->
-    {% if answer %}
-    <section class="card answer-card">
-      <div class="answer-header">
-        <h2>Answer</h2>
-        {% if source %}
-        <span class="pill" title="How this answer was generated">
-          {{ source == 'ai' and 'AI' or 'Rule' }}
-        </span>
+            <div class="row j-between ai-center">
+              <button class="primary" type="submit" id="submit-btn" aria-label="Submit question">Ask</button>
+
+              <!-- Diagnostics links: visible only if enabled by config or ?debug=true -->
+              {% set show_diag = config.get('UI_DEBUG_LINKS', False) or request.args.get('debug') == 'true' %}
+              {% if show_diag %}
+                <div class="small">
+                  <a class="link muted" href="{{ url_for('web.healthz') }}" target="_blank" rel="noopener noreferrer">Health check</a>
+                  <span class="muted"> • </span>
+                  <a class="link muted" href="{{ url_for('web.debug_info') }}" target="_blank" rel="noopener noreferrer">Debug info</a>
+                </div>
+              {% endif %}
+            </div>
+
+            <div id="sr-status" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
+            <noscript>
+              <p class="notice small">JavaScript is disabled. Submissions still work, but the loading overlay and field locking are unavailable.</p>
+            </noscript>
+          </form>
+        </section>
+      </div>
+
+      <!-- RIGHT: Answer (then Weather) -->
+      <div class="grid-col">
+        {% if answer %}
+          {% if ai_error and source == 'rule' %}
+            <div class="notice small" role="alert">
+              <strong>AI unavailable</strong>: {{ ai_error }}<br>
+              Fell back to rule-based advice. See <a href="/debug" target="_blank" rel="noopener noreferrer">/debug</a>.
+            </div>
+          {% endif %}
+
+          <section class="card" aria-labelledby="answer-heading">
+            <div class="row j-between ai-center">
+              <h2 id="answer-heading" class="m0">Answer</h2>
+              {% if source %}
+                <span class="badge" title="Answer origin">
+                  {{ source == 'ai' and 'AI' or 'Rule' }}
+                </span>
+              {% endif %}
+            </div>
+            <pre class="answer-text mt06">{{ answer }}</pre>
+            <p class="muted small mt06">
+              Generated by: <strong>{{ source == 'ai' and 'OpenAI (fallback-safe)' or 'Rule-based engine' }}</strong>
+            </p>
+          </section>
+        {% else %}
+          <section class="card" aria-labelledby="answer-heading">
+            <h2 id="answer-heading" class="m0">Answer</h2>
+            <p class="muted small mt06">Answers appear here after submitting the form.</p>
+          </section>
+        {% endif %}
+
+        {% if weather %}
+          <section class="card" aria-labelledby="weather-heading">
+            <h2 id="weather-heading" class="m0">Local Weather</h2>
+            <p class="mt06">
+              <strong>{{ weather.city }}</strong> — {{ weather.conditions or 'N/A' }}<br>
+              Temp: {{ weather.temp_c }} °C • Humidity: {{ weather.humidity }}% • Wind: {{ weather.wind_mps }} m/s
+            </p>
+          </section>
         {% endif %}
       </div>
-
-      {% if ai_error and source == 'rule' %}
-      <div class="notice small">
-        <strong>AI unavailable</strong>: {{ ai_error }}<br>
-        Fell back to rule-based advice. Check <a class="link" href="/debug" target="_blank">/debug</a>.
-      </div>
-      {% endif %}
-
-      <pre class="answer-text">{{ answer }}</pre>
-      <p class="muted small">
-        Generated by: <strong>{{ source == 'ai' and 'OpenAI (fallback-safe)' or 'Rule-based engine' }}</strong>
-      </p>
     </section>
-    {% endif %}
 
-    <!-- Weather Info -->
-    {% if weather %}
-    <section class="card">
-      <h2>Local Weather</h2>
-      <p>
-        <strong>{{ weather.city }}</strong> — {{ weather.conditions or 'N/A' }}<br>
-        Temp: {{ weather.temp_c }} °C • Humidity: {{ weather.humidity }}% • Wind: {{ weather.wind_mps }} m/s
-      </p>
-    </section>
-    {% endif %}
-
-    <!-- History -->
-    <section class="card">
-      <div class="section-header">
-        <h2>Recent Q&A</h2>
-        <a class="link small" href="{{ url_for('web.clear_history') }}">Clear</a>
+    <!-- History (full width) -->
+    <section class="card" aria-labelledby="history-heading">
+      <div class="row j-between ai-center">
+        <h2 id="history-heading" class="m0">Recent Q&A</h2>
+        <a class="link small" href="{{ url_for('web.clear_history') }}" title="Clear in-memory history">Clear</a>
       </div>
       {% if history and history|length > 0 %}
-      <ul class="history">
-        {% for item in history %}
-        <li>
-          <div class="small muted mono">{{ item.ts }}</div>
-          <div class="small">
-            <span class="pill">{{ item.source == 'ai' and 'AI' or 'Rule' }}</span>
-            {% if item.plant %}<strong>Plant:</strong> {{ item.plant }} • {% endif %}
-            {% if item.city %}<strong>City:</strong> {{ item.city }}{% endif %}
-          </div>
-          <div class="small"><strong>Q:</strong> {{ item.question }}</div>
-          <details>
-            <summary class="small link">Show answer</summary>
-            <pre class="small">{{ item.answer }}</pre>
-          </details>
-        </li>
-        {% endfor %}
-      </ul>
+        <ul class="history mt06">
+          {% for item in history %}
+            <li>
+              <div class="small muted mono">{{ item.ts }}</div>
+              <div class="small">
+                <span class="badge">{{ item.source == 'ai' and 'AI' or 'Rule' }}</span>
+                {% if item.plant %}<strong>Plant:</strong> {{ item.plant }} • {% endif %}
+                {% if item.city %}<strong>City:</strong> {{ item.city }}{% endif %}
+              </div>
+              <div class="small mt04">
+                <strong>Q:</strong> {{ item.question }}
+              </div>
+              <details class="mt06">
+                <summary class="small link">Show answer</summary>
+                <pre class="small mt04">{{ item.answer }}</pre>
+              </details>
+            </li>
+          {% endfor %}
+        </ul>
       {% else %}
-      <p class="muted small">No questions yet. Ask something above to populate the history.</p>
+        <p class="muted small mt06">No questions yet. Ask something above to populate the history.</p>
       {% endif %}
     </section>
   </main>

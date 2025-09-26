@@ -23,6 +23,7 @@ def create_app():
     """Create and configure the Flask application instance."""
     load_dotenv()
     app = Flask(__name__, static_folder="static", template_folder="templates")
+    app.config["UI_DEBUG_LINKS"] = False  # Set to True for local dev if you want always-visible debug links
 
     # -------------------------------------------------------------------------
     # Core configuration
