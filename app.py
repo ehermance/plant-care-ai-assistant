@@ -153,24 +153,90 @@ def clear_history():
 
 # ---------- Core helpers ----------
 def get_weather_for_city(city: str):
+    """
+    Best-effort weather lookup:
+      1) Normalize q for OpenWeather (e.g., 'Austin, TX' -> 'Austin,TX,US').
+      2) Try current weather by name.
+      3) If that fails (e.g., 404), geocode city -> (lat,lon) and fetch by coordinates.
+    """
     key = os.getenv("OPENWEATHER_API_KEY") or app.config.get("OPENWEATHER_API_KEY")
     if not city or not key:
         return None
+
+    def _ok(resp):
+        try:
+            resp.raise_for_status()
+            return True
+        except Exception:
+            return False
+
     try:
-        url = "https://api.openweathermap.org/data/2.5/weather"
-        params = {"q": city, "appid": key, "units": "metric"}
-        r = requests.get(url, params=params, timeout=6)
-        r.raise_for_status()
-        data = r.json()
-        return {
-            "city": data.get("name", city),
-            "temp_c": data.get("main", {}).get("temp"),
-            "humidity": data.get("main", {}).get("humidity"),
-            "conditions": (data.get("weather") or [{}])[0].get("description"),
-            "wind_mps": data.get("wind", {}).get("speed"),
-        }
+        # 1) Try by name (normalized)
+        q = normalize_city_for_openweather(city)
+        weather_url = "https://api.openweathermap.org/data/2.5/weather"
+        r = requests.get(weather_url, params={"q": q, "appid": key, "units": "metric"}, timeout=6)
+        if _ok(r):
+            data = r.json()
+            return {
+                "city": data.get("name", city),
+                "temp_c": data.get("main", {}).get("temp"),
+                "humidity": data.get("main", {}).get("humidity"),
+                "conditions": (data.get("weather") or [{}])[0].get("description"),
+                "wind_mps": data.get("wind", {}).get("speed"),
+            }
+
+        # 2) Fallback: Geocode to lat/lon then fetch weather by coords
+        geo_url = "https://api.openweathermap.org/geo/1.0/direct"
+        gr = requests.get(geo_url, params={"q": q, "limit": 1, "appid": key}, timeout=6)
+        if _ok(gr):
+            arr = gr.json() or []
+            if arr:
+                lat = arr[0].get("lat")
+                lon = arr[0].get("lon")
+                name = arr[0].get("name") or city
+                if lat is not None and lon is not None:
+                    wr = requests.get(weather_url, params={"lat": lat, "lon": lon, "appid": key, "units": "metric"}, timeout=6)
+                    if _ok(wr):
+                        data = wr.json()
+                        return {
+                            "city": data.get("name", name),
+                            "temp_c": data.get("main", {}).get("temp"),
+                            "humidity": data.get("main", {}).get("humidity"),
+                            "conditions": (data.get("weather") or [{}])[0].get("description"),
+                            "wind_mps": data.get("wind", {}).get("speed"),
+                        }
+        return None
     except Exception:
         return None
+
+
+def normalize_city_for_openweather(raw: str) -> str:
+    """
+    Accepts 'City', 'City, ST', 'City, ST, CC', 'City, CC' and returns a string
+    OpenWeather likes. If state is present with no country, assume US.
+    Examples:
+      'Austin'           -> 'Austin'
+      'Austin, TX'       -> 'Austin,TX,US'
+      'Austin,TX'        -> 'Austin,TX,US'
+      'Paris, FR'        -> 'Paris,FR'
+      'Toronto, CA'      -> 'Toronto,CA'
+      'São Paulo, BR'    -> 'São Paulo,BR'
+    """
+    if not raw:
+        return ""
+    parts = [p.strip() for p in raw.split(",") if p.strip()]
+    if len(parts) == 1:
+        return parts[0]
+    if len(parts) == 2:
+        city, second = parts[0], parts[1]
+        # If second looks like a 2-letter state code, assume US
+        if len(second) == 2 and second.isalpha():
+            return f"{city},{second.upper()},US"
+        # Otherwise treat second as country code
+        return f"{city},{second.upper()}"
+    # 3 or more parts: use first three (city,state,country) with normalized casing
+    city, state, country = parts[0], parts[1], parts[2]
+    return f"{city},{state.upper()},{country.upper()}"
 
 def basic_plant_tip(q, p):
     q = (q or "").lower()
