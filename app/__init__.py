@@ -1,98 +1,84 @@
 """
-Application factory for the Plant Care AI Assistant.
+Application factory and global configuration.
 
-Creates and configures the Flask app instance:
-- Loads environment variables
-- Sets secret key and config
-- Initializes Flask-Limiter for rate limiting
-- Registers UI/API blueprints
-- Applies a strict Content Security Policy (CSP)
-- Re-exports selected helpers for tests that import from `app`
+Creates the Flask app, applies security headers (CSP), configures rate limiting,
+registers blueprints, and exposes UI flags used by templates. This file keeps
+startup/config concerns together and avoids domain logic here.
+
+Also provides a small set of compatibility exports so older tests that import
+functions from the top-level `app` package (e.g., `app.ai_advice`) still work
+after the project was modularized.
 """
 
+from __future__ import annotations
 import os
-from flask import Flask
-from dotenv import load_dotenv
-
+from flask import Flask, Response
+from dotenv import load_dotenv  # <-- ensure .env is loaded for local dev
 from .extensions import limiter
 from .routes.web import web_bp
-from .routes.api import api_bp
 
 
-def create_app():
-    """Create and configure the Flask application instance."""
+def create_app() -> Flask:
+    # Load env vars from .env early so os.getenv() picks them up in dev.
+    # In production, rely on real environment variables instead of .env.
     load_dotenv()
-    app = Flask(__name__, static_folder="static", template_folder="templates")
-    app.config["UI_DEBUG_LINKS"] = False  # Set to True for local dev if you want always-visible debug links
 
-    # -------------------------------------------------------------------------
-    # Core configuration
-    # -------------------------------------------------------------------------
-    app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-only-not-secret")
-
-    # Human-friendly knobs for rate limits
-    app.config.update(
-        RATE_LIMIT_DEFAULT=os.getenv("RATE_LIMIT_DEFAULT", "60 per minute;300 per hour"),
-        RATE_LIMIT_ASK=os.getenv("RATE_LIMIT_ASK", "20 per minute;200 per day"),
-        RATE_LIMIT_STORAGE_URI=os.getenv("RATE_LIMIT_STORAGE_URI", "memory://"),
-        RATE_LIMIT_ENABLED=os.getenv("RATE_LIMIT_ENABLED", "true").lower() == "true",
+    app = Flask(
+        __name__,
+        static_folder="static",
+        template_folder="templates",
     )
 
-    # -------------------------------------------------------------------------
-    # Flask-Limiter configuration (RATELIMIT_* keys it actually reads)
-    # Normalize RATE_LIMIT_DEFAULT to a single semicolon-delimited string.
-    # Examples accepted by limits:
-    #   "60 per minute;300 per hour"  OR  "100/day"
-    # This avoids the list/iterable confusion paths inside flask-limiter 3.x.
-    raw_default = app.config["RATE_LIMIT_DEFAULT"]
-    if isinstance(raw_default, str):
-        # Collapse any accidental multi-semicolon spacing, trim ends
-        default_str = ";".join(s.strip() for s in raw_default.split(";") if s.strip())
-    elif isinstance(raw_default, (list, tuple)):
-        default_str = ";".join(str(s).strip() for s in raw_default if str(s).strip())
-    else:
-        default_str = ""
+    # Secret key (sessions/CSRF). In production, prefer an env var.
+    app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-only-not-secret")
 
-    app.config["RATELIMIT_DEFAULT"] = default_str
-    app.config["RATELIMIT_STORAGE_URI"] = app.config["RATE_LIMIT_STORAGE_URI"]
-    app.config["RATELIMIT_ENABLED"] = app.config["RATE_LIMIT_ENABLED"]
-    app.config["RATELIMIT_HEADERS_ENABLED"] = True  # expose limit headers
+    # Surface API keys in app.config for /debug and services that read config.
+    # (Reading from os.getenv at call time still works; this just mirrors them.)
+    app.config.setdefault("OPENWEATHER_API_KEY", os.getenv("OPENWEATHER_API_KEY", ""))
+    app.config.setdefault("OPENAI_API_KEY", os.getenv("OPENAI_API_KEY", ""))
 
-    # Initialize the limiter (no keyword args for v3.x)
+    # Optional UI flag: the template shows Health/Debug links if True or if ?debug=true.
+    app.config.setdefault("UI_DEBUG_LINKS", False)
+
+    # ---- Rate limiting (Flask-Limiter v3) ----
+    # For production, use Redis/Memcached: e.g., app.config["RATELIMIT_STORAGE_URI"] = "redis://host:6379"
+    app.config.setdefault("RATELIMIT_ENABLED", True)
+    app.config.setdefault("RATELIMIT_STORAGE_URI", "memory://")
+    # Default limits applied to all routes unless a route overrides with @limiter.limit(...)
+    app.config.setdefault("RATELIMIT_DEFAULT", ["60 per minute", "300 per hour"])
     limiter.init_app(app)
 
-    # -------------------------------------------------------------------------
-    # Register blueprints (routes)
-    # -------------------------------------------------------------------------
-    app.register_blueprint(web_bp)
-    app.register_blueprint(api_bp, url_prefix="/")
+    # ---- Content Security Policy ----
+    csp = (
+        "default-src 'self'; "
+        "script-src 'self'; "
+        "style-src 'self'; "
+        "img-src 'self' data:; "
+        "font-src 'self'; "
+        "connect-src 'self'; "
+        "object-src 'none'; "
+        "base-uri 'self'; "
+        "frame-ancestors 'none'; "
+        "form-action 'self'"
+    )
 
-    # -------------------------------------------------------------------------
-    # Content Security Policy (CSP)
-    # -------------------------------------------------------------------------
     @app.after_request
-    def set_csp(resp):
-        """Apply a strict Content Security Policy to every response."""
-        resp.headers["Content-Security-Policy"] = (
-            "default-src 'self'; "
-            "script-src 'self'; "
-            "style-src 'self'; "
-            "img-src 'self' data:; "
-            "font-src 'self'; "
-            "object-src 'none'; "
-            "base-uri 'self'; "
-            "frame-ancestors 'none'; "
-            "form-action 'self'; "
-            "upgrade-insecure-requests"
-        )
+    def apply_security_headers(resp: Response) -> Response:
+        resp.headers["Content-Security-Policy"] = csp
+        resp.headers["X-Content-Type-Options"] = "nosniff"
+        resp.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        resp.headers["X-Frame-Options"] = "DENY"
+        resp.headers["X-XSS-Protection"] = "0"  # CSP supersedes legacy XSS filter
         return resp
+
+    # Blueprints
+    app.register_blueprint(web_bp)
 
     return app
 
 
 # -----------------------------------------------------------------------------
-# Re-exports for backwards compatibility with tests and direct imports
+# Backward-compat exports for tests that import from the top-level `app` package
 # -----------------------------------------------------------------------------
-from .services.weather import get_weather_for_city  # noqa: E402
-from .services.ai import ai_advice, AI_LAST_ERROR  # noqa: E402
-from .routes.web import weather_adjustment_tip, basic_plant_tip  # noqa: E402
+from .services.ai import ai_advice as ai_advice  # noqa: E402,F401
+from .services.ai import _weather_tip as weather_adjustment_tip  # noqa: E402,F401

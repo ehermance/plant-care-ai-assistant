@@ -1,63 +1,104 @@
 """
-Validates and sanitizes user inputs, provides a shallow sensitivity check,
-and redacts simple PII before adding entries to the history.
+Input validation and normalization.
+
+Trims and bounds field lengths, filters suspicious characters while allowing
+natural punctuation, normalizes select values, and builds a clean payload for
+downstream processing.
 """
 
+from __future__ import annotations
+import html
 import re
-import unicodedata
+from typing import Any, Dict, Tuple
 
-# Input length limits.
+# Allowlist regex: we REMOVE anything NOT in this set.
+# Includes letters/numbers/space and common lightweight punctuation used in names.
+# This keeps plant/city fields readable while dropping odd control/symbol characters.
+_SAFE_CHARS_PATTERN = re.compile(r"[^a-zA-Z0-9\s\-\.,'()/&]+")
+
+MAX_PLANT_LEN = 80
+MAX_CITY_LEN = 80
 MAX_QUESTION_LEN = 1200
-MAX_SHORT_FIELD_LEN = 80
 
-# Common punctuation used in plant and city names.
-ALLOWED_PUNCT = set(" -'(),./&×")
+# Allowed values for the care-context select. Anything else is coerced to the default.
+CARE_CONTEXT_CHOICES = {"indoor_potted", "outdoor_potted", "outdoor_bed"}
 
-# PII patterns for redaction in saved history.
-EMAIL_RE = re.compile(r"[\w\.-]+@[\w\.-]+\.\w+")
-PHONE_RE = re.compile(r"\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b")
 
-# Simple trigger list for obviously sensitive/abusive requests.
-SENSITIVE_TRIGGERS = (
-    "api key", "password", "private key", "token ", "ssh ", "exploit", "ddos", "hack", "bypass"
-)
+def _soft_sanitize(text: str, max_len: int) -> str:
+    """
+    Normalizes names/locations:
+    - strip whitespace
+    - bound length
+    - remove disallowed characters via allowlist
+    - collapse double spaces
+    """
+    t = (text or "").strip()
+    if not t:
+        return ""
+    t = t[:max_len]
+    t = _SAFE_CHARS_PATTERN.sub("", t)
+    t = re.sub(r"\s{2,}", " ", t)
+    return t
 
-def is_safe_short_field(text: str | None) -> bool:
-    """Accept Unicode letters/digits/spaces and a limited punctuation set."""
+
+def _soft_sanitize_question(text: str, max_len: int) -> str:
+    """
+    Question field is a bit more permissive:
+    - strip & bound length
+    - remove control chars only; keep reasonable punctuation
+    - normalize repeated tabs/spaces
+    """
+    t = (text or "").strip()
+    if not t:
+        return ""
+    t = t[:max_len]
+    t = re.sub(r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]", "", t)
+    t = re.sub(r"[ \t]{2,}", " ", t)
+    return t
+
+
+def normalize_context(value: str | None) -> str:
+    """Coerce unknown/missing values to the default option."""
+    v = (value or "").strip().lower()
+    return v if v in CARE_CONTEXT_CHOICES else "indoor_potted"
+
+
+def display_sanitize_short(text: str) -> str:
+    """
+    Short UI messages are HTML-escaped and truncated to avoid layout breaks.
+    Use this only for brief notices surfaced to the page.
+    """
     if not text:
-        return True
-    if len(text) > MAX_SHORT_FIELD_LEN:
-        return False
-    s = unicodedata.normalize("NFKC", text)
-    for ch in s:
-        if ch.isalpha() or ch.isdigit() or ch.isspace() or ch in ALLOWED_PUNCT:
-            continue
-        return False
-    return True
+        return ""
+    t = html.escape(text)
+    return (t[:240] + "…") if len(t) > 240 else t
 
-def validate_inputs(plant: str | None, city: str | None, question: str) -> tuple[bool, str]:
-    """Return (ok, message). Message is user-friendly when not ok."""
-    if not question or len(question) > MAX_QUESTION_LEN:
-        return False, "Question is required and must be under 1200 characters."
-    if not is_safe_short_field(plant):
-        return False, "Plant name is invalid or too long."
-    if not is_safe_short_field(city):
-        return False, "City name is invalid or too long."
-    return True, ""
 
-def looks_sensitive(question: str) -> bool:
-    """Quick guard for obviously sensitive/abusive content."""
-    q = (question or "").lower()
-    return any(t in q for t in SENSITIVE_TRIGGERS)
+def validate_inputs(form: Dict[str, Any]) -> Tuple[Dict[str, Any], str | None]:
+    """
+    Validates incoming form data and returns (payload, error_message).
+    On success, payload has:
+      - plant (optional sanitized string)
+      - city (optional sanitized string)
+      - care_context (normalized select value)
+      - question (required string within length limit)
+    """
+    raw_plant = form.get("plant", "")
+    raw_city = form.get("city", "")
+    raw_question = form.get("question", "")
+    raw_context = form.get("care_context", "")
 
-def redact_pii(text: str) -> str:
-    """Replace emails and phone numbers with placeholders."""
-    text = EMAIL_RE.sub("[email]", text)
-    text = PHONE_RE.sub("[phone]", text)
-    return text
+    plant = _soft_sanitize(raw_plant, MAX_PLANT_LEN)
+    city = _soft_sanitize(raw_city, MAX_CITY_LEN)
+    question = _soft_sanitize_question(raw_question, MAX_QUESTION_LEN)
+    care_context = normalize_context(raw_context)
 
-def display_sanitize_short(text: str | None) -> str | None:
-    """Normalize and trim short values for consistent display."""
-    if text is None:
-        return None
-    return unicodedata.normalize("NFKC", text).strip()
+    if not question:
+        return {}, "Question is required and must be under 1200 characters."
+
+    return {
+        "plant": plant,
+        "city": city,
+        "question": question,
+        "care_context": care_context,
+    }, None

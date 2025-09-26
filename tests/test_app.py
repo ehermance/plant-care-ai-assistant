@@ -1,3 +1,10 @@
+"""
+High-level tests for validation, weather, and advice generation.
+
+Covers success and fallback paths to ensure stable behavior regardless of
+external services or configuration.
+"""
+
 import sys
 import types
 import importlib

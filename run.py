@@ -1,8 +1,8 @@
 """
-Development entrypoint.
+Local development entry point.
 
-Creates the Flask app via the application factory and runs the built-in
-debug server. Useful for local development with auto-reload.
+Creates the Flask app via create_app() and runs the dev server. Keeps startup
+simple and avoids embedding app logic here.
 """
 
 from app import create_app
@@ -10,4 +10,5 @@ from app import create_app
 app = create_app()
 
 if __name__ == "__main__":
+    # For local dev only; use a proper WSGI server in production.
     app.run(debug=True)

@@ -1,73 +1,66 @@
 /**
- * This file handles all client-side interactivity:
- * - Listens for clicks on recommended preset buttons and pre-fills the form
- *   (plant, city, question) with their data attributes.
- * - Optionally auto-submits the form if the button includes data-autosubmit="1".
- * - Manages the "loading overlay" and disables form fields while the request is in progress.
- * - Re-enables the form if the user navigates back using the browser's back/forward cache.
- * 
- * This keeps the UI responsive, secure, and accessible, while delegating
- * all AI logic and validation to the Flask backend.
+ * Client-side interactivity.
+ *
+ * Responsibilities:
+ * - Prefills the form from recommended preset buttons (plant, city, question, care_context)
+ * - Shows a loading overlay and prevents interaction while submitting
+ * - IMPORTANT: does NOT disable the <select> so its value is included in POST
+ * - Restores interactivity when navigating back via the browser cache (bfcache)
  */
 
 (function () {
   const form = document.getElementById('ask-form');
+  const presets = document.getElementById('presets');
+
   const plantInput = document.getElementById('plant');
   const cityInput = document.getElementById('city');
+  const contextSelect = document.getElementById('care_context');
   const questionInput = document.getElementById('question');
   const submitBtn = document.getElementById('submit-btn');
 
-  // Handle clicks on recommended preset buttons
-  const presetsWrap = document.getElementById('presets');
-  if (presetsWrap) {
-    presetsWrap.addEventListener('click', (e) => {
+  // Handle clicks on any .preset-btn within the presets container.
+  // Uses event delegation so adding/removing buttons requires no extra JS wiring.
+  if (presets) {
+    presets.addEventListener('click', (e) => {
       const btn = e.target.closest('.preset-btn');
       if (!btn) return;
 
-      const { plant, city, question, autosubmit } = btn.dataset;
+      const { plant, city, question, context } = btn.dataset;
 
-      // Fill form fields if provided
-      if (typeof plant === 'string') {
-        plantInput.value = plant;
-        plantInput.dispatchEvent(new Event('input', { bubbles: true }));
-      }
-      if (typeof city === 'string' && city.trim() !== '') {
-        cityInput.value = city;
-        cityInput.dispatchEvent(new Event('input', { bubbles: true }));
-      }
-      if (typeof question === 'string') {
-        questionInput.value = question;
-        questionInput.dispatchEvent(new Event('input', { bubbles: true }));
-      }
+      if (typeof plant === 'string') plantInput.value = plant;
+      if (typeof city === 'string' && city.trim() !== '') cityInput.value = city;
+      if (typeof question === 'string') questionInput.value = question;
+      if (typeof context === 'string') contextSelect.value = context;
 
-      // Focus the question field so user can tweak it if they want
+      // Move focus where typing is most likely to continue
       questionInput.focus();
-
-      // If button requests auto-submit, send the form immediately
-      if (autosubmit === '1' && questionInput.value.trim().length > 0) {
-        form.requestSubmit();
-      }
     });
   }
 
-  // Show loading overlay & disable interactions during form submission
   if (form) {
     form.addEventListener('submit', () => {
+      // Visual lock + overlay
       form.classList.add('is-submitting');
-      submitBtn.disabled = true;
-      plantInput.readOnly = true;
-      cityInput.readOnly = true;
-      questionInput.readOnly = true;
+
+      // Disable the submit button to prevent double submits
+      if (submitBtn) submitBtn.disabled = true;
+
+      // Set text inputs/textarea to readOnly so user cannot modify values during submit
+      [plantInput, cityInput, questionInput].forEach((el) => el && (el.readOnly = true));
+
+      // IMPORTANT: Do NOT disable the <select>. Disabled fields are not submitted.
+      // We rely on CSS (.is-submitting) to block interaction with it.
+      // if (contextSelect) contextSelect.disabled = true;  // intentionally NOT used
     });
 
-    // Handle browser back/forward cache: restore form to usable state
+    // When navigating back/forward, some browsers use the bfcache and keep the DOM alive.
+    // This event lets us restore the interactive state cleanly.
     window.addEventListener('pageshow', (event) => {
       if (event.persisted) {
         form.classList.remove('is-submitting');
-        submitBtn.disabled = false;
-        plantInput.readOnly = false;
-        cityInput.readOnly = false;
-        questionInput.readOnly = false;
+        if (submitBtn) submitBtn.disabled = false;
+        [plantInput, cityInput, questionInput].forEach((el) => el && (el.readOnly = false));
+        // contextSelect remains enabled (we never disabled it)
       }
     });
   }
