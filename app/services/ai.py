@@ -44,21 +44,39 @@ def _openai_client():
         except Exception as e2:
             return None, f"OpenAI import error: {e or e2}"
 
+def _fmt_temp(weather: Optional[dict]) -> str:
+    """Return a compact temperature string using both units when available."""
+    if not weather:
+        return "n/a"
+    t_c = weather.get("temp_c")
+    t_f = weather.get("temp_f")
+    try:
+        if isinstance(t_c, (int, float)) and isinstance(t_f, (int, float)):
+            return f"~{t_c:.0f}°C / {t_f:.0f}°F"
+        if isinstance(t_c, (int, float)):
+            return f"~{t_c:.0f}°C"
+        if isinstance(t_f, (int, float)):
+            return f"~{t_f:.0f}°F"
+    except Exception:
+        pass
+    return "n/a"
 
 def _weather_tip(weather: Optional[dict], plant: Optional[str]) -> Optional[str]:
     """
-    Tiny, safe hint based on temperature. Defensive against missing keys/None.
+    Tiny, safe hint based on temperature (thresholds in °C), but display both °C/°F when possible.
     """
     if not weather or weather.get("temp_c") is None:
         return None
-    t = weather["temp_c"]
+
+    t_c = weather["temp_c"]
+    temp_str = _fmt_temp(weather)
     name = plant or "the plant"
     try:
-        if t >= 32:
-            return f"It’s hot (~{t:.0f}°C). Check {name} more often; water may evaporate quickly."
-        if t <= 5:
-            return f"It’s cold (~{t:.0f}°C). Keep {name} away from drafts and reduce watering."
-        return f"Current temp ~{t:.0f}°C. Maintain your usual schedule; verify soil moisture first."
+        if t_c >= 32:
+            return f"It’s hot ({temp_str}). Check {name} more often; water may evaporate quickly."
+        if t_c <= 5:
+            return f"It’s cold ({temp_str}). Keep {name} away from drafts and reduce watering."
+        return f"Current temp {temp_str}. Maintain your usual schedule; verify soil moisture first."
     except Exception:
         return None
 
@@ -108,15 +126,31 @@ def _ai_advice(question: str, plant: Optional[str], weather: Optional[dict], car
         city = weather.get("city")
         if city:
             parts.append(f"city: {city}")
+
         temp_c = weather.get("temp_c")
         if temp_c is not None:
             parts.append(f"temp_c: {temp_c}")
+
+        temp_f = weather.get("temp_f")
+        if temp_f is not None:
+            parts.append(f"temp_f: {temp_f}")
+
         hum = weather.get("humidity")
         if hum is not None:
             parts.append(f"humidity: {hum}%")
+
         cond = weather.get("conditions")
         if cond:
             parts.append(f"conditions: {cond}")
+
+        wind_mps = weather.get("wind_mps")
+        if wind_mps is not None:
+            parts.append(f"wind_mps: {wind_mps}")
+
+        wind_mph = weather.get("wind_mph")
+        if wind_mph is not None:
+            parts.append(f"wind_mph: {wind_mph}")
+
         w_summary = ", ".join(parts) if parts else None
 
     context_map = {

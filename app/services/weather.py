@@ -76,13 +76,19 @@ def get_weather_for_city(city: str | None) -> Optional[Dict]:
 
         r.raise_for_status()
         data = r.json()
+        temp_c = data.get("main", {}).get("temp")
+        wind_mps = data.get("wind", {}).get("speed")
+
         return {
             "city": data.get("name", city),
-            "temp_c": data.get("main", {}).get("temp"),
+            "temp_c": temp_c,
+            "temp_f": round((temp_c * 9 / 5) + 32, 1) if isinstance(temp_c, (int, float)) else None,
             "humidity": data.get("main", {}).get("humidity"),
             "conditions": (data.get("weather") or [{}])[0].get("description"),
-            "wind_mps": data.get("wind", {}).get("speed"),
+            "wind_mps": wind_mps,
+            "wind_mph": round(wind_mps * 2.23694, 1) if isinstance(wind_mps, (int, float)) else None,
         }
+
     except Exception:
         # Silently return None on any error; the UI should remain responsive.
         return None

@@ -28,3 +28,10 @@ cp .env.example .env
 python run.py
 # visit http://127.0.0.1:5000/
 ```
+
+## License
+
+Licensed under the [MIT License](LICENSE).
+
+© 2025 EDH Dev.  
+The Plant Care AI Assistant code is open source; the EDH Dev name and logo remain © EDH Dev.

@@ -99,13 +99,13 @@ submissions, including the “Where is the plant?” selection.
 
         <!-- Form -->
         <section class="card form-card" aria-labelledby="form-title">
-          <h2 id="form-title" class="section-title">Ask for advice</h2>
-
           <!-- Loading overlay that appears on submit -->
           <div class="form-loading-overlay" aria-hidden="true">
             <div class="spinner" aria-hidden="true"></div>
-            <div>loading overlay…</div>
+            <div>Thinking…</div>
           </div>
+
+          <h2 id="form-title" class="section-title">Ask for advice</h2>
 
           <form id="ask-form" class="form-grid" action="{{ url_for('web.ask') }}" method="post" novalidate>
             <div class="form-row form-row--two">
@@ -170,7 +170,12 @@ submissions, including the “Where is the plant?” selection.
         </section>
 
         <!-- Answer -->
-        <section class="card" aria-labelledby="answer-title">
+        <section class="card answer-card" aria-labelledby="answer-title">
+          <div class="answer-loading-overlay" aria-hidden="true">
+            <div class="spinner" aria-hidden="true"></div>
+            <div>Thinking…</div>
+          </div>
+
           <h2 id="answer-title" class="section-title">Answer</h2>
           {% if answer %}
             <p class="small muted">
@@ -182,7 +187,6 @@ submissions, including the “Where is the plant?” selection.
           {% endif %}
         </section>
 
-      </section>
 
       <!-- Weather (shows when available) -->
       <section class="card" aria-labelledby="weather-title">
@@ -190,7 +194,13 @@ submissions, including the “Where is the plant?” selection.
         {% if weather %}
           <p>
             <strong>{{ weather.city }}</strong> — {{ weather.conditions or 'N/A' }}<br />
-            Temp: {{ weather.temp_c }} °C • Humidity: {{ weather.humidity }}% • Wind: {{ weather.wind_mps }} m/s
+            Temp:
+              {% if weather.temp_f is not none %}{{ weather.temp_f }} °F{% endif %}
+              {% if weather.temp_c is not none %} ({{ weather.temp_c }} °C){% endif %}
+            • Humidity: {{ weather.humidity }}%
+            • Wind:
+              {% if weather.wind_mph is not none %}{{ weather.wind_mph }} mph{% endif %}
+              {% if weather.wind_mps is not none %} ({{ weather.wind_mps }} m/s){% endif %}
           </p>
         {% else %}
           <p class="muted">Enter a city to include a short weather tip in the answer.</p>
@@ -229,6 +239,10 @@ submissions, including the “Where is the plant?” selection.
       </section>
     </main>
   </div>
+  <footer class="site-footer" role="contentinfo">
+    <p>&copy; <span id="copyright-year"></span> <a href="https://ehermance.github.io" rel="noopener">EDH Dev</a> — Built with care</p>
+  </footer>
+
 
   <!-- Local JS (no inline scripts for CSP) -->
   <script src="{{ url_for('static', filename='app.js') }}" defer></script>

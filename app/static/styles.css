@@ -168,7 +168,13 @@ a.muted-link {
 }
 
 /* Loading overlay shown over the form during submission */
-.form-loading-overlay {
+.form-card,
+.answer-card {
+  position: relative;
+}
+
+.form-loading-overlay,
+.answer-loading-overlay {
   position: absolute;
   inset: 0;
   display: none;
@@ -177,8 +183,24 @@ a.muted-link {
   background: rgba(255,255,255,0.6);
   backdrop-filter: blur(1px);
   border-radius: 12px;
+  z-index: 2;
 }
-.is-submitting .form-loading-overlay { display: flex; }
+
+.form-card.is-submitting .form-loading-overlay { display: flex; }
+.answer-card.is-submitting .answer-loading-overlay { display: flex; }
+
+.form-card.is-submitting,
+.answer-card.is-submitting {
+  pointer-events: none; /* prevent clicks while loading */
+  opacity: 0.95;
+}
+
+.is-submitting .form-grid input,
+.is-submitting .form-grid select,
+.is-submitting .form-grid textarea,
+.is-submitting .form-grid button {
+  pointer-events: none;
+}
 
 /* Simple spinner */
 .spinner {
@@ -200,3 +222,18 @@ ul.history {
   gap: .75rem;
 }
 ul.history li { border: 1px solid #eee; border-radius: 10px; padding: .75rem; background: white; }
+
+/* Footer */
+.site-footer {
+  margin-top: 2rem;
+  padding: 1rem 0;
+  font-size: 0.9rem;
+  color: #666;
+  border-top: 1px solid rgba(0,0,0,.08);
+  text-align: center;
+}
+.site-footer a { color: inherit; text-decoration: underline; }
+.site-footer a:hover { text-decoration: none; }
+@media (prefers-color-scheme: dark) {
+  .site-footer { color: #b9c0cf; border-top-color: rgba(255,255,255,.12); }
+}

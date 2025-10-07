@@ -38,30 +38,41 @@
   }
 
   if (form) {
-    form.addEventListener('submit', () => {
-      // Visual lock + overlay
-      form.classList.add('is-submitting');
+    const formCard = document.querySelector('.form-card');
+    const answerCard = document.querySelector('.answer-card');
 
-      // Disable the submit button to prevent double submits
-      if (submitBtn) submitBtn.disabled = true;
-
-      // Set text inputs/textarea to readOnly so user cannot modify values during submit
-      [plantInput, cityInput, questionInput].forEach((el) => el && (el.readOnly = true));
-
-      // IMPORTANT: Do NOT disable the <select>. Disabled fields are not submitted.
-      // We rely on CSS (.is-submitting) to block interaction with it.
-      // if (contextSelect) contextSelect.disabled = true;  // intentionally NOT used
-    });
-
-    // When navigating back/forward, some browsers use the bfcache and keep the DOM alive.
-    // This event lets us restore the interactive state cleanly.
-    window.addEventListener('pageshow', (event) => {
-      if (event.persisted) {
-        form.classList.remove('is-submitting');
-        if (submitBtn) submitBtn.disabled = false;
-        [plantInput, cityInput, questionInput].forEach((el) => el && (el.readOnly = false));
-        // contextSelect remains enabled (we never disabled it)
+    function setSubmitting(on) {
+      // Toggle loading state on the cards to reveal overlays
+      if (formCard) {
+        formCard.classList.toggle('is-submitting', on);
+        formCard.setAttribute('aria-busy', on ? 'true' : 'false');
       }
+      if (answerCard) {
+        answerCard.classList.toggle('is-submitting', on);
+        answerCard.setAttribute('aria-busy', on ? 'true' : 'false');
+      }
+
+      // Prevent double submit
+      const submitBtn = document.getElementById('submit-btn');
+      if (submitBtn) submitBtn.disabled = !!on;
+
+      // Make text fields readOnly so values still POST
+      ['plant','city','question'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.readOnly = !!on;
+      });
+      // Don't disable the <select>; disabled fields don't submit
+    }
+
+    form.addEventListener('submit', () => setSubmitting(true));
+
+    // Restore state if user navigates back via bfcache
+    window.addEventListener('pageshow', (ev) => {
+      if (ev.persisted) setSubmitting(false);
     });
   }
+
+  // Footer year
+  const yearEl = document.getElementById('copyright-year');
+  if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 })();
