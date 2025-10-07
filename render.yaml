@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: plant-care-ai-assistant
+    env: python
+    plan: free
+    region: oregon
+    buildCommand: |
+      pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: >
+      gunicorn "wsgi:app" -w 2 -k gthread --threads 4 -b 0.0.0.0:$PORT
+      --max-requests 200 --max-requests-jitter 50 --timeout 120
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: FLASK_SECRET_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENWEATHER_API_KEY
+        sync: false
+      - key: RATE_LIMIT_ENABLED
+        value: "true"
+      - key: RATE_LIMIT_DEFAULT
+        value: "60 per minute;300 per hour"
+      - key: RATE_LIMIT_ASK
+        value: "20 per minute;200 per day"
+      # - key: RATELIMIT_STORAGE_URI
+      #   sync: false

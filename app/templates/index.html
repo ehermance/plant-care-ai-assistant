@@ -12,8 +12,34 @@ submissions, including the “Where is the plant?” selection.
   <meta charset="UTF-8" />
   <title>Plant Care AI Assistant</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Local CSS (no external CDNs to satisfy CSP) -->
+  <meta name="description"
+        content="Ask for plant care help from an AI-powered plant care assistant that gives personalized watering, light, and soil tips based on your plants and local weather." />
+  <meta name="theme-color" content="#C2188B" />
+  <meta name="author" content="EDH Dev" />
+
+  <!-- Open Graph / social cards -->
+  <meta property="og:title" content="Plant Care AI Assistant" />
+  <meta property="og:description"
+        content="Ask for plant care help and get quick, weather-aware advice powered by AI and expert rules." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="{{ url_for('static', filename='og-preview.png', _external=True) }}" />
+  <meta property="og:url" content="{{ request.url_root }}" />
+
+  <!-- Favicons -->
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+<link rel="alternate icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32.png') }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16.png') }}">
+<link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+<link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+<meta name="theme-color" content="#C2188B">
+
+
+  <!-- Local CSS (no CDNs to satisfy CSP) -->
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+
+  <!-- Accessibility note -->
+  <meta name="robots" content="index, follow" />
 </head>
 <body>
   <div class="container">

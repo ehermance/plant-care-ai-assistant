@@ -15,6 +15,7 @@ import os
 from flask import Flask, Response
 from dotenv import load_dotenv  # <-- ensure .env is loaded for local dev
 from .extensions import limiter
+from .routes.api import api_bp
 from .routes.web import web_bp
 
 
@@ -73,6 +74,7 @@ def create_app() -> Flask:
 
     # Blueprints
     app.register_blueprint(web_bp)
+    app.register_blueprint(api_bp, url_prefix="/api/v1")
 
     return app
 
