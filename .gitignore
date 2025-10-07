@@ -50,6 +50,9 @@ site/
 *.old
 *.tmp
 
+# Keep lock file tracked
+!requirements-lock.txt
+
 # ========================================
 # Node modules (if any front-end build)
 # ========================================
