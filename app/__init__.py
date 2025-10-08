@@ -47,7 +47,23 @@ def create_app() -> Flask:
     app.config.setdefault("RATELIMIT_STORAGE_URI", "memory://")
     # Default limits applied to all routes unless a route overrides with @limiter.limit(...)
     app.config.setdefault("RATELIMIT_DEFAULT", ["60 per minute", "300 per hour"])
+
+    # Normalize RATELIMIT_DEFAULT in case it's a *stringified list* from env
+    raw_limits = app.config.get("RATELIMIT_DEFAULT")
+    if isinstance(raw_limits, str):
+        # Accept "a; b" or "a, b" or even "['a', 'b']"
+        cleaned = raw_limits.strip()
+        if cleaned.startswith("[") and cleaned.endswith("]"):
+            # strip brackets and quotes, then split by comma
+            cleaned = cleaned[1:-1].replace("'", "").replace('"', "")
+            parts = [p.strip() for p in cleaned.split(",") if p.strip()]
+        else:
+            # split by ; or ,
+            parts = [p.strip() for p in cleaned.replace(";", ",").split(",") if p.strip()]
+        app.config["RATELIMIT_DEFAULT"] = parts
+
     limiter.init_app(app)
+
 
     # ---- Content Security Policy ----
     csp = (

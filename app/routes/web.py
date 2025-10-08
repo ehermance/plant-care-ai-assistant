@@ -65,6 +65,7 @@ def index():
         weather=None,
         form_values=None,
         history=list(HISTORY),
+        has_history=len(HISTORY) > 0,
         source=None,
         ai_error=None,
     )
@@ -96,6 +97,7 @@ def ask():
                 "question": request.form.get("question", ""),
             },
             history=list(HISTORY),
+            has_history=len(HISTORY) > 0,
             source="rule",
             ai_error=None,
         ), 400
@@ -114,6 +116,7 @@ def ask():
             weather=None,
             form_values=payload,
             history=list(HISTORY),
+            has_history=len(HISTORY) > 0,
             source="rule",
             ai_error=None,
         ), 400
@@ -146,6 +149,7 @@ def ask():
         weather=weather,
         form_values={"plant": plant, "city": city, "care_context": care_context, "question": question},
         history=list(HISTORY),
+        has_history=len(HISTORY) > 0,
         source=source,
         ai_error=AI_LAST_ERROR,  # non-empty if AI failed and fallback triggered
     )

@@ -198,10 +198,12 @@ No inline scripts/styles to satisfy the CSP.
       <section class="card" aria-labelledby="history-title">
         <div class="history-header">
           <h2 id="history-title" class="section-title">Recent Q&amp;A</h2>
-          <a class="muted-link small" href="{{ url_for('web.clear_history') }}">Clear</a>
+          {% if has_history %}
+            <a class="muted-link small" href="{{ url_for('web.clear_history') }}">Clear</a>
+          {% endif %}
         </div>
 
-        {% if history and history|length > 0 %}
+        {% if has_history %}
           <ul class="history">
             {% for item in history %}
               <li>
@@ -224,6 +226,7 @@ No inline scripts/styles to satisfy the CSP.
           <p class="muted">No questions yet. Ask something above to populate the history.</p>
         {% endif %}
       </section>
+
     </main>
   </div>
 
