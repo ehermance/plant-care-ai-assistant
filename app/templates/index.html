@@ -1,10 +1,9 @@
 <!--
 Main UI template.
 
-Renders the header (with a short summary), recommended presets, the form,
-answer, weather, and history. Designed to be accessible and responsive, with
-no inline scripts/styles to keep a strict CSP. Form state is preserved across
-submissions, including the “Where is the plant?” selection.
+Renders the header, recommended presets, a two-column area (form + answer),
+a shared loading overlay that covers both columns, then weather and history.
+No inline scripts/styles to satisfy the CSP.
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -26,19 +25,17 @@ submissions, including the “Where is the plant?” selection.
   <meta property="og:url" content="{{ request.url_root }}" />
 
   <!-- Favicons -->
-<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
-<link rel="alternate icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32.png') }}">
-<link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16.png') }}">
-<link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
-<link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
-<meta name="theme-color" content="#C2188B">
-
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="alternate icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16.png') }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+  <meta name="theme-color" content="#C2188B">
 
   <!-- Local CSS (no CDNs to satisfy CSP) -->
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
 
-  <!-- Accessibility note -->
   <meta name="robots" content="index, follow" />
 </head>
 <body>
@@ -63,28 +60,24 @@ submissions, including the “Where is the plant?” selection.
       <section class="card" aria-labelledby="presets-title">
         <h2 id="presets-title" class="section-title">Recommended presets</h2>
         <div id="presets" aria-label="Recommended plant presets">
-          <!-- Note: data-context sets the care context select; omit data-city to avoid forcing a location -->
           <button type="button" class="preset-btn"
                   data-plant="Monstera deliciosa"
                   data-question="How often should I water?"
                   data-context="indoor_potted">
             Monstera — watering (indoors)
           </button>
-
           <button type="button" class="preset-btn"
                   data-plant="Lavender"
                   data-question="How much sun does it need?"
                   data-context="outdoor_bed">
             Lavender — light (garden bed)
           </button>
-
           <button type="button" class="preset-btn"
                   data-plant="Rosemary"
                   data-question="Best pot size and soil?"
                   data-context="outdoor_potted">
-            Rosemary — pot & soil (outdoor pot)
+            Rosemary — pot &amp; soil (outdoor pot)
           </button>
-
           <button type="button" class="preset-btn"
                   data-plant="Snake Plant"
                   data-question="Fertilizer schedule?"
@@ -94,17 +87,16 @@ submissions, including the “Where is the plant?” selection.
         </div>
       </section>
 
-      <!-- Two-column layout on wide screens: form on the left, answer on the right -->
-      <section class="grid-two">
+      <!-- Two-column layout on wide screens: shared overlay covers both columns -->
+      <section class="grid-two" aria-labelledby="form-title" aria-busy="false">
+        <!-- Shared loading overlay spanning both columns -->
+        <div class="combined-loading-overlay" role="status" aria-live="polite" aria-atomic="true">
+          <div class="spinner" aria-hidden="true"></div>
+          <div>Thinking…</div>
+        </div>
 
         <!-- Form -->
         <section class="card form-card" aria-labelledby="form-title">
-          <!-- Loading overlay that appears on submit -->
-          <div class="form-loading-overlay" aria-hidden="true">
-            <div class="spinner" aria-hidden="true"></div>
-            <div>Thinking…</div>
-          </div>
-
           <h2 id="form-title" class="section-title">Ask for advice</h2>
 
           <form id="ask-form" class="form-grid" action="{{ url_for('web.ask') }}" method="post" novalidate>
@@ -163,19 +155,14 @@ submissions, including the “Where is the plant?” selection.
           </form>
 
           {% if ai_error and source == 'rule' %}
-            <p class="small muted" role="status" aria-live="polite" style="margin-top:.6rem;">
+            <p class="small muted" role="status" aria-live="polite">
               AI unavailable: {{ ai_error }} — using rule-based advice.
             </p>
           {% endif %}
         </section>
 
-        <!-- Answer -->
-        <section class="card answer-card" aria-labelledby="answer-title">
-          <div class="answer-loading-overlay" aria-hidden="true">
-            <div class="spinner" aria-hidden="true"></div>
-            <div>Thinking…</div>
-          </div>
-
+        <!-- Answer (focusable region so JS can move focus here after submit) -->
+        <section class="card answer-card" aria-labelledby="answer-title" role="region" tabindex="-1">
           <h2 id="answer-title" class="section-title">Answer</h2>
           {% if answer %}
             <p class="small muted">
@@ -186,7 +173,7 @@ submissions, including the “Where is the plant?” selection.
             <p class="muted">Submit a question to see guidance here.</p>
           {% endif %}
         </section>
-
+      </section>
 
       <!-- Weather (shows when available) -->
       <section class="card" aria-labelledby="weather-title">
@@ -209,7 +196,7 @@ submissions, including the “Where is the plant?” selection.
 
       <!-- History -->
       <section class="card" aria-labelledby="history-title">
-        <div style="display:flex; justify-content: space-between; align-items: baseline;">
+        <div class="history-header">
           <h2 id="history-title" class="section-title">Recent Q&amp;A</h2>
           <a class="muted-link small" href="{{ url_for('web.clear_history') }}">Clear</a>
         </div>
@@ -225,10 +212,10 @@ submissions, including the “Where is the plant?” selection.
                   {% if item.plant %} • <strong>Plant:</strong> {{ item.plant }}{% endif %}
                   {% if item.city %} • <strong>City:</strong> {{ item.city }}{% endif %}
                 </div>
-                <div class="small" style="margin-top:.35rem;"><strong>Q:</strong> {{ item.question }}</div>
-                <details style="margin-top:.35rem;">
+                <div class="small history-q"><strong>Q:</strong> {{ item.question }}</div>
+                <details class="history-details">
                   <summary class="small muted-link">Show answer</summary>
-                  <pre class="prewrap small" style="margin-top:.4rem;">{{ item.answer }}</pre>
+                  <pre class="prewrap small history-answer">{{ item.answer }}</pre>
                 </details>
               </li>
             {% endfor %}
@@ -239,10 +226,10 @@ submissions, including the “Where is the plant?” selection.
       </section>
     </main>
   </div>
+
   <footer class="site-footer" role="contentinfo">
     <p>&copy; <span id="copyright-year"></span> <a href="https://ehermance.github.io" rel="noopener">EDH Dev</a> — Built with care</p>
   </footer>
-
 
   <!-- Local JS (no inline scripts for CSP) -->
   <script src="{{ url_for('static', filename='app.js') }}" defer></script>
