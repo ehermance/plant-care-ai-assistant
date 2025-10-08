@@ -92,6 +92,10 @@ def create_app() -> Flask:
     app.register_blueprint(web_bp)
     app.register_blueprint(api_bp, url_prefix="/api/v1")
 
+    # Add Jinja global for templates that need current date/time
+    from datetime import datetime
+    app.jinja_env.globals["now"] = lambda: datetime.now()
+
     return app
 
 

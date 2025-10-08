@@ -18,6 +18,7 @@ body {
 }
 
 .container { max-width: 1040px; margin: 0 auto; padding: 1.25rem; }
+.nowrap { white-space: nowrap; }
 
 header.app-header { padding: 1rem 0 0.5rem 0; border-bottom: 1px solid #eee; }
 header.app-header h1 { margin: 0 0 .5rem 0; font-size: clamp(1.25rem, 1.6rem, 2rem); font-weight: 700; }
@@ -111,6 +112,82 @@ a.muted-link { text-decoration: none; color: #0f766e; font-size: .95rem; }
   margin-right: .5rem;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Weather */
+/* 5-day forecast layout */
+.forecast-grid {
+  display: grid;
+  gap: .75rem;
+  grid-template-columns: 1fr;
+  margin-top: .6rem;
+}
+@media (min-width: 560px) {
+  .forecast-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 880px) {
+  .forecast-grid { grid-template-columns: repeat(6, 1fr); }
+}
+
+.forecast-card {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  background: #fff;
+  padding: .75rem;
+  display: grid;
+  gap: .35rem;
+  align-content: start;
+}
+.forecast-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .5rem;
+}
+.forecast-day { font-weight: 700; }
+.forecast-daywrap {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .35rem;
+}
+.forecast-date {
+  color: #6b7280; /* muted */
+  font-size: .9rem;
+}
+.forecast-emoji { font-size: 1.6rem; line-height: 1; }
+.forecast-desc { color: #374151; font-size: .95rem; }
+.forecast-temps {
+  display: flex;
+  gap: .4rem;
+  align-items: baseline;
+  margin-top: .25rem;
+}
+.forecast-temps .tmax { font-weight: 700; }
+.forecast-temps .tmin { color: #6b7280; opacity: 0.9; }
+.forecast-temps .tparen { opacity: 0.75; }
+.forecast-extras { margin-top: .25rem; }
+
+/* Highlight and pin "Today" card */
+.forecast-card.today {
+  background: #e8f7f5;
+  border-color: #9fd1ca;
+  order: -1; /* ensures "Today" is always first in visual order */
+  box-shadow: 0 0 0 2px #0f766e22;
+  transition: box-shadow 0.2s ease-in-out;
+}
+.forecast-card.today .forecast-day { color: #0f766e; }
+.forecast-card.today:hover,
+.forecast-card.today:focus-within { box-shadow: 0 0 0 3px #0f766e44; }
+
+.badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background: #0f766e;
+  color: #fff;
+  margin-left: 0.35rem;
+  vertical-align: middle;
+}
 
 /* History */
 .history-header { display: flex; justify-content: space-between; align-items: baseline; }

@@ -3,7 +3,8 @@ Main UI template.
 
 Renders the header, recommended presets, a two-column area (form + answer),
 a shared loading overlay that covers both columns, then weather and history.
-No inline scripts/styles to satisfy the CSP.
+No inline scripts/styles to satisfy the CSP. Uses a global Jinja helper `now()`
+(registered in the app factory) for the current date/time.
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -107,12 +108,11 @@ No inline scripts/styles to satisfy the CSP.
                        placeholder="e.g., Monstera deliciosa"
                        value="{{ (form_values and form_values.plant) or '' }}" />
               </div>
-
               <div>
-                <label for="city">City (optional)</label>
+                <label for="city">City or ZIP (optional)</label>
                 <input id="city" name="city" type="text" autocomplete="off"
-                       placeholder="e.g., Austin, TX"
-                       value="{{ (form_values and form_values.city) or '' }}" />
+                      placeholder="e.g., Austin, TX or 73301"
+                      value="{{ (form_values and form_values.city) or '' }}" />
               </div>
             </div>
 
@@ -176,21 +176,54 @@ No inline scripts/styles to satisfy the CSP.
       </section>
 
       <!-- Weather (shows when available) -->
-      <section class="card" aria-labelledby="weather-title">
-        <h2 id="weather-title" class="section-title">Local weather</h2>
+      <section id="weather-section">
         {% if weather %}
-          <p>
-            <strong>{{ weather.city }}</strong> — {{ weather.conditions or 'N/A' }}<br />
-            Temp:
-              {% if weather.temp_f is not none %}{{ weather.temp_f }} °F{% endif %}
-              {% if weather.temp_c is not none %} ({{ weather.temp_c }} °C){% endif %}
-            • Humidity: {{ weather.humidity }}%
-            • Wind:
-              {% if weather.wind_mph is not none %}{{ weather.wind_mph }} mph{% endif %}
-              {% if weather.wind_mps is not none %} ({{ weather.wind_mps }} m/s){% endif %}
-          </p>
+        <h2 class="section-title">Local Weather</h2>
+        <div class="forecast-grid">
+          <!-- Today card -->
+          <div class="forecast-card today">
+            <div class="forecast-top">
+              <div class="forecast-daywrap">
+                <span class="forecast-day">Today</span>
+              </div>
+              <div class="forecast-date">{{ now().strftime('%Y-%m-%d') }}</div>
+            </div>
+            <div class="forecast-temps">
+              <span class="tmax">{{ weather.temp_f | round(0) }}°F</span>
+            </div>
+            <div class="forecast-extras">
+              <div class="forecast-desc">{{ weather.conditions|capitalize }}</div>
+              <div class="small muted">Humidity: {{ weather.humidity }}% • Wind: {{ weather.wind_mph }} mph</div>
+            </div>
+          </div>
+
+          <!-- 5-day forecast cards -->
+          {% if forecast %}
+            {% for f in forecast %}
+            <div class="forecast-card">
+              <div class="forecast-top">
+                <div class="forecast-daywrap">
+                  <span class="forecast-day">{{ f.day }}</span>
+                </div>
+                <div class="forecast-date">{{ f.date }}</div>
+              </div>
+              <div class="forecast-temps">
+                <span class="tmax">{{ f.temp_max_f|round(0) }}°F</span>
+                <span class="tparen">/</span>
+                <span class="tmin">{{ f.temp_min_f|round(0) }}°F</span>
+              </div>
+              <div class="forecast-extras">
+                <div class="forecast-desc">{{ f.conditions|capitalize }}</div>
+                <div class="small muted">Humidity: {{ f.humidity }}% • Wind: {{ f.wind_mph }} mph</div>
+              </div>
+            </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+        {% elif form_values and form_values.city %}
+        <p class="muted">No weather data available for that city or ZIP.</p>
         {% else %}
-          <p class="muted">Enter a city to include a short weather tip in the answer.</p>
+        <p class="muted">Enter a city or ZIP to include a short weather tip in the answer.</p>
         {% endif %}
       </section>
 

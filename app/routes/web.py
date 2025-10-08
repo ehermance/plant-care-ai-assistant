@@ -14,6 +14,7 @@ from ..extensions import limiter
 from ..services.ai import generate_advice, AI_LAST_ERROR
 from ..services.moderation import run_moderation
 from ..utils.validation import validate_inputs, display_sanitize_short
+from ..services.weather import get_forecast_for_city  # real implementation
 
 # Small, ephemeral history kept in memory for convenience. Clears on restart.
 HISTORY = deque(maxlen=25)
@@ -46,6 +47,7 @@ def debug_info():
 
 
 @web_bp.route("/history/clear")
+@limiter.exempt  # optional: exempt from rate limit noise
 def clear_history():
     """Clears the in-memory Q&A history."""
     HISTORY.clear()
@@ -63,6 +65,7 @@ def index():
         "index.html",
         answer=None,
         weather=None,
+        forecast=None,
         form_values=None,
         history=list(HISTORY),
         has_history=len(HISTORY) > 0,
@@ -79,17 +82,18 @@ def ask():
     - Validate/normalize form fields
     - Block unsafe content via moderation
     - Generate advice (AI-first, rule fallback)
+    - Fetch a 5-day forecast (best-effort)
     - Store a compact history item
     - Re-render the page with the answer and context
     """
     payload, err_msg = validate_inputs(request.form)
 
     if err_msg:
-        # Return a friendly message and keep the fields so the user can fix & resubmit.
         return render_template(
             "index.html",
             answer=display_sanitize_short(err_msg),
             weather=None,
+            forecast=None,
             form_values={
                 "plant": request.form.get("plant", ""),
                 "city": request.form.get("city", ""),
@@ -107,13 +111,13 @@ def ask():
     care_context = payload["care_context"]
     question = payload["question"]
 
-    # Light, fast moderation pass before any external calls/logging.
     allowed, reason = run_moderation(question)
     if not allowed:
         return render_template(
             "index.html",
             answer=display_sanitize_short(f"Question blocked by content policy: {reason}"),
             weather=None,
+            forecast=None,
             form_values=payload,
             history=list(HISTORY),
             has_history=len(HISTORY) > 0,
@@ -121,7 +125,7 @@ def ask():
             ai_error=None,
         ), 400
 
-    # Advice engine performs best-effort weather fetch internally and picks AI or rule-based output.
+    # Advice engine returns (answer, weather, source)
     answer, weather, source = generate_advice(
         question=question,
         plant=plant,
@@ -129,7 +133,9 @@ def ask():
         care_context=care_context,
     )
 
-    # Minimal history item for recall; avoids storing secrets or long blobs.
+    # 5-day forecast is best-effort and independent of the advice pipeline
+    forecast = get_forecast_for_city(city) if city else None
+
     HISTORY.appendleft(
         {
             "ts": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -147,9 +153,10 @@ def ask():
         "index.html",
         answer=answer,
         weather=weather,
+        forecast=forecast,
         form_values={"plant": plant, "city": city, "care_context": care_context, "question": question},
         history=list(HISTORY),
         has_history=len(HISTORY) > 0,
         source=source,
-        ai_error=AI_LAST_ERROR,  # non-empty if AI failed and fallback triggered
+        ai_error=AI_LAST_ERROR,
     )
