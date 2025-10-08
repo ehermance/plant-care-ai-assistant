@@ -180,7 +180,7 @@ No inline scripts/styles to satisfy the CSP. Uses a global Jinja helper `now()`
         {% if weather %}
         <h2 class="section-title">Local Weather</h2>
         <div class="forecast-grid">
-          <!-- Today card -->
+         <!-- Today card -->
           <div class="forecast-card today">
             <div class="forecast-top">
               <div class="forecast-daywrap">
@@ -192,11 +192,13 @@ No inline scripts/styles to satisfy the CSP. Uses a global Jinja helper `now()`
               <span class="tmax">{{ weather.temp_f | round(0) }}°F</span>
             </div>
             <div class="forecast-extras">
-              <div class="forecast-desc">{{ weather.conditions|capitalize }}</div>
+              <div class="forecast-desc">
+                <span class="forecast-emoji" aria-label="{{ weather.conditions }}">{{ weather.emoji }}</span>
+                {{ weather.conditions|capitalize }}
+              </div>
               <div class="small muted">Humidity: {{ weather.humidity }}% • Wind: {{ weather.wind_mph }} mph</div>
             </div>
           </div>
-
           <!-- 5-day forecast cards -->
           {% if forecast %}
             {% for f in forecast %}
@@ -213,12 +215,16 @@ No inline scripts/styles to satisfy the CSP. Uses a global Jinja helper `now()`
                 <span class="tmin">{{ f.temp_min_f|round(0) }}°F</span>
               </div>
               <div class="forecast-extras">
-                <div class="forecast-desc">{{ f.conditions|capitalize }}</div>
+                <div class="forecast-desc">
+                  <span class="forecast-emoji" aria-label="{{ f.conditions }}">{{ f.emoji }}</span>
+                  {{ f.conditions|capitalize }}
+                </div>
                 <div class="small muted">Humidity: {{ f.humidity }}% • Wind: {{ f.wind_mph }} mph</div>
               </div>
             </div>
             {% endfor %}
           {% endif %}
+
         </div>
         {% elif form_values and form_values.city %}
         <p class="muted">No weather data available for that city or ZIP.</p>

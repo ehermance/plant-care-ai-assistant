@@ -164,7 +164,7 @@ a.muted-link { text-decoration: none; color: #0f766e; font-size: .95rem; }
 .forecast-temps .tmax { font-weight: 700; }
 .forecast-temps .tmin { color: #6b7280; opacity: 0.9; }
 .forecast-temps .tparen { opacity: 0.75; }
-.forecast-extras { margin-top: .25rem; }
+.forecast-extras { margin-top: .25rem; line-height: 1.6; }
 
 /* Highlight and pin "Today" card */
 .forecast-card.today {
