@@ -36,7 +36,9 @@
           <span class="visually-hidden">EDH Dev</span>
         </a>
         <div class="brand-text">
-          <h1 class="app-title">Plant Care AI Assistant</h1>
+          <h1 class="app-title">
+            Plant Care AI Assistant <span aria-hidden="true" class="title-emojis">🪴 🌱 🌿</span>
+          </h1>
           <p class="app-subtitle">Practical, weather-aware tips for healthy plants. Clean design, accessible by default.</p>
         </div>
       </div>
@@ -141,11 +143,9 @@
 
             <div class="actions">
               <button id="submit-btn" class="primary" type="submit">Ask</button>
-              {% if form_values %}
-                <span class="small muted">Last submitted:
-                  <span class="mono">{{ form_values.care_context or 'indoor_potted' }}</span>
-                </span>
-              {% endif %}
+              <button id="reset-btn" class="secondary" type="button" aria-label="Clear all fields">
+                Reset
+              </button>
             </div>
           </form>
 
@@ -169,134 +169,115 @@
         </section>
       </section>
 
-      <section id="weather-section" data-units="f" aria-labelledby="weather-title">
-        {% set today_date = now().strftime('%Y-%m-%d') %}
-        <div class="weather-header">
-          <h2 id="weather-title" class="section-title">
-            {% if form_values and form_values.city %}
-              Local Weather for {{ form_values.city }}
-            {% elif weather and weather.city %}
-              Local Weather for {{ weather.city }}
-            {% else %}
-              Local Weather
-            {% endif %}
-          </h2>
-
-          {% if weather %}
-          <form class="units-toggle" aria-label="Temperature units">
-            <fieldset>
-              <legend class="visually-hidden">Select units</legend>
-              <label class="toggle-seg">
-                <input type="radio" name="units" value="f" checked />
-                <span aria-hidden="true">°F</span>
-                <span class="visually-hidden">Fahrenheit</span>
-              </label>
-              <label class="toggle-seg">
-                <input type="radio" name="units" value="c" />
-                <span aria-hidden="true">°C</span>
-                <span class="visually-hidden">Celsius</span>
-              </label>
-            </fieldset>
-          </form>
-          {% endif %}
-        </div>
-
+      <!-- Weather (shows when available) -->
+      <section id="weather-section">
         {% if weather %}
-          {% if hourly and hourly|length > 0 %}
-          <div class="hourly-scroller" role="group" aria-label="Hourly forecast">
-            {% for h in hourly %}
-              <div class="hourly-chip">
-                <div class="hourly-time">{{ h.time }}</div>
-                <div class="hourly-emoji" aria-hidden="true">{{ h.emoji }}</div>
-                <div class="hourly-temp">
-                  <span class="only-f">{{ h.temp_f|round(0) }}°F</span>
-                  <span class="only-c">{{ h.temp_c|round(0) }}°C</span>
+          <div class="weather-header">
+            <h2 class="section-title">Local Weather for {{ weather.city }}</h2>
+
+            <!-- Units toggle (right aligned) -->
+            <form class="units-toggle" aria-label="Temperature units">
+              <fieldset role="radiogroup" aria-label="Select units">
+                <label class="toggle-seg">
+                  <input type="radio" name="units" value="f" checked>
+                  °F
+                </label>
+                <label class="toggle-seg">
+                  <input type="radio" name="units" value="c">
+                  °C
+                </label>
+              </fieldset>
+            </form>
+          </div>
+
+          <!-- Hourly forecast -->
+          {% if hourly %}
+          <div class="hourly-wrap" aria-label="Hourly forecast for the rest of today">
+            <div class="hourly-header">
+              <h3 class="section-subtitle">Today, every 3 hours</h3>
+            </div>
+            <div class="hourly-scroll" role="list">
+              {% for h in hourly %}
+                <div class="hourly-chip" role="listitem" aria-label="{{ h.time }}">
+                  <div class="hourly-time">{{ h.time }}</div>
+                  <div class="hourly-emoji" aria-hidden="true">{{ h.emoji }}</div>
+                  <div class="hourly-temp">
+                    <span class="only-f">{{ (h.temp_f is not none) and (h.temp_f|round(0)|string + '°F') or '' }}</span>
+                    <span class="only-c">{{ (h.temp_c is not none) and (h.temp_c|round(0)|string + '°C') or '' }}</span>
+                  </div>
                 </div>
-              </div>
-            {% endfor %}
-          </div>
-          {% endif %}
-
-          {% if alerts and alerts|length > 0 %}
-          <div class="weather-alerts" role="region" aria-label="Weather alerts">
-            {% for a in alerts %}
-              <div class="alert-item">
-                <strong class="alert-title">{{ a.title }}</strong>
-                <span class="alert-desc">{{ a.desc }}</span>
-              </div>
-            {% endfor %}
-          </div>
-          {% endif %}
-
-          <div class="forecast-grid">
-            {% set today_forecast = None %}
-            {% if forecast %}
-              {% for f in forecast %}
-                {% if f.date == today_date %}
-                  {% set today_forecast = f %}
-                {% endif %}
               {% endfor %}
-            {% endif %}
+            </div>
+          </div>
+          {% endif %}
 
-            <div class="forecast-card today" aria-label="Today's weather summary">
+          <!-- Daily forecast -->
+          <div class="forecast-grid">
+            <!-- Today card -->
+            <div class="forecast-card today" aria-labelledby="today-title">
               <div class="forecast-top">
                 <div class="forecast-daywrap">
-                  <div class="forecast-day">Today</div>
+                  <div id="today-title" class="forecast-day">Today</div>
                   <span class="badge">Now</span>
                 </div>
-                <div class="forecast-emoji" aria-hidden="true">{{ weather.emoji or '🌤️' }}</div>
+                <div class="forecast-emoji" aria-hidden="true">{{ weather.emoji or '⛅' }}</div>
               </div>
-              <div class="forecast-date">{{ today_date }}</div>
+
+              <div class="forecast-date">{{ today_str }}</div>
+              <div class="forecast-desc">{{ (weather.conditions or 'N/A')|capitalize }}</div>
 
               <div class="forecast-temps">
-                <span class="tlabel">Current</span>
-                <span class="only-f tmax">{{ weather.temp_f | round(0) }}°F</span>
-                <span class="only-c tmax">{{ weather.temp_c | round(0) }}°C</span>
+                <span class="tlabel">Current:</span>
+                <span class="only-f">{{ (weather.temp_f is not none) and (weather.temp_f|round(0)|string + '°F') or '—' }}</span>
+                <span class="only-c">{{ (weather.temp_c is not none) and (weather.temp_c|round(0)|string + '°C') or '—' }}</span>
               </div>
 
-              {% if today_forecast %}
-              <div class="forecast-temps">
-                <span class="tlabel">High / Low</span>
-                <span class="only-f tmax">{{ today_forecast.temp_max_f|round(0) }}°F</span>
-                <span class="only-c tmax">{{ today_forecast.temp_max_c|round(0) }}°C</span>
-                <span class="only-f tmin">/ {{ today_forecast.temp_min_f|round(0) }}°F</span>
-                <span class="only-c tmin">/ {{ today_forecast.temp_min_c|round(0) }}°C</span>
-              </div>
-              {% endif %}
-
-              <div class="forecast-desc">{{ weather.conditions|capitalize }}</div>
-              <div class="forecast-extras small muted">
-                Humidity: {{ weather.humidity }}% • Wind: {{ weather.wind_mph }} mph
+              <!-- Keep rows consistent across cards; highs/lows optional if you add them later -->
+              <div class="forecast-extras small">
+                Humidity: {{ weather.humidity }}% • Wind:
+                <span class="only-f">{{ weather.wind_mph }} mph</span>
+                <span class="only-c">{{ (weather.wind_mps is not none) and (weather.wind_mps|round(1)|string + ' m/s') or '—' }}</span>
               </div>
             </div>
 
+            <!-- Next 5 days (exactly five to keep a total of 6 cards) -->
             {% if forecast %}
-              {% for f in forecast %}
-              <div class="forecast-card" aria-label="Daily forecast">
-                <div class="forecast-top">
-                  <div class="forecast-day">{{ f.day }}</div>
-                  <div class="forecast-emoji" aria-hidden="true">{{ f.emoji }}</div>
+              {% for f in forecast[:5] %}
+                <div class="forecast-card">
+                  <div class="forecast-top">
+                    <div class="forecast-daywrap">
+                      <div class="forecast-day">{{ f.day }}</div>
+                    </div>
+                    <div class="forecast-emoji" aria-hidden="true">{{ f.emoji or '⛅' }}</div>
+                  </div>
+
+                  <div class="forecast-date">{{ f.date }}</div>
+                  <div class="forecast-desc">{{ (f.conditions or 'N/A')|capitalize }}</div>
+
+                  <div class="forecast-temps">
+                    <span class="tlabel">High:</span>
+                    <span class="only-f tmax">{{ (f.temp_max_f is not none) and (f.temp_max_f|round(0)|string + '°F') or '—' }}</span>
+                    <span class="only-c tmax">{{ (f.temp_max_c is not none) and (f.temp_max_c|round(0)|string + '°C') or '—' }}</span>
+                  </div>
+                  <div class="forecast-temps">
+                    <span class="tlabel">Low:</span>
+                    <span class="only-f tmin">{{ (f.temp_min_f is not none) and (f.temp_min_f|round(0)|string + '°F') or '—' }}</span>
+                    <span class="only-c tmin">{{ (f.temp_min_c is not none) and (f.temp_min_c|round(0)|string + '°C') or '—' }}</span>
+                  </div>
+
+                  <div class="forecast-extras small">
+                    Humidity: {{ f.humidity }}% • Wind:
+                    <span class="only-f">{{ f.wind_mph }} mph</span>
+                    <span class="only-c">{{ (f.wind_mps is not none) and (f.wind_mps|round(1)|string + ' m/s') or '—' }}</span>
+                  </div>
                 </div>
-                <div class="forecast-date">{{ f.date }}</div>
-                <div class="forecast-temps">
-                  <span class="tlabel">High / Low</span>
-                  <span class="only-f tmax">{{ f.temp_max_f|round(0) }}°F</span>
-                  <span class="only-c tmax">{{ f.temp_max_c|round(0) }}°C</span>
-                  <span class="only-f tmin">/ {{ f.temp_min_f|round(0) }}°F</span>
-                  <span class="only-c tmin">/ {{ f.temp_min_c|round(0) }}°C</span>
-                </div>
-                <div class="forecast-desc">{{ f.conditions|capitalize }}</div>
-                <div class="forecast-extras small muted">
-                  Humidity: {{ f.humidity }}% • Wind: {{ f.wind_mph }} mph
-                </div>
-              </div>
               {% endfor %}
             {% endif %}
           </div>
         {% elif form_values and form_values.city %}
-          <p class="muted">No weather data available for that location.</p>
+          <p class="muted">No weather data available for that city or ZIP.</p>
         {% else %}
-          <p class="muted">Enter a city or ZIP to include weather tips in the answer.</p>
+          <p class="muted">Enter a city or ZIP to include weather insights in the answer.</p>
         {% endif %}
       </section>
 

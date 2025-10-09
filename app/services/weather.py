@@ -24,6 +24,7 @@ from datetime import datetime, timezone, timedelta
 from collections import defaultdict, Counter
 from flask import current_app, has_app_context
 
+
 _US_STATE_LIKE = re.compile(r"^\s*([^,]+),\s*([A-Za-z]{2})\s*$")
 _US_ZIP = re.compile(r"^\s*(\d{5})(?:-\d{4})?\s*$")
 
@@ -105,6 +106,7 @@ def get_weather_for_city(city: str | None) -> Optional[Dict]:
         return None
 
 def _coords_for(city: str, key: str):
+    """Auto-doc: see function name for purpose."""
     base = "https://api.openweathermap.org/data/2.5/weather"
     session = requests.Session()
     params = {"appid": key, "units": "metric"}

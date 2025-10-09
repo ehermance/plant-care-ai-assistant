@@ -14,6 +14,7 @@ from flask import current_app, has_app_context
 from .weather import get_weather_for_city
 
 # Most recent AI error (shown in UI/Debug to help diagnose model/key issues)
+
 AI_LAST_ERROR: Optional[str] = None
 
 

@@ -6,6 +6,7 @@ which returns regional plant presets using geolocation or city as hints.
 from flask import Blueprint, request, jsonify
 from ..utils.presets import infer_region_from_latlon, infer_region_from_city, region_presets
 
+
 api_bp = Blueprint("api", __name__)
 
 @api_bp.route("/presets")

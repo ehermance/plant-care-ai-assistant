@@ -15,6 +15,7 @@ from __future__ import annotations
 import os
 from typing import List
 
+
 def _list_from_env(name: str, default: str) -> List[str]:
     """
     Parse a semicolon-OR-comma-separated env var into a list of strings.

@@ -19,6 +19,7 @@ from .routes.api import api_bp
 from .routes.web import web_bp
 
 
+
 def create_app() -> Flask:
     # Load env vars from .env early so os.getenv() picks them up in dev.
     # In production, rely on real environment variables instead of .env.

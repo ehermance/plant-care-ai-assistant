@@ -1,4 +1,6 @@
-/**
+(function() {
+  'use strict';
+  /**
  * Client-side interactivity.
  *
  * - Prefill form from preset buttons (plant, question, context, optional city)
@@ -7,6 +9,7 @@
  * - After submit, focuses the Answer region and scrolls into view (reduced-motion aware)
  * - Units toggle (°F default, persisted to localStorage) controls presentation only
  * - Restores interactivity on bfcache navigation
+ * - Reset button clears fields to a clean state (not just HTML “reset” to initial values)
  */
 
 (function () {
@@ -18,6 +21,7 @@
   const contextSelect = document.getElementById('care_context');
   const questionInput = document.getElementById('question');
   const submitBtn = document.getElementById('submit-btn');
+  const resetBtn = document.getElementById('reset-btn');
 
   const gridTwo = document.querySelector('.grid-two');
   const answerCard = document.querySelector('.answer-card');
@@ -36,6 +40,20 @@
       if (typeof context === 'string') contextSelect.value = context;
 
       questionInput.focus();
+    });
+  }
+
+  // --- Reset (clear) button ---
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      // Clear all fields to blank, and reset context to the default option
+      if (plantInput) plantInput.value = '';
+      if (cityInput) cityInput.value = '';
+      if (questionInput) questionInput.value = '';
+      if (contextSelect) contextSelect.value = 'indoor_potted';
+
+      // Put focus in the first field for quick typing
+      plantInput?.focus();
     });
   }
 
@@ -109,4 +127,5 @@
   // Footer year
   const yearEl = document.getElementById('copyright-year');
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+})();
 })();

@@ -14,6 +14,7 @@ from typing import Any, Dict, Tuple
 # Allowlist regex: we REMOVE anything NOT in this set.
 # Includes letters/numbers/space and common lightweight punctuation used in names.
 # This keeps plant/city fields readable while dropping odd control/symbol characters.
+
 _SAFE_CHARS_PATTERN = re.compile(r"[^a-zA-Z0-9\s\-\.,'()/&]+")
 
 MAX_PLANT_LEN = 80

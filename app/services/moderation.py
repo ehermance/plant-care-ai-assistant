@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import Tuple
 
 # Very light heuristic example; extend as needed.
+
 _BLOCKLIST = {
     "hate", "suicide", "bomb", "kill", "murder", "shoot", "terror", "nsfw",
 }
