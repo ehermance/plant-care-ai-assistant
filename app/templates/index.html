@@ -28,7 +28,7 @@
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
 
-  <div class="brand-hero" role="banner" aria-label="EDH Dev brand header with decorative tech-flora background">
+  <div class="brand-hero" role="banner" aria-label="EDH Dev brand header">
     <div class="container hero-inner">
       <div class="brand-lockup">
         <a class="brand-chip" href="https://ehermance.github.io" target="_blank" rel="noopener">
@@ -173,8 +173,11 @@
       <section id="weather-section">
         {% if weather %}
           <div class="weather-header">
-            <h2 class="section-title">Local Weather for {{ weather.city }}</h2>
-
+            <h2 class="section-title" id="weather-heading">
+              Local weather for {{ city or 'your area' }}, today + next 5 days
+              <span class="visually-hidden">Use the toggle to switch temperature units.</span>
+              <span class="weather-note small muted" aria-hidden="true">Hourly in 3-hour intervals</span>
+            </h2>
             <!-- Units toggle (right aligned) -->
             <form class="units-toggle" aria-label="Temperature units">
               <fieldset role="radiogroup" aria-label="Select units">
@@ -193,9 +196,6 @@
           <!-- Hourly forecast -->
           {% if hourly %}
           <div class="hourly-wrap" aria-label="Hourly forecast for the rest of today">
-            <div class="hourly-header">
-              <h3 class="section-subtitle">Today, every 3 hours</h3>
-            </div>
             <div class="hourly-scroll" role="list">
               {% for h in hourly %}
                 <div class="hourly-chip" role="listitem" aria-label="{{ h.time }}">
