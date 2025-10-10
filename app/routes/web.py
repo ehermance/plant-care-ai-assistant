@@ -6,10 +6,8 @@ invokes the advice engine, pulls best-effort forecast/hourly data, and records
 in-memory history. Keeps templates simple by passing everything they need.
 """
 
-from flask import Blueprint, render_template, request, redirect, url_for, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, current_app, session
 from datetime import datetime
-from collections import deque
-
 from ..extensions import limiter
 from ..services.ai import generate_advice, AI_LAST_ERROR
 from ..services.moderation import run_moderation
@@ -28,8 +26,38 @@ except Exception:  # pragma: no cover
     def get_forecast_for_city(city):
         return None
 
-# Small, ephemeral history kept in memory for convenience. Clears on restart.
-HISTORY = deque(maxlen=25)
+# --- Per-session history (client-side via Flask session) ---
+MAX_HISTORY = 25
+
+def _safe_trunc(s: str, limit: int = 600) -> str:
+    if not isinstance(s, str):
+        s = str(s) if s is not None else ""
+    return (s[:limit] + "…") if len(s) > limit else s
+
+def _get_history():
+    """Return this user's history list from the session."""
+    return session.get("history", [])
+
+def _set_history(items):
+    """Persist the history list back to the session, enforcing MAX_HISTORY."""
+    session["history"] = list(items)[:MAX_HISTORY]
+    session.modified = True  # ensure the cookie updates
+
+def _push_history_item(item: dict):
+    items = _get_history()
+    # Light compaction to protect cookie size
+    compact = {
+        "ts": item.get("ts"),
+        "plant": _safe_trunc(item.get("plant", ""), 120),
+        "city": _safe_trunc(item.get("city", ""), 120),
+        "care_context": _safe_trunc(item.get("care_context", ""), 80),
+        "question": _safe_trunc(item.get("question", ""), 600),
+        # Keep the whole answer if typically short; otherwise truncate
+        "answer": _safe_trunc(item.get("answer", ""), 2000),
+        "source": item.get("source"),
+    }
+    items.insert(0, compact)
+    _set_history(items)
 
 web_bp = Blueprint("web", __name__)
 
@@ -52,7 +80,7 @@ def debug_info():
         "flask_secret_key_set": bool(current_app.secret_key),
         "weather_api_configured": bool(current_app.config.get("OPENWEATHER_API_KEY")),
         "openai_configured": bool(current_app.config.get("OPENAI_API_KEY")),
-        "history_len": len(HISTORY),
+        "history_len": len(_get_history()),
         "ai_last_error": AI_LAST_ERROR,
     }
     return info
@@ -61,8 +89,8 @@ def debug_info():
 @web_bp.route("/history/clear")
 @limiter.exempt  # optional: exempt from rate limit noise
 def clear_history():
-    """Clears the in-memory Q&A history."""
-    HISTORY.clear()
+    session.pop("history", None)  # only this user's session history
+    session.modified = True
     return redirect(url_for("web.index"))
 
 
@@ -80,8 +108,8 @@ def index():
         forecast=None,
         hourly=None,
         form_values=None,
-        history=list(HISTORY),
-        has_history=len(HISTORY) > 0,
+        history=_get_history(),
+        has_history=len(_get_history()) > 0,
         source=None,
         ai_error=None,
         today_str=today_str,
@@ -120,8 +148,8 @@ def ask():
                 "care_context": request.form.get("care_context", "indoor_potted"),
                 "question": request.form.get("question", ""),
             },
-            history=list(HISTORY),
-            has_history=len(HISTORY) > 0,
+            history=_get_history(),
+            has_history=len(_get_history()) > 0,
             source="rule",
             ai_error=None,
             today_str=today_str,
@@ -142,8 +170,8 @@ def ask():
             forecast=None,
             hourly=None,
             form_values=payload,
-            history=list(HISTORY),
-            has_history=len(HISTORY) > 0,
+            history=_get_history(),
+            has_history=len(_get_history()) > 0,
             source="rule",
             ai_error=None,
             today_str=today_str,
@@ -184,18 +212,15 @@ def ask():
         forecast = forecast[:5]  # enforce exactly +5 days in UI
 
     # Record history
-    HISTORY.appendleft(
-        {
-            "ts": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "plant": plant,
-            "city": city,
-            "care_context": care_context,
-            "question": question,
-            "answer": answer,
-            "weather": weather,
-            "source": source,
-        }
-    )
+    _push_history_item({
+        "ts": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "plant": plant,
+        "city": city,
+        "care_context": care_context,
+        "question": question,
+        "answer": answer,
+        "source": source,
+    })
 
     today_str = datetime.now().strftime("%Y-%m-%d")
     return render_template(
@@ -205,8 +230,8 @@ def ask():
         forecast=forecast,
         hourly=hourly,
         form_values={"plant": plant, "city": city, "care_context": care_context, "question": question},
-        history=list(HISTORY),
-        has_history=len(HISTORY) > 0,
+        history=_get_history(),
+        has_history=len(_get_history()) > 0,
         source=source,
         ai_error=AI_LAST_ERROR,
         today_str=today_str,

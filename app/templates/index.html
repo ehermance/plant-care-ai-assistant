@@ -174,7 +174,7 @@
         {% if weather %}
           <div class="weather-header">
             <h2 class="section-title" id="weather-heading">
-              Local weather for {{ city or 'your area' }}, today + next 5 days
+              Local weather for {{ form_values.city or 'your area' }}, today + next 5 days
               <span class="visually-hidden">Use the toggle to switch temperature units.</span>
               <span class="weather-note small muted" aria-hidden="true">Hourly in 3-hour intervals</span>
             </h2>
