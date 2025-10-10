@@ -25,9 +25,9 @@ services:
       - key: RATELIMIT_ENABLED
         value: "true"
       - key: RATELIMIT_DEFAULT
-        value: "60 per minute; 300 per hour"
+        value: "40 per minute; 2000 per day"
       - key: RATELIMIT_ASK
-        value: "20 per minute; 200 per day"
+        value: "8 per minute; 1 per 2 seconds; 200 per day"
       # Optionally add storage if you move off memory:// (recommended in production)
       # - key: RATELIMIT_STORAGE_URI
       #   value: "redis://<host>:6379/0"
