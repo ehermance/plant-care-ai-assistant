@@ -33,7 +33,7 @@ HISTORY = deque(maxlen=25)
 
 web_bp = Blueprint("web", __name__)
 
-
+@limiter.exempt
 @web_bp.route("/healthz")
 def healthz():
     """Simple health endpoint to verify the server responds."""
@@ -67,7 +67,6 @@ def clear_history():
 
 
 @web_bp.route("/", methods=["GET"])
-@limiter.limit("120 per minute")  # modest protection for the index page
 def index():
     """
     Render the main page on GET. The template uses these variables to decide
@@ -88,9 +87,12 @@ def index():
         today_str=today_str,
     )
 
+# Read rate string from config at request time (supports env/config changes)
+def _ask_rate():
+    return current_app.config.get("RATELIMIT_ASK", "8 per minute; 1 per 2 seconds; 200 per day")
 
 @web_bp.route("/ask", methods=["POST"])
-@limiter.limit("30 per minute")  # protects the form handler from burst abuse
+@limiter.limit(_ask_rate)  # protects the form handler from burst abuse
 def ask():
     """
     Process a submission:
