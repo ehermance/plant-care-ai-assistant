@@ -49,15 +49,16 @@ def create_app() -> Flask:
     # ---- Content Security Policy ----
     csp = (
         "default-src 'self'; "
-        "script-src 'self'; "
+        "script-src 'self' https://static.cloudflareinsights.com; "
         "style-src 'self'; "
         "img-src 'self' data:; "
         "font-src 'self'; "
-        "connect-src 'self'; "
+        "connect-src 'self' https://cloudflareinsights.com https://static.cloudflareinsights.com; "
         "object-src 'none'; "
         "base-uri 'self'; "
         "frame-ancestors 'none'; "
-        "form-action 'self'"
+        "form-action 'self'; "
+        "upgrade-insecure-requests"
     )
 
     @app.after_request
@@ -76,6 +77,9 @@ def create_app() -> Flask:
     # Add Jinja global for templates that need current date/time
     from datetime import datetime
     app.jinja_env.globals["now"] = lambda: datetime.now()
+
+    # Add Jinja global for Cloudflare Web Analytics
+    app.jinja_env.globals["CF_BEACON_TOKEN"] = os.getenv("CF_BEACON_TOKEN", "")
 
     return app
 

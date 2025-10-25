@@ -6,15 +6,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
         content="Ask for plant care help from an AI-powered assistant that gives practical tips based on your plants and local weather." />
-  <meta name="theme-color" content="#0F766E" />
   <meta name="author" content="EDH Dev" />
+  <meta name="theme-color" content="#0F766E" />
 
+  <!-- Security Meta Tags -->
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                script-src 'self' https://static.cloudflareinsights.com;
+                style-src 'self';
+                img-src 'self' data:;
+                font-src 'self';
+                connect-src 'self' https://cloudflareinsights.com https://static.cloudflareinsights.com;
+                object-src 'none';
+                base-uri 'self';
+                frame-ancestors 'none';
+                form-action 'self';
+                upgrade-insecure-requests">
+
+  <!-- Canonical & Social -->
   <meta property="og:title" content="Plant Care AI Assistant" />
   <meta property="og:description" content="Weather-aware plant care tips with an AI assist and graceful fallbacks." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="{{ url_for('static', filename='og-preview.png', _external=True) }}" />
   <meta property="og:url" content="{{ request.url_root }}" />
+  <meta name="robots" content="index, follow" />
 
+   <!-- Icons & PWA -->
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
   <link rel="alternate icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32.png') }}">
@@ -22,10 +40,14 @@
   <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
   <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
-  <meta name="robots" content="index, follow" />
+  <!-- Performance hints -->
+  <link rel="preconnect" href="https://static.cloudflareinsights.com" crossorigin>
 
-  <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "7250062292cd4ae38d38e3224d61802d"}'></script><!-- End Cloudflare Web Analytics -->
+  <!-- Styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+
+  <!-- Web Analytics -->
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "{{ CF_BEACON_TOKEN }}"}'></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
@@ -33,7 +55,7 @@
   <div class="brand-hero" role="banner" aria-label="EDH Dev brand header">
     <div class="container hero-inner">
       <div class="brand-lockup">
-        <a class="brand-chip" href="https://ehermance.github.io" target="_blank" rel="noopener">
+        <a class="brand-chip" href="https://www.ehermance.com" target="_blank" rel="noopener">
           <span class="brand-initials" aria-hidden="true">EDH</span>
           <span class="visually-hidden">EDH Dev</span>
         </a>
