@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Check Your Email - Plant Care AI Assistant{% endblock %}
+
+{% block content %}
+<section class="card auth-card text-center" aria-labelledby="check-email-title">
+  <div class="auth-icon" aria-hidden="true">📧</div>
+
+  <h2 id="check-email-title" class="section-title">Check Your Email</h2>
+
+  <p class="auth-message">
+    We've sent a magic link to:
+  </p>
+
+  <p class="auth-email">
+    <strong>{{ email }}</strong>
+  </p>
+
+  <div class="auth-instructions">
+    <ol class="text-left">
+      <li>Open your email inbox</li>
+      <li>Look for an email from Plant Care AI Assistant</li>
+      <li>Click the magic link to sign in</li>
+      <li>You'll be redirected back here automatically</li>
+    </ol>
+  </div>
+
+  <div class="auth-help" role="region" aria-labelledby="help-title">
+    <h3 id="help-title" class="small">Didn't receive the email?</h3>
+    <ul class="small muted text-left">
+      <li>Check your spam or junk folder</li>
+      <li>Make sure you entered the correct email address</li>
+      <li>Wait a few minutes — emails can be delayed</li>
+      <li>Try signing up again if it doesn't arrive</li>
+    </ul>
+  </div>
+
+  <a href="{{ url_for('auth.signup') }}" class="btn btn-secondary">
+    Send Another Link
+  </a>
+</section>
+
+<!-- Accessibility note -->
+<div class="sr-only" role="status" aria-live="polite">
+  A magic link has been sent to {{ email }}. Please check your email to continue.
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Auto-dismiss flash messages
+document.addEventListener('DOMContentLoaded', function() {
+  const flashes = document.querySelectorAll('.flash');
+  flashes.forEach(flash => {
+    const closeBtn = flash.querySelector('.flash-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => flash.remove());
+    }
+    setTimeout(() => flash.remove(), 5000);
+  });
+});
+</script>
+{% endblock %}

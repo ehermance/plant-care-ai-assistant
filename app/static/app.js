@@ -127,5 +127,124 @@
   // Footer year
   const yearEl = document.getElementById('copyright-year');
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
+  // --- User Menu Dropdown (WCAG Compliant) ---
+  const userMenuBtn = document.getElementById('user-menu-btn');
+  const userMenuDropdown = document.getElementById('user-menu-dropdown');
+
+  if (userMenuBtn && userMenuDropdown) {
+    // Toggle dropdown on click
+    userMenuBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const isExpanded = userMenuBtn.getAttribute('aria-expanded') === 'true';
+
+      if (isExpanded) {
+        closeUserMenu();
+      } else {
+        openUserMenu();
+      }
+    });
+
+    // Open menu with keyboard (Enter/Space handled by click event)
+    userMenuBtn.addEventListener('keydown', function(e) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (userMenuBtn.getAttribute('aria-expanded') !== 'true') {
+          openUserMenu();
+        }
+        // Focus first menu item
+        const firstLink = userMenuDropdown.querySelector('a[role="menuitem"]');
+        if (firstLink) firstLink.focus();
+      }
+    });
+
+    // Close on Escape key (WCAG 2.1.1 Keyboard requirement)
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && userMenuBtn.getAttribute('aria-expanded') === 'true') {
+        closeUserMenu();
+        userMenuBtn.focus(); // Return focus to button
+      }
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+      if (userMenuBtn.getAttribute('aria-expanded') === 'true') {
+        if (!userMenuDropdown.contains(e.target) && e.target !== userMenuBtn) {
+          closeUserMenu();
+        }
+      }
+    });
+
+    // Arrow key navigation in dropdown (WCAG 2.4.3)
+    userMenuDropdown.addEventListener('keydown', function(e) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const menuItems = Array.from(userMenuDropdown.querySelectorAll('a[role="menuitem"]'));
+        const currentIndex = menuItems.indexOf(document.activeElement);
+
+        let nextIndex;
+        if (e.key === 'ArrowDown') {
+          nextIndex = (currentIndex + 1) % menuItems.length;
+        } else {
+          nextIndex = currentIndex <= 0 ? menuItems.length - 1 : currentIndex - 1;
+        }
+
+        if (menuItems[nextIndex]) {
+          menuItems[nextIndex].focus();
+        }
+      }
+    });
+
+    function openUserMenu() {
+      userMenuDropdown.removeAttribute('hidden');
+      userMenuBtn.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeUserMenu() {
+      userMenuDropdown.setAttribute('hidden', '');
+      userMenuBtn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  // --- Flash Message Dismissal (WCAG Compliant) ---
+  const flashMessages = document.querySelectorAll('.flash');
+
+  flashMessages.forEach(function(flash) {
+    const closeBtn = flash.querySelector('.flash-close');
+
+    if (closeBtn) {
+      // Click handler
+      closeBtn.addEventListener('click', function() {
+        dismissFlash(flash);
+      });
+
+      // Keyboard handler (Enter/Space)
+      closeBtn.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          dismissFlash(flash);
+        }
+      });
+    }
+  });
+
+  function dismissFlash(flashEl) {
+    // Check if user prefers reduced motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReducedMotion) {
+      // Instant removal
+      flashEl.remove();
+    } else {
+      // Fade out animation
+      flashEl.style.opacity = '0';
+      flashEl.style.transform = 'translateY(-10px)';
+      flashEl.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+
+      setTimeout(function() {
+        flashEl.remove();
+      }, 300);
+    }
+  }
 })();
 })();

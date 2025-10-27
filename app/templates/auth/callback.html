@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Authenticating... - Plant Care AI Assistant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <div class="auth-loading" role="status" aria-live="polite">
+    <div class="spinner" aria-hidden="true"></div>
+    <h1>Signing you in...</h1>
+    <p id="status-message">Please wait while we authenticate your account.</p>
+  </div>
+
+  <!-- External JavaScript (CSP compliant) -->
+  <script src="{{ url_for('static', filename='auth-callback.js') }}"></script>
+</body>
+</html>

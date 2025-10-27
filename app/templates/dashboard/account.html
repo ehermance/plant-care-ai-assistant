@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Account Settings - Plant Care AI Assistant{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb Navigation (WCAG 2.4.8) -->
+<nav aria-label="Breadcrumb" class="breadcrumb">
+  <ol>
+    <li><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+    <li aria-current="page">Account Settings</li>
+  </ol>
+</nav>
+
+<!-- Page Header -->
+<section class="dashboard-hero">
+  <h2 class="dashboard-greeting">Account Settings</h2>
+  <p class="dashboard-subtitle">Manage your profile, plan, and preferences.</p>
+</section>
+
+<!-- Account Information -->
+<section class="card" aria-labelledby="account-info-title">
+  <h3 id="account-info-title" class="section-title">Account Information</h3>
+
+  <dl class="info-list">
+    <div class="info-item">
+      <dt>Email Address</dt>
+      <dd>{{ profile.email if profile else current_user.email }}</dd>
+    </div>
+
+    <div class="info-item">
+      <dt>Account ID</dt>
+      <dd><code class="code-snippet">{{ current_user.id[:8] }}...</code></dd>
+    </div>
+
+    <div class="info-item">
+      <dt>Member Since</dt>
+      <dd>{{ current_user.created_at.strftime('%B %d, %Y') if current_user.created_at else 'Recently' }}</dd>
+    </div>
+  </dl>
+</section>
+
+<!-- Subscription & Plan -->
+<section class="card" aria-labelledby="subscription-title">
+  <h3 id="subscription-title" class="section-title">Subscription & Plan</h3>
+
+  <div class="plan-status">
+    <!-- Current: Free Forever -->
+    <div class="plan-badge plan-badge-starter">
+      <span class="badge-icon" aria-hidden="true">🌱</span>
+      <div class="badge-content">
+        <strong>Starter Plan</strong>
+        <span class="badge-subtitle">Free forever, up to 20 plants</span>
+      </div>
+    </div>
+
+    <div class="plan-details">
+      <p>You're on the <strong>Starter</strong> plan (free forever).</p>
+      <p class="small muted">All core features included. Premium options will be available in the future for power users who want advanced features like unlimited plants, AI image diagnosis, and export tools.</p>
+    </div>
+  </div>
+
+  <!-- Plan Comparison -->
+  <details class="plan-comparison">
+    <summary>Compare plans</summary>
+    <div class="comparison-table">
+      <table>
+        <caption class="visually-hidden">Plan feature comparison</caption>
+        <thead>
+          <tr>
+            <th scope="col">Feature</th>
+            <th scope="col">Starter</th>
+            <th scope="col">Premium</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Plants</th>
+            <td>Up to 20</td>
+            <td>Unlimited</td>
+          </tr>
+          <tr>
+            <th scope="row">Care reminders</th>
+            <td>✓</td>
+            <td>✓</td>
+          </tr>
+          <tr>
+            <th scope="row">AI assistant</th>
+            <td>✓</td>
+            <td>✓</td>
+          </tr>
+          <tr>
+            <th scope="row">Photo uploads</th>
+            <td>✓</td>
+            <td>✓</td>
+          </tr>
+          <tr>
+            <th scope="row">AI image diagnosis</th>
+            <td>—</td>
+            <td>Coming soon</td>
+          </tr>
+          <tr>
+            <th scope="row">CSV/PDF export</th>
+            <td>—</td>
+            <td>✓</td>
+          </tr>
+          <tr>
+            <th scope="row">Seasonal task generator</th>
+            <td>—</td>
+            <td>✓</td>
+          </tr>
+          <tr>
+            <th scope="row">Priority support</th>
+            <td>—</td>
+            <td>✓</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+</section>
+
+<!-- Preferences (Placeholder for future) -->
+<section class="card" aria-labelledby="preferences-title">
+  <h3 id="preferences-title" class="section-title">Preferences</h3>
+  <p class="muted">Email notifications, reminder settings, and other preferences will be available in a future update.</p>
+</section>
+
+<!-- Danger Zone -->
+<section class="card card-danger" aria-labelledby="danger-title">
+  <h3 id="danger-title" class="section-title">Account Management</h3>
+
+  <div class="danger-actions">
+    <div class="danger-item">
+      <div>
+        <strong>Log Out</strong>
+        <p class="small muted">Sign out of your account on this device.</p>
+      </div>
+      <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary btn-small">
+        Log Out
+      </a>
+    </div>
+
+    <div class="danger-item">
+      <div>
+        <strong>Delete Account</strong>
+        <p class="small muted">Permanently delete your account and all data. This action cannot be undone.</p>
+      </div>
+      <button class="btn btn-outline btn-small" disabled>
+        Delete Account (Coming Soon)
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Back to Dashboard -->
+<div class="page-actions">
+  <a href="{{ url_for('dashboard.index') }}" class="muted-link">
+    ← Back to Dashboard
+  </a>
+</div>
+
+{% endblock %}

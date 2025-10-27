@@ -27,6 +27,12 @@ class BaseConfig:
     OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "")
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
+    # Supabase (Database + Auth + Storage)
+    SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+    SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
+    SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+    SUPABASE_REDIRECT_URL = os.getenv("SUPABASE_REDIRECT_URL", "http://localhost:5000/auth/callback")
+
     # Flask-Limiter v3
     RATELIMIT_ENABLED = os.getenv("RATELIMIT_ENABLED", "true").lower() == "true"
     RATELIMIT_STORAGE_URI = os.getenv("RATELIMIT_STORAGE_URI", "memory://")

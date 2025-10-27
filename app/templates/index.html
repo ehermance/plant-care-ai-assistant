@@ -67,6 +67,13 @@
         </div>
       </div>
 
+      <!-- Simple Navigation -->
+      <nav class="hero-nav" aria-label="Main navigation" style="margin-top: 1rem;">
+        <a class="nav-link" href="{{ url_for('pricing.index') }}">Pricing</a>
+        <a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a>
+        <a class="btn btn-primary" href="{{ url_for('auth.signup') }}">Sign Up Free</a>
+      </nav>
+
       {% set show_debug = (config.UI_DEBUG_LINKS or request.args.get('debug') == 'true') %}
       {% if show_debug %}
         <p class="small hero-links">
@@ -341,7 +348,7 @@
   </div>
 
   <footer class="site-footer" role="contentinfo">
-    <p>&copy; <span id="copyright-year"></span> <a href="https://ehermance.github.io" rel="noopener">EDH Dev</a> — Built with care</p>
+    <p>&copy; <span id="copyright-year"></span> <a href="https://www.ehermance.com" rel="noopener">EDH Dev</a> — Built with care</p>
   </footer>
 
   <script src="{{ url_for('static', filename='app.js') }}" defer></script>

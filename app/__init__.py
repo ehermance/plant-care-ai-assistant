@@ -17,6 +17,11 @@ from dotenv import load_dotenv  # <-- ensure .env is loaded for local dev
 from .extensions import limiter
 from .routes.api import api_bp
 from .routes.web import web_bp
+from .routes.auth import auth_bp
+from .routes.dashboard import dashboard_bp
+from .routes.pricing import pricing_bp
+from .services import supabase_client
+from .utils import auth
 
 
 def create_app() -> Flask:
@@ -46,14 +51,23 @@ def create_app() -> Flask:
     if not app.secret_key:
         app.secret_key = app.config.get("SECRET_KEY", "")
 
+    # Initialize Supabase client
+    supabase_client.init_supabase(app)
+
+    # Register auth context processor (makes current_user, is_authenticated, etc. available in templates)
+    app.context_processor(auth.inject_auth_context)
+
     # ---- Content Security Policy ----
+    # Allow Supabase domains for auth, API calls, and storage
+    supabase_domain = app.config.get("SUPABASE_URL", "").replace("https://", "").replace("http://", "")
+
     csp = (
         "default-src 'self'; "
         "script-src 'self' https://static.cloudflareinsights.com; "
         "style-src 'self'; "
-        "img-src 'self' data:; "
+        f"img-src 'self' data: https://{supabase_domain}; "  # Allow Supabase Storage images
         "font-src 'self'; "
-        "connect-src 'self' https://cloudflareinsights.com https://static.cloudflareinsights.com; "
+        f"connect-src 'self' https://cloudflareinsights.com https://static.cloudflareinsights.com https://{supabase_domain}; "  # Allow Supabase API calls
         "object-src 'none'; "
         "base-uri 'self'; "
         "frame-ancestors 'none'; "
@@ -73,6 +87,9 @@ def create_app() -> Flask:
     # Blueprints
     app.register_blueprint(web_bp)
     app.register_blueprint(api_bp, url_prefix="/api/v1")
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(dashboard_bp)
+    app.register_blueprint(pricing_bp)
 
     # Add Jinja global for templates that need current date/time
     from datetime import datetime

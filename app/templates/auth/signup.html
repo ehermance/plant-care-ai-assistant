@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - Plant Care AI Assistant{% endblock %}
+{% block description %}Create your free account to track plants, set reminders, and get personalized care tips.{% endblock %}
+
+{% block content %}
+<section class="card auth-card" aria-labelledby="signup-title">
+  <h2 id="signup-title" class="section-title">Sign Up for Free</h2>
+
+  <p class="auth-subtitle">
+    <strong>Free forever</strong> for home gardeners — no credit card, ever
+  </p>
+
+  <div class="benefits-list">
+    <ul>
+      <li>✓ Track up to 20 plants with photos</li>
+      <li>✓ Smart watering & fertilizer reminders</li>
+      <li>✓ AI plant care assistant</li>
+      <li>✓ Weather-aware suggestions</li>
+    </ul>
+  </div>
+
+  <!-- Magic Link Signup Form -->
+  <form method="POST" action="{{ url_for('auth.signup') }}" class="auth-form" novalidate>
+    <!-- CSRF Protection (Flask-WTF will add this automatically if we use it, but for now manual) -->
+
+    <!-- Honeypot field (hidden from users, bots will fill it) -->
+    <div class="honeypot" aria-hidden="true">
+      <label for="website">Website (leave blank)</label>
+      <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+    </div>
+
+    <div class="form-group">
+      <label for="email" class="form-label">
+        Email Address
+        <span class="required" aria-label="required">*</span>
+      </label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        class="form-input"
+        required
+        autocomplete="email"
+        aria-required="true"
+        aria-describedby="email-help"
+        placeholder="you@example.com"
+        pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+      />
+      <small id="email-help" class="form-help">
+        We'll send you a magic link to sign in — no password needed
+      </small>
+    </div>
+
+    <!-- Hidden field to preserve 'next' parameter -->
+    {% if next %}
+      <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary btn-block">
+      Send Magic Link
+    </button>
+  </form>
+
+  <div class="auth-footer">
+    <p class="small muted">
+      Already have an account?
+      <a href="{{ url_for('auth.login') }}">Log in</a>
+    </p>
+    <p class="small muted">
+      By signing up, you agree to our <a href="/terms" rel="noopener">Terms of Service</a>
+      and <a href="/privacy" rel="noopener">Privacy Policy</a>
+    </p>
+  </div>
+</section>
+
+<!-- Security & Privacy Notice -->
+<section class="card privacy-notice" aria-labelledby="privacy-title">
+  <h3 id="privacy-title" class="small">🔒 Your Privacy & Security</h3>
+  <ul class="small muted">
+    <li>Passwordless authentication via secure magic links</li>
+    <li>Your data is encrypted and never shared with third parties</li>
+    <li>Rate limiting protects against abuse</li>
+    <li>WCAG 2.1 AA accessible by design</li>
+  </ul>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Bot protection: Check honeypot field on submit
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('.auth-form');
+  const honeypot = document.getElementById('website');
+
+  form.addEventListener('submit', function(e) {
+    // If honeypot filled, likely a bot
+    if (honeypot && honeypot.value !== '') {
+      e.preventDefault();
+      console.warn('Suspicious form submission blocked');
+      return false;
+    }
+  });
+
+  // Email validation feedback
+  const emailInput = document.getElementById('email');
+  emailInput.addEventListener('blur', function() {
+    if (emailInput.value && !emailInput.checkValidity()) {
+      emailInput.setAttribute('aria-invalid', 'true');
+    } else {
+      emailInput.removeAttribute('aria-invalid');
+    }
+  });
+});
+
+// Auto-dismiss flash messages after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+  const flashes = document.querySelectorAll('.flash');
+  flashes.forEach(flash => {
+    const closeBtn = flash.querySelector('.flash-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => flash.remove());
+    }
+    setTimeout(() => flash.remove(), 5000);
+  });
+});
+</script>
+{% endblock %}
