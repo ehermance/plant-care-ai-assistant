@@ -20,7 +20,6 @@
                 connect-src 'self' https://cloudflareinsights.com https://static.cloudflareinsights.com;
                 object-src 'none';
                 base-uri 'self';
-                frame-ancestors 'none';
                 form-action 'self';
                 upgrade-insecure-requests">
 
@@ -55,9 +54,9 @@
   <div class="brand-hero" role="banner" aria-label="EDH Dev brand header">
     <div class="container hero-inner">
       <div class="brand-lockup">
-        <a class="brand-chip" href="https://www.ehermance.com" target="_blank" rel="noopener">
+        <a class="brand-chip" href="{{ url_for('web.index') }}" aria-label="Plant Care AI Home">
           <span class="brand-initials" aria-hidden="true">EDH</span>
-          <span class="visually-hidden">EDH Dev</span>
+          <span class="visually-hidden">Home</span>
         </a>
         <div class="brand-text">
           <h1 class="app-title">
@@ -68,7 +67,7 @@
       </div>
 
       <!-- Simple Navigation -->
-      <nav class="hero-nav" aria-label="Main navigation" style="margin-top: 1rem;">
+      <nav class="hero-nav" aria-label="Main navigation">
         <a class="nav-link" href="{{ url_for('pricing.index') }}">Pricing</a>
         <a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a>
         <a class="btn btn-primary" href="{{ url_for('auth.signup') }}">Sign Up Free</a>
@@ -129,6 +128,7 @@
           <h2 id="form-title" class="section-title">Ask for advice</h2>
 
           <form id="ask-form" class="form-grid" action="{{ url_for('web.ask') }}" method="post" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <div class="form-row form-row--two">
               <div>
                 <label for="plant">Plant (optional)</label>

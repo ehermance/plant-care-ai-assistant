@@ -13,12 +13,19 @@ Notes:
 
 from __future__ import annotations
 import os
+from datetime import timedelta
 
 class BaseConfig:
     # Secrets & basics
     SECRET_KEY = os.getenv("FLASK_SECRET_KEY", "")
     DEBUG = False
     TESTING = False
+
+    # Session configuration
+    PERMANENT_SESSION_LIFETIME = timedelta(days=30)  # Sessions last 30 days
+    SESSION_COOKIE_SECURE = True  # Only send cookies over HTTPS (overridden in dev)
+    SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to cookies
+    SESSION_COOKIE_SAMESITE = "Lax"  # CSRF protection (Lax allows normal links)
 
     # Feature flags
     UI_DEBUG_LINKS = os.getenv("UI_DEBUG_LINKS", "").strip().lower() in {"1", "true", "yes"}
@@ -55,6 +62,8 @@ class DevConfig(BaseConfig):
     # Disable aggressive static caching in dev
     SEND_FILE_MAX_AGE_DEFAULT = 0
     PREFERRED_URL_SCHEME = "http"
+    # Allow cookies over HTTP in dev
+    SESSION_COOKIE_SECURE = False
 
 class TestConfig(BaseConfig):
     """CI/pytest settings."""

@@ -22,7 +22,8 @@
 
   <!-- Magic Link Signup Form -->
   <form method="POST" action="{{ url_for('auth.signup') }}" class="auth-form" novalidate>
-    <!-- CSRF Protection (Flask-WTF will add this automatically if we use it, but for now manual) -->
+    <!-- CSRF Protection -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
     <!-- Honeypot field (hidden from users, bots will fill it) -->
     <div class="honeypot" aria-hidden="true">
@@ -48,7 +49,8 @@
         pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
       />
       <small id="email-help" class="form-help">
-        We'll send you a magic link to sign in — no password needed
+        We'll send you a magic link to sign in — no password needed.
+        <strong>Returning user?</strong> Just enter your email and we'll log you in.
       </small>
     </div>
 
@@ -63,10 +65,6 @@
   </form>
 
   <div class="auth-footer">
-    <p class="small muted">
-      Already have an account?
-      <a href="{{ url_for('auth.login') }}">Log in</a>
-    </p>
     <p class="small muted">
       By signing up, you agree to our <a href="/terms" rel="noopener">Terms of Service</a>
       and <a href="/privacy" rel="noopener">Privacy Policy</a>
@@ -92,6 +90,8 @@
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.querySelector('.auth-form');
   const honeypot = document.getElementById('website');
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn.textContent;
 
   form.addEventListener('submit', function(e) {
     // If honeypot filled, likely a bot
@@ -99,6 +99,18 @@ document.addEventListener('DOMContentLoaded', function() {
       e.preventDefault();
       console.warn('Suspicious form submission blocked');
       return false;
+    }
+
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+    submitBtn.setAttribute('aria-busy', 'true');
+
+    // If form validation fails, re-enable button
+    if (!form.checkValidity()) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+      submitBtn.removeAttribute('aria-busy');
     }
   });
 

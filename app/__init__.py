@@ -13,6 +13,7 @@ after the project was modularized.
 from __future__ import annotations
 import os
 from flask import Flask, Response
+from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv  # <-- ensure .env is loaded for local dev
 from .extensions import limiter
 from .routes.api import api_bp
@@ -20,6 +21,8 @@ from .routes.web import web_bp
 from .routes.auth import auth_bp
 from .routes.dashboard import dashboard_bp
 from .routes.pricing import pricing_bp
+from .routes.legal import legal_bp
+from .routes.plants import plants_bp
 from .services import supabase_client
 from .utils import auth
 
@@ -50,6 +53,9 @@ def create_app() -> Flask:
     # Ensure SECRET_KEY is applied from config
     if not app.secret_key:
         app.secret_key = app.config.get("SECRET_KEY", "")
+
+    # Initialize CSRF Protection
+    csrf = CSRFProtect(app)
 
     # Initialize Supabase client
     supabase_client.init_supabase(app)
@@ -90,6 +96,8 @@ def create_app() -> Flask:
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(pricing_bp)
+    app.register_blueprint(legal_bp)
+    app.register_blueprint(plants_bp)
 
     # Add Jinja global for templates that need current date/time
     from datetime import datetime

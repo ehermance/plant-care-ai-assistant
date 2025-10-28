@@ -9,6 +9,7 @@ Handles:
 """
 
 from __future__ import annotations
+import re
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
 from app.services import supabase_client
 from app.utils.auth import set_session, clear_session, get_current_user, require_auth
@@ -55,8 +56,15 @@ def signup():
         flash("Please enter your email address.", "error")
         return redirect(url_for("auth.signup"))
 
-    # Basic email validation
-    if "@" not in email or "." not in email:
+    # Email validation
+    # RFC 5322 simplified pattern
+    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+
+    if len(email) > 320:  # RFC 5321 max email length
+        flash("Email address is too long.", "error")
+        return redirect(url_for("auth.signup"))
+
+    if not re.match(email_pattern, email):
         flash("Please enter a valid email address.", "error")
         return redirect(url_for("auth.signup"))
 
@@ -70,8 +78,10 @@ def signup():
 
         return redirect(url_for("auth.check_email"))
     else:
-        current_app.logger.error(f"Failed to send magic link: {result.get('error')}")
-        flash("Failed to send magic link. Please try again.", "error")
+        # Use the user-friendly error message from supabase_client
+        error_message = result.get("message", "Failed to send magic link. Please try again.")
+        current_app.logger.error(f"Failed to send magic link: {result.get('error')} - {error_message}")
+        flash(error_message, "error")
         return redirect(url_for("auth.signup"))
 
 

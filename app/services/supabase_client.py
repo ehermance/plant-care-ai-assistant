@@ -104,8 +104,30 @@ def send_magic_link(email: str) -> Dict[str, Any]:
             "message": f"Magic link sent to {email}. Please check your inbox."
         }
     except Exception as e:
+        error_msg = str(e).lower()
         current_app.logger.error(f"Error sending magic link: {e}")
-        return {"success": False, "error": str(e)}
+
+        # Detect rate limiting errors
+        if "rate limit" in error_msg or "too many requests" in error_msg:
+            return {
+                "success": False,
+                "error": "rate_limit",
+                "message": "You've requested too many magic links. Please wait a few minutes and try again."
+            }
+        # Detect invalid email errors
+        elif "invalid" in error_msg and "email" in error_msg:
+            return {
+                "success": False,
+                "error": "invalid_email",
+                "message": "The email address is invalid. Please check and try again."
+            }
+        # Generic error
+        else:
+            return {
+                "success": False,
+                "error": "unknown",
+                "message": "Unable to send magic link. Please try again later."
+            }
 
 
 def verify_session(access_token: str, refresh_token: Optional[str] = None) -> Optional[Dict[str, Any]]:
@@ -357,12 +379,12 @@ def can_add_plant(user_id: str) -> tuple[bool, str]:
     if has_premium_access(user_id):
         return True, "Premium access - unlimited plants"
 
-    # Starter users limited to 10 plants
+    # Starter users limited to 20 plants
     current_count = get_plant_count(user_id)
-    if current_count >= 10:
-        return False, f"You've reached your 10-plant limit. Upgrade to Premium for unlimited plants."
+    if current_count >= 20:
+        return False, f"You've reached your 20-plant limit. Upgrade to Premium for unlimited plants."
 
-    return True, f"You can add {10 - current_count} more plants"
+    return True, f"You can add {20 - current_count} more plants"
 
 
 # ============================================================================

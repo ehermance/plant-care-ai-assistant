@@ -61,4 +61,6 @@ node_modules/
 # ========================================
 # Debug Docs and Notes
 # ========================================
+.claude/
 docs/
+migrations/
