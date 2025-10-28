@@ -23,8 +23,8 @@
    <!-- Icons & PWA -->
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
   <link rel="alternate icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32.png') }}">
-  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
   <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
   <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
 
@@ -47,14 +47,14 @@
     <div class="container hero-inner">
       <div class="brand-lockup">
         <a class="brand-chip" href="{{ url_for('web.index') }}" aria-label="Plant Care AI Home">
-          <span class="brand-initials" aria-hidden="true">EDH</span>
+          <span class="brand-initials" aria-hidden="true">🌿</span>
           <span class="visually-hidden">Home</span>
         </a>
         <div class="brand-text">
           <h1 class="app-title">
-            Plant Care AI Assistant <span aria-hidden="true" class="title-emojis">🪴 🌱 🌿</span>
+            Plant Care AI Assistant <span aria-hidden="true" class="title-emojis">🪴 🌱 🌵</span>
           </h1>
-          <p class="app-subtitle">{% block subtitle %}Practical, weather-aware tips for healthy plants. Clean design, accessible by default.{% endblock %}</p>
+          <p class="app-subtitle">{% block subtitle %}Your plants deserve to thrive. We'll show you how.{% endblock %}</p>
         </div>
       </div>
 

@@ -81,19 +81,24 @@ body {
 }
 .hero-inner { position: relative; z-index: 1; padding-top: .75rem; padding-bottom: 1rem; }
 
-/* Disable watermark block since we're not using a background image */
-.page-watermark { display: none; }
-
 /* Brand lockup */
-.brand-lockup { display: grid; grid-template-columns: auto 1fr; gap: .85rem; align-items: center; }
+.brand-lockup { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: center; }
 .brand-chip {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 44px; height: 44px; border-radius: 12px;
+  width: 64px; height: 64px; border-radius: 16px;
   background: var(--chip-bg); color: var(--chip-fg);
   text-decoration: none; font-weight: 700; letter-spacing: .5px;
   box-shadow: 0 2px 10px rgba(0,0,0,.25), inset 0 0 0 2px rgba(255,255,255,.1);
 }
-.brand-initials { font-size: .95rem; }
+.brand-initials {
+  font-size: 2.75rem;
+  /* Drop shadow for depth */
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))
+          drop-shadow(0 0 8px rgba(94, 234, 212, 0.4));
+  /* Soft glow effect */
+  text-shadow: 0 0 20px rgba(94, 234, 212, 0.3),
+               0 0 40px rgba(94, 234, 212, 0.2);
+}
 .app-title { margin: 0; font-size: clamp(1.25rem, 1.6rem, 2rem); color: #fff; }
 .title-emojis { font-size: .9em; margin-left: .35rem; }
 .app-subtitle { margin: .25rem 0 0 0; color: #e8fffb; }
@@ -1196,6 +1201,10 @@ ul.history li:hover {
   .legal-content a {
     color: #5eead4;
   }
+  .auth-loading .spinner {
+    border-color: #374151;
+    border-top-color: var(--brand-teal);
+  }
 }
 
 /* =====================================================
@@ -1255,4 +1264,192 @@ ul.history li:hover {
 .legal-content a:hover {
   color: var(--brand-teal-600);
   text-decoration: underline;
+}
+
+/* =====================================================
+   Phase 2: Botanical Touches
+   ===================================================== */
+
+/* Logo animation: gentle grow on hover */
+@keyframes gentle-grow {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.brand-chip {
+  transition: transform 0.2s ease;
+}
+
+.brand-chip:hover {
+  animation: gentle-grow 1.5s ease-in-out;
+}
+
+/* Respect user preferences for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .brand-chip:hover {
+    animation: none;
+    transform: scale(1.03);
+  }
+}
+
+/* Botanical watermark background - repeating pattern */
+.page-watermark {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url('botanical-watermark.svg');
+  background-repeat: repeat;
+  background-position: 0 0;
+  background-size: 400px 400px;
+  opacity: 0.15;
+}
+
+.brand-hero .hero-inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* Buy Me a Coffee - Hybrid Yellow Style */
+.footer-support {
+  margin-top: 1rem;
+}
+
+.support-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: linear-gradient(135deg, #FFDD00 0%, #FFC600 100%);
+  color: #1a1a1a;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 8px rgba(255, 221, 0, 0.3);
+}
+
+.support-link:hover {
+  background: linear-gradient(135deg, #FFC600 0%, #FFDD00 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 221, 0, 0.4);
+  border-color: var(--brand-teal-600);
+}
+
+.support-link:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(255, 221, 0, 0.3);
+}
+
+/* Leaf checkmark benefits list */
+.benefits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.benefit-item::before {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  background-image: url('leaf-check.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  margin-top: 0.3rem;
+}
+
+/* Empty state illustration */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.empty-state-illustration {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 1.5rem;
+  opacity: 0.15;
+}
+
+.empty-state-message {
+  font-size: 1.25rem;
+  color: var(--brand-ink-2);
+  margin-bottom: 1rem;
+}
+
+.empty-state-hint {
+  font-size: 0.95rem;
+  color: var(--brand-ink-3);
+}
+
+/* Dark mode adjustments for Phase 2 */
+@media (prefers-color-scheme: dark) {
+  .page-watermark {
+    opacity: 0.08;
+  }
+
+  .support-link {
+    background: linear-gradient(135deg, #FFDD00 0%, #FFC600 100%);
+    color: #1a1a1a;
+    box-shadow: 0 2px 8px rgba(255, 221, 0, 0.2);
+  }
+
+  .support-link:hover {
+    box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3);
+  }
+
+  .empty-state-message {
+    color: #d1d5db;
+  }
+
+  .empty-state-hint {
+    color: #9ca3af;
+  }
+
+  /* Stronger glow for emoji in dark mode */
+  .brand-initials {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))
+            drop-shadow(0 0 12px rgba(94, 234, 212, 0.6));
+    text-shadow: 0 0 25px rgba(94, 234, 212, 0.4),
+                 0 0 50px rgba(94, 234, 212, 0.3);
+  }
+}
+
+/* Responsive brand chip - smaller on mobile */
+@media (max-width: 640px) {
+  .brand-chip {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+  }
+  .brand-initials {
+    font-size: 2.25rem;
+  }
+  .brand-lockup {
+    gap: 0.75rem;
+  }
 }
