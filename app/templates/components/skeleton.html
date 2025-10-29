@@ -1,0 +1,36 @@
+{# Skeleton loading component - Modern loading state #}
+{# Usage: {% include 'components/skeleton.html' with {'type': 'card'} %} #}
+
+{% if type == 'card' %}
+  {# Card skeleton for plant cards, weather cards, etc. #}
+  <div class="card skeleton-card skeleton" aria-busy="true" aria-live="polite">
+    <div class="skeleton-title skeleton"></div>
+    <div class="skeleton-text skeleton"></div>
+    <div class="skeleton-text skeleton"></div>
+    <div class="skeleton-text skeleton"></div>
+  </div>
+
+{% elif type == 'card-grid' %}
+  {# Grid of card skeletons #}
+  <div class="dashboard-stats" aria-busy="true">
+    <div class="skeleton-card skeleton"></div>
+    <div class="skeleton-card skeleton"></div>
+    <div class="skeleton-card skeleton"></div>
+    <div class="skeleton-card skeleton"></div>
+  </div>
+
+{% elif type == 'text' %}
+  {# Text skeleton for loading content #}
+  <div class="skeleton-title skeleton" aria-busy="true"></div>
+  <div class="skeleton-text skeleton"></div>
+  <div class="skeleton-text skeleton"></div>
+  <div class="skeleton-text skeleton"></div>
+
+{% elif type == 'button' %}
+  {# Button skeleton #}
+  <div class="skeleton-button skeleton" aria-busy="true"></div>
+
+{% else %}
+  {# Default: single card skeleton #}
+  <div class="skeleton-card skeleton" aria-busy="true" aria-live="polite"></div>
+{% endif %}
