@@ -47,17 +47,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
-// Auto-dismiss flash messages
-document.addEventListener('DOMContentLoaded', function() {
-  const flashes = document.querySelectorAll('.flash');
-  flashes.forEach(flash => {
-    const closeBtn = flash.querySelector('.flash-close');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => flash.remove());
-    }
-    setTimeout(() => flash.remove(), 5000);
-  });
-});
-</script>
+<!-- Flash message handling is already in toast.js -->
 {% endblock %}

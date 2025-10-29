@@ -82,8 +82,10 @@
   }
   </script>
 
-  <!-- Web Analytics -->
+  <!-- Web Analytics (Cloudflare) -->
+  {% if CF_BEACON_TOKEN %}
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "{{ CF_BEACON_TOKEN }}"}'></script>
+  {% endif %}
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>

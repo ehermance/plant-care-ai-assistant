@@ -67,13 +67,16 @@ def create_app() -> Flask:
     # Allow Supabase domains for auth, API calls, and storage
     supabase_domain = app.config.get("SUPABASE_URL", "").replace("https://", "").replace("http://", "")
 
+    # Content Security Policy
+    # Note: 'unsafe-inline' is needed for JSON-LD structured data (SEO)
+    # This is safe as JSON-LD scripts are type="application/ld+json" (data, not executable)
     csp = (
         "default-src 'self'; "
-        "script-src 'self' https://static.cloudflareinsights.com; "
-        "style-src 'self'; "
-        f"img-src 'self' data: https://{supabase_domain}; "  # Allow Supabase Storage images
+        "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; "
+        "style-src 'self' 'unsafe-inline'; "  # Allow inline styles (modernization CSS)
+        f"img-src 'self' data: https://{supabase_domain}; "
         "font-src 'self'; "
-        f"connect-src 'self' https://cloudflareinsights.com https://static.cloudflareinsights.com https://{supabase_domain}; "  # Allow Supabase API calls
+        f"connect-src 'self' https://cloudflareinsights.com https://static.cloudflareinsights.com https://{supabase_domain}; "
         "object-src 'none'; "
         "base-uri 'self'; "
         "frame-ancestors 'none'; "

@@ -83,56 +83,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
-// Bot protection: Check honeypot field on submit
-document.addEventListener('DOMContentLoaded', function() {
-  const form = document.querySelector('.auth-form');
-  const honeypot = document.getElementById('website');
-  const submitBtn = form.querySelector('button[type="submit"]');
-  const originalBtnText = submitBtn.textContent;
-
-  form.addEventListener('submit', function(e) {
-    // If honeypot filled, likely a bot
-    if (honeypot && honeypot.value !== '') {
-      e.preventDefault();
-      console.warn('Suspicious form submission blocked');
-      return false;
-    }
-
-    // Show loading state
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending...';
-    submitBtn.setAttribute('aria-busy', 'true');
-
-    // If form validation fails, re-enable button
-    if (!form.checkValidity()) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalBtnText;
-      submitBtn.removeAttribute('aria-busy');
-    }
-  });
-
-  // Email validation feedback
-  const emailInput = document.getElementById('email');
-  emailInput.addEventListener('blur', function() {
-    if (emailInput.value && !emailInput.checkValidity()) {
-      emailInput.setAttribute('aria-invalid', 'true');
-    } else {
-      emailInput.removeAttribute('aria-invalid');
-    }
-  });
-});
-
-// Auto-dismiss flash messages after 5 seconds
-document.addEventListener('DOMContentLoaded', function() {
-  const flashes = document.querySelectorAll('.flash');
-  flashes.forEach(flash => {
-    const closeBtn = flash.querySelector('.flash-close');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => flash.remove());
-    }
-    setTimeout(() => flash.remove(), 5000);
-  });
-});
-</script>
+<script src="{{ url_for('static', filename='js/signup.js') }}"></script>
 {% endblock %}
