@@ -37,10 +37,3 @@ services:
         sync: false
       - key: SUPABASE_REDIRECT_URL
         sync: false
-redirects:
-  - source: https://www.plantcareai.app/*
-    destination: https://plantcareai.app/:splat
-    status: 301
-  - source: https://plants.ehermance.com/*
-    destination: https://plantcareai.app/ask
-    status: 301

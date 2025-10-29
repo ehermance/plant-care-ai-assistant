@@ -12,7 +12,7 @@ after the project was modularized.
 
 from __future__ import annotations
 import os
-from flask import Flask, Response
+from flask import Flask, Response, request, redirect
 from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv  # <-- ensure .env is loaded for local dev
 from .extensions import limiter
@@ -89,6 +89,32 @@ def create_app() -> Flask:
         resp.headers["X-Frame-Options"] = "DENY"
         resp.headers["X-XSS-Protection"] = "0"  # CSP supersedes legacy XSS filter
         return resp
+
+    # ---- Domain Redirects ----
+    # Handle www subdomain and legacy domain redirects
+    @app.before_request
+    def handle_domain_redirects():
+        """
+        Redirect www subdomain to apex domain and legacy domain to new domain.
+        - www.plantcareai.app/* → plantcareai.app/*
+        - plants.ehermance.com/* → plantcareai.app/ask
+        """
+        host = request.host.lower()
+
+        # Redirect www subdomain to apex domain (301 permanent)
+        if host.startswith("www."):
+            new_url = request.url.replace(f"://{host}", f"://{host[4:]}", 1)
+            return redirect(new_url, code=301)
+
+        # Redirect legacy domain to new domain's /ask page (301 permanent)
+        if host == "plants.ehermance.com" or host.startswith("plants.ehermance.com:"):
+            new_url = request.url.replace(
+                f"://{host}",
+                "://plantcareai.app",
+                1
+            )
+            # Force path to /ask for legacy domain
+            return redirect("https://plantcareai.app/ask", code=301)
 
     # Blueprints
     app.register_blueprint(web_bp)
