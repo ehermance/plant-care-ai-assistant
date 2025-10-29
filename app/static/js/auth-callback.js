@@ -10,6 +10,50 @@
  * - HTTPS enforced by Supabase and our CSP
  */
 (function() {
+  // --- Plant-themed loading messages ---
+  const plantLoadingPhrases = [
+    'Planting seeds…',
+    'Watering your garden…',
+    'Checking the soil…',
+    'Letting roots grow…',
+    'Nurturing seedlings…',
+    'Adding fertilizer…',
+    'Adjusting sunlight…',
+    'Pruning branches…',
+    'Harvesting results…',
+    'Cultivating your space…'
+  ];
+
+  let loadingPhraseInterval = null;
+  let currentPhraseIndex = 0;
+
+  function rotateLoadingMessage() {
+    const loadingPhrase = document.getElementById('loading-phrase');
+    if (!loadingPhrase) return;
+
+    currentPhraseIndex = (currentPhraseIndex + 1) % plantLoadingPhrases.length;
+    loadingPhrase.textContent = plantLoadingPhrases[currentPhraseIndex];
+  }
+
+  function startLoadingRotation() {
+    const loadingPhrase = document.getElementById('loading-phrase');
+    if (!loadingPhrase) return;
+
+    currentPhraseIndex = 0;
+    loadingPhrase.textContent = plantLoadingPhrases[currentPhraseIndex];
+    loadingPhraseInterval = setInterval(rotateLoadingMessage, 2000);
+  }
+
+  function stopLoadingRotation() {
+    if (loadingPhraseInterval) {
+      clearInterval(loadingPhraseInterval);
+      loadingPhraseInterval = null;
+    }
+  }
+
+  // Start rotating loading messages
+  startLoadingRotation();
+
   const statusEl = document.getElementById('status-message');
 
   if (!statusEl) {
@@ -28,6 +72,7 @@
 
   // Handle errors from Supabase
   if (errorCode) {
+    stopLoadingRotation();
     statusEl.setAttribute('role', 'alert');
     console.error('Auth error:', errorCode, errorDescription);
 
@@ -52,6 +97,7 @@
 
   // Check if tokens present
   if (!accessToken) {
+    stopLoadingRotation();
     statusEl.textContent = 'No authentication token found. Redirecting...';
     setTimeout(function() {
       window.location.href = '/auth/signup';

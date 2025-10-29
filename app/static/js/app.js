@@ -57,6 +57,50 @@
     });
   }
 
+  // --- Plant-themed loading messages ---
+  const plantLoadingPhrases = [
+    'Germinating…',
+    'Sprouting…',
+    'Taking root…',
+    'Growing leaves…',
+    'Photosynthesizing…',
+    'Soaking up sunshine…',
+    'Absorbing nutrients…',
+    'Unfurling petals…',
+    'Reaching for the light…',
+    'Blossoming…'
+  ];
+
+  let loadingPhraseInterval = null;
+  let currentPhraseIndex = 0;
+
+  function rotateLoadingMessage() {
+    const loadingMessage = document.getElementById('loading-message');
+    if (!loadingMessage) return;
+
+    currentPhraseIndex = (currentPhraseIndex + 1) % plantLoadingPhrases.length;
+    loadingMessage.textContent = plantLoadingPhrases[currentPhraseIndex];
+  }
+
+  function startLoadingRotation() {
+    const loadingMessage = document.getElementById('loading-message');
+    if (!loadingMessage) return;
+
+    // Reset to first message
+    currentPhraseIndex = 0;
+    loadingMessage.textContent = plantLoadingPhrases[currentPhraseIndex];
+
+    // Rotate through messages every 2 seconds
+    loadingPhraseInterval = setInterval(rotateLoadingMessage, 2000);
+  }
+
+  function stopLoadingRotation() {
+    if (loadingPhraseInterval) {
+      clearInterval(loadingPhraseInterval);
+      loadingPhraseInterval = null;
+    }
+  }
+
   // --- Submit loading state ---
   function setSubmitting(on) {
     if (gridTwo) {
@@ -68,6 +112,13 @@
       const el = document.getElementById(id);
       if (el) el.readOnly = !!on;
     });
+
+    // Start/stop loading message rotation
+    if (on) {
+      startLoadingRotation();
+    } else {
+      stopLoadingRotation();
+    }
   }
 
   function scrollIntoViewPref(el) {

@@ -170,7 +170,7 @@ def sign_out(access_token: str) -> bool:
     Sign out a user session.
 
     Args:
-        access_token: JWT access token
+        access_token: JWT access token (used to set session before signing out)
 
     Returns:
         True if successful, False otherwise
@@ -179,7 +179,12 @@ def sign_out(access_token: str) -> bool:
         return False
 
     try:
-        _supabase_client.auth.sign_out(access_token)
+        # Set the session first if we have an access token
+        if access_token:
+            _supabase_client.auth.set_session(access_token, "")
+
+        # Sign out (no parameters needed - signs out current session)
+        _supabase_client.auth.sign_out()
         return True
     except Exception as e:
         current_app.logger.error(f"Error signing out: {e}")

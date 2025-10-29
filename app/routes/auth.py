@@ -184,7 +184,7 @@ def logout():
     clear_session()
     flash("You've been logged out successfully.", "info")
 
-    return redirect(url_for("web.index"))
+    return redirect(url_for("auth.signup"))
 
 
 @auth_bp.route("/me")
