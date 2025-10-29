@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ plant.name }} - Plant Care AI{% endblock %}
+{% block description %}Edit {{ plant.name }} details.{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Edit {{ plant.name }} ✏️</h1>
+  <p class="page-subtitle">Update your plant's information</p>
+</div>
+
+<div class="form-container">
+  <form method="POST" action="{{ url_for('plants.edit', plant_id=plant.id) }}" enctype="multipart/form-data" class="plant-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+    <div class="form-group">
+      <label for="name" class="form-label">
+        Plant Name <span class="required">*</span>
+      </label>
+      <input
+        type="text"
+        id="name"
+        name="name"
+        class="form-input"
+        required
+        value="{{ plant.name }}"
+        maxlength="100"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="nickname" class="form-label">
+        Nickname (Optional)
+      </label>
+      <input
+        type="text"
+        id="nickname"
+        name="nickname"
+        class="form-input"
+        value="{{ plant.nickname or '' }}"
+        maxlength="50"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="species" class="form-label">
+        Species/Variety (Optional)
+      </label>
+      <input
+        type="text"
+        id="species"
+        name="species"
+        class="form-input"
+        value="{{ plant.species or '' }}"
+        maxlength="100"
+      />
+    </div>
+
+    <div class="form-row form-row--two">
+      <div class="form-group">
+        <label for="location" class="form-label">
+          Location
+        </label>
+        <input
+          type="text"
+          id="location"
+          name="location"
+          class="form-input"
+          value="{{ plant.location or '' }}"
+          maxlength="50"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="light" class="form-label">
+          Light Conditions
+        </label>
+        <select id="light" name="light" class="form-input">
+          <option value="">Select light level</option>
+          <option value="Low" {% if plant.light == 'Low' %}selected{% endif %}>Low (Indirect light)</option>
+          <option value="Medium" {% if plant.light == 'Medium' %}selected{% endif %}>Medium (Bright indirect)</option>
+          <option value="High" {% if plant.light == 'High' %}selected{% endif %}>High (Direct sunlight)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="notes" class="form-label">
+        Care Notes (Optional)
+      </label>
+      <textarea
+        id="notes"
+        name="notes"
+        class="form-input"
+        rows="4"
+        maxlength="500"
+      >{{ plant.notes or '' }}</textarea>
+    </div>
+
+    {% if plant.photo_url %}
+      <div class="current-photo">
+        <label class="form-label">Current Photo</label>
+        <img src="{{ plant.photo_url }}" alt="{{ plant.name }}" class="current-photo-thumb">
+      </div>
+    {% endif %}
+
+    <div class="form-group">
+      <label for="photo" class="form-label">
+        {% if plant.photo_url %}Replace Photo{% else %}Add Photo{% endif %} (Optional)
+      </label>
+      <input
+        type="file"
+        id="photo"
+        name="photo"
+        class="form-input"
+        accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+      />
+      <small class="form-help">Max 5MB. Supported: JPG, PNG, GIF, WebP</small>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        Save Changes
+      </button>
+      <a href="{{ url_for('plants.view', plant_id=plant.id) }}" class="btn btn-secondary">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -46,6 +46,9 @@ class BaseConfig:
     RATELIMIT_DEFAULT = os.getenv("RATELIMIT_DEFAULT", "40 per minute; 2000 per day")
     RATELIMIT_ASK = os.getenv("RATELIMIT_ASK", "8 per minute; 1 per 2 seconds; 200 per day")
 
+    # File uploads
+    MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10MB max upload size
+
     # Misc
     PREFERRED_URL_SCHEME = os.getenv("PREFERRED_URL_SCHEME", "https")
     SEND_FILE_MAX_AGE_DEFAULT = int(os.getenv("SEND_FILE_MAX_AGE_DEFAULT", "3600"))

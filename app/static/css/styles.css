@@ -2703,3 +2703,322 @@ ul.history li:hover {
     box-shadow: 0 1px 3px rgba(251, 191, 36, 0.4);
   }
 }
+
+/* =====================================================
+   Plant Management Styles
+   ===================================================== */
+
+/* Page header for plant pages */
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-subtitle {
+  color: var(--brand-muted);
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+.plant-nickname-large {
+  font-size: 0.9em;
+  color: var(--brand-muted);
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Actions bar */
+.actions-bar {
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Plants grid */
+.plants-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 640px) {
+  .plants-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Plant card */
+.plant-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.plant-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-depth-md);
+}
+
+.plant-photo {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: var(--gradient-card-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plant-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.plant-photo-placeholder {
+  background: linear-gradient(135deg, #f0f7f6 0%, #e6f2f0 100%);
+}
+
+.plant-icon {
+  font-size: 4rem;
+  opacity: 0.3;
+}
+
+.plant-info {
+  padding: 1.25rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.plant-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--brand-ink);
+  margin: 0 0 0.5rem 0;
+}
+
+.plant-nickname {
+  font-size: 0.9em;
+  color: var(--brand-muted);
+  font-weight: 400;
+  font-style: italic;
+}
+
+.plant-species {
+  color: var(--brand-muted);
+  font-size: 0.95rem;
+  margin: 0 0 1rem 0;
+}
+
+.plant-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.plant-tag {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  background: rgba(15, 118, 110, 0.1);
+  color: var(--brand-teal-600);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.plant-actions {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--brand-border);
+}
+
+/* Plant detail page */
+.plant-detail {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.plant-detail-photo {
+  margin-bottom: 2rem;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-depth-md);
+}
+
+.plant-detail-photo img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.plant-detail-info {
+  margin-bottom: 2rem;
+}
+
+.info-list {
+  margin: 1.5rem 0 0 0;
+}
+
+.info-item {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--brand-border);
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-item dt {
+  font-weight: 600;
+  color: var(--brand-ink-2);
+}
+
+.info-item dd {
+  margin: 0;
+  color: var(--brand-ink);
+}
+
+@media (max-width: 640px) {
+  .info-item {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+}
+
+/* Plant actions section */
+.plant-actions-section {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: 2rem;
+  border-top: 2px solid var(--brand-border);
+}
+
+.delete-form {
+  margin-left: auto;
+}
+
+/* Plant form */
+.form-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.plant-form {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--shadow-depth-sm);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  color: var(--brand-ink-2);
+  margin-bottom: 0.5rem;
+}
+
+.required {
+  color: var(--error);
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--brand-border);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background: var(--bg-warm-white);
+}
+
+.form-input:focus {
+  border-color: var(--brand-teal);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+}
+
+.form-help {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--brand-muted);
+  font-size: 0.9rem;
+}
+
+.form-row--two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .form-row--two {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--brand-border);
+}
+
+/* Current photo in edit form */
+.current-photo {
+  margin-bottom: 1.5rem;
+}
+
+.current-photo-thumb {
+  max-width: 200px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  margin-top: 0.5rem;
+}
+
+/* Danger button for delete */
+.btn-danger {
+  color: var(--error);
+  border-color: var(--error);
+}
+
+.btn-danger:hover,
+.btn-danger:focus {
+  background: var(--error);
+  color: white;
+  border-color: var(--error);
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .plant-photo-placeholder {
+    background: linear-gradient(135deg, #0f1a1a 0%, #1a2828 100%);
+  }
+
+  .plant-tag {
+    background: rgba(94, 234, 212, 0.15);
+    color: #5eead4;
+  }
+
+  .form-input {
+    background: #0f1a1a;
+    color: #e8edf2;
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+
+  .plant-form {
+    background: #0b1212;
+  }
+}

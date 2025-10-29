@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}My Plants - Plant Care AI{% endblock %}
+{% block description %}View and manage your plant collection.{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>My Plants 🪴</h1>
+  <p class="page-subtitle">You're caring for {{ plant_count }} {{ 'plant' if plant_count == 1 else 'plants' }}</p>
+</div>
+
+<div class="actions-bar">
+  <a href="{{ url_for('plants.add') }}" class="btn btn-primary">
+    + Add Plant
+  </a>
+</div>
+
+{% if plants %}
+  <div class="plants-grid">
+    {% for plant in plants %}
+      <article class="plant-card card">
+        {% if plant.photo_url %}
+          <div class="plant-photo">
+            <img src="{{ plant.photo_url }}" alt="Photo of {{ plant.name }}" loading="lazy">
+          </div>
+        {% else %}
+          <div class="plant-photo plant-photo-placeholder">
+            <span class="plant-icon" aria-hidden="true">🌱</span>
+          </div>
+        {% endif %}
+
+        <div class="plant-info">
+          <h3 class="plant-name">
+            {{ plant.name }}
+            {% if plant.nickname %}
+              <span class="plant-nickname">"{{ plant.nickname }}"</span>
+            {% endif %}
+          </h3>
+
+          {% if plant.species %}
+            <p class="plant-species">{{ plant.species }}</p>
+          {% endif %}
+
+          <div class="plant-meta">
+            {% if plant.location %}
+              <span class="plant-tag">📍 {{ plant.location }}</span>
+            {% endif %}
+            {% if plant.light %}
+              <span class="plant-tag">☀️ {{ plant.light }}</span>
+            {% endif %}
+          </div>
+
+          <div class="plant-actions">
+            <a href="{{ url_for('plants.view', plant_id=plant.id) }}" class="btn btn-secondary btn-small">
+              View Details
+            </a>
+          </div>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <div class="empty-icon empty-icon-seed" aria-hidden="true">🌱</div>
+    <h2 class="empty-state-message">No plants yet!</h2>
+    <p class="empty-state-hint">
+      Start building your plant collection by adding your first plant.
+    </p>
+    <a href="{{ url_for('plants.add') }}" class="btn btn-primary">
+      Add Your First Plant
+    </a>
+  </div>
+{% endif %}
+{% endblock %}

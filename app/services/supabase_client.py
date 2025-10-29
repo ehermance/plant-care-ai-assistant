@@ -392,6 +392,240 @@ def can_add_plant(user_id: str) -> tuple[bool, str]:
     return True, f"You can add {20 - current_count} more plants"
 
 
+def get_user_plants(user_id: str, limit: int = 100, offset: int = 0) -> list[dict]:
+    """
+    Get all plants for a user with pagination.
+
+    Args:
+        user_id: Supabase user UUID
+        limit: Maximum number of plants to return
+        offset: Number of plants to skip (for pagination)
+
+    Returns:
+        List of plant dictionaries, empty list if error
+    """
+    if not _supabase_client:
+        return []
+
+    try:
+        response = (_supabase_client
+                   .table("plants")
+                   .select("*")
+                   .eq("user_id", user_id)
+                   .order("created_at", desc=True)
+                   .limit(limit)
+                   .offset(offset)
+                   .execute())
+        return response.data or []
+    except Exception as e:
+        current_app.logger.error(f"Error getting user plants: {e}")
+        return []
+
+
+def get_plant_by_id(plant_id: str, user_id: str) -> dict | None:
+    """
+    Get a single plant by ID, verifying ownership.
+
+    Args:
+        plant_id: Plant UUID
+        user_id: User UUID (for ownership verification)
+
+    Returns:
+        Plant dictionary if found and owned by user, None otherwise
+    """
+    if not _supabase_client:
+        return None
+
+    try:
+        response = (_supabase_client
+                   .table("plants")
+                   .select("*")
+                   .eq("id", plant_id)
+                   .eq("user_id", user_id)
+                   .single()
+                   .execute())
+        return response.data
+    except Exception as e:
+        current_app.logger.error(f"Error getting plant {plant_id}: {e}")
+        return None
+
+
+def create_plant(user_id: str, plant_data: dict) -> dict | None:
+    """
+    Create a new plant for the user.
+
+    Args:
+        user_id: User UUID
+        plant_data: Dictionary with plant fields (name, species, nickname, location, light, notes, photo_url)
+
+    Returns:
+        Created plant dictionary, or None if error
+    """
+    if not _supabase_client:
+        return None
+
+    try:
+        # Prepare plant data with user_id
+        data = {
+            "user_id": user_id,
+            "name": plant_data.get("name", "").strip(),
+            "species": plant_data.get("species", "").strip() or None,
+            "nickname": plant_data.get("nickname", "").strip() or None,
+            "location": plant_data.get("location", "").strip() or None,
+            "light": plant_data.get("light", "").strip() or None,
+            "notes": plant_data.get("notes", "").strip() or None,
+            "photo_url": plant_data.get("photo_url") or None,
+        }
+
+        response = _supabase_client.table("plants").insert(data).execute()
+
+        if response.data and len(response.data) > 0:
+            return response.data[0]
+        return None
+    except Exception as e:
+        current_app.logger.error(f"Error creating plant: {e}")
+        return None
+
+
+def update_plant(plant_id: str, user_id: str, plant_data: dict) -> dict | None:
+    """
+    Update an existing plant (with ownership verification).
+
+    Args:
+        plant_id: Plant UUID
+        user_id: User UUID (for ownership verification)
+        plant_data: Dictionary with fields to update
+
+    Returns:
+        Updated plant dictionary, or None if error
+    """
+    if not _supabase_client:
+        return None
+
+    try:
+        # Prepare update data (only include provided fields)
+        data = {}
+        if "name" in plant_data:
+            data["name"] = plant_data["name"].strip()
+        if "species" in plant_data:
+            data["species"] = plant_data["species"].strip() or None
+        if "nickname" in plant_data:
+            data["nickname"] = plant_data["nickname"].strip() or None
+        if "location" in plant_data:
+            data["location"] = plant_data["location"].strip() or None
+        if "light" in plant_data:
+            data["light"] = plant_data["light"].strip() or None
+        if "notes" in plant_data:
+            data["notes"] = plant_data["notes"].strip() or None
+        if "photo_url" in plant_data:
+            data["photo_url"] = plant_data["photo_url"] or None
+
+        response = (_supabase_client
+                   .table("plants")
+                   .update(data)
+                   .eq("id", plant_id)
+                   .eq("user_id", user_id)  # Ownership check
+                   .execute())
+
+        if response.data and len(response.data) > 0:
+            return response.data[0]
+        return None
+    except Exception as e:
+        current_app.logger.error(f"Error updating plant {plant_id}: {e}")
+        return None
+
+
+def delete_plant(plant_id: str, user_id: str) -> bool:
+    """
+    Delete a plant (with ownership verification).
+
+    Args:
+        plant_id: Plant UUID
+        user_id: User UUID (for ownership verification)
+
+    Returns:
+        True if deleted successfully, False otherwise
+    """
+    if not _supabase_client:
+        return False
+
+    try:
+        response = (_supabase_client
+                   .table("plants")
+                   .delete()
+                   .eq("id", plant_id)
+                   .eq("user_id", user_id)  # Ownership check
+                   .execute())
+        return True
+    except Exception as e:
+        current_app.logger.error(f"Error deleting plant {plant_id}: {e}")
+        return False
+
+
+def upload_plant_photo(file_bytes: bytes, user_id: str, filename: str) -> str | None:
+    """
+    Upload a plant photo to Supabase Storage.
+
+    Args:
+        file_bytes: Image file bytes
+        user_id: User UUID (for organizing files)
+        filename: Original filename
+
+    Returns:
+        Public URL of uploaded image, or None if error
+    """
+    if not _supabase_client:
+        return None
+
+    try:
+        import uuid
+        from pathlib import Path
+
+        # Generate unique filename
+        file_ext = Path(filename).suffix.lower()
+        unique_filename = f"{user_id}/{uuid.uuid4()}{file_ext}"
+
+        # Upload to plant-photos bucket
+        response = _supabase_client.storage.from_("plant-photos").upload(
+            unique_filename,
+            file_bytes,
+            file_options={"content-type": f"image/{file_ext.lstrip('.')}" if file_ext else "image/jpeg"}
+        )
+
+        # Get public URL
+        public_url = _supabase_client.storage.from_("plant-photos").get_public_url(unique_filename)
+        return public_url
+    except Exception as e:
+        current_app.logger.error(f"Error uploading plant photo: {e}")
+        return None
+
+
+def delete_plant_photo(photo_url: str) -> bool:
+    """
+    Delete a plant photo from Supabase Storage.
+
+    Args:
+        photo_url: Full public URL of the photo
+
+    Returns:
+        True if deleted successfully, False otherwise
+    """
+    if not _supabase_client or not photo_url:
+        return False
+
+    try:
+        # Extract file path from URL
+        # URL format: https://{project}.supabase.co/storage/v1/object/public/plant-photos/{path}
+        if "/plant-photos/" in photo_url:
+            file_path = photo_url.split("/plant-photos/")[1]
+            _supabase_client.storage.from_("plant-photos").remove([file_path])
+            return True
+        return False
+    except Exception as e:
+        current_app.logger.error(f"Error deleting plant photo: {e}")
+        return False
+
+
 # ============================================================================
 # Onboarding Helpers
 # ============================================================================

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}{{ plant.name }} - Plant Care AI{% endblock %}
+{% block description %}View details for {{ plant.name }}.{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>
+    {{ plant.name }}
+    {% if plant.nickname %}
+      <span class="plant-nickname-large">"{{ plant.nickname }}"</span>
+    {% endif %}
+  </h1>
+  {% if plant.species %}
+    <p class="page-subtitle">{{ plant.species }}</p>
+  {% endif %}
+</div>
+
+<div class="plant-detail">
+  {% if plant.photo_url %}
+    <div class="plant-detail-photo">
+      <img src="{{ plant.photo_url }}" alt="Photo of {{ plant.name }}">
+    </div>
+  {% endif %}
+
+  <div class="plant-detail-info card">
+    <h2>Plant Information</h2>
+
+    <dl class="info-list">
+      {% if plant.location %}
+        <div class="info-item">
+          <dt>📍 Location</dt>
+          <dd>{{ plant.location }}</dd>
+        </div>
+      {% endif %}
+
+      {% if plant.light %}
+        <div class="info-item">
+          <dt>☀️ Light</dt>
+          <dd>{{ plant.light }}</dd>
+        </div>
+      {% endif %}
+
+      {% if plant.notes %}
+        <div class="info-item">
+          <dt>📝 Notes</dt>
+          <dd>{{ plant.notes }}</dd>
+        </div>
+      {% endif %}
+
+      <div class="info-item">
+        <dt>📅 Added</dt>
+        <dd>{{ plant.created_at[:10] if plant.created_at else 'Unknown' }}</dd>
+      </div>
+    </dl>
+  </div>
+
+  <div class="plant-actions-section">
+    <a href="{{ url_for('plants.edit', plant_id=plant.id) }}" class="btn btn-primary">
+      Edit Plant
+    </a>
+    <a href="{{ url_for('plants.index') }}" class="btn btn-secondary">
+      Back to Plants
+    </a>
+
+    <form method="POST" action="{{ url_for('plants.delete', plant_id=plant.id) }}" class="delete-form" onsubmit="return confirm('Are you sure you want to delete {{ plant.name }}? This cannot be undone.');">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <button type="submit" class="btn btn-outline btn-danger">
+        Delete Plant
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}
