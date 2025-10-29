@@ -66,11 +66,25 @@
         </div>
       </div>
 
-      <!-- Simple Navigation -->
+      <!-- Navigation (logged in vs logged out) -->
       <nav class="hero-nav" aria-label="Main navigation">
-        <a class="nav-link" href="{{ url_for('pricing.index') }}">Pricing</a>
-        <a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a>
-        <a class="btn btn-primary" href="{{ url_for('auth.signup') }}">Sign Up Free</a>
+        {% if is_authenticated %}
+          <a class="nav-link" href="{{ url_for('dashboard.index') }}">Dashboard</a>
+          <a class="nav-link" href="{{ url_for('web.index') }}">Ask AI</a>
+          <div class="user-menu">
+            <button class="user-menu-btn" aria-expanded="false" aria-haspopup="true" id="user-menu-btn">
+              <span aria-label="Account menu for {{ current_user.email }}">{{ current_user.email|truncate(20) }} ▾</span>
+            </button>
+            <div class="user-menu-dropdown" hidden id="user-menu-dropdown" role="menu" aria-labelledby="user-menu-btn">
+              <a href="{{ url_for('dashboard.account') }}" role="menuitem">Account Settings</a>
+              <a href="{{ url_for('auth.logout') }}" role="menuitem">Log Out</a>
+            </div>
+          </div>
+        {% else %}
+          <a class="nav-link" href="{{ url_for('pricing.index') }}">Pricing</a>
+          <a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a>
+          <a class="btn btn-primary" href="{{ url_for('auth.signup') }}">Sign Up Free</a>
+        {% endif %}
       </nav>
 
       {% set show_debug = (config.UI_DEBUG_LINKS or request.args.get('debug') == 'true') %}

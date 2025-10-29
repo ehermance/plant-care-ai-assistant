@@ -512,7 +512,7 @@ ul.history li:hover {
   background: var(--card-bg); /* Use warm background */
   border: 1px solid var(--brand-border); border-radius: 12px; /* Softer corners */
   box-shadow: var(--shadow-lg); /* Use warm shadow system */
-  min-width: 200px; z-index: 1000;
+  min-width: 200px; z-index: 10000;
 }
 .user-menu-dropdown[hidden] { display: none; }
 .user-menu-dropdown a, .user-menu-dropdown span {
