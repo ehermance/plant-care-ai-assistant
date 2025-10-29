@@ -4,8 +4,7 @@ services:
     env: python
     plan: free
     buildCommand: |
-      pip install --upgrade pip
-      pip install -r requirements-lock.txt
+      pip install --upgrade pip; pip install -r requirements-lock.txt
     startCommand: >
       gunicorn "wsgi:app" -w 2 -k gthread --threads 4 -b 0.0.0.0:$PORT
       --max-requests 200 --max-requests-jitter 50 --timeout 120
@@ -30,10 +29,6 @@ services:
         value: "40 per minute; 2000 per day"
       - key: RATELIMIT_ASK
         value: "8 per minute; 1 per 2 seconds; 200 per day"
-      # Optionally add storage if you move off memory:// (recommended in production)
-      # - key: RATELIMIT_STORAGE_URI
-      #   value: "redis://<host>:6379/0"
-      # Supabase (Database + Auth + Storage)
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_ANON_KEY
@@ -42,3 +37,10 @@ services:
         sync: false
       - key: SUPABASE_REDIRECT_URL
         sync: false
+redirects:
+  - source: https://www.plantcareai.app/*
+    destination: https://plantcareai.app/:splat
+    status: 301
+  - source: https://plants.ehermance.com/*
+    destination: https://plantcareai.app/ask
+    status: 301

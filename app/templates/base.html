@@ -2,22 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>{% block title %}Plant Care AI Assistant • EDH Dev{% endblock %}</title>
+  <title>{% block title %}Plant Care AI | Smart Plant Assistant for Weather-Aware Watering & Tips | EDH Dev{% endblock %}</title>
+  
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-        content="{% block description %}Ask for plant care help from an AI-powered assistant that gives practical tips based on your plants and local weather.{% endblock %}" />
+        content="{% block description %}Plant Care AI helps you keep every plant thriving with AI-powered reminders, weather-aware watering, and personalized care tips. Free to start, built by EDH Dev.{% endblock %}" />
+  <meta name="keywords"
+        content="plant care app, AI plant assistant, smart plant watering, plant reminder app, weather-based plant care, gardening app, houseplant tips">
   <meta name="author" content="EDH Dev" />
   <meta name="theme-color" content="#0F766E" />
 
   <!-- Security Meta Tags -->
   <meta name="referrer" content="strict-origin-when-cross-origin">
 
-  <!-- Canonical & Social -->
-  <meta property="og:title" content="{% block og_title %}Plant Care AI Assistant{% endblock %}" />
-  <meta property="og:description" content="{% block og_description %}Weather-aware plant care tips with an AI assist and graceful fallbacks.{% endblock %}" />
+  <!-- Canonical URL -->
+  <link rel="canonical" href="{{ request.url }}" />
+
+  <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Plant Care AI" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:url" content="{{ request.url }}" />
+  <meta property="og:title" content="{% block og_title %}Plant Care AI 🌿 Your Smart Plant Assistant{% endblock %}" />
+  <meta property="og:description" content="{% block og_description %}Personalized, weather-aware plant care powered by AI. No ads, just greener growth.{% endblock %}" />
   <meta property="og:image" content="{{ url_for('static', filename='og-preview.png', _external=True) }}" />
-  <meta property="og:url" content="{{ request.url_root }}" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Plant Care AI - Smart Plant Assistant" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{% block twitter_title %}Plant Care AI – Smart Plant Assistant{% endblock %}" />
+  <meta name="twitter:description" content="{% block twitter_description %}AI-powered plant care reminders and weather-aware guidance.{% endblock %}" />
+  <meta name="twitter:image" content="{{ url_for('static', filename='og-preview.png', _external=True) }}" />
+  <meta name="twitter:image:alt" content="Plant Care AI - Smart Plant Assistant" />
+
+  <!-- SEO -->
   <meta name="robots" content="index, follow" />
 
    <!-- Icons & PWA -->
@@ -36,33 +55,64 @@
 
   {% block extra_head %}{% endblock %}
 
+  <!-- Structured Data (JSON-LD) for SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Plant Care AI",
+    "applicationCategory": "LifestyleApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "AI-powered plant care assistant that provides personalized, weather-aware care reminders and tips for your plants.",
+    "url": "{{ request.url_root }}",
+    "author": {
+      "@type": "Organization",
+      "name": "EDH Dev"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5.0",
+      "ratingCount": "1"
+    }
+  }
+  </script>
+
   <!-- Web Analytics -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "{{ CF_BEACON_TOKEN }}"}'></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
 
-  <!-- Brand Header -->
-  <div class="brand-hero" role="banner" aria-label="EDH Dev brand header">
-    <div class="container hero-inner">
-      <div class="brand-lockup">
-        <a class="brand-chip" href="{{ url_for('web.index') }}" aria-label="Plant Care AI Home">
-          <span class="brand-initials" aria-hidden="true">🌿</span>
+  <!-- Site Header -->
+  <header class="site-header" role="banner">
+    <div class="container header-inner">
+      <div class="logo-lockup">
+        <a class="site-logo" href="{{ url_for('web.index') }}" aria-label="Plant Care AI Home">
+          <span class="logo-icon" aria-hidden="true">🌿</span>
           <span class="visually-hidden">Home</span>
         </a>
         <div class="brand-text">
-          <h1 class="app-title">
-            Plant Care AI Assistant <span aria-hidden="true" class="title-emojis">🪴 🌱 🌵</span>
+          <h1 class="site-title">
+            Plant Care AI Assistant <span aria-hidden="true" class="title-decoration">🪴 🌱 🌵</span>
           </h1>
-          <p class="app-subtitle">{% block subtitle %}Your plants deserve to thrive. We'll show you how.{% endblock %}</p>
+          <p class="site-tagline">{% block subtitle %}Your plants deserve to thrive. We'll show you how.{% endblock %}</p>
         </div>
       </div>
 
-      <!-- Navigation (logged in vs logged out) -->
-      <nav class="hero-nav" aria-label="Main navigation">
+      <!-- Main Navigation -->
+      <nav class="site-nav" aria-label="Main navigation">
         {% if is_authenticated %}
-          <a class="nav-link" href="{{ url_for('dashboard.index') }}">Dashboard</a>
-          <a class="nav-link" href="{{ url_for('web.index') }}">Ask AI</a>
+          <a class="nav-link{% if request.endpoint and request.endpoint.startswith('dashboard.') %} active{% endif %}"
+             href="{{ url_for('dashboard.index') }}"
+             {% if request.endpoint and request.endpoint.startswith('dashboard.') %}aria-current="page"{% endif %}>Dashboard</a>
+          <a class="nav-link{% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %} active{% endif %}"
+             href="{{ url_for('web.ask_ai') }}"
+             {% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %}aria-current="page"{% endif %}>Care Assistant</a>
           <div class="user-menu">
             <button class="user-menu-btn" aria-expanded="false" aria-haspopup="true" id="user-menu-btn">
               <span aria-label="Account menu for {{ current_user.email }}">{{ current_user.email|truncate(20) }} ▾</span>
@@ -73,22 +123,29 @@
             </div>
           </div>
         {% else %}
-          <a class="nav-link" href="{{ url_for('pricing.index') }}">Pricing</a>
-          <a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a>
+          <a class="nav-link{% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %} active{% endif %}"
+             href="{{ url_for('web.ask_ai') }}"
+             {% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %}aria-current="page"{% endif %}>Care Assistant</a>
+          <a class="nav-link{% if request.endpoint and request.endpoint.startswith('pricing.') %} active{% endif %}"
+             href="{{ url_for('pricing.index') }}"
+             {% if request.endpoint and request.endpoint.startswith('pricing.') %}aria-current="page"{% endif %}>Features</a>
+          <a class="nav-link{% if request.endpoint and request.endpoint.startswith('auth.login') %} active{% endif %}"
+             href="{{ url_for('auth.login') }}"
+             {% if request.endpoint and request.endpoint.startswith('auth.login') %}aria-current="page"{% endif %}>Log In</a>
           <a class="btn btn-primary" href="{{ url_for('auth.signup') }}">Sign Up Free</a>
         {% endif %}
       </nav>
 
       {% set show_debug = (config.UI_DEBUG_LINKS or request.args.get('debug') == 'true') %}
       {% if show_debug %}
-        <p class="small hero-links">
+        <p class="small nav-links">
           <a class="muted-link" href="{{ url_for('web.healthz') }}" target="_blank" rel="noopener">Health check</a>
           &middot;
           <a class="muted-link" href="{{ url_for('web.debug_info') }}" target="_blank" rel="noopener">Debug info</a>
         </p>
       {% endif %}
     </div>
-  </div>
+  </header>
 
   <div class="page-watermark" aria-hidden="true"></div>
 

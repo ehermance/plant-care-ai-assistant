@@ -91,13 +91,30 @@ def debug_info():
 def clear_history():
     session.pop("history", None)  # only this user's session history
     session.modified = True
-    return redirect(url_for("web.index"))
+    return redirect(url_for("web.ask_ai"))
 
 
-@web_bp.route("/", methods=["GET"])
+@web_bp.route("/")
 def index():
     """
-    Render the main page on GET. The template uses these variables to decide
+    Homepage - redirects based on authentication state:
+    - Authenticated: Dashboard
+    - Unauthenticated: Signup page
+    """
+    from ..utils.auth import get_current_user
+
+    if get_current_user():
+        # User is logged in - go to dashboard
+        return redirect(url_for("dashboard.index"))
+    else:
+        # User not logged in - go to signup
+        return redirect(url_for("auth.signup"))
+
+
+@web_bp.route("/ask", methods=["GET"])
+def ask_ai():
+    """
+    Render the Ask AI page on GET. The template uses these variables to decide
     what to show; passing explicit None keeps Jinja conditional logic simple.
     """
     today_str = datetime.now().strftime("%Y-%m-%d")

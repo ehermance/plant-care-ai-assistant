@@ -1,370 +1,263 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Plant Care AI Assistant • EDH Dev</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description"
-        content="Ask for plant care help from an AI-powered assistant that gives practical tips based on your plants and local weather." />
-  <meta name="author" content="EDH Dev" />
-  <meta name="theme-color" content="#0F766E" />
+{% extends "base.html" %}
 
-  <!-- Security Meta Tags -->
-  <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self';
-                script-src 'self' https://static.cloudflareinsights.com;
-                style-src 'self';
-                img-src 'self' data:;
-                font-src 'self';
-                connect-src 'self' https://cloudflareinsights.com https://static.cloudflareinsights.com;
-                object-src 'none';
-                base-uri 'self';
-                form-action 'self';
-                upgrade-insecure-requests">
+{% block title %}Plant Care AI Assistant • EDH Dev{% endblock %}
 
-  <!-- Canonical & Social -->
-  <meta property="og:title" content="Plant Care AI Assistant" />
-  <meta property="og:description" content="Weather-aware plant care tips with an AI assist and graceful fallbacks." />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="{{ url_for('static', filename='og-preview.png', _external=True) }}" />
-  <meta property="og:url" content="{{ request.url_root }}" />
-  <meta name="robots" content="index, follow" />
+{% block description %}Ask for plant care help from an AI-powered assistant that gives practical tips based on your plants and local weather.{% endblock %}
 
-   <!-- Icons & PWA -->
-  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/icons/favicon.svg') }}">
-  <link rel="alternate icon" type="image/x-icon" href="{{ url_for('static', filename='images/icons/favicon.ico') }}">
-  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/icons/favicon-32x32.png') }}">
-  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/icons/favicon-16x16.png') }}">
-  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/icons/apple-touch-icon.png') }}">
-  <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+{% block content %}
+<section class="card" aria-labelledby="presets-title">
+  <h2 id="presets-title" class="section-title">Recommended presets</h2>
+  <div id="presets" aria-label="Recommended plant presets">
+    <button type="button" class="preset-btn"
+            data-plant="Monstera deliciosa"
+            data-question="How often should I water?"
+            data-context="indoor_potted">
+      Monstera — watering (indoors)
+    </button>
+    <button type="button" class="preset-btn"
+            data-plant="Lavender"
+            data-question="How much sun does it need?"
+            data-context="outdoor_bed">
+      Lavender — light (garden bed)
+    </button>
+    <button type="button" class="preset-btn"
+            data-plant="Rosemary"
+            data-question="Best pot size and soil?"
+            data-context="outdoor_potted">
+      Rosemary — pot &amp; soil (outdoor pot)
+    </button>
+    <button type="button" class="preset-btn"
+            data-plant="Snake Plant"
+            data-question="Fertilizer schedule?"
+            data-context="indoor_potted">
+      Snake Plant — fertilizing (indoors)
+    </button>
+  </div>
+</section>
 
-  <!-- Performance hints -->
-  <link rel="preconnect" href="https://static.cloudflareinsights.com" crossorigin>
+<section class="grid-two" aria-labelledby="form-title" aria-busy="false">
+  <div class="combined-loading-overlay" role="status" aria-live="polite" aria-atomic="true">
+    <div class="spinner" aria-hidden="true"></div>
+    <div id="loading-message">Germinating…</div>
+  </div>
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  <section class="card form-card" aria-labelledby="form-title">
+    <h2 id="form-title" class="section-title">Get Plant Care Advice</h2>
 
-  <!-- Web Analytics -->
-  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "{{ CF_BEACON_TOKEN }}"}'></script>
-</head>
-<body>
-  <a class="skip-link" href="#main">Skip to main content</a>
-
-  <div class="brand-hero" role="banner" aria-label="EDH Dev brand header">
-    <div class="container hero-inner">
-      <div class="brand-lockup">
-        <a class="brand-chip" href="{{ url_for('web.index') }}" aria-label="Plant Care AI Home">
-          <span class="brand-initials" aria-hidden="true">🌿</span>
-          <span class="visually-hidden">Home</span>
-        </a>
-        <div class="brand-text">
-          <h1 class="app-title">
-            Plant Care AI Assistant <span aria-hidden="true" class="title-emojis">🪴 🌱 🌵</span>
-          </h1>
-          <p class="app-subtitle">Your plants deserve to thrive. We'll show you how.</p>
+    <form id="ask-form" class="form-grid" action="{{ url_for('web.ask') }}" method="post" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <div class="form-row form-row--two">
+        <div>
+          <label for="plant">Plant (optional)</label>
+          <input id="plant" name="plant" type="text" autocomplete="off"
+                 placeholder="e.g., Monstera deliciosa"
+                 value="{{ (form_values and form_values.plant) or '' }}" />
+        </div>
+        <div>
+          <label for="city">City or ZIP (optional)</label>
+          <input id="city" name="city" type="text" autocomplete="off"
+                placeholder="e.g., Austin, TX or 73301"
+                value="{{ (form_values and form_values.city) or '' }}" />
         </div>
       </div>
 
-      <!-- Navigation (logged in vs logged out) -->
-      <nav class="hero-nav" aria-label="Main navigation">
-        {% if is_authenticated %}
-          <a class="nav-link" href="{{ url_for('dashboard.index') }}">Dashboard</a>
-          <a class="nav-link" href="{{ url_for('web.index') }}">Ask AI</a>
-          <div class="user-menu">
-            <button class="user-menu-btn" aria-expanded="false" aria-haspopup="true" id="user-menu-btn">
-              <span aria-label="Account menu for {{ current_user.email }}">{{ current_user.email|truncate(20) }} ▾</span>
-            </button>
-            <div class="user-menu-dropdown" hidden id="user-menu-dropdown" role="menu" aria-labelledby="user-menu-btn">
-              <a href="{{ url_for('dashboard.account') }}" role="menuitem">Account Settings</a>
-              <a href="{{ url_for('auth.logout') }}" role="menuitem">Log Out</a>
+      <div class="form-row">
+        <div>
+          <label for="care_context">Where is the plant?</label>
+          <select id="care_context" name="care_context" aria-label="Where is the plant?">
+            <option value="indoor_potted"
+              {% if (form_values and form_values.care_context == 'indoor_potted') or (not form_values) %}selected{% endif %}>
+              Potted house plant (indoors)
+            </option>
+            <option value="outdoor_potted"
+              {% if form_values and form_values.care_context == 'outdoor_potted' %}selected{% endif %}>
+              Potted plant kept outdoors
+            </option>
+            <option value="outdoor_bed"
+              {% if form_values and form_values.care_context == 'outdoor_bed' %}selected{% endif %}>
+              Plant in an outdoor garden bed
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div>
+          <label for="question">Question</label>
+          <textarea id="question" name="question" rows="5"
+                    placeholder="e.g., How often should I water?">{{ (form_values and form_values.question) or '' }}</textarea>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="submit-btn" class="primary" type="submit">Ask</button>
+        <button id="reset-btn" class="secondary" type="button" aria-label="Clear all fields">
+          Reset
+        </button>
+      </div>
+    </form>
+
+    {% if ai_error and source == 'rule' %}
+      <p class="small muted" role="status" aria-live="polite">
+        AI unavailable — showing rule-based tips.
+      </p>
+    {% endif %}
+  </section>
+
+  <section class="card answer-card" aria-labelledby="answer-title" role="region" tabindex="-1">
+    <h2 id="answer-title" class="section-title">Answer</h2>
+    {% if answer %}
+      <p class="small muted">
+        Generated by: <strong>{{ source == 'ai' and 'OpenAI' or 'Rule-based engine' }}</strong>
+      </p>
+      <pre class="prewrap">{{ answer }}</pre>
+    {% else %}
+      <p class="muted">Submit a question to see guidance here.</p>
+    {% endif %}
+  </section>
+</section>
+
+<!-- Weather (shows when available) -->
+<section id="weather-section">
+  {% if weather %}
+    <div class="weather-header">
+      <h2 class="section-title" id="weather-heading">
+        Local weather for {{ form_values.city or 'your area' }}, today + next 5 days
+        <span class="visually-hidden">Use the toggle to switch temperature units.</span>
+        <span class="weather-note small muted" aria-hidden="true">Hourly in 3-hour intervals</span>
+      </h2>
+      <!-- Units toggle (right aligned) -->
+      <form class="units-toggle" aria-label="Temperature units">
+        <fieldset role="radiogroup" aria-label="Select units">
+          <label class="toggle-seg">
+            <input type="radio" name="units" value="f" checked>
+            °F
+          </label>
+          <label class="toggle-seg">
+            <input type="radio" name="units" value="c">
+            °C
+          </label>
+        </fieldset>
+      </form>
+    </div>
+
+    <!-- Hourly forecast -->
+    {% if hourly %}
+    <div class="hourly-wrap" aria-label="Hourly forecast for the rest of today">
+      <div class="hourly-scroll" role="list">
+        {% for h in hourly %}
+          <div class="hourly-chip" role="listitem" aria-label="{{ h.time }}">
+            <div class="hourly-time">{{ h.time }}</div>
+            <div class="hourly-emoji" aria-hidden="true">{{ h.emoji }}</div>
+            <div class="hourly-temp">
+              <span class="only-f">{{ (h.temp_f is not none) and (h.temp_f|round(0)|string + '°F') or '' }}</span>
+              <span class="only-c">{{ (h.temp_c is not none) and (h.temp_c|round(0)|string + '°C') or '' }}</span>
             </div>
           </div>
-        {% else %}
-          <a class="nav-link" href="{{ url_for('pricing.index') }}">Pricing</a>
-          <a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a>
-          <a class="btn btn-primary" href="{{ url_for('auth.signup') }}">Sign Up Free</a>
-        {% endif %}
-      </nav>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
 
-      {% set show_debug = (config.UI_DEBUG_LINKS or request.args.get('debug') == 'true') %}
-      {% if show_debug %}
-        <p class="small hero-links">
-          <a class="muted-link" href="{{ url_for('web.healthz') }}" target="_blank" rel="noopener">Health check</a>
-          &middot;
-          <a class="muted-link" href="{{ url_for('web.debug_info') }}" target="_blank" rel="noopener">Debug info</a>
-        </p>
+    <!-- Daily forecast -->
+    <div class="forecast-grid">
+      <!-- Today card -->
+      <div class="forecast-card today" aria-labelledby="today-title">
+        <div class="forecast-top">
+          <div class="forecast-daywrap">
+            <div id="today-title" class="forecast-day">Today</div>
+            <span class="badge">Now</span>
+          </div>
+          <div class="forecast-emoji" aria-hidden="true">{{ weather.emoji or '⛅' }}</div>
+        </div>
+
+        <div class="forecast-date">{{ today_str }}</div>
+        <div class="forecast-desc">{{ (weather.conditions or 'N/A')|capitalize }}</div>
+
+        <div class="forecast-temps">
+          <span class="tlabel">Current:</span>
+          <span class="only-f">{{ (weather.temp_f is not none) and (weather.temp_f|round(0)|string + '°F') or '—' }}</span>
+          <span class="only-c">{{ (weather.temp_c is not none) and (weather.temp_c|round(0)|string + '°C') or '—' }}</span>
+        </div>
+
+        <!-- Keep rows consistent across cards; highs/lows optional if you add them later -->
+        <div class="forecast-extras small">
+          Humidity: {{ weather.humidity }}% • Wind:
+          <span class="only-f">{{ weather.wind_mph }} mph</span>
+          <span class="only-c">{{ (weather.wind_mps is not none) and (weather.wind_mps|round(1)|string + ' m/s') or '—' }}</span>
+        </div>
+      </div>
+
+      <!-- Next 5 days (exactly five to keep a total of 6 cards) -->
+      {% if forecast %}
+        {% for f in forecast[:5] %}
+          <div class="forecast-card">
+            <div class="forecast-top">
+              <div class="forecast-daywrap">
+                <div class="forecast-day">{{ f.day }}</div>
+              </div>
+              <div class="forecast-emoji" aria-hidden="true">{{ f.emoji or '⛅' }}</div>
+            </div>
+
+            <div class="forecast-date">{{ f.date }}</div>
+            <div class="forecast-desc">{{ (f.conditions or 'N/A')|capitalize }}</div>
+
+            <div class="forecast-temps">
+              <span class="tlabel">High:</span>
+              <span class="only-f tmax">{{ (f.temp_max_f is not none) and (f.temp_max_f|round(0)|string + '°F') or '—' }}</span>
+              <span class="only-c tmax">{{ (f.temp_max_c is not none) and (f.temp_max_c|round(0)|string + '°C') or '—' }}</span>
+            </div>
+            <div class="forecast-temps">
+              <span class="tlabel">Low:</span>
+              <span class="only-f tmin">{{ (f.temp_min_f is not none) and (f.temp_min_f|round(0)|string + '°F') or '—' }}</span>
+              <span class="only-c tmin">{{ (f.temp_min_c is not none) and (f.temp_min_c|round(0)|string + '°C') or '—' }}</span>
+            </div>
+
+            <div class="forecast-extras small">
+              Humidity: {{ f.humidity }}% • Wind:
+              <span class="only-f">{{ f.wind_mph }} mph</span>
+              <span class="only-c">{{ (f.wind_mps is not none) and (f.wind_mps|round(1)|string + ' m/s') or '—' }}</span>
+            </div>
+          </div>
+        {% endfor %}
       {% endif %}
     </div>
+  {% elif form_values and form_values.city %}
+    <p class="muted">No weather data available for that city or ZIP.</p>
+  {% else %}
+    <p class="muted">Enter a city or ZIP to include weather insights in the answer.</p>
+  {% endif %}
+</section>
+
+<section class="card" aria-labelledby="history-title">
+  <div class="history-header">
+    <h2 id="history-title" class="section-title">Recent Q&amp;A</h2>
+    {% if has_history %}
+      <a class="muted-link small clear-link" href="{{ url_for('web.clear_history') }}">Clear</a>
+    {% endif %}
   </div>
 
-  <div class="page-watermark" aria-hidden="true"></div>
-
-  <div class="container">
-    <main id="main">
-      <section class="card" aria-labelledby="presets-title">
-        <h2 id="presets-title" class="section-title">Recommended presets</h2>
-        <div id="presets" aria-label="Recommended plant presets">
-          <button type="button" class="preset-btn"
-                  data-plant="Monstera deliciosa"
-                  data-question="How often should I water?"
-                  data-context="indoor_potted">
-            Monstera — watering (indoors)
-          </button>
-          <button type="button" class="preset-btn"
-                  data-plant="Lavender"
-                  data-question="How much sun does it need?"
-                  data-context="outdoor_bed">
-            Lavender — light (garden bed)
-          </button>
-          <button type="button" class="preset-btn"
-                  data-plant="Rosemary"
-                  data-question="Best pot size and soil?"
-                  data-context="outdoor_potted">
-            Rosemary — pot &amp; soil (outdoor pot)
-          </button>
-          <button type="button" class="preset-btn"
-                  data-plant="Snake Plant"
-                  data-question="Fertilizer schedule?"
-                  data-context="indoor_potted">
-            Snake Plant — fertilizing (indoors)
-          </button>
-        </div>
-      </section>
-
-      <section class="grid-two" aria-labelledby="form-title" aria-busy="false">
-        <div class="combined-loading-overlay" role="status" aria-live="polite" aria-atomic="true">
-          <div class="spinner" aria-hidden="true"></div>
-          <div id="loading-message">Germinating…</div>
-        </div>
-
-        <section class="card form-card" aria-labelledby="form-title">
-          <h2 id="form-title" class="section-title">Ask for advice</h2>
-
-          <form id="ask-form" class="form-grid" action="{{ url_for('web.ask') }}" method="post" novalidate>
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <div class="form-row form-row--two">
-              <div>
-                <label for="plant">Plant (optional)</label>
-                <input id="plant" name="plant" type="text" autocomplete="off"
-                       placeholder="e.g., Monstera deliciosa"
-                       value="{{ (form_values and form_values.plant) or '' }}" />
-              </div>
-              <div>
-                <label for="city">City or ZIP (optional)</label>
-                <input id="city" name="city" type="text" autocomplete="off"
-                      placeholder="e.g., Austin, TX or 73301"
-                      value="{{ (form_values and form_values.city) or '' }}" />
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div>
-                <label for="care_context">Where is the plant?</label>
-                <select id="care_context" name="care_context" aria-label="Where is the plant?">
-                  <option value="indoor_potted"
-                    {% if (form_values and form_values.care_context == 'indoor_potted') or (not form_values) %}selected{% endif %}>
-                    Potted house plant (indoors)
-                  </option>
-                  <option value="outdoor_potted"
-                    {% if form_values and form_values.care_context == 'outdoor_potted' %}selected{% endif %}>
-                    Potted plant kept outdoors
-                  </option>
-                  <option value="outdoor_bed"
-                    {% if form_values and form_values.care_context == 'outdoor_bed' %}selected{% endif %}>
-                    Plant in an outdoor garden bed
-                  </option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div>
-                <label for="question">Question</label>
-                <textarea id="question" name="question" rows="5"
-                          placeholder="e.g., How often should I water?">{{ (form_values and form_values.question) or '' }}</textarea>
-              </div>
-            </div>
-
-            <div class="actions">
-              <button id="submit-btn" class="primary" type="submit">Ask</button>
-              <button id="reset-btn" class="secondary" type="button" aria-label="Clear all fields">
-                Reset
-              </button>
-            </div>
-          </form>
-
-          {% if ai_error and source == 'rule' %}
-            <p class="small muted" role="status" aria-live="polite">
-              AI unavailable — showing rule-based tips.
-            </p>
-          {% endif %}
-        </section>
-
-        <section class="card answer-card" aria-labelledby="answer-title" role="region" tabindex="-1">
-          <h2 id="answer-title" class="section-title">Answer</h2>
-          {% if answer %}
-            <p class="small muted">
-              Generated by: <strong>{{ source == 'ai' and 'OpenAI' or 'Rule-based engine' }}</strong>
-            </p>
-            <pre class="prewrap">{{ answer }}</pre>
-          {% else %}
-            <p class="muted">Submit a question to see guidance here.</p>
-          {% endif %}
-        </section>
-      </section>
-
-      <!-- Weather (shows when available) -->
-      <section id="weather-section">
-        {% if weather %}
-          <div class="weather-header">
-            <h2 class="section-title" id="weather-heading">
-              Local weather for {{ form_values.city or 'your area' }}, today + next 5 days
-              <span class="visually-hidden">Use the toggle to switch temperature units.</span>
-              <span class="weather-note small muted" aria-hidden="true">Hourly in 3-hour intervals</span>
-            </h2>
-            <!-- Units toggle (right aligned) -->
-            <form class="units-toggle" aria-label="Temperature units">
-              <fieldset role="radiogroup" aria-label="Select units">
-                <label class="toggle-seg">
-                  <input type="radio" name="units" value="f" checked>
-                  °F
-                </label>
-                <label class="toggle-seg">
-                  <input type="radio" name="units" value="c">
-                  °C
-                </label>
-              </fieldset>
-            </form>
+  {% if has_history %}
+    <ul class="history">
+      {% for item in history %}
+        <li>
+          <div class="small muted mono">{{ item.ts }}</div>
+          <div class="small">
+            <span class="mono">{{ item.source == 'ai' and 'AI' or 'Rule' }}</span>
+            {% if item.care_context %} • <span class="mono">{{ item.care_context }}</span>{% endif %}
+            {% if item.plant %} • <strong>Plant:</strong> {{ item.plant }}{% endif %}
+            {% if item.city %} • <strong>City/Zip:</strong> {{ item.city }}{% endif %}
           </div>
-
-          <!-- Hourly forecast -->
-          {% if hourly %}
-          <div class="hourly-wrap" aria-label="Hourly forecast for the rest of today">
-            <div class="hourly-scroll" role="list">
-              {% for h in hourly %}
-                <div class="hourly-chip" role="listitem" aria-label="{{ h.time }}">
-                  <div class="hourly-time">{{ h.time }}</div>
-                  <div class="hourly-emoji" aria-hidden="true">{{ h.emoji }}</div>
-                  <div class="hourly-temp">
-                    <span class="only-f">{{ (h.temp_f is not none) and (h.temp_f|round(0)|string + '°F') or '' }}</span>
-                    <span class="only-c">{{ (h.temp_c is not none) and (h.temp_c|round(0)|string + '°C') or '' }}</span>
-                  </div>
-                </div>
-              {% endfor %}
-            </div>
-          </div>
-          {% endif %}
-
-          <!-- Daily forecast -->
-          <div class="forecast-grid">
-            <!-- Today card -->
-            <div class="forecast-card today" aria-labelledby="today-title">
-              <div class="forecast-top">
-                <div class="forecast-daywrap">
-                  <div id="today-title" class="forecast-day">Today</div>
-                  <span class="badge">Now</span>
-                </div>
-                <div class="forecast-emoji" aria-hidden="true">{{ weather.emoji or '⛅' }}</div>
-              </div>
-
-              <div class="forecast-date">{{ today_str }}</div>
-              <div class="forecast-desc">{{ (weather.conditions or 'N/A')|capitalize }}</div>
-
-              <div class="forecast-temps">
-                <span class="tlabel">Current:</span>
-                <span class="only-f">{{ (weather.temp_f is not none) and (weather.temp_f|round(0)|string + '°F') or '—' }}</span>
-                <span class="only-c">{{ (weather.temp_c is not none) and (weather.temp_c|round(0)|string + '°C') or '—' }}</span>
-              </div>
-
-              <!-- Keep rows consistent across cards; highs/lows optional if you add them later -->
-              <div class="forecast-extras small">
-                Humidity: {{ weather.humidity }}% • Wind:
-                <span class="only-f">{{ weather.wind_mph }} mph</span>
-                <span class="only-c">{{ (weather.wind_mps is not none) and (weather.wind_mps|round(1)|string + ' m/s') or '—' }}</span>
-              </div>
-            </div>
-
-            <!-- Next 5 days (exactly five to keep a total of 6 cards) -->
-            {% if forecast %}
-              {% for f in forecast[:5] %}
-                <div class="forecast-card">
-                  <div class="forecast-top">
-                    <div class="forecast-daywrap">
-                      <div class="forecast-day">{{ f.day }}</div>
-                    </div>
-                    <div class="forecast-emoji" aria-hidden="true">{{ f.emoji or '⛅' }}</div>
-                  </div>
-
-                  <div class="forecast-date">{{ f.date }}</div>
-                  <div class="forecast-desc">{{ (f.conditions or 'N/A')|capitalize }}</div>
-
-                  <div class="forecast-temps">
-                    <span class="tlabel">High:</span>
-                    <span class="only-f tmax">{{ (f.temp_max_f is not none) and (f.temp_max_f|round(0)|string + '°F') or '—' }}</span>
-                    <span class="only-c tmax">{{ (f.temp_max_c is not none) and (f.temp_max_c|round(0)|string + '°C') or '—' }}</span>
-                  </div>
-                  <div class="forecast-temps">
-                    <span class="tlabel">Low:</span>
-                    <span class="only-f tmin">{{ (f.temp_min_f is not none) and (f.temp_min_f|round(0)|string + '°F') or '—' }}</span>
-                    <span class="only-c tmin">{{ (f.temp_min_c is not none) and (f.temp_min_c|round(0)|string + '°C') or '—' }}</span>
-                  </div>
-
-                  <div class="forecast-extras small">
-                    Humidity: {{ f.humidity }}% • Wind:
-                    <span class="only-f">{{ f.wind_mph }} mph</span>
-                    <span class="only-c">{{ (f.wind_mps is not none) and (f.wind_mps|round(1)|string + ' m/s') or '—' }}</span>
-                  </div>
-                </div>
-              {% endfor %}
-            {% endif %}
-          </div>
-        {% elif form_values and form_values.city %}
-          <p class="muted">No weather data available for that city or ZIP.</p>
-        {% else %}
-          <p class="muted">Enter a city or ZIP to include weather insights in the answer.</p>
-        {% endif %}
-      </section>
-
-      <section class="card" aria-labelledby="history-title">
-        <div class="history-header">
-          <h2 id="history-title" class="section-title">Recent Q&amp;A</h2>
-          {% if has_history %}
-            <a class="muted-link small clear-link" href="{{ url_for('web.clear_history') }}">Clear</a>
-          {% endif %}
-        </div>
-
-        {% if has_history %}
-          <ul class="history">
-            {% for item in history %}
-              <li>
-                <div class="small muted mono">{{ item.ts }}</div>
-                <div class="small">
-                  <span class="mono">{{ item.source == 'ai' and 'AI' or 'Rule' }}</span>
-                  {% if item.care_context %} • <span class="mono">{{ item.care_context }}</span>{% endif %}
-                  {% if item.plant %} • <strong>Plant:</strong> {{ item.plant }}{% endif %}
-                  {% if item.city %} • <strong>City/Zip:</strong> {{ item.city }}{% endif %}
-                </div>
-                <div class="small history-q"><strong>Q:</strong> {{ item.question }}</div>
-                <details class="history-details">
-                  <summary class="small muted-link">Show answer</summary>
-                  <pre class="prewrap small history-answer">{{ item.answer }}</pre>
-                </details>
-              </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p class="muted">No questions yet. Ask something above to populate the history.</p>
-        {% endif %}
-      </section>
-
-    </main>
-  </div>
-
-  <footer class="site-footer" role="contentinfo">
-    <p>&copy; <span id="copyright-year"></span> <a href="https://www.ehermance.com" rel="noopener">EDH Dev</a> — Built with care</p>
-  </footer>
-
-  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
-</body>
-</html>
+          <div class="small history-q"><strong>Q:</strong> {{ item.question }}</div>
+          <details class="history-details">
+            <summary class="small muted-link">Show answer</summary>
+            <pre class="prewrap small history-answer">{{ item.answer }}</pre>
+          </details>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="muted">No questions yet. Ask something above to populate the history.</p>
+  {% endif %}
+</section>
+{% endblock %}
