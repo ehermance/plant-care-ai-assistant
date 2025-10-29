@@ -175,8 +175,9 @@
   </div>
 
   <!-- Mobile Bottom Navigation (app-like experience) -->
-  {% if is_authenticated %}
-    <nav class="bottom-nav" aria-label="Mobile navigation">
+  <nav class="bottom-nav" aria-label="Mobile navigation">
+    {% if is_authenticated %}
+      {# Authenticated users: Home, Care, Account #}
       <a href="{{ url_for('dashboard.index') }}" class="bottom-nav-item{% if request.endpoint and request.endpoint.startswith('dashboard.') %} active{% endif %}">
         <span class="bottom-nav-item-icon" aria-hidden="true">🏠</span>
         <span>Home</span>
@@ -189,8 +190,22 @@
         <span class="bottom-nav-item-icon" aria-hidden="true">👤</span>
         <span>Account</span>
       </a>
-    </nav>
-  {% endif %}
+    {% else %}
+      {# Unauthenticated users: Care, Features, Sign Up #}
+      <a href="{{ url_for('web.ask_ai') }}" class="bottom-nav-item{% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %} active{% endif %}">
+        <span class="bottom-nav-item-icon" aria-hidden="true">🌿</span>
+        <span>Care</span>
+      </a>
+      <a href="{{ url_for('pricing.index') }}" class="bottom-nav-item{% if request.endpoint and request.endpoint.startswith('pricing.') %} active{% endif %}">
+        <span class="bottom-nav-item-icon" aria-hidden="true">✨</span>
+        <span>Features</span>
+      </a>
+      <a href="{{ url_for('auth.signup') }}" class="bottom-nav-item{% if request.endpoint and request.endpoint.startswith('auth.signup') %} active{% endif %}">
+        <span class="bottom-nav-item-icon" aria-hidden="true">🌱</span>
+        <span>Sign Up</span>
+      </a>
+    {% endif %}
+  </nav>
 
   <!-- Footer -->
   <footer class="site-footer" role="contentinfo">
