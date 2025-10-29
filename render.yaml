@@ -33,3 +33,12 @@ services:
       # Optionally add storage if you move off memory:// (recommended in production)
       # - key: RATELIMIT_STORAGE_URI
       #   value: "redis://<host>:6379/0"
+      # Supabase (Database + Auth + Storage)
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_REDIRECT_URL
+        sync: false
