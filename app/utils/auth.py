@@ -20,6 +20,7 @@ from app.services import supabase_client
 
 SESSION_USER_KEY = "user"
 SESSION_ACCESS_TOKEN_KEY = "access_token"
+SESSION_REFRESH_TOKEN_KEY = "refresh_token"
 
 
 def get_current_user() -> Optional[Dict[str, Any]]:
@@ -35,12 +36,14 @@ def get_current_user() -> Optional[Dict[str, Any]]:
 
     # Try to get from session
     access_token = session.get(SESSION_ACCESS_TOKEN_KEY)
+    refresh_token = session.get(SESSION_REFRESH_TOKEN_KEY)
+
     if not access_token:
         g.user = None
         return None
 
-    # Verify token with Supabase
-    user = supabase_client.verify_session(access_token)
+    # Verify token with Supabase (pass both tokens)
+    user = supabase_client.verify_session(access_token, refresh_token)
     if not user:
         # Token invalid/expired, clear session
         clear_session()
@@ -63,19 +66,22 @@ def get_current_user_id() -> Optional[str]:
     return user.get("id") if user else None
 
 
-def set_session(user: Dict[str, Any], access_token: str) -> None:
+def set_session(user: Dict[str, Any], access_token: str, refresh_token: Optional[str] = None) -> None:
     """
     Store user session data.
 
     Args:
         user: User dict from Supabase Auth
         access_token: JWT access token
+        refresh_token: Optional refresh token for session renewal
     """
     session[SESSION_USER_KEY] = {
         "id": user.get("id"),
         "email": user.get("email"),
     }
     session[SESSION_ACCESS_TOKEN_KEY] = access_token
+    if refresh_token:
+        session[SESSION_REFRESH_TOKEN_KEY] = refresh_token
     session.permanent = True  # Use permanent session (configurable lifetime)
 
 
@@ -83,6 +89,7 @@ def clear_session() -> None:
     """Clear user session data."""
     session.pop(SESSION_USER_KEY, None)
     session.pop(SESSION_ACCESS_TOKEN_KEY, None)
+    session.pop(SESSION_REFRESH_TOKEN_KEY, None)
 
 
 def is_authenticated() -> bool:

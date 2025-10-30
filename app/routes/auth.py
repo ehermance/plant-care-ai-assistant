@@ -132,8 +132,8 @@ def callback():
         flash("Authentication failed. Please try again.", "error")
         return redirect(url_for("auth.signup"))
 
-    # Set session
-    set_session(user, access_token)
+    # Set session with both tokens
+    set_session(user, access_token, refresh_token)
 
     # Get or create user profile
     user_id = user.get("id")
