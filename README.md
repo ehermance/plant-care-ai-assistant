@@ -1,4 +1,4 @@
-# Plant Care AI Assistant
+# Plant Care AI Assistant, PlantCareAI
 
 Flask application that provides plant-care guidance using a layered approach:
 rule-based tips, local weather context, and optional OpenAI answers with
@@ -34,4 +34,4 @@ python run.py
 Licensed under the [MIT License](LICENSE).
 
 © 2025 EDH Dev.  
-The Plant Care AI Assistant code is open source; the EDH Dev name and logo remain © EDH Dev.
+The Plant Care AI Assistant, PlantCareAI, code is open source; the EDH Dev name and logo remain © EDH Dev.

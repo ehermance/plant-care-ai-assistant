@@ -162,7 +162,7 @@ def callback():
     is_new_user = profile is None or not supabase_client.is_onboarding_completed(user_id)
 
     if is_new_user:
-        flash(f"Welcome to Plant Care AI! Let's add your first plant 🌱", "success")
+        flash(f"Welcome to PlantCareAI! Let's add your first plant 🌱", "success")
     else:
         flash(f"Welcome back!", "success")
 
