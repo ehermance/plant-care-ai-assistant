@@ -25,7 +25,7 @@
   <meta property="og:url" content="{{ request.url }}" />
   <meta property="og:title" content="{% block og_title %}Plant Care AI 🌿 Your Smart Plant Assistant{% endblock %}" />
   <meta property="og:description" content="{% block og_description %}Personalized, weather-aware plant care powered by AI. No ads, just greener growth.{% endblock %}" />
-  <meta property="og:image" content="{{ url_for('static', filename='og-preview.png', _external=True) }}" />
+  <meta property="og:image" content="{{ url_for('static', filename='images/logos/og-preview.png', _external=True) }}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="Plant Care AI - Smart Plant Assistant" />
@@ -33,7 +33,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="{% block twitter_title %}Plant Care AI – Smart Plant Assistant{% endblock %}" />
   <meta name="twitter:description" content="{% block twitter_description %}AI-powered plant care reminders and weather-aware guidance.{% endblock %}" />
-  <meta name="twitter:image" content="{{ url_for('static', filename='og-preview.png', _external=True) }}" />
+  <meta name="twitter:image" content="{{ url_for('static', filename='images/logos/og-preview.png', _external=True) }}" />
   <meta name="twitter:image:alt" content="Plant Care AI - Smart Plant Assistant" />
 
   <!-- SEO -->
@@ -94,15 +94,17 @@
   <header class="site-header" role="banner">
     <div class="container header-inner">
       <div class="logo-lockup">
-        <a class="site-logo" href="{{ url_for('web.index') }}" aria-label="Plant Care AI Home">
+        <a class="site-logo" href="{{ url_for('web.index') }}" aria-label="PlantCareAI.app Home Logo">
           <span class="logo-icon" aria-hidden="true">🌿</span>
           <span class="visually-hidden">Home</span>
         </a>
-        <div class="brand-text">
-          <h1 class="site-title">
-            Plant Care AI Assistant <span aria-hidden="true" class="title-decoration">🪴 🌱 🌵</span>
-          </h1>
-          <p class="site-tagline">{% block subtitle %}Your plants deserve to thrive. We'll show you how.{% endblock %}</p>
+        <div class="brand-text-wrapper">
+          <a class="brand-text" href="{{ url_for('web.index') }}" aria-label="PlantCareAI.app Home Banner">
+            <h1 class="site-title">
+              PlantCareAI.app <span aria-hidden="true" class="title-decoration">🪴 🌱 🌵</span>
+            </h1>
+            <p class="site-tagline">{% block subtitle %}Your plants deserve to thrive. We'll show you how.{% endblock %}</p>
+          </a>
         </div>
       </div>
 

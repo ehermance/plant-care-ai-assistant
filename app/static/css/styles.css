@@ -201,6 +201,11 @@ body {
                0 0 40px rgba(94, 234, 212, 0.2);
 }
 
+.brand-text,
+.brand-text:hover {
+  text-decoration: none;
+}
+
 .site-title {
   margin: 0;
   font-size: clamp(1.25rem, 1.6rem, 2rem);
@@ -275,6 +280,8 @@ main { display: grid; grid-template-columns: 1fr; gap: 1rem; position: relative;
   border-bottom-color: var(--brand-teal-600);
 }
 .section-title { margin: 0 0 .5rem 0; font-size: 1.1rem; font-weight: 700; }
+.section-subtitle { margin: 0 0 .5rem 0; font-size: 1rem; font-weight: 700; }
+.preline { white-space: pre-line; margin: 0; }
 .prewrap { white-space: pre-wrap; margin: 0; }
 a.muted-link { text-decoration: none; color: var(--link); font-size: .95rem; }
 .muted { color: var(--brand-muted); font-size: .95rem; }
@@ -390,6 +397,12 @@ button.secondary:active {
 .grid-two.is-submitting .form-grid button { pointer-events: none; }
 
 .answer-card:focus { outline: 2px solid var(--focus); outline-offset: 2px; }
+.answer-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.answer-text { font-family: "Nunito", "Segoe UI", "Helvetica Neue", sans-serif; }
 
 /* Spinner */
 .spinner {
@@ -1301,8 +1314,9 @@ ul.history li:hover {
 
 /* Honeypot - Bot Protection (hidden from humans) */
 .honeypot {
-  position: absolute; left: -9999px; width: 1px; height: 1px;
-  opacity: 0; pointer-events: none; tabindex: -1;
+  position: absolute; left: -9999px; top: auto;
+  width: 1px; height: 1px; overflow: hidden;
+  opacity: 0; pointer-events: none;
 }
 
 /* Flash Messages */

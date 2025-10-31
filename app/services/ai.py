@@ -62,11 +62,11 @@ def _fmt_temp(weather: Optional[dict]) -> str:
         pass
     return "n/a"
 
-def _weather_tip(weather: Optional[dict], plant: Optional[str]) -> Optional[str]:
+def _weather_tip(weather: Optional[dict], plant: Optional[str], care_context: str) -> Optional[str]:
     """
     Tiny, safe hint based on temperature (thresholds in °C), but display both °C/°F when possible.
     """
-    if not weather or weather.get("temp_c") is None:
+    if not weather or weather.get("temp_c") is None or "indoor" in care_context:
         return None
 
     t_c = weather["temp_c"]
@@ -162,7 +162,7 @@ def _ai_advice(question: str, plant: Optional[str], weather: Optional[dict], car
     context_str = context_map.get(care_context, "potted house plant (indoors)")
 
     sys_msg = (
-        "You are a plant-care expert. Provide safe, concise, practical steps. "
+        "You are a helfpul plant-care expert with calm persona. Provide safe, concise, accurate, and practical steps. "
         "If uncertain, say so."
     )
     user_msg = (
@@ -170,7 +170,7 @@ def _ai_advice(question: str, plant: Optional[str], weather: Optional[dict], car
         f"Care context: {context_str}\n"
         f"Question: {question.strip()}\n"
         f"Weather: {w_summary or 'n/a'}\n\n"
-        "Respond with 3–6 short bullet points."
+        "Respond with one short, introductory sentence, 3–6 short bullet points, and a final encouraging sentence."
     )
 
     try:
@@ -249,7 +249,7 @@ def generate_advice(
         answer = _basic_plant_tip(question, plant, care_context)
         source = "rule"
 
-    hint = _weather_tip(weather, plant)
+    hint = _weather_tip(weather, plant, care_context)
     if hint:
         city_name = weather.get("city") if weather else (city or "")
         suffix = f"\n\nWeather tip{(' for ' + city_name) if city_name else ''}: {hint}"
