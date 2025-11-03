@@ -62,11 +62,25 @@ def _fmt_temp(weather: Optional[dict]) -> str:
         pass
     return "n/a"
 
-def _weather_tip(weather: Optional[dict], plant: Optional[str], care_context: str) -> Optional[str]:
+def _weather_tip(weather: Optional[dict], plant: Optional[str], care_context: Optional[str] = None) -> Optional[str]:
     """
     Tiny, safe hint based on temperature (thresholds in °C), but display both °C/°F when possible.
+    Only shows tips for outdoor plants (outdoor_potted, outdoor_bed).
+
+    Args:
+        weather: Weather dict with temp_c and optional care_context
+        plant: Plant name for personalization
+        care_context: Location context (outdoor_potted, outdoor_bed, indoor_potted, etc.)
+                     Can also be passed in weather dict as weather["care_context"]
     """
-    if not weather or weather.get("temp_c") is None or "indoor" in care_context:
+    if not weather or weather.get("temp_c") is None:
+        return None
+
+    # Get care_context from parameter or weather dict, default to outdoor_potted for backward compatibility
+    context = care_context or weather.get("care_context", "outdoor_potted")
+
+    # Only show weather tips for outdoor plants (not indoor)
+    if "indoor" in context.lower():
         return None
 
     t_c = weather["temp_c"]
@@ -74,9 +88,9 @@ def _weather_tip(weather: Optional[dict], plant: Optional[str], care_context: st
     name = plant or "the plant"
     try:
         if t_c >= 32:
-            return f"It’s hot ({temp_str}). Check {name} more often; water may evaporate quickly."
+            return f"It's hot ({temp_str}). Check {name} more often; water may evaporate quickly."
         if t_c <= 5:
-            return f"It’s cold ({temp_str}). Keep {name} away from drafts and reduce watering."
+            return f"It's cold ({temp_str}). Keep {name} away from drafts and reduce watering."
         return f"Current temp {temp_str}. Maintain your usual schedule; verify soil moisture first."
     except Exception:
         return None

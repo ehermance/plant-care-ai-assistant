@@ -7,6 +7,25 @@
     <filter id="grayscale">
       <feColorMatrix type="saturate" values="0"/>
     </filter>
+
+    <!-- Monstera leaf template (with fenestrations) -->
+    <g id="monstera-leaf">
+      <!-- Leaf outline -->
+      <path d="M 0,0 Q 18,12 28,35 Q 32,52 30,72 Q 26,92 18,108 Q 8,118 -8,108 Q -16,92 -20,72 Q -22,52 -18,35 Q -8,12 0,0 Z"
+            fill="#8BA888" stroke="none"/>
+      <!-- Central vein -->
+      <path d="M 0,2 L 2,110" fill="none" stroke="#0d9488" stroke-width="1.5" opacity="0.3"/>
+      <!-- Left fenestrations (characteristic splits) -->
+      <ellipse cx="-8" cy="30" rx="2.5" ry="8" fill="#0d9488" opacity="0.15"/>
+      <ellipse cx="-10" cy="50" rx="2.8" ry="10" fill="#0d9488" opacity="0.15"/>
+      <ellipse cx="-12" cy="70" rx="3" ry="12" fill="#0d9488" opacity="0.15"/>
+      <ellipse cx="-9" cy="88" rx="2.5" ry="9" fill="#0d9488" opacity="0.15"/>
+      <!-- Right fenestrations -->
+      <ellipse cx="10" cy="35" rx="2.5" ry="8" fill="#0d9488" opacity="0.15"/>
+      <ellipse cx="12" cy="55" rx="2.8" ry="10" fill="#0d9488" opacity="0.15"/>
+      <ellipse cx="14" cy="75" rx="3" ry="12" fill="#0d9488" opacity="0.15"/>
+      <ellipse cx="11" cy="92" rx="2.5" ry="9" fill="#0d9488" opacity="0.15"/>
+    </g>
   </defs>
 
   <g id="botanical-flourish" fill="none" stroke="#8BA888" stroke-linecap="round" stroke-linejoin="round">
@@ -230,6 +249,17 @@
           stroke-width="1.5" opacity="0.4"/>
     <path d="M 120,450 Q 200,480 280,500"
           stroke-width="1.5" opacity="0.4"/>
+
+    <!-- MONSTERA LEAVES (brand accent with fenestrations) -->
+
+    <!-- Monstera 1 - upper center area -->
+    <use href="#monstera-leaf" transform="translate(315, 120) scale(0.35) rotate(-20)" opacity="0.9"/>
+
+    <!-- Monstera 2 - right side -->
+    <use href="#monstera-leaf" transform="translate(545, 340) scale(0.28) rotate(35)" opacity="0.85"/>
+
+    <!-- Monstera 3 - lower center area -->
+    <use href="#monstera-leaf" transform="translate(295, 500) scale(0.32) rotate(-45)" opacity="0.88"/>
 
     <!-- ILLUSTRATED HIBISCUS FLOWERS (10% - modern line style, green) -->
 

@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>{% block title %}PlantCareAI.app | Smart Plant Assistant for Weather-Aware Watering & Tips | EDH Dev{% endblock %}</title>
+  <title>{% block title %}PlantCareAI | Smart Plant Assistant for Weather-Aware Watering & Tips | EDH Dev{% endblock %}</title>
   
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-        content="{% block description %}PlantCareAI.app helps you keep every plant thriving with AI-powered reminders, weather-aware watering, and personalized care tips. Free to start, built by EDH Dev.{% endblock %}" />
+        content="{% block description %}PlantCareAI helps you keep every plant thriving with AI-powered reminders, weather-aware watering, and personalized care tips. Free to start, built by EDH Dev.{% endblock %}" />
   <meta name="keywords"
         content="plant care ai, plant care app, AI plant assistant, smart plant watering, plant reminder app, weather-based plant care, gardening app, houseplant tips">
   <meta name="author" content="EDH Dev" />
@@ -94,14 +94,14 @@
   <header class="site-header" role="banner">
     <div class="container header-inner">
       <div class="logo-lockup">
-        <a class="site-logo" href="{{ url_for('web.index') }}" aria-label="PlantCareAI.app Home Logo">
+        <a class="site-logo" href="{{ url_for('web.index') }}" aria-label="PlantCareAI Home Logo">
           <span class="logo-icon" aria-hidden="true">🌿</span>
           <span class="visually-hidden">Home</span>
         </a>
         <div class="brand-text-wrapper">
-          <a class="brand-text" href="{{ url_for('web.index') }}" aria-label="PlantCareAI.app Home Banner">
+          <a class="brand-text" href="{{ url_for('web.index') }}" aria-label="PlantCareAI Home Banner">
             <h1 class="site-title">
-              PlantCareAI.app <span aria-hidden="true" class="title-decoration">🪴 🌱 🌵</span>
+              PlantCareAI <span aria-hidden="true" class="title-decoration">🪴 🌱 🌵</span>
             </h1>
             <p class="site-tagline">{% block subtitle %}Your plants deserve to thrive. We'll show you how.{% endblock %}</p>
           </a>
@@ -149,9 +149,8 @@
         </p>
       {% endif %}
     </div>
+    <div class="header-watermark" aria-hidden="true"></div>
   </header>
-
-  <div class="page-watermark" aria-hidden="true"></div>
 
   <!-- Flash Messages (WCAG-compliant alerts) -->
   {% with messages = get_flashed_messages(with_categories=true) %}

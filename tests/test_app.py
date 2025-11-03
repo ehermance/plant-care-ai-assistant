@@ -149,3 +149,22 @@ def test_weather_adjustment_tip_missing_temp(monkeypatch):
     # No temp_c -> should gracefully return None
     assert app.weather_adjustment_tip({"city": "Austin"}, "Monstera") is None
 
+def test_weather_adjustment_tip_indoor_context_param(monkeypatch):
+    import app; importlib.reload(app)
+    # Indoor plant with care_context parameter -> should return None (no weather tip)
+    tip = app.weather_adjustment_tip({"temp_c": 33, "city": "Austin"}, "Monstera", "indoor_potted")
+    assert tip is None
+
+def test_weather_adjustment_tip_indoor_context_in_weather(monkeypatch):
+    import app; importlib.reload(app)
+    # Indoor plant with care_context in weather dict -> should return None (no weather tip)
+    tip = app.weather_adjustment_tip({"temp_c": 33, "city": "Austin", "care_context": "indoor_potted"}, "Monstera")
+    assert tip is None
+
+def test_weather_adjustment_tip_outdoor_context_explicit(monkeypatch):
+    import app; importlib.reload(app)
+    # Outdoor plant with explicit care_context -> should return weather tip
+    tip = app.weather_adjustment_tip({"temp_c": 33, "city": "Austin"}, "Monstera", "outdoor_potted")
+    assert tip is not None
+    assert "hot" in tip.lower()
+

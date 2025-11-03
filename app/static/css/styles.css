@@ -1567,6 +1567,30 @@ ul.history li:hover {
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
 }
+/* Clickable stat cards */
+.stat-card-link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+.stat-card-link:hover {
+  border-color: var(--brand-teal);
+  box-shadow: var(--shadow-depth-md);
+  transform: translateY(-4px);
+}
+.stat-card-link:focus {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+/* Disabled stat cards (coming soon) */
+.stat-card-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.stat-card-disabled:hover {
+  box-shadow: var(--shadow-sm);
+  transform: none;
+}
 .stat-icon {
   font-size: 2.5rem; line-height: 1;
 }
@@ -2287,9 +2311,9 @@ ul.history li:hover {
   }
 }
 
-/* Botanical watermark background - repeating pattern */
-.page-watermark {
-  position: fixed;
+/* Botanical watermark background - repeating pattern (header only) */
+.header-watermark {
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;

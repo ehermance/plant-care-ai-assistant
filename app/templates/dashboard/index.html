@@ -22,15 +22,15 @@
 
 <!-- Quick Stats -->
 <div class="dashboard-stats">
-  <div class="stat-card">
+  <a href="{{ url_for('plants.index') }}" class="stat-card stat-card-link">
     <div class="stat-icon" aria-hidden="true">🪴</div>
     <div class="stat-content">
       <div class="stat-value">{{ plant_count }}</div>
       <div class="stat-label">Plants</div>
     </div>
-  </div>
+  </a>
 
-  <div class="stat-card">
+  <div class="stat-card stat-card-disabled" title="Coming soon - Care reminders">
     <div class="stat-icon" aria-hidden="true">💧</div>
     <div class="stat-content">
       <div class="stat-value">0</div>
@@ -38,7 +38,7 @@
     </div>
   </div>
 
-  <div class="stat-card">
+  <div class="stat-card stat-card-disabled" title="Coming soon - Care reminders">
     <div class="stat-icon" aria-hidden="true">📅</div>
     <div class="stat-content">
       <div class="stat-value">0</div>
@@ -46,13 +46,13 @@
     </div>
   </div>
 
-  <div class="stat-card">
+  <a href="{{ url_for('pricing.index') }}" class="stat-card stat-card-link">
     <div class="stat-icon" aria-hidden="true">🌱</div>
     <div class="stat-content">
       <div class="stat-value">Starter</div>
       <div class="stat-label">Free Forever</div>
     </div>
-  </div>
+  </a>
 </div>
 
 <!-- Quick Actions -->
