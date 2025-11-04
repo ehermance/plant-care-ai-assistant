@@ -29,7 +29,8 @@ from .utils import auth
 
 def create_app() -> Flask:
     # Load .env early (for local dev)
-    load_dotenv()
+    # Use override=True to ensure .env values take precedence over system environment
+    load_dotenv(override=True)
 
     app = Flask(
         __name__,

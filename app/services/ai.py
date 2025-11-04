@@ -17,33 +17,92 @@ from .weather import get_weather_for_city
 
 AI_LAST_ERROR: Optional[str] = None
 
+# Track which AI provider was actually used for the last successful response
+AI_LAST_PROVIDER: Optional[str] = None
 
-def _openai_client():
+# Cache for LiteLLM Router to avoid recreating on every request
+_ROUTER_CACHE: Optional[object] = None
+
+
+def _clear_router_cache():
+    """Clear the router cache. Used for testing and when API keys change."""
+    global _ROUTER_CACHE
+    _ROUTER_CACHE = None
+
+
+def _get_litellm_router():
     """
-    Returns an OpenAI client or (None, error).
+    Returns a LiteLLM Router configured with OpenAI (primary) and Gemini (fallback),
+    or (None, error) if neither API key is available.
 
-    Reads OPENAI_API_KEY from the environment first; if a Flask app context is
-    active, also checks current_app.config. This avoids touching current_app
-    during unit tests that import this module without an application context.
+    Reads API keys from environment first; if a Flask app context is active,
+    also checks current_app.config.
+
+    PERFORMANCE: Router is cached to avoid recreation on every request.
     """
-    key = os.getenv("OPENAI_API_KEY")
-    if not key and has_app_context():
-        key = current_app.config.get("OPENAI_API_KEY")
+    global _ROUTER_CACHE
 
-    if not key:
-        return None, "OPENAI_API_KEY not configured"
+    # Return cached router if available
+    if _ROUTER_CACHE is not None:
+        return _ROUTER_CACHE, None
 
-    # Prefer modern SDK first; fall back to legacy if present.
+    openai_key = os.getenv("OPENAI_API_KEY")
+    gemini_key = os.getenv("GEMINI_API_KEY")
+
+    if not openai_key and has_app_context():
+        openai_key = current_app.config.get("OPENAI_API_KEY")
+    if not gemini_key and has_app_context():
+        gemini_key = current_app.config.get("GEMINI_API_KEY")
+
+    if not openai_key and not gemini_key:
+        return None, "Neither OPENAI_API_KEY nor GEMINI_API_KEY configured"
+
     try:
-        from openai import OpenAI
-        return OpenAI(api_key=key), None
+        from litellm import Router
+
+        model_list = []
+        fallbacks = {}
+
+        # Add OpenAI as primary if key exists
+        if openai_key:
+            model_list.append({
+                "model_name": "primary-gpt",
+                "litellm_params": {
+                    "model": "gpt-4o-mini",
+                    "api_key": openai_key,
+                    "temperature": 0.3,
+                    "max_tokens": 1500,  # Increased from 350 to match Gemini
+                }
+            })
+
+        # Add Gemini as fallback if key exists
+        if gemini_key:
+            model_list.append({
+                "model_name": "fallback-gemini",
+                "litellm_params": {
+                    "model": "gemini/gemini-flash-latest",
+                    "api_key": gemini_key,
+                    "temperature": 0.3,
+                    "max_tokens": 1500,  # Increased from 350 to avoid truncation
+                }
+            })
+
+        # Configure fallback chain: OpenAI -> Gemini
+        if openai_key and gemini_key:
+            fallbacks = [{"primary-gpt": ["fallback-gemini"]}]
+
+        router = Router(
+            model_list=model_list,
+            fallbacks=fallbacks if fallbacks else None,
+            num_retries=2,
+            timeout=30,
+        )
+
+        # Cache the router for future requests
+        _ROUTER_CACHE = router
+        return router, None
     except Exception as e:
-        try:
-            import openai as legacy  # type: ignore
-            legacy.api_key = key
-            return legacy, None
-        except Exception as e2:
-            return None, f"OpenAI import error: {e or e2}"
+        return None, f"LiteLLM Router initialization error: {e}"
 
 def _fmt_temp(weather: Optional[dict]) -> str:
     """Return a compact temperature string using both units when available."""
@@ -121,18 +180,20 @@ def _basic_plant_tip(question: str, plant: Optional[str], care_context: str) -> 
     return f"For {loc}, aim for bright-indirect light, water when the top inch is dry, and ensure good drainage."
 
 
-def _ai_advice(question: str, plant: Optional[str], weather: Optional[dict], care_context: str) -> Optional[str]:
+def _ai_advice(question: str, plant: Optional[str], weather: Optional[dict], care_context: str) -> Tuple[Optional[str], Optional[str]]:
     """
-    Calls OpenAI via the modern SDK if available; falls back to the Responses API;
-    if both fail, returns None (the caller will use rule-based output).
+    Calls AI providers using LiteLLM Router (OpenAI primary, Gemini fallback).
+    Returns (response_text, provider_name) or (None, None) if all providers fail.
+    The caller will use rule-based output if this returns (None, None).
     """
-    global AI_LAST_ERROR
+    global AI_LAST_ERROR, AI_LAST_PROVIDER
     AI_LAST_ERROR = None
+    AI_LAST_PROVIDER = None
 
-    client, err = _openai_client()
-    if not client:
-        AI_LAST_ERROR = err or "Unknown OpenAI client error"
-        return None
+    router, err = _get_litellm_router()
+    if not router:
+        AI_LAST_ERROR = err or "AI Router initialization failed"
+        return None, None
 
     # Compact weather summary included in the prompt when available.
     w_summary = None
@@ -176,7 +237,7 @@ def _ai_advice(question: str, plant: Optional[str], weather: Optional[dict], car
     context_str = context_map.get(care_context, "potted house plant (indoors)")
 
     sys_msg = (
-        "You are a helfpul plant-care expert with calm persona. Provide safe, concise, accurate, and practical steps. "
+        "You are a helpful plant-care expert with calm persona. Provide safe, concise, accurate, and practical steps. "
         "If uncertain, say so."
     )
     user_msg = (
@@ -188,44 +249,40 @@ def _ai_advice(question: str, plant: Optional[str], weather: Optional[dict], car
     )
 
     try:
-        # Modern Chat Completions
-        if hasattr(client, "chat") and hasattr(client.chat, "completions"):
-            resp = client.chat.completions.create(
-                model="gpt-4o-mini",
-                temperature=0.3,
-                max_tokens=350,
-                messages=[{"role": "system", "content": sys_msg},
-                          {"role": "user", "content": user_msg}],
-            )
-            txt = (resp.choices[0].message.content or "").strip()
-            if txt:
-                return txt
+        # Use LiteLLM Router with automatic fallback
+        # Start with primary model (OpenAI if configured)
+        openai_key = os.getenv("OPENAI_API_KEY")
+        if not openai_key and has_app_context():
+            openai_key = current_app.config.get("OPENAI_API_KEY")
 
-        # Responses API (SDK-dependent)
-        if hasattr(client, "responses") and hasattr(client.responses, "create"):
-            resp2 = client.responses.create(
-                model="gpt-4o-mini",
-                input=[{"role": "system", "content": sys_msg},
-                       {"role": "user", "content": user_msg}],
-                temperature=0.3,
-                max_output_tokens=350,
-            )
-            txt = getattr(resp2, "output_text", None)
-            if not txt:
-                content = getattr(resp2, "content", None)
-                if isinstance(content, list) and content and hasattr(content[0], "text"):
-                    txt = getattr(content[0].text, "value", "").strip()
-                elif isinstance(content, str):
-                    txt = content.strip()
-            if txt:
-                return txt
+        model_to_use = "primary-gpt" if openai_key else "fallback-gemini"
 
-        AI_LAST_ERROR = "No usable OpenAI response (model/path mismatch)"
-        return None
+        resp = router.completion(
+            model=model_to_use,
+            messages=[
+                {"role": "system", "content": sys_msg},
+                {"role": "user", "content": user_msg}
+            ],
+        )
+
+        txt = (resp.choices[0].message.content or "").strip()
+
+        if txt:
+            # Determine which provider was actually used
+            model_used = getattr(resp, "model", None) or model_to_use
+            if "gemini" in model_used.lower():
+                AI_LAST_PROVIDER = "gemini"
+                return txt, "gemini"
+            else:
+                AI_LAST_PROVIDER = "openai"
+                return txt, "openai"
+
+        AI_LAST_ERROR = "Empty response from AI providers"
+        return None, None
     except Exception as e:
         # Never raise; capture a short reason for /debug and the template.
         AI_LAST_ERROR = str(e)[:300]
-        return None
+        return None, None
 
 
 def ai_advice(
@@ -236,8 +293,10 @@ def ai_advice(
 ) -> str | None:
     """
     Back-compat shim for any code/tests that import ai_advice directly.
+    Returns just the text response, discarding the provider information.
     """
-    return _ai_advice(question, plant, weather, care_context or "indoor_potted")
+    text, _provider = _ai_advice(question, plant, weather, care_context or "indoor_potted")
+    return text
 
 
 def generate_advice(
@@ -249,16 +308,16 @@ def generate_advice(
     """
     Orchestrates advice generation:
       1) Best-effort weather fetch (does not block if it fails)
-      2) Try OpenAI; on failure, fall back to rules
+      2) Try AI providers (OpenAI primary, Gemini fallback); on failure, fall back to rules
       3) Append a short weather hint when available
-    Returns (answer, weather, source: "ai"|"rule")
+    Returns (answer, weather, source: "openai"|"gemini"|"rule")
     """
     weather = get_weather_for_city(city) if city else None
 
-    ai_text = _ai_advice(question, plant, weather, care_context)
-    if ai_text:
+    ai_text, provider = _ai_advice(question, plant, weather, care_context)
+    if ai_text and provider:
         answer = ai_text
-        source = "ai"
+        source = provider  # "openai" or "gemini"
     else:
         answer = _basic_plant_tip(question, plant, care_context)
         source = "rule"

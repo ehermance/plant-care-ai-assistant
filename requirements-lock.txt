@@ -22,6 +22,7 @@ filelock==3.20.0
 Flask==3.0.3
 Flask-Limiter==3.8.0
 Flask-WTF==1.2.1
+google-generativeai==0.8.3
 gunicorn==23.0.0
 h11==0.16.0
 h2==4.3.0
@@ -36,13 +37,14 @@ Jinja2==3.1.6
 jiter==0.11.0
 joblib==1.5.2
 limits==5.5.0
+litellm==1.70.0
 markdown-it-py==4.0.0
 MarkupSafe==3.0.2
 marshmallow==4.0.1
 mdurl==0.1.2
 multidict==6.7.0
 nltk==3.9.2
-openai==2.6.1
+openai==1.75.0
 ordered-set==4.1.0
 packaging==25.0
 pillow==11.3.0

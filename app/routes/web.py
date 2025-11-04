@@ -73,13 +73,32 @@ def debug_info():
     """
     Lightweight status snapshot for troubleshooting. The template controls
     visibility (requires UI flag or ?debug=true); this endpoint itself stays simple.
+
+    SECURITY: Only available in development/debug mode to prevent information disclosure.
     """
+    # Restrict to development environment only
+    if not current_app.config.get("DEBUG", False):
+        return {"error": "Not available in production"}, 404
+
+    import os
     loaded_keys = [k for k in ("FLASK_SECRET_KEY", "OPENWEATHER_API_KEY", "OPENAI_API_KEY") if current_app.config.get(k)]
+
+    # Check API key lengths for debugging
+    openai_key = current_app.config.get("OPENAI_API_KEY", "")
+    gemini_key = current_app.config.get("GEMINI_API_KEY", "")
+    openai_env = os.getenv("OPENAI_API_KEY", "")
+    gemini_env = os.getenv("GEMINI_API_KEY", "")
+
     info = {
         "loaded_env_vars": loaded_keys,
         "flask_secret_key_set": bool(current_app.secret_key),
         "weather_api_configured": bool(current_app.config.get("OPENWEATHER_API_KEY")),
-        "openai_configured": bool(current_app.config.get("OPENAI_API_KEY")),
+        "openai_configured": bool(openai_key),
+        "openai_key_length": len(openai_key) if openai_key else 0,
+        "gemini_configured": bool(gemini_key),
+        "gemini_key_length": len(gemini_key) if gemini_key else 0,
+        "openai_env_length": len(openai_env) if openai_env else 0,
+        "gemini_env_length": len(gemini_env) if gemini_env else 0,
         "history_len": len(_get_history()),
         "ai_last_error": AI_LAST_ERROR,
     }

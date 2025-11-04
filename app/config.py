@@ -33,6 +33,7 @@ class BaseConfig:
     # Third-party keys
     OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "")
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
     # Supabase (Database + Auth + Storage)
     SUPABASE_URL = os.getenv("SUPABASE_URL", "")

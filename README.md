@@ -1,9 +1,7 @@
 # Plant Care AI Assistant, PlantCareAI
 
 Flask application that provides plant-care guidance using a layered approach:
-rule-based tips, local weather context, and optional OpenAI answers with
-graceful fallback. The UI is accessible and CSP-compliant, with a loading
-indicator and geolocation-aware presets.
+rule-based tips, local weather context, and optional OpenAI answers with graceful fallback to Google Gemini or to a basic rule-based engine if neither AI providers are available. The UI is accessible and CSP-compliant, with a loading indicator and geolocation-aware presets.
 
 ## Features
 
