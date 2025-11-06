@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Reminder - PlantCareAI{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <h1 class="page-title">Edit Reminder</h1>
+  <p class="page-subtitle">Update your care reminder settings</p>
+</section>
+
+<section class="card">
+  <form method="POST" action="{{ url_for('reminders.edit', reminder_id=reminder.id) }}" class="form-vertical">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+    <!-- Title -->
+    <div class="form-group">
+      <label for="title">Reminder Title *</label>
+      <input
+        type="text"
+        id="title"
+        name="title"
+        maxlength="255"
+        value="{{ reminder.title }}"
+        required
+      />
+    </div>
+
+    <!-- Frequency -->
+    <div class="form-group">
+      <label for="frequency">Frequency *</label>
+      <select id="frequency" name="frequency" required onchange="toggleCustomInterval(this)">
+        <option value="daily" {% if reminder.frequency == 'daily' %}selected{% endif %}>Daily</option>
+        <option value="every_2_days" {% if reminder.frequency == 'every_2_days' %}selected{% endif %}>Every 2 Days</option>
+        <option value="every_3_days" {% if reminder.frequency == 'every_3_days' %}selected{% endif %}>Every 3 Days</option>
+        <option value="weekly" {% if reminder.frequency == 'weekly' %}selected{% endif %}>Weekly</option>
+        <option value="biweekly" {% if reminder.frequency == 'biweekly' %}selected{% endif %}>Biweekly (Every 2 Weeks)</option>
+        <option value="monthly" {% if reminder.frequency == 'monthly' %}selected{% endif %}>Monthly</option>
+        <option value="one_time" {% if reminder.frequency == 'one_time' %}selected{% endif %}>One-time Only</option>
+        <option value="custom" {% if reminder.frequency == 'custom' %}selected{% endif %}>Custom Interval</option>
+      </select>
+      <small class="form-hint">One-time reminders will be archived after completion</small>
+    </div>
+
+    <!-- Custom Interval -->
+    <div class="form-group" id="custom-interval-group" {% if reminder.frequency != 'custom' %}style="display: none;"{% endif %}>
+      <label for="custom_interval_days">Custom Interval (Days) *</label>
+      <input
+        type="number"
+        id="custom_interval_days"
+        name="custom_interval_days"
+        min="1"
+        max="365"
+        value="{{ reminder.custom_interval_days or '' }}"
+        {% if reminder.frequency == 'custom' %}required{% endif %}
+      />
+      <small class="form-hint">Enter number of days between reminders (1-365)</small>
+    </div>
+
+    <!-- Notes -->
+    <div class="form-group">
+      <label for="notes">Notes (Optional)</label>
+      <textarea
+        id="notes"
+        name="notes"
+        rows="3"
+        maxlength="500"
+        placeholder="Add any special instructions or notes..."
+      >{{ reminder.notes or '' }}</textarea>
+    </div>
+
+    <!-- Weather Adjustment -->
+    <div class="form-group">
+      <label class="checkbox-label">
+        <input type="checkbox" name="skip_weather_adjustment" {% if reminder.skip_weather_adjustment %}checked{% endif %} />
+        Skip weather adjustments
+      </label>
+      <small class="form-hint">If checked, this reminder won't be adjusted based on weather conditions</small>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</section>
+
+<script>
+// Toggle custom interval field
+function toggleCustomInterval(select) {
+  const customGroup = document.getElementById('custom-interval-group');
+  const customInput = document.getElementById('custom_interval_days');
+
+  if (select.value === 'custom') {
+    customGroup.style.display = 'block';
+    customInput.required = true;
+  } else {
+    customGroup.style.display = 'none';
+    customInput.required = false;
+  }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  toggleCustomInterval(document.getElementById('frequency'));
+});
+</script>
+
+{% endblock %}

@@ -23,6 +23,7 @@ from .routes.dashboard import dashboard_bp
 from .routes.pricing import pricing_bp
 from .routes.legal import legal_bp
 from .routes.plants import plants_bp
+from .routes.reminders import reminders_bp
 from .services import supabase_client
 from .utils import auth
 
@@ -102,6 +103,7 @@ def create_app() -> Flask:
     app.register_blueprint(pricing_bp)
     app.register_blueprint(legal_bp)
     app.register_blueprint(plants_bp)
+    app.register_blueprint(reminders_bp)
 
     # Add Jinja global for templates that need current date/time
     from datetime import datetime

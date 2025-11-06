@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}Care Reminders - PlantCareAI{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header">
+  <h1 class="page-title">Care Reminders</h1>
+  <p class="page-subtitle">Stay on top of your plant care schedule</p>
+  <div class="page-actions">
+    <a href="{{ url_for('reminders.create') }}" class="btn btn-primary">
+      + New Reminder
+    </a>
+    <a href="{{ url_for('reminders.history') }}" class="btn btn-secondary">
+      📜 View History
+    </a>
+  </div>
+</section>
+
+<!-- Reminder Stats -->
+<div class="dashboard-stats">
+  <div class="stat-card">
+    <div class="stat-icon" aria-hidden="true">⏰</div>
+    <div class="stat-content">
+      <div class="stat-value">{{ stats.due_today or 0 }}</div>
+      <div class="stat-label">Due Today</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" aria-hidden="true">📅</div>
+    <div class="stat-content">
+      <div class="stat-value">{{ stats.upcoming_7_days or 0 }}</div>
+      <div class="stat-label">Next 7 Days</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" aria-hidden="true">✅</div>
+    <div class="stat-content">
+      <div class="stat-value">{{ stats.completed_this_week or 0 }}</div>
+      <div class="stat-label">Completed This Week</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" aria-hidden="true">📋</div>
+    <div class="stat-content">
+      <div class="stat-value">{{ stats.active_reminders or 0 }}</div>
+      <div class="stat-label">Total Active</div>
+    </div>
+  </div>
+</div>
+
+<!-- Due Today Section -->
+{% if due_reminders %}
+<section class="card" aria-labelledby="due-title">
+  <h2 id="due-title" class="section-title">Due Today</h2>
+  <div class="reminder-list">
+    {% for reminder in due_reminders %}
+    <div class="reminder-item reminder-due">
+      <div class="reminder-icon">
+        {% if reminder.reminder_type == 'watering' %}💧
+        {% elif reminder.reminder_type == 'fertilizing' %}🌿
+        {% elif reminder.reminder_type == 'misting' %}💦
+        {% elif reminder.reminder_type == 'pruning' %}✂️
+        {% elif reminder.reminder_type == 'repotting' %}🪴
+        {% elif reminder.reminder_type == 'inspection' %}🔍
+        {% else %}📝{% endif %}
+      </div>
+
+      <div class="reminder-content">
+        <h3 class="reminder-title">
+          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}">
+            {{ reminder.title }}
+          </a>
+        </h3>
+        <p class="reminder-meta">
+          <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="plant-link">
+            {{ reminder.plant_name }}{% if reminder.plant_nickname %} "{{ reminder.plant_nickname }}"{% endif %}
+          </a>
+          {% if reminder.weather_adjustment_reason %}
+          <span class="badge badge-weather" title="{{ reminder.weather_adjustment_reason }}">
+            🌤️ Weather adjusted
+          </span>
+          {% endif %}
+        </p>
+        {% if reminder.notes %}
+        <p class="reminder-notes small">{{ reminder.notes[:100] }}{% if reminder.notes|length > 100 %}...{% endif %}</p>
+        {% endif %}
+      </div>
+
+      <div class="reminder-actions">
+        <form method="POST" action="{{ url_for('reminders.complete', reminder_id=reminder.id) }}" style="display:inline;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn btn-small btn-primary" title="Mark complete">
+            ✓ Done
+          </button>
+        </form>
+        <form method="POST" action="{{ url_for('reminders.snooze', reminder_id=reminder.id) }}" style="display:inline;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <input type="hidden" name="days" value="1"/>
+          <button type="submit" class="btn btn-small btn-secondary" title="Snooze 1 day">
+            💤 Snooze
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Upcoming Section -->
+{% if upcoming_reminders %}
+<section class="card" aria-labelledby="upcoming-title">
+  <h2 id="upcoming-title" class="section-title">Upcoming (Next 7 Days)</h2>
+  <div class="reminder-list">
+    {% for reminder in upcoming_reminders %}
+    <div class="reminder-item">
+      <div class="reminder-icon">
+        {% if reminder.reminder_type == 'watering' %}💧
+        {% elif reminder.reminder_type == 'fertilizing' %}🌿
+        {% elif reminder.reminder_type == 'misting' %}💦
+        {% elif reminder.reminder_type == 'pruning' %}✂️
+        {% elif reminder.reminder_type == 'repotting' %}🪴
+        {% elif reminder.reminder_type == 'inspection' %}🔍
+        {% else %}📝{% endif %}
+      </div>
+
+      <div class="reminder-content">
+        <h3 class="reminder-title">
+          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}">
+            {{ reminder.title }}
+          </a>
+        </h3>
+        <p class="reminder-meta">
+          <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="plant-link">
+            {{ reminder.plant_name }}{% if reminder.plant_nickname %} "{{ reminder.plant_nickname }}"{% endif %}
+          </a>
+          • Due {{ reminder.effective_due_date }}
+          {% if reminder.days_until_due %}
+          (in {{ reminder.days_until_due }} day{% if reminder.days_until_due != 1 %}s{% endif %})
+          {% endif %}
+        </p>
+      </div>
+
+      <div class="reminder-actions">
+        <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="btn btn-small btn-secondary">
+          View
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- All Reminders Section -->
+{% if all_reminders %}
+<section class="card" aria-labelledby="all-title">
+  <h2 id="all-title" class="section-title">All Active Reminders</h2>
+  <div class="reminder-list">
+    {% for reminder in all_reminders %}
+    <div class="reminder-item">
+      <div class="reminder-icon">
+        {% if reminder.reminder_type == 'watering' %}💧
+        {% elif reminder.reminder_type == 'fertilizing' %}🌿
+        {% elif reminder.reminder_type == 'misting' %}💦
+        {% elif reminder.reminder_type == 'pruning' %}✂️
+        {% elif reminder.reminder_type == 'repotting' %}🪴
+        {% elif reminder.reminder_type == 'inspection' %}🔍
+        {% else %}📝{% endif %}
+      </div>
+
+      <div class="reminder-content">
+        <h3 class="reminder-title">
+          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}">
+            {{ reminder.title }}
+          </a>
+        </h3>
+        <p class="reminder-meta">
+          <a href="{{ url_for('plants.view', plant_id=reminder.plants.id) }}" class="plant-link">
+            {{ reminder.plants.name }}{% if reminder.plants.nickname %} "{{ reminder.plants.nickname }}"{% endif %}
+          </a>
+          • {{ reminder.frequency|replace('_', ' ')|title }} • Next: {{ reminder.next_due }}
+        </p>
+      </div>
+
+      <div class="reminder-actions">
+        <a href="{{ url_for('reminders.edit', reminder_id=reminder.id) }}" class="btn btn-small btn-secondary">
+          Edit
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Empty State -->
+{% if not all_reminders %}
+<section class="card empty-state">
+  <div class="empty-state-icon" aria-hidden="true">⏰</div>
+  <h3 class="empty-state-message">No reminders yet</h3>
+  <p class="empty-state-hint">Create your first care reminder to stay on top of watering, fertilizing, and other plant care tasks.</p>
+  <a href="{{ url_for('reminders.create') }}" class="btn btn-primary">Create Reminder</a>
+</section>
+{% endif %}
+
+{% endblock %}

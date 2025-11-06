@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}New Reminder - PlantCareAI{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <h1 class="page-title">Create Care Reminder</h1>
+  <p class="page-subtitle">Set up a one-time or recurring reminder for plant care</p>
+</section>
+
+<section class="card">
+  <form method="POST" action="{{ url_for('reminders.create') }}" class="form-vertical">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+    <!-- Plant Selection -->
+    <div class="form-group">
+      <label for="plant_id">Plant *</label>
+      <select id="plant_id" name="plant_id" required>
+        <option value="">Select a plant...</option>
+        {% for plant in plants %}
+        <option value="{{ plant.id }}">
+          {{ plant.name }}{% if plant.nickname %} "{{ plant.nickname }}"{% endif %}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Reminder Type -->
+    <div class="form-group">
+      <label for="reminder_type">Reminder Type *</label>
+      <select id="reminder_type" name="reminder_type" required>
+        {% for value, label in reminder_types.items() %}
+        <option value="{{ value }}" {% if value == 'watering' %}selected{% endif %}>
+          {{ label }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Title -->
+    <div class="form-group">
+      <label for="title">Reminder Title *</label>
+      <input
+        type="text"
+        id="title"
+        name="title"
+        maxlength="255"
+        placeholder="e.g., Water Monstera"
+        required
+      />
+      <small class="form-hint">Give your reminder a descriptive name</small>
+    </div>
+
+    <!-- Frequency -->
+    <div class="form-group">
+      <label for="frequency">Frequency *</label>
+      <select id="frequency" name="frequency" required onchange="toggleCustomInterval(this)">
+        <option value="daily">Daily</option>
+        <option value="every_2_days">Every 2 Days</option>
+        <option value="every_3_days">Every 3 Days</option>
+        <option value="weekly" selected>Weekly</option>
+        <option value="biweekly">Biweekly (Every 2 Weeks)</option>
+        <option value="monthly">Monthly</option>
+        <option value="one_time">One-time Only</option>
+        <option value="custom">Custom Interval</option>
+      </select>
+      <small class="form-hint">One-time reminders will be archived after completion</small>
+    </div>
+
+    <!-- Custom Interval (hidden by default) -->
+    <div class="form-group" id="custom-interval-group" style="display: none;">
+      <label for="custom_interval_days">Custom Interval (Days) *</label>
+      <input
+        type="number"
+        id="custom_interval_days"
+        name="custom_interval_days"
+        min="1"
+        max="365"
+        placeholder="e.g., 5"
+      />
+      <small class="form-hint">Enter number of days between reminders (1-365)</small>
+    </div>
+
+    <!-- Notes -->
+    <div class="form-group">
+      <label for="notes">Notes (Optional)</label>
+      <textarea
+        id="notes"
+        name="notes"
+        rows="3"
+        maxlength="500"
+        placeholder="Add any special instructions or notes..."
+      ></textarea>
+      <small class="form-hint">Optional care instructions or reminders</small>
+    </div>
+
+    <!-- Weather Adjustment -->
+    <div class="form-group">
+      <label class="checkbox-label">
+        <input type="checkbox" name="skip_weather_adjustment" />
+        Skip weather adjustments
+      </label>
+      <small class="form-hint">If checked, this reminder won't be adjusted based on weather conditions</small>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Create Reminder</button>
+      <a href="{{ url_for('reminders.index') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</section>
+
+<script>
+// Toggle custom interval field
+function toggleCustomInterval(select) {
+  const customGroup = document.getElementById('custom-interval-group');
+  const customInput = document.getElementById('custom_interval_days');
+
+  if (select.value === 'custom') {
+    customGroup.style.display = 'block';
+    customInput.required = true;
+  } else {
+    customGroup.style.display = 'none';
+    customInput.required = false;
+  }
+}
+
+// Auto-fill title based on plant and reminder type
+document.addEventListener('DOMContentLoaded', function() {
+  const plantSelect = document.getElementById('plant_id');
+  const typeSelect = document.getElementById('reminder_type');
+  const titleInput = document.getElementById('title');
+
+  function updateTitle() {
+    if (!titleInput.value || titleInput.dataset.autoFilled) {
+      const plantText = plantSelect.options[plantSelect.selectedIndex]?.text || '';
+      const typeText = typeSelect.options[typeSelect.selectedIndex]?.text || '';
+
+      if (plantText && plantText !== 'Select a plant...' && typeText) {
+        titleInput.value = `${typeText} - ${plantText}`;
+        titleInput.dataset.autoFilled = 'true';
+      }
+    }
+  }
+
+  plantSelect.addEventListener('change', updateTitle);
+  typeSelect.addEventListener('change', updateTitle);
+
+  // Clear auto-filled flag when user manually edits
+  titleInput.addEventListener('input', function() {
+    if (this.value !== titleInput.dataset.previousValue) {
+      delete titleInput.dataset.autoFilled;
+    }
+    titleInput.dataset.previousValue = this.value;
+  });
+});
+</script>
+
+{% endblock %}

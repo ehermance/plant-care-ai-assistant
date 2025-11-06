@@ -12,6 +12,7 @@ from __future__ import annotations
 from flask import Blueprint, render_template, redirect, url_for
 from app.utils.auth import require_auth, get_current_user_id
 from app.services import supabase_client
+from app.services import reminders as reminder_service
 
 
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
@@ -40,6 +41,10 @@ def index():
     trial_days = supabase_client.trial_days_remaining(user_id)
     has_premium_access = supabase_client.has_premium_access(user_id)
 
+    # Get reminder stats and due reminders
+    reminder_stats = reminder_service.get_reminder_stats(user_id)
+    due_reminders = reminder_service.get_due_reminders(user_id)
+
     return render_template(
         "dashboard/index.html",
         profile=profile,
@@ -48,6 +53,8 @@ def index():
         is_in_trial=is_in_trial,
         trial_days=trial_days,
         has_premium_access=has_premium_access,
+        reminder_stats=reminder_stats,
+        due_reminders=due_reminders,
     )
 
 

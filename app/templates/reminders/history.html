@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Reminder History - PlantCareAI{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <h1 class="page-title">Reminder History</h1>
+  <p class="page-subtitle">View your completed and archived reminders</p>
+  <div class="page-actions">
+    <a href="{{ url_for('reminders.index') }}" class="btn btn-secondary">
+      ← Back to Active Reminders
+    </a>
+  </div>
+</section>
+
+{% if archived_reminders %}
+<section class="card">
+  <div class="section-header">
+    <h2 class="section-title">Archived Reminders</h2>
+    <span class="badge badge-muted">{{ archived_reminders|length }}</span>
+  </div>
+
+  <div class="reminder-list">
+    {% for reminder in archived_reminders %}
+    <div class="reminder-item">
+      <div class="reminder-icon">
+        {% if reminder.reminder_type == 'watering' %}💧
+        {% elif reminder.reminder_type == 'fertilizing' %}🌿
+        {% elif reminder.reminder_type == 'misting' %}💦
+        {% elif reminder.reminder_type == 'pruning' %}✂️
+        {% elif reminder.reminder_type == 'repotting' %}🪴
+        {% elif reminder.reminder_type == 'inspection' %}🔍
+        {% else %}📝{% endif %}
+      </div>
+
+      <div class="reminder-content">
+        <h3 class="reminder-title">
+          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}">
+            {{ reminder.title }}
+          </a>
+        </h3>
+        <p class="reminder-meta small">
+          <strong>{{ reminder.frequency|replace('_', ' ')|title }}</strong>
+          {% if reminder.frequency == 'one_time' %}
+          <span class="badge badge-muted">One-time</span>
+          {% endif %}
+        </p>
+        {% if reminder.last_completed_at %}
+        <p class="reminder-meta small muted">
+          Completed: {{ reminder.last_completed_at|replace('T', ' at ')|replace('+00:00', ' UTC')|replace('.000000', '') }}
+        </p>
+        {% endif %}
+        {% if reminder.notes %}
+        <p class="reminder-notes small muted">{{ reminder.notes }}</p>
+        {% endif %}
+      </div>
+
+      <div class="reminder-actions">
+        <span class="badge badge-muted">Archived</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% else %}
+<section class="card empty-state">
+  <div class="empty-state-content">
+    <h3 class="empty-state-message">No archived reminders yet</h3>
+    <p class="empty-state-hint">
+      When you complete one-time reminders or deactivate recurring ones, they'll appear here.
+    </p>
+    <a href="{{ url_for('reminders.index') }}" class="btn btn-primary">
+      View Active Reminders
+    </a>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

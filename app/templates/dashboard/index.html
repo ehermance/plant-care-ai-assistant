@@ -30,21 +30,21 @@
     </div>
   </a>
 
-  <div class="stat-card stat-card-disabled" title="Coming soon - Care reminders">
+  <a href="{{ url_for('reminders.index') }}" class="stat-card stat-card-link {% if reminder_stats.due_today > 0 %}stat-card-alert{% endif %}">
     <div class="stat-icon" aria-hidden="true">💧</div>
     <div class="stat-content">
-      <div class="stat-value">0</div>
+      <div class="stat-value">{{ reminder_stats.due_today or 0 }}</div>
       <div class="stat-label">Due Today</div>
     </div>
-  </div>
+  </a>
 
-  <div class="stat-card stat-card-disabled" title="Coming soon - Care reminders">
+  <a href="{{ url_for('reminders.index') }}" class="stat-card stat-card-link">
     <div class="stat-icon" aria-hidden="true">📅</div>
     <div class="stat-content">
-      <div class="stat-value">0</div>
+      <div class="stat-value">{{ reminder_stats.upcoming_7_days or 0 }}</div>
       <div class="stat-label">Upcoming</div>
     </div>
-  </div>
+  </a>
 
   <a href="{{ url_for('pricing.index') }}" class="stat-card stat-card-link">
     <div class="stat-icon" aria-hidden="true">🌱</div>
@@ -62,6 +62,9 @@
   <div class="action-buttons">
     <a href="/plants/add" class="btn btn-primary">
       Add Plant
+    </a>
+    <a href="{{ url_for('reminders.create') }}" class="btn btn-primary">
+      + New Reminder
     </a>
     <a href="{{ url_for('web.ask_ai') }}" class="btn btn-secondary">
       Care Assistant
@@ -93,13 +96,81 @@
 </section>
 {% endif %}
 
-<!-- Reminders Placeholder (will be implemented in Phase 5) -->
+<!-- Care Reminders Due Today -->
+{% if due_reminders %}
 <section class="card" aria-labelledby="reminders-title">
-  <h3 id="reminders-title" class="section-title">
-    Care Reminders
-    <span class="badge-soon">Coming Soon</span>
-  </h3>
-  <p class="muted">Reminders will appear here once you add plants and set up care schedules.</p>
+  <div class="section-header">
+    <h3 id="reminders-title" class="section-title">
+      Care Reminders Due Today
+      {% if reminder_stats.due_today > 0 %}
+      <span class="badge badge-alert">{{ reminder_stats.due_today }}</span>
+      {% endif %}
+    </h3>
+    <a href="{{ url_for('reminders.index') }}" class="muted-link small">View all →</a>
+  </div>
+
+  <div class="reminder-list">
+    {% for reminder in due_reminders[:5] %}
+    <div class="reminder-item reminder-due">
+      <div class="reminder-icon">
+        {% if reminder.reminder_type == 'watering' %}💧
+        {% elif reminder.reminder_type == 'fertilizing' %}🌿
+        {% elif reminder.reminder_type == 'misting' %}💦
+        {% elif reminder.reminder_type == 'pruning' %}✂️
+        {% elif reminder.reminder_type == 'repotting' %}🪴
+        {% elif reminder.reminder_type == 'inspection' %}🔍
+        {% else %}📝{% endif %}
+      </div>
+
+      <div class="reminder-content">
+        <h4 class="reminder-title">
+          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}">
+            {{ reminder.title }}
+          </a>
+        </h4>
+        <p class="reminder-meta small">
+          <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="plant-link">
+            {{ reminder.plant_name }}{% if reminder.plant_nickname %} "{{ reminder.plant_nickname }}"{% endif %}
+          </a>
+          {% if reminder.weather_adjustment_reason %}
+          <span class="badge badge-weather" title="{{ reminder.weather_adjustment_reason }}">
+            🌤️ Adjusted
+          </span>
+          {% endif %}
+        </p>
+      </div>
+
+      <div class="reminder-actions">
+        <form method="POST" action="{{ url_for('reminders.complete', reminder_id=reminder.id) }}" style="display:inline;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn btn-small btn-primary" title="Mark complete">
+            ✓ Done
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if reminder_stats.due_today > 5 %}
+  <div class="muted small" style="text-align:center; margin-top:1rem;">
+    <a href="{{ url_for('reminders.index') }}">+ {{ reminder_stats.due_today - 5 }} more reminders</a>
+  </div>
+  {% endif %}
 </section>
+{% elif reminder_stats.active_reminders > 0 %}
+<section class="card" aria-labelledby="reminders-title">
+  <div class="section-header">
+    <h3 id="reminders-title" class="section-title">Care Reminders</h3>
+    <a href="{{ url_for('reminders.index') }}" class="muted-link small">View all →</a>
+  </div>
+  <p class="muted">✅ No reminders due today! You have {{ reminder_stats.upcoming_7_days }} upcoming in the next 7 days.</p>
+</section>
+{% else %}
+<section class="card" aria-labelledby="reminders-title">
+  <h3 id="reminders-title" class="section-title">Care Reminders</h3>
+  <p class="muted">No reminders yet. <a href="{{ url_for('reminders.create') }}">Create your first reminder</a> to stay on top of plant care!</p>
+</section>
+{% endif %}
 
 {% endblock %}
