@@ -23,6 +23,36 @@
   <section class="card">
     <h2 class="section-title">Details</h2>
 
+    <!-- Plant Info -->
+    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
+      {% if reminder.plants.photo_url %}
+      <img
+        src="{{ reminder.plants.photo_url }}"
+        alt="{{ reminder.plants.name }}"
+        style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;"
+      />
+      {% else %}
+      <div style="width: 80px; height: 80px; background: var(--bg-secondary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+        🪴
+      </div>
+      {% endif %}
+      <div style="flex: 1;">
+        <h3 style="margin: 0; font-size: 1.1rem;">
+          <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}">
+            {{ reminder.plants.name }}
+          </a>
+        </h3>
+        {% if reminder.plants.nickname %}
+        <p style="margin: 0.25rem 0; color: var(--text-muted); font-size: 0.9rem;">"{{ reminder.plants.nickname }}"</p>
+        {% endif %}
+        {% if reminder.plants.location %}
+        <p style="margin: 0.25rem 0; color: var(--text-muted); font-size: 0.9rem;">
+          📍 {{ reminder.plants.location }}
+        </p>
+        {% endif %}
+      </div>
+    </div>
+
     <dl class="detail-list">
       <dt>Frequency</dt>
       <dd>{{ reminder.frequency|replace('_', ' ')|title }}

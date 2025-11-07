@@ -240,6 +240,37 @@ def complete(reminder_id):
     return redirect(request.referrer or url_for("reminders.index"))
 
 
+@reminders_bp.route("/bulk-complete", methods=["POST"])
+@require_auth
+def bulk_complete():
+    """Mark all due reminders as complete."""
+    user_id = get_current_user_id()
+    if not user_id:
+        flash("Please log in to complete reminders.", "error")
+        return redirect(url_for("auth.login"))
+
+    # Get all due reminders
+    due_reminders = reminder_service.get_due_reminders(user_id)
+
+    completed_count = 0
+    errors = []
+
+    for reminder in due_reminders:
+        success, error = reminder_service.mark_reminder_complete(reminder["id"], user_id)
+        if success:
+            completed_count += 1
+        else:
+            errors.append(f"{reminder['title']}: {error}")
+
+    if completed_count > 0:
+        flash(f"✓ Marked {completed_count} reminder{'s' if completed_count != 1 else ''} complete!", "success")
+
+    if errors:
+        flash(f"Some reminders failed: {'; '.join(errors[:3])}", "error")
+
+    return redirect(url_for("reminders.index"))
+
+
 @reminders_bp.route("/<reminder_id>/snooze", methods=["POST"])
 @require_auth
 def snooze(reminder_id):

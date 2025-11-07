@@ -109,9 +109,9 @@
     <a href="{{ url_for('reminders.index') }}" class="muted-link small">View all →</a>
   </div>
 
-  <div class="reminder-list">
+  <div class="reminder-list" id="dashboard-reminders-list">
     {% for reminder in due_reminders[:5] %}
-    <div class="reminder-item reminder-due">
+    <div class="reminder-item reminder-due" data-reminder-id="{{ reminder.id }}">
       <div class="reminder-icon">
         {% if reminder.reminder_type == 'watering' %}💧
         {% elif reminder.reminder_type == 'fertilizing' %}🌿
@@ -141,12 +141,14 @@
       </div>
 
       <div class="reminder-actions">
-        <form method="POST" action="{{ url_for('reminders.complete', reminder_id=reminder.id) }}" style="display:inline;">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-          <button type="submit" class="btn btn-small btn-primary" title="Mark complete">
-            ✓ Done
-          </button>
-        </form>
+        <button
+          class="btn btn-small btn-primary quick-complete-btn"
+          data-reminder-id="{{ reminder.id }}"
+          data-reminder-title="{{ reminder.title }}"
+          title="Mark complete"
+        >
+          ✓ Done
+        </button>
       </div>
     </div>
     {% endfor %}
@@ -172,5 +174,91 @@
   <p class="muted">No reminders yet. <a href="{{ url_for('reminders.create') }}">Create your first reminder</a> to stay on top of plant care!</p>
 </section>
 {% endif %}
+
+<script>
+// Quick Complete functionality for dashboard reminders
+document.addEventListener('DOMContentLoaded', function() {
+  const completeButtons = document.querySelectorAll('.quick-complete-btn');
+
+  completeButtons.forEach(button => {
+    button.addEventListener('click', async function(e) {
+      e.preventDefault();
+
+      const reminderId = this.dataset.reminderId;
+      const reminderTitle = this.dataset.reminderTitle;
+      const reminderItem = this.closest('[data-reminder-id]');
+
+      // Disable button and show loading state
+      this.disabled = true;
+      this.innerHTML = '⏳ Completing...';
+
+      try {
+        const response = await fetch(`/reminders/api/${reminderId}/complete`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+          }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Fade out and remove the reminder item
+          reminderItem.style.opacity = '0';
+          reminderItem.style.transition = 'opacity 0.3s ease';
+
+          setTimeout(() => {
+            reminderItem.remove();
+
+            // Check if list is empty
+            const remindersList = document.getElementById('dashboard-reminders-list');
+            if (remindersList && remindersList.children.length === 0) {
+              // Reload page to update stats and show empty state
+              window.location.reload();
+            } else {
+              // Show success message
+              if (window.showToast) {
+                window.showToast(`✓ ${reminderTitle} marked complete!`, 'success');
+              }
+
+              // Update the "Due Today" badge count
+              const badge = document.querySelector('#reminders-title .badge');
+              if (badge) {
+                const currentCount = parseInt(badge.textContent) || 0;
+                const newCount = currentCount - 1;
+                if (newCount > 0) {
+                  badge.textContent = newCount;
+                } else {
+                  badge.remove();
+                }
+              }
+            }
+          }, 300);
+
+        } else {
+          // Show error
+          this.disabled = false;
+          this.innerHTML = '✓ Done';
+          if (window.showToast) {
+            window.showToast(data.error || 'Failed to complete reminder', 'error');
+          } else {
+            alert(data.error || 'Failed to complete reminder');
+          }
+        }
+      } catch (error) {
+        console.error('Error completing reminder:', error);
+        this.disabled = false;
+        this.innerHTML = '✓ Done';
+        if (window.showToast) {
+          window.showToast('Network error. Please try again.', 'error');
+        } else {
+          alert('Network error. Please try again.');
+        }
+      }
+    });
+  });
+});
+</script>
 
 {% endblock %}
