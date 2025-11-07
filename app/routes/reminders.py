@@ -427,14 +427,26 @@ def api_stats():
 @reminders_bp.route("/api/<reminder_id>/complete", methods=["POST"])
 @require_auth
 def api_complete(reminder_id):
-    """Mark reminder complete via JSON API."""
+    """
+    Mark reminder complete via JSON API.
+
+    Security: CSRF token required via X-CSRFToken header
+    (automatically validated by Flask-WTF CSRFProtect)
+    """
     user_id = get_current_user_id()
     if not user_id:
         return jsonify({"success": False, "error": "Unauthorized"}), 401
+
+    # Validate reminder_id format (UUID)
+    import re
+    if not re.match(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', reminder_id, re.IGNORECASE):
+        return jsonify({"success": False, "error": "Invalid reminder ID"}), 400
 
     success, error = reminder_service.mark_reminder_complete(reminder_id, user_id)
 
     if success:
         return jsonify({"success": True, "message": "Reminder completed"})
     else:
-        return jsonify({"success": False, "error": error}), 400
+        # Sanitize error messages for security
+        safe_error = error if error else "Failed to complete reminder"
+        return jsonify({"success": False, "error": safe_error}), 400

@@ -175,9 +175,14 @@
 </section>
 {% endif %}
 
+<!-- CSRF token for AJAX requests (secure storage) -->
+<div id="csrf-token" data-csrf="{{ csrf_token() }}" style="display:none;"></div>
+
 <script>
 // Quick Complete functionality for dashboard reminders
 document.addEventListener('DOMContentLoaded', function() {
+  // Get CSRF token securely from data attribute
+  const csrfToken = document.getElementById('csrf-token').dataset.csrf;
   const completeButtons = document.querySelectorAll('.quick-complete-btn');
 
   completeButtons.forEach(button => {
@@ -197,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token() }}'
+            'X-CSRFToken': csrfToken
           }
         });
 

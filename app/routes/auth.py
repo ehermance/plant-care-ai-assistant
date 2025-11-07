@@ -152,11 +152,15 @@ def callback():
     #     flash(f"Welcome! Let's set up your first plant.", "success")
     #     return redirect(url_for("onboarding.step1"))
 
-    # Redirect to dashboard or 'next' URL
+    # Redirect to dashboard or 'next' URL (with open redirect protection)
     next_url = request.args.get("next", "")
-    if next_url and next_url.startswith("/"):
-        flash(f"Welcome back, {email}!", "success")
-        return redirect(next_url)
+    if next_url:
+        from urllib.parse import urlparse
+        parsed = urlparse(next_url)
+        # Only allow relative URLs with no scheme or netloc (prevents //evil.com)
+        if parsed.scheme == '' and parsed.netloc == '' and next_url.startswith("/") and not next_url.startswith("//"):
+            flash(f"Welcome back, {email}!", "success")
+            return redirect(next_url)
 
     # Check if this is a new signup (profile just created)
     is_new_user = profile is None or not supabase_client.is_onboarding_completed(user_id)
