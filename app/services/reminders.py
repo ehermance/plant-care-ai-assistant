@@ -374,6 +374,55 @@ def delete_reminder(reminder_id: str, user_id: str) -> Tuple[bool, Optional[str]
         return False, f"Error deleting reminder: {str(e)}"
 
 
+def toggle_reminder_status(reminder_id: str, user_id: str) -> Tuple[bool, Optional[str]]:
+    """
+    Toggle a reminder's active status (activate/deactivate).
+
+    When reactivating, sets next_due to tomorrow.
+
+    Args:
+        reminder_id: Reminder's UUID
+        user_id: User's UUID (for authorization)
+
+    Returns:
+        (success, error_message)
+    """
+    from datetime import datetime, timedelta
+
+    supabase = get_admin_client()
+    if not supabase:
+        return False, "Database not configured"
+
+    try:
+        # Get current reminder to check is_active status
+        response = supabase.table("reminders").select("is_active, frequency").eq("id", reminder_id).eq("user_id", user_id).execute()
+
+        if not response.data:
+            return False, "Reminder not found or unauthorized"
+
+        current_reminder = response.data[0]
+        current_status = current_reminder.get("is_active", True)
+        new_status = not current_status
+
+        # Prepare update data
+        update_data = {"is_active": new_status}
+
+        # If reactivating (False -> True), set next_due to tomorrow
+        if new_status:
+            tomorrow = (datetime.now() + timedelta(days=1)).date()
+            update_data["next_due"] = tomorrow.isoformat()
+
+        # Update reminder
+        response = supabase.table("reminders").update(update_data).eq("id", reminder_id).eq("user_id", user_id).execute()
+
+        if response.data:
+            return True, None
+        return False, "Failed to toggle reminder status"
+
+    except Exception as e:
+        return False, f"Error toggling reminder status: {str(e)}"
+
+
 def get_reminder_stats(user_id: str) -> Dict[str, int]:
     """
     Get reminder statistics for a user.
@@ -595,3 +644,43 @@ def batch_adjust_reminders_for_weather(
             stats["skipped"] += 1
 
     return stats
+
+
+def get_reminders_for_month(user_id: str, year: int, month: int) -> List[Dict[str, Any]]:
+    """
+    Get all active reminders with next_due dates in the specified month.
+
+    Args:
+        user_id: User's UUID
+        year: Year (e.g., 2025)
+        month: Month (1-12)
+
+    Returns:
+        List of reminder dictionaries with plant info, grouped by date
+    """
+    supabase = get_admin_client()
+    if not supabase:
+        return []
+
+    try:
+        # Calculate first and last day of month
+        from calendar import monthrange
+        first_day = date(year, month, 1)
+        last_day_num = monthrange(year, month)[1]
+        last_day = date(year, month, last_day_num)
+
+        # Get all active reminders with next_due in this month
+        response = supabase.table("reminders") \
+            .select("*, plants(id, name, nickname, photo_url, location)") \
+            .eq("user_id", user_id) \
+            .eq("is_active", True) \
+            .gte("next_due", first_day.isoformat()) \
+            .lte("next_due", last_day.isoformat()) \
+            .order("next_due") \
+            .execute()
+
+        return response.data if response.data else []
+
+    except Exception as e:
+        print(f"Error fetching reminders for month: {e}")
+        return []

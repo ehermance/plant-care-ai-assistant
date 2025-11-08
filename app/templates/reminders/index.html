@@ -8,53 +8,56 @@
   <h1 class="page-title">Care Reminders</h1>
   <p class="page-subtitle">Stay on top of your plant care schedule</p>
   <div class="page-actions">
-    <a href="{{ url_for('reminders.create') }}" class="btn btn-primary">
-      + New Reminder
+    <a href="{{ url_for('reminders.calendar') }}" class="btn btn-secondary">
+      📅 Calendar View
     </a>
     <a href="{{ url_for('reminders.history') }}" class="btn btn-secondary">
       📜 View History
+    </a>
+    <a href="{{ url_for('reminders.create') }}" class="btn btn-primary">
+      + New Reminder
     </a>
   </div>
 </section>
 
 <!-- Reminder Stats -->
 <div class="dashboard-stats">
-  <div class="stat-card">
+  <a href="#due-today" class="stat-card stat-card-link">
     <div class="stat-icon" aria-hidden="true">⏰</div>
     <div class="stat-content">
       <div class="stat-value">{{ stats.due_today or 0 }}</div>
       <div class="stat-label">Due Today</div>
     </div>
-  </div>
+  </a>
 
-  <div class="stat-card">
+  <a href="{{ url_for('reminders.calendar') }}" class="stat-card stat-card-link">
     <div class="stat-icon" aria-hidden="true">📅</div>
     <div class="stat-content">
       <div class="stat-value">{{ stats.upcoming_7_days or 0 }}</div>
       <div class="stat-label">Next 7 Days</div>
     </div>
-  </div>
+  </a>
 
-  <div class="stat-card">
+  <a href="{{ url_for('reminders.history') }}" class="stat-card stat-card-link">
     <div class="stat-icon" aria-hidden="true">✅</div>
     <div class="stat-content">
       <div class="stat-value">{{ stats.completed_this_week or 0 }}</div>
       <div class="stat-label">Completed This Week</div>
     </div>
-  </div>
+  </a>
 
-  <div class="stat-card">
+  <a href="#all-reminders" class="stat-card stat-card-link">
     <div class="stat-icon" aria-hidden="true">📋</div>
     <div class="stat-content">
       <div class="stat-value">{{ stats.active_reminders or 0 }}</div>
       <div class="stat-label">Total Active</div>
     </div>
-  </div>
+  </a>
 </div>
 
 <!-- Due Today Section -->
 {% if due_reminders %}
-<section class="card" aria-labelledby="due-title">
+<section id="due-today" class="card" aria-labelledby="due-title">
   <div class="section-header">
     <h2 id="due-title" class="section-title">Due Today</h2>
     {% if due_reminders|length > 1 %}
@@ -171,7 +174,7 @@
 
 <!-- All Reminders Section -->
 {% if all_reminders %}
-<section class="card" aria-labelledby="all-title">
+<section id="all-reminders" class="card" aria-labelledby="all-title">
   <h2 id="all-title" class="section-title">All Active Reminders</h2>
   <div class="reminder-list">
     {% for reminder in all_reminders %}

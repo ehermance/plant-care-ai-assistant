@@ -38,7 +38,7 @@
         <option value="one_time" {% if reminder.frequency == 'one_time' %}selected{% endif %}>One-time Only</option>
         <option value="custom" {% if reminder.frequency == 'custom' %}selected{% endif %}>Custom Interval</option>
       </select>
-      <small class="form-hint">One-time reminders will be archived after completion</small>
+      <small class="form-hint">One-time reminders will become inactive after completion</small>
     </div>
 
     <!-- Custom Interval -->

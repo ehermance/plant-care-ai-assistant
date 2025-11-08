@@ -113,7 +113,7 @@
         {% if is_authenticated %}
           <a class="nav-link{% if request.endpoint and request.endpoint.startswith('dashboard.') %} active{% endif %}"
              href="{{ url_for('dashboard.index') }}"
-             {% if request.endpoint and request.endpoint.startswith('dashboard.') %}aria-current="page"{% endif %}>Dashboard</a>
+             {% if request.endpoint and request.endpoint.startswith('dashboard.') %}aria-current="page"{% endif %}>Home</a>
           <a class="nav-link{% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %} active{% endif %}"
              href="{{ url_for('web.ask_ai') }}"
              {% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %}aria-current="page"{% endif %}>Care Assistant</a>

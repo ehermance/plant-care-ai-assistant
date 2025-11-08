@@ -40,29 +40,29 @@ def index():
 @reminders_bp.route("/history")
 @require_auth
 def history():
-    """Display completed/archived reminders history."""
+    """Display completed/inactive reminders history."""
     user_id = get_current_user_id()
     if not user_id:
         flash("Please log in to view reminders.", "error")
         return redirect(url_for("auth.login"))
 
-    # Get inactive (archived) reminders
-    archived_reminders = reminder_service.get_user_reminders(user_id, active_only=False)
+    # Get inactive reminders
+    inactive_reminders = reminder_service.get_user_reminders(user_id, active_only=False)
 
     # Filter to only inactive ones and sort by completion date (most recent first)
-    archived_reminders = [
-        r for r in archived_reminders if not r.get("is_active", True)
+    inactive_reminders = [
+        r for r in inactive_reminders if not r.get("is_active", True)
     ]
     # Sort by last_completed_at, falling back to updated_at, then empty string
     # Use 'or' instead of nested get() to handle None values properly
-    archived_reminders.sort(
+    inactive_reminders.sort(
         key=lambda r: r.get("last_completed_at") or r.get("updated_at") or "",
         reverse=True
     )
 
     return render_template(
         "reminders/history.html",
-        archived_reminders=archived_reminders,
+        inactive_reminders=inactive_reminders,
     )
 
 
@@ -313,6 +313,25 @@ def delete(reminder_id):
     return redirect(url_for("reminders.index"))
 
 
+@reminders_bp.route("/<reminder_id>/toggle-status", methods=["POST"])
+@require_auth
+def toggle_status(reminder_id):
+    """Toggle reminder's active status (activate/deactivate)."""
+    user_id = get_current_user_id()
+    if not user_id:
+        flash("Please log in to toggle reminder status.", "error")
+        return redirect(request.referrer or url_for("reminders.index"))
+
+    success, error = reminder_service.toggle_reminder_status(reminder_id, user_id)
+
+    if not success:
+        flash(f"Error toggling reminder status: {error}", "error")
+        return redirect(request.referrer or url_for("reminders.index"))
+
+    flash("Reminder status updated successfully.", "success")
+    return redirect(request.referrer or url_for("reminders.index"))
+
+
 @reminders_bp.route("/<reminder_id>/adjust-weather", methods=["POST"])
 @require_auth
 def adjust_weather(reminder_id):
@@ -450,3 +469,79 @@ def api_complete(reminder_id):
         # Sanitize error messages for security
         safe_error = error if error else "Failed to complete reminder"
         return jsonify({"success": False, "error": safe_error}), 400
+
+
+@reminders_bp.route("/calendar")
+@reminders_bp.route("/calendar/<int:year>/<int:month>")
+@require_auth
+def calendar(year=None, month=None):
+    """
+    Display care calendar view showing all reminders for a month.
+
+    Args:
+        year: Year to display (defaults to current year)
+        month: Month to display (defaults to current month)
+    """
+    from datetime import datetime
+    from calendar import monthcalendar, month_name
+
+    user_id = get_current_user_id()
+    if not user_id:
+        flash("Please log in to view calendar.", "error")
+        return redirect(url_for("auth.login"))
+
+    # Default to current month if not specified
+    today = datetime.now()
+    if year is None:
+        year = today.year
+    if month is None:
+        month = today.month
+
+    # Validate month range
+    if not (1 <= month <= 12):
+        flash("Invalid month specified.", "error")
+        return redirect(url_for("reminders.calendar"))
+
+    # Get reminders for this month
+    reminders = reminder_service.get_reminders_for_month(user_id, year, month)
+
+    # Group reminders by date
+    from collections import defaultdict
+    reminders_by_date = defaultdict(list)
+    for reminder in reminders:
+        if reminder.get("next_due"):
+            # Extract date from next_due (format: YYYY-MM-DD)
+            due_date = reminder["next_due"]
+            reminders_by_date[due_date].append(reminder)
+
+    # Get calendar grid (list of weeks, each week is a list of days)
+    calendar_grid = monthcalendar(year, month)
+
+    # Calculate previous and next month
+    if month == 1:
+        prev_month = 12
+        prev_year = year - 1
+    else:
+        prev_month = month - 1
+        prev_year = year
+
+    if month == 12:
+        next_month = 1
+        next_year = year + 1
+    else:
+        next_month = month + 1
+        next_year = year
+
+    return render_template(
+        "reminders/calendar.html",
+        year=year,
+        month=month,
+        month_name=month_name[month],
+        calendar_grid=calendar_grid,
+        reminders_by_date=dict(reminders_by_date),
+        today=today.date(),
+        prev_year=prev_year,
+        prev_month=prev_month,
+        next_year=next_year,
+        next_month=next_month,
+    )

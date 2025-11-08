@@ -152,17 +152,23 @@
       {% endif %}
       {% endif %}
 
-      <!-- Delete -->
-      <form method="POST" action="{{ url_for('reminders.delete', reminder_id=reminder.id) }}" onsubmit="return confirm('Are you sure you want to delete this reminder?');">
+      <!-- Deactivate -->
+      <form method="POST" action="{{ url_for('reminders.toggle_status', reminder_id=reminder.id) }}" onsubmit="return confirm('Deactivate this reminder? You can reactivate it later from the history page.');">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <button type="submit" class="btn btn-outline btn-block btn-danger">
-          Delete Reminder
+          Deactivate Reminder
         </button>
       </form>
     </div>
     {% else %}
-    <p class="muted">This reminder has been archived and cannot be modified.</p>
+    <p class="muted">This reminder is inactive.</p>
     <div class="action-buttons-vertical" style="margin-top: 1rem;">
+      <form method="POST" action="{{ url_for('reminders.toggle_status', reminder_id=reminder.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="btn btn-primary btn-block">
+          ✓ Activate Reminder
+        </button>
+      </form>
       <a href="{{ url_for('reminders.index') }}" class="btn btn-secondary btn-block">
         ← Back to Active Reminders
       </a>

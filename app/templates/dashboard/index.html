@@ -38,11 +38,11 @@
     </div>
   </a>
 
-  <a href="{{ url_for('reminders.index') }}" class="stat-card stat-card-link">
+  <a href="{{ url_for('reminders.calendar') }}" class="stat-card stat-card-link">
     <div class="stat-icon" aria-hidden="true">📅</div>
     <div class="stat-content">
       <div class="stat-value">{{ reminder_stats.upcoming_7_days or 0 }}</div>
-      <div class="stat-label">Upcoming</div>
+      <div class="stat-label">Calendar</div>
     </div>
   </a>
 
