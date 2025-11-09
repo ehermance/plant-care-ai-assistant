@@ -6,8 +6,17 @@
 
 class ThemeManager {
   constructor() {
-    // Get saved preference or default to 'auto'
-    this.theme = localStorage.getItem('theme') || 'auto';
+    // Priority: server-side theme (from database) > localStorage > default 'auto'
+    const serverTheme = window.__INITIAL_THEME__;
+    const localTheme = localStorage.getItem('theme');
+
+    // Use server theme if available, otherwise use localStorage, otherwise default to 'auto'
+    this.theme = serverTheme || localTheme || 'auto';
+
+    // Sync localStorage with server theme if they differ
+    if (serverTheme && serverTheme !== localTheme) {
+      localStorage.setItem('theme', serverTheme);
+    }
 
     // Media query for system dark mode preference
     this.darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');

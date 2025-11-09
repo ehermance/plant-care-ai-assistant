@@ -203,6 +203,7 @@ def inject_auth_context():
         - is_premium: Boolean
         - is_in_trial: Boolean
         - trial_days_remaining: Integer
+        - profile: User profile dict or None (includes theme_preference)
     """
     user = get_current_user()
     user_id = user.get("id") if user else None
@@ -214,4 +215,5 @@ def inject_auth_context():
         "is_in_trial": supabase_client.is_in_trial(user_id) if user_id else False,
         "trial_days_remaining": supabase_client.trial_days_remaining(user_id) if user_id else 0,
         "has_premium_access": supabase_client.has_premium_access(user_id) if user_id else False,
+        "profile": supabase_client.get_user_profile(user_id) if user_id else None,
     }

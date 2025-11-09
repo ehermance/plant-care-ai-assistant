@@ -59,6 +59,12 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
 
   <!-- Theme Manager (load early to prevent flash) -->
+  <script>
+    // Pass server-side theme preference to JavaScript (if user is authenticated)
+    {% if is_authenticated and profile and profile.theme_preference %}
+      window.__INITIAL_THEME__ = '{{ profile.theme_preference }}';
+    {% endif %}
+  </script>
   <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 
   {% block extra_head %}{% endblock %}
