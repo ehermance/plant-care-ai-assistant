@@ -9,7 +9,7 @@ Shows:
 """
 
 from __future__ import annotations
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, request, flash
 from app.utils.auth import require_auth, get_current_user_id
 from app.services import supabase_client
 from app.services import reminders as reminder_service
@@ -58,19 +58,40 @@ def index():
     )
 
 
-@dashboard_bp.route("/account")
+@dashboard_bp.route("/account", methods=["GET", "POST"])
 @require_auth
 def account():
     """
     Account settings page.
 
+    GET: Shows account settings form
+    POST: Updates user preferences (city)
+
     Shows:
     - Email
     - Plan type
     - Subscription management
+    - Location preferences
     """
     user_id = get_current_user_id()
     profile = supabase_client.get_user_profile(user_id)
+
+    if request.method == "POST":
+        # Handle city update
+        city = request.form.get("city", "").strip()
+
+        # Update city in profile
+        success, error = supabase_client.update_user_city(user_id, city)
+
+        if success:
+            if city:
+                flash("Location updated successfully!", "success")
+            else:
+                flash("Location cleared successfully.", "success")
+            # Refresh profile to show updated data
+            profile = supabase_client.get_user_profile(user_id)
+        else:
+            flash(f"Failed to update location: {error}", "error")
 
     return render_template(
         "dashboard/account.html",

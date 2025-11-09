@@ -10,8 +10,32 @@ Provides centralized access to Supabase for:
 from __future__ import annotations
 from typing import Optional, Dict, Any
 from datetime import datetime, timedelta
-from flask import current_app
+from flask import current_app, has_app_context
 from supabase import create_client, Client
+
+
+def _safe_log_error(message: str) -> None:
+    """
+    Log error message only if Flask app context is available.
+
+    This allows functions to be called from tests without app context.
+    In production, errors are logged to current_app.logger.
+    In tests without app context, errors are silently ignored.
+    """
+    try:
+        if has_app_context():
+            current_app.logger.error(message)
+    except (ImportError, RuntimeError):
+        pass  # Ignore if no app context available (e.g., in tests)
+
+
+def _safe_log_info(message: str) -> None:
+    """Log info message only if Flask app context is available."""
+    try:
+        if has_app_context():
+            current_app.logger.info(message)
+    except (ImportError, RuntimeError):
+        pass
 
 
 # Global client instances (initialized once per app)
@@ -105,7 +129,7 @@ def send_magic_link(email: str) -> Dict[str, Any]:
         }
     except Exception as e:
         error_msg = str(e).lower()
-        current_app.logger.error(f"Error sending magic link: {e}")
+        _safe_log_error(f"Error sending magic link: {e}")
 
         # Detect rate limiting errors
         if "rate limit" in error_msg or "too many requests" in error_msg:
@@ -161,7 +185,7 @@ def verify_session(access_token: str, refresh_token: Optional[str] = None) -> Op
         return None
 
     except Exception as e:
-        current_app.logger.error(f"Error verifying session: {e}")
+        _safe_log_error(f"Error verifying session: {e}")
         return None
 
 
@@ -187,7 +211,7 @@ def sign_out(access_token: str) -> bool:
         _supabase_client.auth.sign_out()
         return True
     except Exception as e:
-        current_app.logger.error(f"Error signing out: {e}")
+        _safe_log_error(f"Error signing out: {e}")
         return False
 
 
@@ -213,7 +237,7 @@ def get_user_profile(user_id: str) -> Optional[Dict[str, Any]]:
         response = _supabase_client.table("profiles").select("*").eq("id", user_id).maybe_single().execute()
         return response.data  # Returns None if no rows found
     except Exception as e:
-        current_app.logger.error(f"Error fetching user profile: {e}")
+        _safe_log_error(f"Error fetching user profile: {e}")
         return None
 
 
@@ -255,11 +279,62 @@ def create_user_profile(user_id: str, email: str) -> Optional[Dict[str, Any]]:
 
         # If profile already exists (duplicate key), fetch and return it instead
         if "duplicate key" in error_msg or "23505" in error_msg:
-            current_app.logger.info(f"Profile already exists for user {user_id}, fetching existing profile")
+            _safe_log_info(f"Profile already exists for user {user_id}, fetching existing profile")
             return get_user_profile(user_id)
 
-        current_app.logger.error(f"Error creating user profile: {e}")
+        _safe_log_error(f"Error creating user profile: {e}")
         return None
+
+
+def update_user_city(user_id: str, city: str) -> tuple[bool, Optional[str]]:
+    """
+    Update user's city/location in their profile.
+
+    Security:
+    - Input sanitization (XSS prevention)
+    - Length validation (max 200 characters)
+    - Authorization check (user can only update own profile)
+
+    Args:
+        user_id: User's UUID
+        city: City name or ZIP code (e.g., "Austin, TX" or "78701")
+
+    Returns:
+        tuple[bool, Optional[str]]: (success, error_message)
+    """
+    if not _supabase_client:
+        return False, "Database not configured"
+
+    try:
+        # Input validation and sanitization
+        if city:
+            # Strip whitespace
+            city = city.strip()
+
+            # Max length check (prevent abuse)
+            if len(city) > 200:
+                return False, "City name too long (max 200 characters)"
+
+            # Basic sanitization: remove dangerous characters
+            # Allow letters, numbers, spaces, commas, hyphens, periods
+            import re
+            if not re.match(r'^[a-zA-Z0-9\s,.\-]+$', city):
+                return False, "Invalid characters in city name"
+        else:
+            city = None  # Allow clearing the city
+
+        # Update profile (RLS ensures user can only update their own)
+        response = _supabase_client.table("profiles").update({
+            "city": city
+        }).eq("id", user_id).execute()
+
+        if response.data:
+            return True, None
+        return False, "Failed to update city"
+
+    except Exception as e:
+        _safe_log_error(f"Error updating user city: {e}")
+        return False, f"Error updating city: {str(e)}"
 
 
 def is_premium(user_id: str) -> bool:
@@ -301,7 +376,7 @@ def is_in_trial(user_id: str) -> bool:
         trial_end = datetime.fromisoformat(trial_ends_at.replace("Z", "+00:00"))
         return datetime.utcnow() < trial_end.replace(tzinfo=None)
     except Exception as e:
-        current_app.logger.error(f"Error parsing trial date: {e}")
+        _safe_log_error(f"Error parsing trial date: {e}")
         return False
 
 
@@ -328,7 +403,7 @@ def trial_days_remaining(user_id: str) -> int:
         delta = trial_end.replace(tzinfo=None) - datetime.utcnow()
         return max(0, delta.days)
     except Exception as e:
-        current_app.logger.error(f"Error calculating trial days: {e}")
+        _safe_log_error(f"Error calculating trial days: {e}")
         return 0
 
 
@@ -366,7 +441,7 @@ def get_plant_count(user_id: str) -> int:
         response = _supabase_client.table("plants").select("id", count="exact").eq("user_id", user_id).execute()
         return response.count or 0
     except Exception as e:
-        current_app.logger.error(f"Error getting plant count: {e}")
+        _safe_log_error(f"Error getting plant count: {e}")
         return 0
 
 
@@ -418,7 +493,7 @@ def get_user_plants(user_id: str, limit: int = 100, offset: int = 0) -> list[dic
                    .execute())
         return response.data or []
     except Exception as e:
-        current_app.logger.error(f"Error getting user plants: {e}")
+        _safe_log_error(f"Error getting user plants: {e}")
         return []
 
 
@@ -446,7 +521,7 @@ def get_plant_by_id(plant_id: str, user_id: str) -> dict | None:
                    .execute())
         return response.data
     except Exception as e:
-        current_app.logger.error(f"Error getting plant {plant_id}: {e}")
+        _safe_log_error(f"Error getting plant {plant_id}: {e}")
         return None
 
 
@@ -483,7 +558,7 @@ def create_plant(user_id: str, plant_data: dict) -> dict | None:
             return response.data[0]
         return None
     except Exception as e:
-        current_app.logger.error(f"Error creating plant: {e}")
+        _safe_log_error(f"Error creating plant: {e}")
         return None
 
 
@@ -531,7 +606,7 @@ def update_plant(plant_id: str, user_id: str, plant_data: dict) -> dict | None:
             return response.data[0]
         return None
     except Exception as e:
-        current_app.logger.error(f"Error updating plant {plant_id}: {e}")
+        _safe_log_error(f"Error updating plant {plant_id}: {e}")
         return None
 
 
@@ -558,7 +633,7 @@ def delete_plant(plant_id: str, user_id: str) -> bool:
                    .execute())
         return True
     except Exception as e:
-        current_app.logger.error(f"Error deleting plant {plant_id}: {e}")
+        _safe_log_error(f"Error deleting plant {plant_id}: {e}")
         return False
 
 
@@ -596,7 +671,7 @@ def upload_plant_photo(file_bytes: bytes, user_id: str, filename: str) -> str | 
         public_url = _supabase_client.storage.from_("plant-photos").get_public_url(unique_filename)
         return public_url
     except Exception as e:
-        current_app.logger.error(f"Error uploading plant photo: {e}")
+        _safe_log_error(f"Error uploading plant photo: {e}")
         return None
 
 
@@ -622,7 +697,7 @@ def delete_plant_photo(photo_url: str) -> bool:
             return True
         return False
     except Exception as e:
-        current_app.logger.error(f"Error deleting plant photo: {e}")
+        _safe_log_error(f"Error deleting plant photo: {e}")
         return False
 
 
@@ -667,5 +742,5 @@ def mark_onboarding_complete(user_id: str) -> bool:
 
         return True
     except Exception as e:
-        current_app.logger.error(f"Error marking onboarding complete: {e}")
+        _safe_log_error(f"Error marking onboarding complete: {e}")
         return False

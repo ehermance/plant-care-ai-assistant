@@ -150,7 +150,20 @@ def ask_ai():
     """
     Render the Ask AI page on GET. The template uses these variables to decide
     what to show; passing explicit None keeps Jinja conditional logic simple.
+
+    If user is authenticated, pre-fill city from their profile.
     """
+    from ..utils.auth import get_current_user_id
+    from ..services.supabase_client import get_user_profile
+
+    # Get user profile to pre-fill city if authenticated
+    default_city = None
+    user_id = get_current_user_id()
+    if user_id:
+        profile = get_user_profile(user_id)
+        if profile:
+            default_city = profile.get("city")
+
     today_str = datetime.now().strftime("%Y-%m-%d")
     return render_template(
         "index.html",
@@ -158,7 +171,7 @@ def ask_ai():
         weather=None,
         forecast=None,
         hourly=None,
-        form_values=None,
+        form_values={"city": default_city} if default_city else None,
         history=_get_history(),
         has_history=len(_get_history()) > 0,
         source=None,

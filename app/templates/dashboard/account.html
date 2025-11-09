@@ -119,13 +119,50 @@
   </details>
 </section>
 
-<!-- Preferences (Placeholder for future) -->
+<!-- Preferences -->
 <section class="card" aria-labelledby="preferences-title">
-  <h3 id="preferences-title" class="section-title">
-    Preferences
-    <span class="badge-soon">Coming Soon</span>
-  </h3>
-  <p class="muted">Email notifications, reminder settings, and other preferences will be available in a future update.</p>
+  <h3 id="preferences-title" class="section-title">Preferences</h3>
+
+  <form method="POST" action="{{ url_for('dashboard.account') }}" class="settings-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+    <div class="form-group">
+      <label for="city" class="form-label">
+        Location
+        <span class="label-optional">(optional)</span>
+      </label>
+      <p id="city-help" class="form-help">
+        Enter your city or ZIP code for weather-aware reminder adjustments.
+        <br>
+        <em>Example: Austin, TX or 78701</em>
+      </p>
+      <input
+        type="text"
+        id="city"
+        name="city"
+        class="form-input"
+        value="{{ profile.city if profile and profile.city else '' }}"
+        placeholder="Enter city or ZIP code"
+        aria-describedby="city-help"
+        maxlength="200"
+      />
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        Save Preferences
+      </button>
+    </div>
+  </form>
+
+  <details class="settings-details" style="margin-top: 1.5rem;">
+    <summary class="small muted">How is my location used?</summary>
+    <p class="small muted" style="margin-top: 0.5rem;">
+      Your location is used to provide weather-based watering adjustments for outdoor plants.
+      We fetch current weather conditions from OpenWeather API to help optimize your plant care schedule.
+      Your location is never shared with third parties and you can clear it at any time.
+    </p>
+  </details>
 </section>
 
 <!-- Danger Zone -->

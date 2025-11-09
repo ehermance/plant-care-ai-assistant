@@ -64,3 +64,4 @@ node_modules/
 .claude/
 docs/
 migrations/
+supabase_migrations/
