@@ -4,80 +4,94 @@
 {% block description %}Add a new plant to your collection.{% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <h1>Add New Plant 🌱</h1>
-  <p class="page-subtitle">Tell us about your new plant friend</p>
+<!-- Page Header -->
+<div class="mb-8">
+  <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+    Add New Plant <span class="inline-block" aria-hidden="true">🌱</span>
+  </h1>
+  <p class="text-lg text-slate-600 dark:text-slate-400">
+    Tell us about your new plant friend
+  </p>
 </div>
 
-<div class="form-container">
-  <form method="POST" action="{{ url_for('plants.add') }}" enctype="multipart/form-data" class="plant-form">
+<!-- Form -->
+<div class="max-w-2xl">
+  <form method="POST" action="{{ url_for('plants.add') }}" enctype="multipart/form-data" class="card">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
-    <div class="form-group">
-      <label for="name" class="form-label">
-        Plant Name <span class="required">*</span>
+    <!-- Plant Name -->
+    <div class="mb-6">
+      <label for="name" class="label label-required">
+        Plant Name
       </label>
       <input
         type="text"
         id="name"
         name="name"
-        class="form-input"
+        class="input"
         required
         placeholder="e.g., Snake Plant, Monstera"
         maxlength="100"
+        aria-describedby="name-help"
       />
-      <small class="form-help">What kind of plant is this?</small>
+      <p id="name-help" class="help-text">What kind of plant is this?</p>
     </div>
 
-    <div class="form-group">
-      <label for="nickname" class="form-label">
-        Nickname (Optional)
+    <!-- Nickname -->
+    <div class="mb-6">
+      <label for="nickname" class="label">
+        Nickname <span class="text-sm font-normal text-slate-500 dark:text-slate-400">(Optional)</span>
       </label>
       <input
         type="text"
         id="nickname"
         name="nickname"
-        class="form-input"
+        class="input"
         placeholder="e.g., Planty McPlantface"
         maxlength="50"
+        aria-describedby="nickname-help"
       />
-      <small class="form-help">Give your plant a fun name!</small>
+      <p id="nickname-help" class="help-text">Give your plant a fun name!</p>
     </div>
 
-    <div class="form-group">
-      <label for="species" class="form-label">
-        Species/Variety (Optional)
+    <!-- Species -->
+    <div class="mb-6">
+      <label for="species" class="label">
+        Species/Variety <span class="text-sm font-normal text-slate-500 dark:text-slate-400">(Optional)</span>
       </label>
       <input
         type="text"
         id="species"
         name="species"
-        class="form-input"
+        class="input"
         placeholder="e.g., Sansevieria trifasciata"
         maxlength="100"
       />
     </div>
 
-    <div class="form-row form-row--two">
-      <div class="form-group">
-        <label for="location" class="form-label">
+    <!-- Location & Light (Two Columns) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+      <!-- Location -->
+      <div>
+        <label for="location" class="label">
           Location
         </label>
         <input
           type="text"
           id="location"
           name="location"
-          class="form-input"
+          class="input"
           placeholder="e.g., Living room window"
           maxlength="50"
         />
       </div>
 
-      <div class="form-group">
-        <label for="light" class="form-label">
+      <!-- Light Conditions -->
+      <div>
+        <label for="light" class="label">
           Light Conditions
         </label>
-        <select id="light" name="light" class="form-input">
+        <select id="light" name="light" class="input">
           <option value="">Select light level</option>
           <option value="Low">Low (Indirect light)</option>
           <option value="Medium">Medium (Bright indirect)</option>
@@ -86,37 +100,41 @@
       </div>
     </div>
 
-    <div class="form-group">
-      <label for="notes" class="form-label">
-        Care Notes (Optional)
+    <!-- Care Notes -->
+    <div class="mb-6">
+      <label for="notes" class="label">
+        Care Notes <span class="text-sm font-normal text-slate-500 dark:text-slate-400">(Optional)</span>
       </label>
       <textarea
         id="notes"
         name="notes"
-        class="form-input"
+        class="input"
         rows="4"
         placeholder="Any special care instructions, watering schedule, or observations..."
         maxlength="500"
       ></textarea>
     </div>
 
-    <div class="form-group">
-      <label for="photo" class="form-label">
-        Photo (Optional)
+    <!-- Photo Upload -->
+    <div class="mb-8">
+      <label for="photo" class="label">
+        Photo <span class="text-sm font-normal text-slate-500 dark:text-slate-400">(Optional)</span>
       </label>
       <input
         type="file"
         id="photo"
         name="photo"
-        class="form-input"
+        class="input file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 dark:file:bg-emerald-900/30 dark:file:text-emerald-400 dark:hover:file:bg-emerald-900/50 file:cursor-pointer"
         accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+        aria-describedby="photo-help"
       />
-      <small class="form-help">Max 5MB. Supported: JPG, PNG, GIF, WebP</small>
+      <p id="photo-help" class="help-text">Max 5MB. Supported: JPG, PNG, GIF, WebP</p>
     </div>
 
-    <div class="form-actions">
+    <!-- Form Actions -->
+    <div class="flex flex-col sm:flex-row gap-3">
       <button type="submit" class="btn btn-primary">
-        Add Plant
+        <span aria-hidden="true">🪴</span> Add Plant
       </button>
       <a href="{{ url_for('plants.index') }}" class="btn btn-secondary">
         Cancel
