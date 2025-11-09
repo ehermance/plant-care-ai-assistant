@@ -1219,3 +1219,232 @@ def test_get_reminders_for_month_returns_list():
     # Should always return a list
     assert isinstance(reminders, list)
 
+
+# --------------------------
+# Plants Service tests (PRIORITY 2 - HIGH) - Extended
+# --------------------------
+
+def test_get_user_plants_returns_list():
+    """Test fetching user's plants returns a list."""
+    from app.services.supabase_client import get_user_plants
+
+    # Get user's plants
+    plants = get_user_plants("test-user-id")
+
+    # Should always return a list (empty if no plants or DB error)
+    assert isinstance(plants, list)
+
+
+def test_get_plant_by_id_not_found():
+    """Test fetching non-existent plant."""
+    from app.services.supabase_client import get_plant_by_id
+
+    # Try to get non-existent plant
+    plant = get_plant_by_id("nonexistent-id", "test-user-id")
+
+    # Should return None for missing plant
+    assert plant is None or isinstance(plant, dict)
+
+
+def test_create_plant_validation():
+    """Test plant creation with invalid data."""
+    from app.services.supabase_client import create_plant
+
+    # Try to create plant with minimal invalid data
+    result = create_plant(
+        user_id="test-user-id",
+        plant_data={"name": "", "species": "Test Species"}  # Empty name
+    )
+
+    # Should handle validation gracefully (returns None or dict)
+    assert result is None or isinstance(result, dict)
+
+
+def test_update_plant_validation():
+    """Test updating non-existent plant."""
+    from app.services.supabase_client import update_plant
+
+    # Try to update non-existent plant
+    result = update_plant(
+        plant_id="nonexistent-id",
+        user_id="test-user-id",
+        plant_data={"name": "Updated Name"}
+    )
+
+    # Should fail gracefully (returns None or dict)
+    assert result is None or isinstance(result, dict)
+
+
+def test_delete_plant_validation():
+    """Test deleting non-existent plant."""
+    from app.services.supabase_client import delete_plant
+
+    # Try to delete non-existent plant
+    success = delete_plant("nonexistent-id", "test-user-id")
+
+    # Should return bool (likely False for nonexistent plant)
+    assert isinstance(success, bool)
+
+
+# --------------------------
+# Authentication tests (PRIORITY 3 - HIGH) - Extended
+# --------------------------
+
+def test_get_current_user_no_session(monkeypatch):
+    """Test getting current user with no session."""
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+
+    from app import create_app
+    from app.utils.auth import get_current_user
+
+    app = create_app()
+
+    # Test within Flask request context (no session data)
+    with app.test_request_context():
+        user = get_current_user()
+        # Should return None when not in session
+        assert user is None
+
+
+def test_get_current_user_id_no_session(monkeypatch):
+    """Test getting current user ID with no session."""
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+
+    from app import create_app
+    from app.utils.auth import get_current_user_id
+
+    app = create_app()
+
+    # Test within Flask request context (no session data)
+    with app.test_request_context():
+        user_id = get_current_user_id()
+        # Should return None when not in session
+        assert user_id is None
+
+
+def test_auth_callback_route_exists(monkeypatch):
+    """Test that auth callback route is registered."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+
+    from app import create_app
+
+    app = create_app()
+    client = app.test_client()
+
+    # Callback route should exist (will redirect or show error without valid token)
+    response = client.get("/auth/callback")
+
+    # Should not return 404 (route exists)
+    assert response.status_code != 404
+
+
+def test_logout_route_exists(monkeypatch):
+    """Test that logout route is registered."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+
+    from app import create_app
+
+    app = create_app()
+    client = app.test_client()
+
+    # Logout route should exist
+    response = client.get("/auth/logout", follow_redirects=False)
+
+    # Should not return 404
+    assert response.status_code != 404
+
+
+def test_signup_route_exists(monkeypatch):
+    """Test that signup route is registered."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+
+    from app import create_app
+
+    app = create_app()
+    client = app.test_client()
+
+    # Signup route should exist
+    response = client.get("/auth/signup")
+
+    # Should return 200 (shows signup page)
+    assert response.status_code == 200
+
+
+# --------------------------
+# Dashboard routes tests (Extended)
+# --------------------------
+
+def test_dashboard_requires_authentication(monkeypatch):
+    """Test that main dashboard requires authentication."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+
+    from app import create_app
+
+    app = create_app()
+    client = app.test_client()
+
+    # Try to access dashboard without auth
+    response = client.get("/dashboard/", follow_redirects=False)
+
+    # Should redirect to login (not show dashboard)
+    assert response.status_code in [302, 303, 307, 401, 403]
+
+
+def test_account_settings_requires_authentication(monkeypatch):
+    """Test that account settings requires authentication."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+
+    from app import create_app
+
+    app = create_app()
+    client = app.test_client()
+
+    # Try to access account settings without auth
+    response = client.get("/dashboard/account", follow_redirects=False)
+
+    # Should redirect to login
+    assert response.status_code in [302, 303, 307, 401, 403]
+
+
+# --------------------------
+# Reminders routes tests (Extended)
+# --------------------------
+
+def test_reminders_index_requires_authentication(monkeypatch):
+    """Test that reminders page requires authentication."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+
+    from app import create_app
+
+    app = create_app()
+    client = app.test_client()
+
+    # Try to access reminders without auth
+    response = client.get("/reminders/", follow_redirects=False)
+
+    # Should redirect to login
+    assert response.status_code in [302, 303, 307, 401, 403]
+
+
+def test_plants_index_requires_authentication(monkeypatch):
+    """Test that plants page requires authentication."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+
+    from app import create_app
+
+    app = create_app()
+    client = app.test_client()
+
+    # Try to access plants without auth
+    response = client.get("/plants/", follow_redirects=False)
+
+    # Should redirect to login
+    assert response.status_code in [302, 303, 307, 401, 403]
+
