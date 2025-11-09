@@ -337,6 +337,45 @@ def update_user_city(user_id: str, city: str) -> tuple[bool, Optional[str]]:
         return False, f"Error updating city: {str(e)}"
 
 
+def update_user_theme(user_id: str, theme: str) -> tuple[bool, Optional[str]]:
+    """
+    Update user's theme preference (light, dark, or auto).
+
+    Security:
+    - Input validation (only allows 'light', 'dark', 'auto')
+    - Authorization check (user can only update own preference)
+
+    Args:
+        user_id: User's UUID
+        theme: Theme preference ('light', 'dark', or 'auto')
+
+    Returns:
+        (success, error_message)
+    """
+    if not _supabase_client:
+        return False, "Database not configured"
+
+    try:
+        # Validate theme value
+        theme = theme.strip().lower() if theme else 'auto'
+
+        if theme not in ['light', 'dark', 'auto']:
+            return False, "Invalid theme option. Must be 'light', 'dark', or 'auto'"
+
+        # Update user's theme preference
+        response = _supabase_client.table("profiles").update({
+            "theme_preference": theme
+        }).eq("id", user_id).execute()
+
+        if response.data:
+            return True, None
+        return False, "Failed to update theme preference"
+
+    except Exception as e:
+        _safe_log_error(f"Error updating user theme: {e}")
+        return False, f"Error updating theme: {str(e)}"
+
+
 def is_premium(user_id: str) -> bool:
     """
     Check if user has premium plan.

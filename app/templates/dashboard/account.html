@@ -148,6 +148,77 @@
       />
     </div>
 
+    <div class="form-group">
+      <label class="form-label">
+        Theme Preference
+      </label>
+      <p id="theme-help" class="form-help">
+        Choose your preferred color scheme. "Auto" follows your device's system setting.
+      </p>
+
+      <div class="radio-group" role="radiogroup" aria-describedby="theme-help">
+        <label class="radio-label">
+          <input
+            type="radio"
+            name="theme"
+            value="light"
+            class="radio-input"
+            {% if profile and profile.theme_preference == 'light' %}checked{% endif %}
+            data-theme-toggle
+            data-theme-value="light"
+          />
+          <span class="radio-text">
+            <span class="radio-icon" aria-hidden="true">☀️</span>
+            <span>
+              <strong>Light Mode</strong>
+              <br>
+              <span class="small muted">Bright, clean interface</span>
+            </span>
+          </span>
+        </label>
+
+        <label class="radio-label">
+          <input
+            type="radio"
+            name="theme"
+            value="dark"
+            class="radio-input"
+            {% if profile and profile.theme_preference == 'dark' %}checked{% endif %}
+            data-theme-toggle
+            data-theme-value="dark"
+          />
+          <span class="radio-text">
+            <span class="radio-icon" aria-hidden="true">🌙</span>
+            <span>
+              <strong>Dark Mode</strong>
+              <br>
+              <span class="small muted">Easy on the eyes at night</span>
+            </span>
+          </span>
+        </label>
+
+        <label class="radio-label">
+          <input
+            type="radio"
+            name="theme"
+            value="auto"
+            class="radio-input"
+            {% if not profile or not profile.theme_preference or profile.theme_preference == 'auto' %}checked{% endif %}
+            data-theme-toggle
+            data-theme-value="auto"
+          />
+          <span class="radio-text">
+            <span class="radio-icon" aria-hidden="true">🌓</span>
+            <span>
+              <strong>Auto (System)</strong>
+              <br>
+              <span class="small muted">Matches your device setting</span>
+            </span>
+          </span>
+        </label>
+      </div>
+    </div>
+
     <div class="form-actions">
       <button type="submit" class="btn btn-primary">
         Save Preferences

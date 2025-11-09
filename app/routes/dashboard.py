@@ -77,21 +77,35 @@ def account():
     profile = supabase_client.get_user_profile(user_id)
 
     if request.method == "POST":
+        # Track if any updates were made
+        updates_made = []
+
         # Handle city update
         city = request.form.get("city", "").strip()
-
-        # Update city in profile
-        success, error = supabase_client.update_user_city(user_id, city)
-
-        if success:
-            if city:
-                flash("Location updated successfully!", "success")
+        if "city" in request.form:  # Only update if field is present
+            success, error = supabase_client.update_user_city(user_id, city)
+            if success:
+                if city:
+                    updates_made.append("location")
+                else:
+                    updates_made.append("location (cleared)")
             else:
-                flash("Location cleared successfully.", "success")
+                flash(f"Failed to update location: {error}", "error")
+
+        # Handle theme update
+        theme = request.form.get("theme", "").strip().lower()
+        if theme and theme in ["light", "dark", "auto"]:
+            success, error = supabase_client.update_user_theme(user_id, theme)
+            if success:
+                updates_made.append("theme")
+            else:
+                flash(f"Failed to update theme: {error}", "error")
+
+        # Show success message if any updates were made
+        if updates_made:
+            flash(f"Preferences updated: {', '.join(updates_made)}", "success")
             # Refresh profile to show updated data
             profile = supabase_client.get_user_profile(user_id)
-        else:
-            flash(f"Failed to update location: {error}", "error")
 
     return render_template(
         "dashboard/account.html",

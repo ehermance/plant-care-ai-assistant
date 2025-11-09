@@ -10,7 +10,9 @@
   <meta name="keywords"
         content="plant care ai, plant care app, AI plant assistant, smart plant watering, plant reminder app, weather-based plant care, gardening app, houseplant tips">
   <meta name="author" content="EDH Dev" />
-  <meta name="theme-color" content="#0F766E" />
+  <!-- Theme color adapts to light/dark mode -->
+  <meta name="theme-color" content="#10b981" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
 
   <!-- Security Meta Tags -->
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -50,8 +52,14 @@
   <!-- Performance hints -->
   <link rel="preconnect" href="https://static.cloudflareinsights.com" crossorigin>
 
-  <!-- Styles -->
+  <!-- Tailwind CSS (Horti-Futuristic Design System) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}" />
+
+  <!-- Legacy styles (temporary - during migration) -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+
+  <!-- Theme Manager (load early to prevent flash) -->
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 
   {% block extra_head %}{% endblock %}
 
