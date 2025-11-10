@@ -184,10 +184,14 @@
   const userMenuDropdown = document.getElementById('user-menu-dropdown');
 
   if (userMenuBtn && userMenuDropdown) {
+    console.log('User menu elements found:', { btn: userMenuBtn, dropdown: userMenuDropdown });
+
     // Toggle dropdown on click
     userMenuBtn.addEventListener('click', function(e) {
       e.stopPropagation();
+      e.preventDefault();
       const isExpanded = userMenuBtn.getAttribute('aria-expanded') === 'true';
+      console.log('Menu clicked, isExpanded:', isExpanded);
 
       if (isExpanded) {
         closeUserMenu();
@@ -247,12 +251,15 @@
     });
 
     function openUserMenu() {
-      userMenuDropdown.removeAttribute('hidden');
+      console.log('Opening menu, classes before:', userMenuDropdown.className);
+      userMenuDropdown.classList.remove('hidden');
       userMenuBtn.setAttribute('aria-expanded', 'true');
+      console.log('Opening menu, classes after:', userMenuDropdown.className);
     }
 
     function closeUserMenu() {
-      userMenuDropdown.setAttribute('hidden', '');
+      console.log('Closing menu');
+      userMenuDropdown.classList.add('hidden');
       userMenuBtn.setAttribute('aria-expanded', 'false');
     }
   }
@@ -297,4 +304,5 @@
       }, 300);
     }
   }
+})();
 })();

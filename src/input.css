@@ -319,6 +319,35 @@
     box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
   }
 
+  /* Logo - Sharp emerald coloring matching header text */
+  .logo-glow {
+    /* Sepia to remove original colors, then apply darker emerald tint with crisp 3D depth */
+    filter: sepia(1) saturate(4.5) hue-rotate(115deg) brightness(0.75)
+            drop-shadow(0 1px 0px rgba(0, 0, 0, 0.25))
+            drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+
+  :is(.dark .logo-glow) {
+    /* Lighter emerald for dark mode with crisp 3D depth */
+    filter: sepia(1) saturate(5) hue-rotate(120deg) brightness(1.0)
+            drop-shadow(0 1px 0px rgba(0, 0, 0, 0.3))
+            drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25));
+  }
+
+  .logo-glow:hover {
+    filter: sepia(1) saturate(5) hue-rotate(115deg) brightness(0.85)
+            drop-shadow(0 1px 0px rgba(0, 0, 0, 0.3))
+            drop-shadow(0 3px 3px rgba(0, 0, 0, 0.25));
+  }
+
+  :is(.dark .logo-glow:hover) {
+    filter: sepia(1) saturate(5.5) hue-rotate(120deg) brightness(1.1)
+            drop-shadow(0 1px 0px rgba(0, 0, 0, 0.35))
+            drop-shadow(0 3px 3px rgba(0, 0, 0, 0.3));
+  }
+
   /* Hide scrollbar but keep functionality */
   .scrollbar-hide {
     -ms-overflow-style: none;
