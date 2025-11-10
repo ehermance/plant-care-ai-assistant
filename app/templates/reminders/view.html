@@ -1,188 +1,243 @@
 {% extends "base.html" %}
 
-{% block title %}{{ reminder.title }} - Reminder - PlantCareAI{% endblock %}
+{% block title %}{{ reminder.title }} - Reminder - Plant Care AI Assistant - PlantCareAI{% endblock %}
+{% block description %}View details for {{ reminder.title }} reminder.{% endblock %}
 
 {% block content %}
-<section class="page-header">
-  <h1 class="page-title">{{ reminder.title }}</h1>
-  <p class="page-subtitle">
+<!-- Page Header -->
+<div class="mb-8">
+  <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+    {{ reminder.title }}
+  </h1>
+  <p class="text-lg text-slate-600 dark:text-slate-400">
     {{ reminder.reminder_type|replace('_', ' ')|title }} reminder for
-    <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}">
+    <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
       {{ reminder.plants.name }}{% if reminder.plants.nickname %} "{{ reminder.plants.nickname }}"{% endif %}
     </a>
   </p>
-  <div class="page-actions">
-    <a href="{{ url_for('reminders.edit', reminder_id=reminder.id) }}" class="btn btn-secondary">
-      Edit
-    </a>
-  </div>
-</section>
+</div>
 
-<div class="grid-two">
+<!-- Action Button -->
+<div class="mb-8">
+  <a href="{{ url_for('reminders.edit', reminder_id=reminder.id) }}" class="btn btn-secondary">
+    <span aria-hidden="true">✏️</span> Edit
+  </a>
+</div>
+
+<!-- Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
   <!-- Reminder Details -->
-  <section class="card">
-    <h2 class="section-title">Details</h2>
+  <div class="lg:col-span-2">
+    <div class="card">
+      <h2 class="section-title">Details</h2>
 
-    <!-- Plant Info -->
-    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
-      {% if reminder.plants.photo_url %}
-      <img
-        src="{{ reminder.plants.photo_url }}"
-        alt="{{ reminder.plants.name }}"
-        style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;"
-      />
-      {% else %}
-      <div style="width: 80px; height: 80px; background: var(--bg-secondary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
-        🪴
-      </div>
-      {% endif %}
-      <div style="flex: 1;">
-        <h3 style="margin: 0; font-size: 1.1rem;">
-          <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}">
-            {{ reminder.plants.name }}
-          </a>
-        </h3>
-        {% if reminder.plants.nickname %}
-        <p style="margin: 0.25rem 0; color: var(--text-muted); font-size: 0.9rem;">"{{ reminder.plants.nickname }}"</p>
-        {% endif %}
-        {% if reminder.plants.location %}
-        <p style="margin: 0.25rem 0; color: var(--text-muted); font-size: 0.9rem;">
-          📍 {{ reminder.plants.location }}
-        </p>
-        {% endif %}
-      </div>
-    </div>
-
-    <dl class="detail-list">
-      <dt>Frequency</dt>
-      <dd>{{ reminder.frequency|replace('_', ' ')|title }}
-        {% if reminder.custom_interval_days %}
-        ({{ reminder.custom_interval_days }} days)
-        {% endif %}
-      </dd>
-
-      {% if reminder.next_due %}
-      <dt>Next Due Date</dt>
-      <dd>
-        <strong>{{ reminder.next_due }}</strong>
-        {% if reminder.weather_adjusted_due %}
-        <br><span class="badge badge-weather">Weather adjusted: {{ reminder.weather_adjusted_due }}</span>
-        {% endif %}
-      </dd>
-      {% endif %}
-
-      {% if reminder.weather_adjustment_reason %}
-      <dt>Weather Adjustment</dt>
-      <dd>{{ reminder.weather_adjustment_reason }}</dd>
-      {% endif %}
-
-      {% if reminder.last_completed_at %}
-      <dt>Last Completed</dt>
-      <dd>{{ reminder.last_completed_at|replace('T', ' at ')|replace('+00:00', ' UTC') }}</dd>
-      {% endif %}
-
-      <dt>Status</dt>
-      <dd>
-        {% if reminder.is_active %}
-        <span class="badge badge-success">Active</span>
+      <!-- Plant Info -->
+      <div class="flex items-start gap-4 mb-6 pb-6 border-b border-slate-200 dark:border-slate-700">
+        {% if reminder.plants.photo_url %}
+        <div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
+          <img
+            src="{{ reminder.plants.photo_url }}"
+            alt="{{ reminder.plants.name }}"
+            class="w-full h-full object-cover"
+          />
+        </div>
         {% else %}
-        <span class="badge badge-muted">Inactive</span>
+        <div class="w-20 h-20 rounded-xl bg-gradient-to-br from-emerald-100 to-cyan-100 dark:from-emerald-900/30 dark:to-cyan-900/30 flex items-center justify-center flex-shrink-0">
+          <span class="text-4xl opacity-60" aria-hidden="true">🪴</span>
+        </div>
         {% endif %}
-      </dd>
+        <div class="flex-1 min-w-0">
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">
+            <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="hover:text-emerald-600 dark:hover:text-emerald-400">
+              {{ reminder.plants.name }}
+            </a>
+          </h3>
+          {% if reminder.plants.nickname %}
+          <p class="text-sm text-slate-600 dark:text-slate-400 mb-1">"{{ reminder.plants.nickname }}"</p>
+          {% endif %}
+          {% if reminder.plants.location %}
+          <p class="text-sm text-slate-500 dark:text-slate-400">
+            <span aria-hidden="true">📍</span> {{ reminder.plants.location }}
+          </p>
+          {% endif %}
+        </div>
+      </div>
 
-      {% if reminder.notes %}
-      <dt>Notes</dt>
-      <dd>{{ reminder.notes }}</dd>
-      {% endif %}
-    </dl>
-  </section>
+      <dl class="space-y-4">
+        <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
+          <dt class="text-2xl flex-shrink-0" aria-hidden="true">🔄</dt>
+          <div class="flex-1">
+            <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Frequency</dt>
+            <dd class="mt-1 text-base text-slate-900 dark:text-slate-100">
+              {{ reminder.frequency|replace('_', ' ')|title }}
+              {% if reminder.custom_interval_days %}
+              ({{ reminder.custom_interval_days }} days)
+              {% endif %}
+            </dd>
+          </div>
+        </div>
+
+        {% if reminder.next_due %}
+        <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
+          <dt class="text-2xl flex-shrink-0" aria-hidden="true">📅</dt>
+          <div class="flex-1">
+            <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Next Due Date</dt>
+            <dd class="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">
+              {{ reminder.next_due }}
+              {% if reminder.weather_adjusted_due %}
+              <br><span class="badge badge-cyan mt-2 inline-block">🌤️ Weather adjusted: {{ reminder.weather_adjusted_due }}</span>
+              {% endif %}
+            </dd>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if reminder.weather_adjustment_reason %}
+        <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
+          <dt class="text-2xl flex-shrink-0" aria-hidden="true">🌤️</dt>
+          <div class="flex-1">
+            <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Weather Adjustment</dt>
+            <dd class="mt-1 text-base text-slate-900 dark:text-slate-100">{{ reminder.weather_adjustment_reason }}</dd>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if reminder.last_completed_at %}
+        <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
+          <dt class="text-2xl flex-shrink-0" aria-hidden="true">✅</dt>
+          <div class="flex-1">
+            <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Last Completed</dt>
+            <dd class="mt-1 text-base text-slate-900 dark:text-slate-100">
+              {{ reminder.last_completed_at|replace('T', ' at ')|replace('+00:00', ' UTC') }}
+            </dd>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
+          <dt class="text-2xl flex-shrink-0" aria-hidden="true">📊</dt>
+          <div class="flex-1">
+            <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Status</dt>
+            <dd class="mt-1">
+              {% if reminder.is_active %}
+              <span class="badge badge-emerald">Active</span>
+              {% else %}
+              <span class="badge badge-rose">Inactive</span>
+              {% endif %}
+            </dd>
+          </div>
+        </div>
+
+        {% if reminder.notes %}
+        <div class="flex items-start gap-3">
+          <dt class="text-2xl flex-shrink-0" aria-hidden="true">📝</dt>
+          <div class="flex-1">
+            <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Notes</dt>
+            <dd class="mt-1 text-base text-slate-900 dark:text-slate-100 whitespace-pre-wrap">{{ reminder.notes }}</dd>
+          </div>
+        </div>
+        {% endif %}
+      </dl>
+    </div>
+  </div>
 
   <!-- Actions -->
-  <section class="card">
-    <h2 class="section-title">Actions</h2>
+  <div class="lg:col-span-1">
+    <div class="card">
+      <h2 class="section-title">Actions</h2>
 
-    {% if reminder.is_active %}
-    <div class="action-buttons-vertical">
-      <!-- Mark Complete -->
-      <form method="POST" action="{{ url_for('reminders.complete', reminder_id=reminder.id) }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        <button type="submit" class="btn btn-primary btn-block">
-          ✓ Mark Complete
-        </button>
-      </form>
+      {% if reminder.is_active %}
+      <div class="space-y-3">
+        <!-- Mark Complete -->
+        <form method="POST" action="{{ url_for('reminders.complete', reminder_id=reminder.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn btn-primary w-full">
+            <span aria-hidden="true">✓</span> Mark Complete
+          </button>
+        </form>
 
-      <!-- Snooze Options -->
-      <details class="action-details">
-        <summary>💤 Snooze Reminder</summary>
-        <div class="snooze-options">
-          <form method="POST" action="{{ url_for('reminders.snooze', reminder_id=reminder.id) }}" style="display:inline;">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <input type="hidden" name="days" value="1"/>
-            <button type="submit" class="btn btn-small btn-secondary">1 day</button>
-          </form>
-          <form method="POST" action="{{ url_for('reminders.snooze', reminder_id=reminder.id) }}" style="display:inline;">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <input type="hidden" name="days" value="2"/>
-            <button type="submit" class="btn btn-small btn-secondary">2 days</button>
-          </form>
-          <form method="POST" action="{{ url_for('reminders.snooze', reminder_id=reminder.id) }}" style="display:inline;">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <input type="hidden" name="days" value="3"/>
-            <button type="submit" class="btn btn-small btn-secondary">3 days</button>
-          </form>
-        </div>
-      </details>
+        <!-- Snooze Options -->
+        <details class="rounded-xl border border-slate-200 dark:border-slate-700">
+          <summary class="px-4 py-3 cursor-pointer font-medium text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors rounded-xl">
+            <span aria-hidden="true">💤</span> Snooze Reminder
+          </summary>
+          <div class="px-4 pb-3 pt-2 flex flex-wrap gap-2 border-t border-slate-200 dark:border-slate-700">
+            <form method="POST" action="{{ url_for('reminders.snooze', reminder_id=reminder.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <input type="hidden" name="days" value="1"/>
+              <button type="submit" class="btn btn-secondary">1 day</button>
+            </form>
+            <form method="POST" action="{{ url_for('reminders.snooze', reminder_id=reminder.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <input type="hidden" name="days" value="2"/>
+              <button type="submit" class="btn btn-secondary">2 days</button>
+            </form>
+            <form method="POST" action="{{ url_for('reminders.snooze', reminder_id=reminder.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <input type="hidden" name="days" value="3"/>
+              <button type="submit" class="btn btn-secondary">3 days</button>
+            </form>
+          </div>
+        </details>
 
-      <!-- Weather Adjustment -->
-      {% if reminder.reminder_type == 'watering' and not reminder.skip_weather_adjustment %}
-      <form method="POST" action="{{ url_for('reminders.adjust_weather', reminder_id=reminder.id) }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        <button type="submit" class="btn btn-secondary btn-block">
-          🌤️ Check Weather Adjustment
-        </button>
-      </form>
+        <!-- Weather Adjustment -->
+        {% if reminder.reminder_type == 'watering' and not reminder.skip_weather_adjustment %}
+        <form method="POST" action="{{ url_for('reminders.adjust_weather', reminder_id=reminder.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn btn-secondary w-full">
+            <span aria-hidden="true">🌤️</span> Check Weather Adjustment
+          </button>
+        </form>
 
-      {% if reminder.weather_adjusted_due %}
-      <form method="POST" action="{{ url_for('reminders.clear_weather', reminder_id=reminder.id) }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        <button type="submit" class="btn btn-secondary btn-block">
-          Clear Weather Adjustment
-        </button>
-      </form>
+        {% if reminder.weather_adjusted_due %}
+        <form method="POST" action="{{ url_for('reminders.clear_weather', reminder_id=reminder.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn btn-secondary w-full">
+            Clear Weather Adjustment
+          </button>
+        </form>
+        {% endif %}
+        {% endif %}
+
+        <!-- Deactivate -->
+        <form method="POST" action="{{ url_for('reminders.toggle_status', reminder_id=reminder.id) }}" onsubmit="return confirm('Deactivate this reminder? You can reactivate it later from the history page.');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn btn-danger w-full">
+            Deactivate Reminder
+          </button>
+        </form>
+      </div>
+      {% else %}
+      <p class="text-slate-500 dark:text-slate-400 mb-4">This reminder is inactive.</p>
+      <div class="space-y-3">
+        <form method="POST" action="{{ url_for('reminders.toggle_status', reminder_id=reminder.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn btn-primary w-full">
+            <span aria-hidden="true">✓</span> Activate Reminder
+          </button>
+        </form>
+        <a href="{{ url_for('reminders.index') }}" class="btn btn-secondary w-full">
+          <span aria-hidden="true">←</span> Back to Active Reminders
+        </a>
+        <a href="{{ url_for('reminders.history') }}" class="btn btn-secondary w-full">
+          View Reminder History
+        </a>
+      </div>
       {% endif %}
-      {% endif %}
 
-      <!-- Deactivate -->
-      <form method="POST" action="{{ url_for('reminders.toggle_status', reminder_id=reminder.id) }}" onsubmit="return confirm('Deactivate this reminder? You can reactivate it later from the history page.');">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        <button type="submit" class="btn btn-outline btn-block btn-danger">
-          Deactivate Reminder
-        </button>
-      </form>
+      <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400 space-y-1">
+        <p>Created: {{ reminder.created_at|replace('T', ' at ')|replace('+00:00', ' UTC') }}</p>
+        <p>Updated: {{ reminder.updated_at|replace('T', ' at ')|replace('+00:00', ' UTC') }}</p>
+      </div>
     </div>
-    {% else %}
-    <p class="muted">This reminder is inactive.</p>
-    <div class="action-buttons-vertical" style="margin-top: 1rem;">
-      <form method="POST" action="{{ url_for('reminders.toggle_status', reminder_id=reminder.id) }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        <button type="submit" class="btn btn-primary btn-block">
-          ✓ Activate Reminder
-        </button>
-      </form>
-      <a href="{{ url_for('reminders.index') }}" class="btn btn-secondary btn-block">
-        ← Back to Active Reminders
-      </a>
-      <a href="{{ url_for('reminders.history') }}" class="btn btn-secondary btn-block">
-        View Reminder History
-      </a>
-    </div>
-    {% endif %}
+  </div>
+</div>
 
-    <div class="muted small" style="margin-top: 1rem;">
-      <p>Created: {{ reminder.created_at|replace('T', ' at ')|replace('+00:00', ' UTC') }}</p>
-      <p>Updated: {{ reminder.updated_at|replace('T', ' at ')|replace('+00:00', ' UTC') }}</p>
-    </div>
-  </section>
+<!-- Back Button -->
+<div class="flex flex-wrap gap-3">
+  <a href="{{ url_for('reminders.index') }}" class="btn btn-secondary">
+    <span aria-hidden="true">←</span> Back to Reminders
+  </a>
 </div>
 
 {% endblock %}

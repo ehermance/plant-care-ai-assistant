@@ -95,10 +95,10 @@
   }
 
   .btn-danger {
-    @apply btn bg-rose-600 hover:bg-rose-500 text-white
+    @apply btn bg-rose-600 hover:bg-rose-700 text-white
            shadow-lg shadow-rose-500/30 hover:shadow-xl hover:shadow-rose-500/40
            hover:scale-[1.02] active:scale-[0.98]
-           dark:bg-rose-500 dark:hover:bg-rose-400
+           dark:bg-rose-700 dark:hover:bg-rose-800
            focus-visible:ring-rose-500;
   }
 

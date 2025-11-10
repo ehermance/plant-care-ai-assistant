@@ -1,78 +1,82 @@
 {% extends "base.html" %}
 
-{% block title %}Care Reminders - PlantCareAI{% endblock %}
+{% block title %}Care Reminders - Plant Care AI Assistant - PlantCareAI{% endblock %}
+{% block description %}Stay on top of your plant care schedule with smart reminders.{% endblock %}
 
 {% block content %}
 <!-- Page Header -->
-<section class="page-header">
-  <h1 class="page-title">Care Reminders</h1>
-  <p class="page-subtitle">Stay on top of your plant care schedule</p>
-  <div class="page-actions">
-    <a href="{{ url_for('reminders.calendar') }}" class="btn btn-secondary">
-      📅 Calendar View
-    </a>
-    <a href="{{ url_for('reminders.history') }}" class="btn btn-secondary">
-      📜 View History
-    </a>
-    <a href="{{ url_for('reminders.create') }}" class="btn btn-primary">
-      + New Reminder
-    </a>
-  </div>
-</section>
+<div class="mb-8">
+  <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+    Care Reminders <span class="inline-block" aria-hidden="true">⏰</span>
+  </h1>
+  <p class="text-lg text-slate-600 dark:text-slate-400">
+    Stay on top of your plant care schedule
+  </p>
+</div>
+
+<!-- Action Buttons -->
+<div class="flex flex-wrap gap-3 mb-8">
+  <a href="{{ url_for('reminders.calendar') }}" class="btn btn-secondary">
+    <span aria-hidden="true">📅</span> Calendar View
+  </a>
+  <a href="{{ url_for('reminders.history') }}" class="btn btn-secondary">
+    <span aria-hidden="true">📜</span> View History
+  </a>
+  <a href="{{ url_for('reminders.create') }}" class="btn btn-primary">
+    <span aria-hidden="true">+</span> New Reminder
+  </a>
+</div>
 
 <!-- Reminder Stats -->
-<div class="dashboard-stats">
-  <a href="#due-today" class="stat-card stat-card-link">
-    <div class="stat-icon" aria-hidden="true">⏰</div>
-    <div class="stat-content">
-      <div class="stat-value">{{ stats.due_today or 0 }}</div>
-      <div class="stat-label">Due Today</div>
-    </div>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+  <a href="#due-today" class="stat-card">
+    <div class="text-4xl mb-3" aria-hidden="true">⏰</div>
+    <div class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">{{ stats.due_today or 0 }}</div>
+    <div class="text-sm text-slate-600 dark:text-slate-400">Due Today</div>
   </a>
 
-  <a href="{{ url_for('reminders.calendar') }}" class="stat-card stat-card-link">
-    <div class="stat-icon" aria-hidden="true">📅</div>
-    <div class="stat-content">
-      <div class="stat-value">{{ stats.upcoming_7_days or 0 }}</div>
-      <div class="stat-label">Next 7 Days</div>
-    </div>
+  <a href="{{ url_for('reminders.calendar') }}" class="stat-card">
+    <div class="text-4xl mb-3" aria-hidden="true">📅</div>
+    <div class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">{{ stats.upcoming_7_days or 0 }}</div>
+    <div class="text-sm text-slate-600 dark:text-slate-400">Next 7 Days</div>
   </a>
 
-  <a href="{{ url_for('reminders.history') }}" class="stat-card stat-card-link">
-    <div class="stat-icon" aria-hidden="true">✅</div>
-    <div class="stat-content">
-      <div class="stat-value">{{ stats.completed_this_week or 0 }}</div>
-      <div class="stat-label">Completed This Week</div>
-    </div>
+  <a href="{{ url_for('reminders.history') }}" class="stat-card">
+    <div class="text-4xl mb-3" aria-hidden="true">✅</div>
+    <div class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">{{ stats.completed_this_week or 0 }}</div>
+    <div class="text-sm text-slate-600 dark:text-slate-400">Completed This Week</div>
   </a>
 
-  <a href="#all-reminders" class="stat-card stat-card-link">
-    <div class="stat-icon" aria-hidden="true">📋</div>
-    <div class="stat-content">
-      <div class="stat-value">{{ stats.active_reminders or 0 }}</div>
-      <div class="stat-label">Total Active</div>
-    </div>
+  <a href="#all-reminders" class="stat-card">
+    <div class="text-4xl mb-3" aria-hidden="true">📋</div>
+    <div class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">{{ stats.active_reminders or 0 }}</div>
+    <div class="text-sm text-slate-600 dark:text-slate-400">Total Active</div>
   </a>
 </div>
 
 <!-- Due Today Section -->
 {% if due_reminders %}
-<section id="due-today" class="card" aria-labelledby="due-title">
-  <div class="section-header">
-    <h2 id="due-title" class="section-title">Due Today</h2>
+<section id="due-today" class="card mb-8" aria-labelledby="due-title">
+  <div class="flex items-center justify-between mb-6">
+    <h2 id="due-title" class="section-title !mb-0">Due Today</h2>
     {% if due_reminders|length > 1 %}
-    <form method="POST" action="{{ url_for('reminders.bulk_complete') }}" style="display: inline;">
+    <form method="POST" action="{{ url_for('reminders.bulk_complete') }}">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-      <button type="submit" class="btn btn-small btn-primary" onclick="return confirm('Mark all {{ due_reminders|length }} reminders as complete?');">
-        ✓ Complete All ({{ due_reminders|length }})
+      <button
+        type="submit"
+        class="btn btn-primary"
+        onclick="return confirm('Mark all {{ due_reminders|length }} reminders as complete?');"
+      >
+        <span aria-hidden="true">✓</span> Complete All ({{ due_reminders|length }})
       </button>
     </form>
     {% endif %}
   </div>
-  <div class="reminder-list">
+
+  <div class="space-y-3">
     {% for reminder in due_reminders %}
-    <div class="reminder-item reminder-due">
-      <div class="reminder-icon">
+    <div class="flex items-start gap-4 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border-2 border-amber-200 dark:border-amber-700 transition-all duration-200 hover:border-amber-400 dark:hover:border-amber-500">
+      <div class="text-2xl flex-shrink-0" aria-hidden="true">
         {% if reminder.reminder_type == 'watering' %}💧
         {% elif reminder.reminder_type == 'fertilizing' %}🌿
         {% elif reminder.reminder_type == 'misting' %}💦
@@ -82,39 +86,39 @@
         {% else %}📝{% endif %}
       </div>
 
-      <div class="reminder-content">
-        <h3 class="reminder-title">
-          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}">
+      <div class="flex-1 min-w-0">
+        <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
+          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
             {{ reminder.title }}
           </a>
         </h3>
-        <p class="reminder-meta">
-          <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="plant-link">
+        <p class="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2 flex-wrap mb-2">
+          <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
             {{ reminder.plant_name }}{% if reminder.plant_nickname %} "{{ reminder.plant_nickname }}"{% endif %}
           </a>
           {% if reminder.weather_adjustment_reason %}
-          <span class="badge badge-weather" title="{{ reminder.weather_adjustment_reason }}">
-            🌤️ Weather adjusted
+          <span class="badge badge-cyan" title="{{ reminder.weather_adjustment_reason }}">
+            <span aria-hidden="true">🌤️</span> Adjusted
           </span>
           {% endif %}
         </p>
         {% if reminder.notes %}
-        <p class="reminder-notes small">{{ reminder.notes[:100] }}{% if reminder.notes|length > 100 %}...{% endif %}</p>
+        <p class="text-sm text-slate-500 dark:text-slate-400">{{ reminder.notes[:100] }}{% if reminder.notes|length > 100 %}...{% endif %}</p>
         {% endif %}
       </div>
 
-      <div class="reminder-actions">
-        <form method="POST" action="{{ url_for('reminders.complete', reminder_id=reminder.id) }}" style="display:inline;">
+      <div class="flex flex-col sm:flex-row gap-2 flex-shrink-0">
+        <form method="POST" action="{{ url_for('reminders.complete', reminder_id=reminder.id) }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-          <button type="submit" class="btn btn-small btn-primary" title="Mark complete">
-            ✓ Done
+          <button type="submit" class="btn btn-primary" title="Mark complete">
+            <span aria-hidden="true">✓</span> Done
           </button>
         </form>
-        <form method="POST" action="{{ url_for('reminders.snooze', reminder_id=reminder.id) }}" style="display:inline;">
+        <form method="POST" action="{{ url_for('reminders.snooze', reminder_id=reminder.id) }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <input type="hidden" name="days" value="1"/>
-          <button type="submit" class="btn btn-small btn-secondary" title="Snooze 1 day">
-            💤 Snooze
+          <button type="submit" class="btn btn-secondary" title="Snooze 1 day">
+            <span aria-hidden="true">💤</span> Snooze
           </button>
         </form>
       </div>
@@ -126,12 +130,13 @@
 
 <!-- Upcoming Section -->
 {% if upcoming_reminders %}
-<section class="card" aria-labelledby="upcoming-title">
+<section class="card mb-8" aria-labelledby="upcoming-title">
   <h2 id="upcoming-title" class="section-title">Upcoming (Next 7 Days)</h2>
-  <div class="reminder-list">
+
+  <div class="space-y-3">
     {% for reminder in upcoming_reminders %}
-    <div class="reminder-item">
-      <div class="reminder-icon">
+    <div class="flex items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:border-emerald-500 dark:hover:border-emerald-400">
+      <div class="text-2xl flex-shrink-0" aria-hidden="true">
         {% if reminder.reminder_type == 'watering' %}💧
         {% elif reminder.reminder_type == 'fertilizing' %}🌿
         {% elif reminder.reminder_type == 'misting' %}💦
@@ -141,28 +146,31 @@
         {% else %}📝{% endif %}
       </div>
 
-      <div class="reminder-content">
-        <h3 class="reminder-title">
-          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}">
+      <div class="flex-1 min-w-0">
+        <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
+          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
             {{ reminder.title }}
           </a>
         </h3>
-        <p class="reminder-meta">
-          <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="plant-link">
+        <p class="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2 flex-wrap mb-2">
+          <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
             {{ reminder.plant_name }}{% if reminder.plant_nickname %} "{{ reminder.plant_nickname }}"{% endif %}
           </a>
-          • Due {{ reminder.effective_due_date }}
+          <span aria-hidden="true">•</span>
+          <span>Due {{ reminder.effective_due_date }}</span>
           {% if reminder.days_until_due %}
-          (in {{ reminder.days_until_due }} day{% if reminder.days_until_due != 1 %}s{% endif %})
+          <span class="badge badge-emerald">
+            in {{ reminder.days_until_due }} day{% if reminder.days_until_due != 1 %}s{% endif %}
+          </span>
           {% endif %}
         </p>
         {% if reminder.notes %}
-        <p class="reminder-notes small muted">{{ reminder.notes[:100] }}{% if reminder.notes|length > 100 %}...{% endif %}</p>
+        <p class="text-sm text-slate-500 dark:text-slate-400">{{ reminder.notes[:100] }}{% if reminder.notes|length > 100 %}...{% endif %}</p>
         {% endif %}
       </div>
 
-      <div class="reminder-actions">
-        <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="btn btn-small btn-secondary">
+      <div class="flex-shrink-0">
+        <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="btn btn-secondary">
           View
         </a>
       </div>
@@ -174,12 +182,13 @@
 
 <!-- All Reminders Section -->
 {% if all_reminders %}
-<section id="all-reminders" class="card" aria-labelledby="all-title">
+<section id="all-reminders" class="card mb-8" aria-labelledby="all-title">
   <h2 id="all-title" class="section-title">All Active Reminders</h2>
-  <div class="reminder-list">
+
+  <div class="space-y-3">
     {% for reminder in all_reminders %}
-    <div class="reminder-item">
-      <div class="reminder-icon">
+    <div class="flex items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:border-emerald-500 dark:hover:border-emerald-400">
+      <div class="text-2xl flex-shrink-0" aria-hidden="true">
         {% if reminder.reminder_type == 'watering' %}💧
         {% elif reminder.reminder_type == 'fertilizing' %}🌿
         {% elif reminder.reminder_type == 'misting' %}💦
@@ -189,25 +198,28 @@
         {% else %}📝{% endif %}
       </div>
 
-      <div class="reminder-content">
-        <h3 class="reminder-title">
-          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}">
+      <div class="flex-1 min-w-0">
+        <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
+          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
             {{ reminder.title }}
           </a>
         </h3>
-        <p class="reminder-meta">
-          <a href="{{ url_for('plants.view', plant_id=reminder.plants.id) }}" class="plant-link">
+        <p class="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2 flex-wrap mb-2">
+          <a href="{{ url_for('plants.view', plant_id=reminder.plants.id) }}" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
             {{ reminder.plants.name }}{% if reminder.plants.nickname %} "{{ reminder.plants.nickname }}"{% endif %}
           </a>
-          • {{ reminder.frequency|replace('_', ' ')|title }} • Next: {{ reminder.next_due }}
+          <span aria-hidden="true">•</span>
+          <span>{{ reminder.frequency|replace('_', ' ')|title }}</span>
+          <span aria-hidden="true">•</span>
+          <span>Next: {{ reminder.next_due }}</span>
         </p>
         {% if reminder.notes %}
-        <p class="reminder-notes small muted">{{ reminder.notes[:100] }}{% if reminder.notes|length > 100 %}...{% endif %}</p>
+        <p class="text-sm text-slate-500 dark:text-slate-400">{{ reminder.notes[:100] }}{% if reminder.notes|length > 100 %}...{% endif %}</p>
         {% endif %}
       </div>
 
-      <div class="reminder-actions">
-        <a href="{{ url_for('reminders.edit', reminder_id=reminder.id) }}" class="btn btn-small btn-secondary">
+      <div class="flex-shrink-0">
+        <a href="{{ url_for('reminders.edit', reminder_id=reminder.id) }}" class="btn btn-secondary">
           Edit
         </a>
       </div>
@@ -219,12 +231,20 @@
 
 <!-- Empty State -->
 {% if not all_reminders %}
-<section class="card empty-state">
-  <div class="empty-state-icon" aria-hidden="true">⏰</div>
-  <h3 class="empty-state-message">No reminders yet</h3>
-  <p class="empty-state-hint">Create your first care reminder to stay on top of watering, fertilizing, and other plant care tasks.</p>
-  <a href="{{ url_for('reminders.create') }}" class="btn btn-primary">Create Reminder</a>
-</section>
+<div class="empty-state">
+  <div class="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-cyan-100 to-emerald-100 dark:from-cyan-900/30 dark:to-emerald-900/30 flex items-center justify-center">
+    <span class="text-6xl opacity-60" aria-hidden="true">⏰</span>
+  </div>
+  <h2 class="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
+    No reminders yet
+  </h2>
+  <p class="text-slate-600 dark:text-slate-400 mb-6 max-w-md">
+    Create your first care reminder to stay on top of watering, fertilizing, and other plant care tasks.
+  </p>
+  <a href="{{ url_for('reminders.create') }}" class="btn btn-primary">
+    <span aria-hidden="true">+</span> Create Reminder
+  </a>
+</div>
 {% endif %}
 
 {% endblock %}
