@@ -3,42 +3,74 @@
 {% block title %}Check Your Email - Plant Care AI Assistant - PlantCareAI{% endblock %}
 
 {% block content %}
-<section class="card auth-card text-center" aria-labelledby="check-email-title">
-  <div class="auth-icon" aria-hidden="true">📧</div>
+<div class="max-w-lg mx-auto">
+  <section class="card text-center" aria-labelledby="check-email-title">
+    <!-- Email Icon -->
+    <div class="inline-flex items-center justify-center w-24 h-24 mb-6 rounded-full bg-gradient-to-br from-emerald-100 to-cyan-100 dark:from-emerald-900/30 dark:to-cyan-900/30">
+      <span class="text-6xl" aria-hidden="true">📧</span>
+    </div>
 
-  <h2 id="check-email-title" class="section-title">Check Your Email</h2>
+    <h2 id="check-email-title" class="section-title mb-6">Check Your Email</h2>
 
-  <p class="auth-message">
-    We've sent a magic link to:
-  </p>
+    <p class="text-lg text-slate-700 dark:text-slate-300 mb-4">
+      We've sent a magic link to:
+    </p>
 
-  <p class="auth-email">
-    <strong>{{ email }}</strong>
-  </p>
+    <p class="mb-8">
+      <strong class="text-xl text-emerald-600 dark:text-emerald-400">{{ email }}</strong>
+    </p>
 
-  <div class="auth-instructions">
-    <ol class="text-left">
-      <li>Open your email inbox</li>
-      <li>Look for a PlantCareAI email from Supabase</li>
-      <li>Click the magic link to sign in</li>
-      <li>You'll be redirected back here automatically</li>
-    </ol>
-  </div>
+    <!-- Instructions -->
+    <div class="mb-8 p-6 bg-slate-50 dark:bg-slate-800/50 rounded-xl text-left">
+      <ol class="space-y-3 text-slate-700 dark:text-slate-300">
+        <li class="flex items-start gap-3">
+          <span class="flex-shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white text-sm font-bold">1</span>
+          <span>Open your email inbox</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="flex-shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white text-sm font-bold">2</span>
+          <span>Look for a PlantCareAI email from Supabase</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="flex-shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white text-sm font-bold">3</span>
+          <span>Click the magic link to sign in</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="flex-shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white text-sm font-bold">4</span>
+          <span>You'll be redirected back here automatically</span>
+        </li>
+      </ol>
+    </div>
 
-  <div class="auth-help" role="region" aria-labelledby="help-title">
-    <h3 id="help-title" class="small">Didn't receive the email?</h3>
-    <ul class="small muted text-left">
-      <li>Check your spam or junk folder</li>
-      <li>Make sure you entered the correct email address</li>
-      <li>Wait a few minutes — emails can be delayed</li>
-      <li>Try signing up again if it doesn't arrive</li>
-    </ul>
-  </div>
+    <!-- Help Section -->
+    <div class="mb-8 p-4 border-2 border-slate-200 dark:border-slate-700 rounded-xl text-left" role="region" aria-labelledby="help-title">
+      <h3 id="help-title" class="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-3">Didn't receive the email?</h3>
+      <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+        <li class="flex items-start gap-2">
+          <span class="text-slate-400 dark:text-slate-500 flex-shrink-0" aria-hidden="true">•</span>
+          <span>Check your spam or junk folder</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="text-slate-400 dark:text-slate-500 flex-shrink-0" aria-hidden="true">•</span>
+          <span>Make sure you entered the correct email address</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="text-slate-400 dark:text-slate-500 flex-shrink-0" aria-hidden="true">•</span>
+          <span>Wait a few minutes — emails can be delayed</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="text-slate-400 dark:text-slate-500 flex-shrink-0" aria-hidden="true">•</span>
+          <span>Try signing up again if it doesn't arrive</span>
+        </li>
+      </ul>
+    </div>
 
-  <a href="{{ url_for('auth.signup') }}" class="btn btn-secondary">
-    Send Another Link
-  </a>
-</section>
+    <!-- CTA Button -->
+    <a href="{{ url_for('auth.signup') }}" class="btn btn-secondary">
+      <span aria-hidden="true">↻</span> Send Another Link
+    </a>
+  </section>
+</div>
 
 <!-- Accessibility note -->
 <div class="sr-only" role="status" aria-live="polite">

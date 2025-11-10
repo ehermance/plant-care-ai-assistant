@@ -13,6 +13,8 @@ from flask import Blueprint, render_template, flash, redirect, url_for, request,
 from werkzeug.utils import secure_filename
 from app.utils.auth import require_auth, get_current_user_id
 from app.services import supabase_client
+from PIL import Image
+from io import BytesIO
 import os
 
 
@@ -26,6 +28,27 @@ MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 def allowed_file(filename: str) -> bool:
     """Check if filename has an allowed extension."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def validate_image_content(file_bytes: bytes) -> bool:
+    """
+    Validate that file content is actually a valid image.
+
+    This prevents malicious files with spoofed extensions by checking
+    the actual file content (magic numbers/file signature).
+
+    Args:
+        file_bytes: The file content as bytes
+
+    Returns:
+        True if valid image, False otherwise
+    """
+    try:
+        img = Image.open(BytesIO(file_bytes))
+        img.verify()  # Verify it's a valid image
+        return True
+    except Exception:
+        return False
 
 
 @plants_bp.route("/")
@@ -90,6 +113,12 @@ def add():
 
                 file.seek(0)  # Reset file pointer
                 file_bytes = file.read()
+
+                # Validate actual file content (prevents malicious files with spoofed extensions)
+                if not validate_image_content(file_bytes):
+                    flash("Invalid image file. Please upload a valid image.", "error")
+                    return render_template("plants/add.html")
+
                 photo_url = supabase_client.upload_plant_photo(
                     file_bytes,
                     user_id,
@@ -179,6 +208,12 @@ def edit(plant_id):
 
                 file.seek(0)
                 file_bytes = file.read()
+
+                # Validate actual file content (prevents malicious files with spoofed extensions)
+                if not validate_image_content(file_bytes):
+                    flash("Invalid image file. Please upload a valid image.", "error")
+                    return render_template("plants/edit.html", plant=plant)
+
                 new_photo_url = supabase_client.upload_plant_photo(
                     file_bytes,
                     user_id,

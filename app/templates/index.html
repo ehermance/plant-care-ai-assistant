@@ -5,28 +5,29 @@
 {% block description %}Ask for plant care help from an AI-powered assistant that gives practical tips based on your plants and local weather.{% endblock %}
 
 {% block content %}
-<section class="card" aria-labelledby="presets-title">
+<!-- Recommended Presets -->
+<section class="card mb-8" aria-labelledby="presets-title">
   <h2 id="presets-title" class="section-title">Recommended presets</h2>
-  <div id="presets" aria-label="Recommended plant presets">
-    <button type="button" class="preset-btn"
+  <div id="presets" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" aria-label="Recommended plant presets">
+    <button type="button" class="btn btn-secondary text-left"
             data-plant="Monstera deliciosa"
             data-question="How often should I water?"
             data-context="indoor_potted">
       Monstera, Indoor, Watering
     </button>
-    <button type="button" class="preset-btn"
+    <button type="button" class="btn btn-secondary text-left"
             data-plant="Lavender"
             data-question="How much sun does it need?"
             data-context="outdoor_bed">
       Lavender, Garden bed, Light
     </button>
-    <button type="button" class="preset-btn"
+    <button type="button" class="btn btn-secondary text-left"
             data-plant="Rosemary"
             data-question="Best pot size and soil?"
             data-context="outdoor_potted">
       Rosemary, Outdoor, Pot &amp; soil
     </button>
-    <button type="button" class="preset-btn"
+    <button type="button" class="btn btn-secondary text-left"
             data-plant="Snake Plant"
             data-question="Fertilizer schedule?"
             data-context="indoor_potted">
@@ -35,233 +36,261 @@
   </div>
 </section>
 
-<section class="grid-two" aria-labelledby="form-title" aria-busy="false">
-  <div class="combined-loading-overlay" role="status" aria-live="polite" aria-atomic="true">
-    <div class="spinner" aria-hidden="true"></div>
-    <div id="loading-message">Germinating… <span class="visually-hidden">(Loading your answer)</span></div>
+<!-- Main Content Grid -->
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 relative" aria-labelledby="form-title" aria-busy="false">
+  <!-- Loading Overlay -->
+  <div class="combined-loading-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center hidden" role="status" aria-live="polite" aria-atomic="true">
+    <div class="card text-center">
+      <div class="inline-block w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4" aria-hidden="true"></div>
+      <div id="loading-message" class="text-lg font-semibold text-slate-900 dark:text-slate-100">
+        Germinating… <span class="visually-hidden">(Loading your answer)</span>
+      </div>
+    </div>
   </div>
 
-  <section class="card form-card" aria-labelledby="form-title">
+  <!-- Form Card -->
+  <div class="card" aria-labelledby="form-title">
     <h2 id="form-title" class="section-title">Get Plant Care Advice</h2>
 
-    <form id="ask-form" class="form-grid" action="{{ url_for('web.ask') }}" method="post" novalidate>
+    <form id="ask-form" action="{{ url_for('web.ask') }}" method="post" novalidate>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-      <div class="form-row form-row--two">
+
+      <!-- Plant & City (Two Columns) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
         <div>
-          <label for="plant">Plant (optional)</label>
+          <label for="plant" class="label">Plant <span class="text-sm font-normal text-slate-500 dark:text-slate-400">(Optional)</span></label>
           <input id="plant" name="plant" type="text" autocomplete="off"
+                 class="input"
                  placeholder="e.g., Monstera deliciosa"
                  value="{{ (form_values and form_values.plant) or '' }}" />
         </div>
         <div>
-          <label for="city">City or ZIP (optional)</label>
+          <label for="city" class="label">City or ZIP <span class="text-sm font-normal text-slate-500 dark:text-slate-400">(Optional)</span></label>
           <input id="city" name="city" type="text" autocomplete="off"
-                placeholder="e.g., Austin, TX or 73301"
-                value="{{ (form_values and form_values.city) or '' }}" />
+                 class="input"
+                 placeholder="e.g., Austin, TX or 73301"
+                 value="{{ (form_values and form_values.city) or '' }}" />
         </div>
       </div>
 
-      <div class="form-row">
-        <div>
-          <label for="care_context">Where is the plant?</label>
-          <select id="care_context" name="care_context" aria-label="Where is the plant?">
-            <option value="indoor_potted"
-              {% if (form_values and form_values.care_context == 'indoor_potted') or (not form_values) %}selected{% endif %}>
-              Potted house plant (indoors)
-            </option>
-            <option value="outdoor_potted"
-              {% if form_values and form_values.care_context == 'outdoor_potted' %}selected{% endif %}>
-              Potted plant kept outdoors
-            </option>
-            <option value="outdoor_bed"
-              {% if form_values and form_values.care_context == 'outdoor_bed' %}selected{% endif %}>
-              Plant in an outdoor garden bed
-            </option>
-          </select>
-        </div>
+      <!-- Care Context -->
+      <div class="mb-6">
+        <label for="care_context" class="label">Where is the plant?</label>
+        <select id="care_context" name="care_context" class="input" aria-label="Where is the plant?">
+          <option value="indoor_potted"
+            {% if (form_values and form_values.care_context == 'indoor_potted') or (not form_values) %}selected{% endif %}>
+            Potted house plant (indoors)
+          </option>
+          <option value="outdoor_potted"
+            {% if form_values and form_values.care_context == 'outdoor_potted' %}selected{% endif %}>
+            Potted plant kept outdoors
+          </option>
+          <option value="outdoor_bed"
+            {% if form_values and form_values.care_context == 'outdoor_bed' %}selected{% endif %}>
+            Plant in an outdoor garden bed
+          </option>
+        </select>
       </div>
 
-      <div class="form-row">
-        <div>
-          <label for="question">Question</label>
-          <textarea id="question" name="question" rows="5"
-                    placeholder="e.g., How often should I water?">{{ (form_values and form_values.question) or '' }}</textarea>
-        </div>
+      <!-- Question -->
+      <div class="mb-6">
+        <label for="question" class="label">Question</label>
+        <textarea id="question" name="question" rows="5"
+                  class="input"
+                  placeholder="e.g., How often should I water?">{{ (form_values and form_values.question) or '' }}</textarea>
       </div>
 
-      <div class="actions">
-        <button id="submit-btn" class="primary" type="submit">Ask</button>
-        <button id="reset-btn" class="secondary" type="button" aria-label="Clear all fields">
+      <!-- Actions -->
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button id="submit-btn" class="btn btn-primary" type="submit">
+          <span aria-hidden="true">🤖</span> Ask
+        </button>
+        <button id="reset-btn" class="btn btn-secondary" type="button" aria-label="Clear all fields">
           Reset
         </button>
       </div>
     </form>
 
     {% if ai_error and source == 'rule' %}
-      <p class="small muted" role="status" aria-live="polite">
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-4" role="status" aria-live="polite">
         AI unavailable — showing rule-based tips.
       </p>
     {% endif %}
-  </section>
+  </div>
 
-  <section class="card answer-card" aria-labelledby="answer-title" role="region" aria-live="polite" aria-atomic="true" tabindex="-1">
+  <!-- Answer Card -->
+  <div class="card" aria-labelledby="answer-title" role="region" aria-live="polite" aria-atomic="true" tabindex="-1">
     {% if answer %}
-      <div class="answer-heading">
-        <h2 id="answer-title" class="section-title">Answer</h2>
-        <div class="small muted">
-          Generated by: <strong>{% if source == 'openai' %}OpenAI{% elif source == 'gemini' %}Google Gemini{% else %}Rule-based engine{% endif %}</strong>
+      <div class="mb-4">
+        <h2 id="answer-title" class="section-title !mb-2">Answer</h2>
+        <div class="text-sm text-slate-500 dark:text-slate-400">
+          Generated by: <strong class="text-slate-700 dark:text-slate-300">{% if source == 'openai' %}OpenAI{% elif source == 'gemini' %}Google Gemini{% else %}Rule-based engine{% endif %}</strong>
         </div>
       </div>
-      <p class="prewrap answer-text">{{ answer }}</p>
+      <p class="whitespace-pre-wrap text-slate-900 dark:text-slate-100">{{ answer }}</p>
     {% else %}
       <h2 id="answer-title" class="section-title">Answer</h2>
-      <p class="muted">Submit a question to see guidance here.</p>
+      <p class="text-slate-500 dark:text-slate-400">Submit a question to see guidance here.</p>
     {% endif %}
-  </section>
+  </div>
 </section>
 
-<!-- Weather (shows when available) -->
-<section id="weather-section">
+<!-- Weather Section -->
+<section id="weather-section" class="mb-8">
   {% if weather %}
-    <div class="weather-header">
-      <h2 class="section-title" id="weather-heading">
-        Local weather for {{ form_values.city or 'your area' }}
-        <span class="visually-hidden">Use the toggle to switch temperature units.</span>
-      </h2>
-      <!-- Units toggle (right aligned) -->
-      <form class="units-toggle" aria-label="Temperature units">
-        <fieldset role="radiogroup" aria-label="Select units">
-          <label class="toggle-seg">
-            <input type="radio" name="units" value="f" checked>
-            °F
-          </label>
-          <label class="toggle-seg">
-            <input type="radio" name="units" value="c">
-            °C
-          </label>
-        </fieldset>
-      </form>
-    </div>
-
-    <!-- Hourly forecast -->
-    {% if hourly %}
-    <h3 class="section-subtitle">Hourly Forecast <span class="weather-note small muted">&mdash; 3-hour intervals</span></h3>
-    <div class="hourly-wrap" aria-label="Hourly forecast for the rest of today">
-      <div class="hourly-scroll" role="list">
-        {% for h in hourly %}
-          <div class="hourly-chip" role="listitem" aria-label="{{ h.time }}">
-            <div class="hourly-time">{{ h.time }}</div>
-            <div class="hourly-emoji" aria-hidden="true">{{ h.emoji }}</div>
-            <div class="hourly-temp">
-              <span class="only-f">{{ (h.temp_f is not none) and (h.temp_f|round(0)|string + '°F') or '' }}</span>
-              <span class="only-c">{{ (h.temp_c is not none) and (h.temp_c|round(0)|string + '°C') or '' }}</span>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-    {% endif %}
-
-    <!-- Daily forecast -->
-    <h3 class="section-subtitle">Daily Forecast <span class="weather-note small muted">&mdash; Today & next 5 days</span></h3>
-    <div class="forecast-grid">
-      <!-- Today card -->
-      <div class="forecast-card today" aria-labelledby="today-title">
-        <div class="forecast-top">
-          <div class="forecast-daywrap">
-            <div id="today-title" class="forecast-day">Today</div>
-            <span class="badge">Now</span>
-          </div>
-          <div class="forecast-emoji" aria-hidden="true">{{ weather.emoji or '⛅' }}</div>
-        </div>
-
-        <div class="forecast-date">{{ today_str }}</div>
-        <div class="forecast-desc">{{ (weather.conditions or 'N/A')|capitalize }}</div>
-
-        <div class="forecast-temps">
-          <span class="tlabel">Current:</span>
-          <span class="only-f">{{ (weather.temp_f is not none) and (weather.temp_f|round(0)|string + '°F') or '—' }}</span>
-          <span class="only-c">{{ (weather.temp_c is not none) and (weather.temp_c|round(0)|string + '°C') or '—' }}</span>
-        </div>
-
-        <!-- Keep rows consistent across cards; highs/lows optional if you add them later -->
-        <div class="forecast-extras small">
-          Humidity: {{ weather.humidity }}% • Wind:
-          <span class="only-f">{{ weather.wind_mph }} mph</span>
-          <span class="only-c">{{ (weather.wind_mps is not none) and (weather.wind_mps|round(1)|string + ' m/s') or '—' }}</span>
-        </div>
+    <div class="card">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="section-title !mb-0" id="weather-heading">
+          Local weather for {{ form_values.city or 'your area' }}
+          <span class="visually-hidden">Use the toggle to switch temperature units.</span>
+        </h2>
+        <!-- Units toggle -->
+        <form class="units-toggle flex items-center gap-2 bg-slate-100 dark:bg-slate-700 p-1 rounded-lg" aria-label="Temperature units">
+          <fieldset role="radiogroup" aria-label="Select units" class="flex gap-1">
+            <label class="px-3 py-1 rounded cursor-pointer transition-colors has-[:checked]:bg-white has-[:checked]:dark:bg-slate-600 has-[:checked]:shadow">
+              <input type="radio" name="units" value="f" checked class="sr-only">
+              <span class="text-sm font-medium text-slate-700 dark:text-slate-300">°F</span>
+            </label>
+            <label class="px-3 py-1 rounded cursor-pointer transition-colors has-[:checked]:bg-white has-[:checked]:dark:bg-slate-600 has-[:checked]:shadow">
+              <input type="radio" name="units" value="c" class="sr-only">
+              <span class="text-sm font-medium text-slate-700 dark:text-slate-300">°C</span>
+            </label>
+          </fieldset>
+        </form>
       </div>
 
-      <!-- Next 5 days (exactly five to keep a total of 6 cards) -->
-      {% if forecast %}
-        {% for f in forecast[:5] %}
-          <div class="forecast-card">
-            <div class="forecast-top">
-              <div class="forecast-daywrap">
-                <div class="forecast-day">{{ f.day }}</div>
+      <!-- Hourly forecast -->
+      {% if hourly %}
+      <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+        Hourly Forecast <span class="text-sm font-normal text-slate-500 dark:text-slate-400">— 3-hour intervals</span>
+      </h3>
+      <div class="mb-6 overflow-x-auto" aria-label="Hourly forecast for the rest of today">
+        <div class="flex gap-3 pb-2" role="list">
+          {% for h in hourly %}
+            <div class="flex-shrink-0 w-20 text-center p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700" role="listitem" aria-label="{{ h.time }}">
+              <div class="text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">{{ h.time }}</div>
+              <div class="text-3xl mb-2" aria-hidden="true">{{ h.emoji }}</div>
+              <div class="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                <span class="only-f">{{ (h.temp_f is not none) and (h.temp_f|round(0)|string + '°F') or '' }}</span>
+                <span class="only-c">{{ (h.temp_c is not none) and (h.temp_c|round(0)|string + '°C') or '' }}</span>
               </div>
-              <div class="forecast-emoji" aria-hidden="true">{{ f.emoji or '⛅' }}</div>
             </div>
-
-            <div class="forecast-date">{{ f.date }}</div>
-            <div class="forecast-desc">{{ (f.conditions or 'N/A')|capitalize }}</div>
-
-            <div class="forecast-temps">
-              <span class="tlabel">High:</span>
-              <span class="only-f tmax">{{ (f.temp_max_f is not none) and (f.temp_max_f|round(0)|string + '°F') or '—' }}</span>
-              <span class="only-c tmax">{{ (f.temp_max_c is not none) and (f.temp_max_c|round(0)|string + '°C') or '—' }}</span>
-            </div>
-            <div class="forecast-temps">
-              <span class="tlabel">Low:</span>
-              <span class="only-f tmin">{{ (f.temp_min_f is not none) and (f.temp_min_f|round(0)|string + '°F') or '—' }}</span>
-              <span class="only-c tmin">{{ (f.temp_min_c is not none) and (f.temp_min_c|round(0)|string + '°C') or '—' }}</span>
-            </div>
-
-            <div class="forecast-extras small">
-              Humidity: {{ f.humidity }}% • Wind:
-              <span class="only-f">{{ f.wind_mph }} mph</span>
-              <span class="only-c">{{ (f.wind_mps is not none) and (f.wind_mps|round(1)|string + ' m/s') or '—' }}</span>
-            </div>
-          </div>
-        {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
       {% endif %}
+
+      <!-- Daily forecast -->
+      <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
+        Daily Forecast <span class="text-sm font-normal text-slate-500 dark:text-slate-400">— Today & next 5 days</span>
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <!-- Today card -->
+        <div class="p-4 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/20 dark:to-cyan-900/20 rounded-xl border-2 border-emerald-200 dark:border-emerald-700" aria-labelledby="today-title">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <div id="today-title" class="text-sm font-bold text-slate-900 dark:text-slate-100">Today</div>
+              <span class="badge badge-emerald mt-1">Now</span>
+            </div>
+            <div class="text-4xl" aria-hidden="true">{{ weather.emoji or '⛅' }}</div>
+          </div>
+
+          <div class="text-xs text-slate-600 dark:text-slate-400 mb-1">{{ today_str }}</div>
+          <div class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">{{ (weather.conditions or 'N/A')|capitalize }}</div>
+
+          <div class="text-sm mb-2">
+            <span class="text-slate-600 dark:text-slate-400">Current:</span>
+            <span class="font-semibold text-slate-900 dark:text-slate-100">
+              <span class="only-f">{{ (weather.temp_f is not none) and (weather.temp_f|round(0)|string + '°F') or '—' }}</span>
+              <span class="only-c">{{ (weather.temp_c is not none) and (weather.temp_c|round(0)|string + '°C') or '—' }}</span>
+            </span>
+          </div>
+
+          <div class="text-xs text-slate-500 dark:text-slate-400">
+            Humidity: {{ weather.humidity }}% • Wind:
+            <span class="only-f">{{ weather.wind_mph }} mph</span>
+            <span class="only-c">{{ (weather.wind_mps is not none) and (weather.wind_mps|round(1)|string + ' m/s') or '—' }}</span>
+          </div>
+        </div>
+
+        <!-- Next 5 days -->
+        {% if forecast %}
+          {% for f in forecast[:5] %}
+            <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+              <div class="flex items-start justify-between mb-3">
+                <div class="text-sm font-bold text-slate-900 dark:text-slate-100">{{ f.day }}</div>
+                <div class="text-4xl" aria-hidden="true">{{ f.emoji or '⛅' }}</div>
+              </div>
+
+              <div class="text-xs text-slate-600 dark:text-slate-400 mb-1">{{ f.date }}</div>
+              <div class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">{{ (f.conditions or 'N/A')|capitalize }}</div>
+
+              <div class="text-sm mb-1">
+                <span class="text-slate-600 dark:text-slate-400">High:</span>
+                <span class="font-semibold text-slate-900 dark:text-slate-100">
+                  <span class="only-f">{{ (f.temp_max_f is not none) and (f.temp_max_f|round(0)|string + '°F') or '—' }}</span>
+                  <span class="only-c">{{ (f.temp_max_c is not none) and (f.temp_max_c|round(0)|string + '°C') or '—' }}</span>
+                </span>
+              </div>
+              <div class="text-sm mb-2">
+                <span class="text-slate-600 dark:text-slate-400">Low:</span>
+                <span class="font-semibold text-slate-900 dark:text-slate-100">
+                  <span class="only-f">{{ (f.temp_min_f is not none) and (f.temp_min_f|round(0)|string + '°F') or '—' }}</span>
+                  <span class="only-c">{{ (f.temp_min_c is not none) and (f.temp_min_c|round(0)|string + '°C') or '—' }}</span>
+                </span>
+              </div>
+
+              <div class="text-xs text-slate-500 dark:text-slate-400">
+                Humidity: {{ f.humidity }}% • Wind:
+                <span class="only-f">{{ f.wind_mph }} mph</span>
+                <span class="only-c">{{ (f.wind_mps is not none) and (f.wind_mps|round(1)|string + ' m/s') or '—' }}</span>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
     </div>
   {% elif form_values and form_values.city %}
-    <p class="muted">No weather data available for that city or ZIP.</p>
+    <div class="card">
+      <p class="text-slate-500 dark:text-slate-400">No weather data available for that city or ZIP.</p>
+    </div>
   {% else %}
-    <p class="muted">Enter a city or ZIP to include weather insights in the answer.</p>
+    <div class="card">
+      <p class="text-slate-500 dark:text-slate-400">Enter a city or ZIP to include weather insights in the answer.</p>
+    </div>
   {% endif %}
 </section>
 
+<!-- Recent Q&A History -->
 <section class="card" aria-labelledby="history-title">
-  <div class="history-header">
-    <h2 id="history-title" class="section-title">Recent Q&amp;A</h2>
+  <div class="flex items-center justify-between mb-6">
+    <h2 id="history-title" class="section-title !mb-0">Recent Q&amp;A</h2>
     {% if has_history %}
-      <a class="muted-link small clear-link" href="{{ url_for('web.clear_history') }}">Clear</a>
+      <a class="text-sm text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors" href="{{ url_for('web.clear_history') }}">Clear</a>
     {% endif %}
   </div>
 
   {% if has_history %}
-    <ul class="history">
+    <ul class="space-y-4">
       {% for item in history %}
-        <li>
-          <div class="small muted mono">{{ item.ts }}</div>
-          <div class="small">
-            <span class="mono">{% if item.source == 'openai' %}OpenAI{% elif item.source == 'gemini' %}Gemini{% elif item.source == 'ai' %}AI{% else %}Rule{% endif %}</span>
-            {% if item.care_context %} • <span class="mono">{{ item.care_context }}</span>{% endif %}
-            {% if item.plant %} • <strong>Plant:</strong> {{ item.plant }}{% endif %}
-            {% if item.city %} • <strong>City/Zip:</strong> {{ item.city }}{% endif %}
+        <li class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
+          <div class="text-xs font-mono text-slate-500 dark:text-slate-400 mb-2">{{ item.ts }}</div>
+          <div class="text-sm text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2 flex-wrap">
+            <span class="badge badge-emerald font-mono">{% if item.source == 'openai' %}OpenAI{% elif item.source == 'gemini' %}Gemini{% elif item.source == 'ai' %}AI{% else %}Rule{% endif %}</span>
+            {% if item.care_context %}<span class="badge badge-cyan font-mono">{{ item.care_context }}</span>{% endif %}
+            {% if item.plant %}<span><strong>Plant:</strong> {{ item.plant }}</span>{% endif %}
+            {% if item.city %}<span><strong>City/Zip:</strong> {{ item.city }}</span>{% endif %}
           </div>
-          <div class="small history-q"><strong>Q:</strong> {{ item.question }}</div>
-          <details class="history-details">
-            <summary class="small muted-link">Show answer</summary>
-            <pre class="prewrap small history-answer">{{ item.answer }}</pre>
+          <div class="text-sm mb-2 text-slate-900 dark:text-slate-100"><strong>Q:</strong> {{ item.question }}</div>
+          <details class="group">
+            <summary class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 cursor-pointer transition-colors">Show answer</summary>
+            <pre class="mt-2 p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 text-sm whitespace-pre-wrap text-slate-900 dark:text-slate-100">{{ item.answer }}</pre>
           </details>
         </li>
       {% endfor %}
     </ul>
   {% else %}
-    <p class="muted">No questions yet. Ask something above to populate the history.</p>
+    <p class="text-slate-500 dark:text-slate-400">No questions yet. Ask something above to populate the history.</p>
   {% endif %}
 </section>
 {% endblock %}

@@ -8,8 +8,19 @@ weather-based adjustments for outdoor plants.
 from __future__ import annotations
 from typing import Optional, Dict, Any, List, Tuple
 from datetime import date, datetime, timedelta
+from flask import current_app, has_app_context
 from app.services.supabase_client import get_client, get_admin_client
 from app.services.weather import get_weather_for_city
+
+
+def _safe_log_error(message: str) -> None:
+    """Safely log an error, handling cases where no app context exists (e.g., in tests)."""
+    if has_app_context():
+        current_app.logger.error(message)
+    else:
+        # Fallback to print for testing/non-Flask contexts
+        print(f"[ERROR] {message}")
+
 
 # Frequency mappings to days
 FREQUENCY_DAYS = {
@@ -144,7 +155,7 @@ def get_user_reminders(
         return response.data if response.data else []
 
     except Exception as e:
-        print(f"Error fetching reminders: {e}")
+        _safe_log_error(f"Error fetching reminders: {e}")
         return []
 
 
@@ -169,7 +180,7 @@ def get_due_reminders(user_id: str) -> List[Dict[str, Any]]:
         return response.data if response.data else []
 
     except Exception as e:
-        print(f"Error fetching due reminders: {e}")
+        _safe_log_error(f"Error fetching due reminders: {e}")
         return []
 
 
@@ -195,7 +206,7 @@ def get_upcoming_reminders(user_id: str, days: int = 7) -> List[Dict[str, Any]]:
         return response.data if response.data else []
 
     except Exception as e:
-        print(f"Error fetching upcoming reminders: {e}")
+        _safe_log_error(f"Error fetching upcoming reminders: {e}")
         return []
 
 
@@ -222,7 +233,7 @@ def get_reminder_by_id(reminder_id: str, user_id: str) -> Optional[Dict[str, Any
         return response.data if response.data else None
 
     except Exception as e:
-        print(f"Error fetching reminder: {e}")
+        _safe_log_error(f"Error fetching reminder: {e}")
         return None
 
 
@@ -460,7 +471,7 @@ def get_reminder_stats(user_id: str) -> Dict[str, int]:
         }
 
     except Exception as e:
-        print(f"Error fetching reminder stats: {e}")
+        _safe_log_error(f"Error fetching reminder stats: {e}")
         return {
             "total_reminders": 0,
             "active_reminders": 0,
@@ -682,5 +693,5 @@ def get_reminders_for_month(user_id: str, year: int, month: int) -> List[Dict[st
         return response.data if response.data else []
 
     except Exception as e:
-        print(f"Error fetching reminders for month: {e}")
+        _safe_log_error(f"Error fetching reminders for month: {e}")
         return []

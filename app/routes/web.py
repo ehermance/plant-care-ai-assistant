@@ -97,22 +97,13 @@ def debug_info():
 
     loaded_keys = [k for k in ("FLASK_SECRET_KEY", "OPENWEATHER_API_KEY", "OPENAI_API_KEY") if current_app.config.get(k)]
 
-    # Check API key lengths for debugging (never expose actual keys)
-    openai_key = current_app.config.get("OPENAI_API_KEY", "")
-    gemini_key = current_app.config.get("GEMINI_API_KEY", "")
-    openai_env = os.getenv("OPENAI_API_KEY", "")
-    gemini_env = os.getenv("GEMINI_API_KEY", "")
-
+    # Only provide boolean configuration status - never expose key lengths or other details
     info = {
         "loaded_env_vars": loaded_keys,
         "flask_secret_key_set": bool(current_app.secret_key),
         "weather_api_configured": bool(current_app.config.get("OPENWEATHER_API_KEY")),
-        "openai_configured": bool(openai_key),
-        "openai_key_length": len(openai_key) if openai_key else 0,
-        "gemini_configured": bool(gemini_key),
-        "gemini_key_length": len(gemini_key) if gemini_key else 0,
-        "openai_env_length": len(openai_env) if openai_env else 0,
-        "gemini_env_length": len(gemini_env) if gemini_env else 0,
+        "openai_configured": bool(current_app.config.get("OPENAI_API_KEY")),
+        "gemini_configured": bool(current_app.config.get("GEMINI_API_KEY")),
         "history_len": len(_get_history()),
         # Sanitize error messages - only show generic info
         "ai_last_error": "Error occurred" if AI_LAST_ERROR else None,

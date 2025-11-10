@@ -4,103 +4,199 @@
 {% block description %}Free forever for plant parents. Track plants, get AI care advice, and never miss a watering.{% endblock %}
 
 {% block content %}
-<section class="pricing-hero">
-  <h2 class="section-title text-center">Currently Free for All Plant Parents 🌱</h2>
-  <p class="text-center muted">We're building features you love. Premium options coming soon.</p>
+<!-- Hero Section -->
+<section class="mb-12 text-center">
+  <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+    Currently Free for All Plant Parents <span class="inline-block" aria-hidden="true">🌱</span>
+  </h2>
+  <p class="text-lg text-slate-600 dark:text-slate-400">
+    We're building features you love. Premium options coming soon.
+  </p>
 </section>
 
-<div class="pricing-grid" id="pricing">
+<!-- Pricing Cards -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16" id="pricing">
   <!-- Current: Free Forever -->
-  <div class="pricing-card pricing-card-featured">
-    <div class="pricing-badge">Available Now</div>
-    <div class="pricing-header">
-      <h3 class="pricing-title">Free Forever</h3>
-      <div class="pricing-price">
-        <span class="price-amount">$0</span>
-      </div>
-      <p class="pricing-description">Perfect for home gardeners</p>
+  <div class="card relative border-4 border-emerald-500 dark:border-emerald-600 shadow-xl shadow-emerald-500/20">
+    <!-- Badge -->
+    <div class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-emerald-600 dark:bg-emerald-500 text-white text-sm font-bold rounded-full shadow-lg">
+      Available Now
     </div>
 
-    <ul class="pricing-features benefits-list">
-      <li class="benefit-item">Track up to 20 plants</li>
-      <li class="benefit-item">AI care assistant</li>
-      <li class="benefit-item">Photo uploads & timeline</li>
-      <li class="benefit-item">Care reminders</li>
-      <li class="benefit-item">Weather-aware tips</li>
-      <li class="benefit-item">Permanent history</li>
+    <!-- Header -->
+    <div class="text-center mb-8 pt-4">
+      <h3 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">Free Forever</h3>
+      <div class="mb-2">
+        <span class="text-5xl font-bold text-emerald-600 dark:text-emerald-400">$0</span>
+      </div>
+      <p class="text-slate-600 dark:text-slate-400">Perfect for home gardeners</p>
+    </div>
+
+    <!-- Features -->
+    <ul class="space-y-3 mb-8">
+      <li class="flex items-start gap-3 text-slate-700 dark:text-slate-300">
+        <span class="text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" aria-hidden="true">✓</span>
+        <span>Track up to 20 plants</span>
+      </li>
+      <li class="flex items-start gap-3 text-slate-700 dark:text-slate-300">
+        <span class="text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" aria-hidden="true">✓</span>
+        <span>AI care assistant</span>
+      </li>
+      <li class="flex items-start gap-3 text-slate-700 dark:text-slate-300">
+        <span class="text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" aria-hidden="true">✓</span>
+        <span>Photo uploads & timeline</span>
+      </li>
+      <li class="flex items-start gap-3 text-slate-700 dark:text-slate-300">
+        <span class="text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" aria-hidden="true">✓</span>
+        <span>Care reminders</span>
+      </li>
+      <li class="flex items-start gap-3 text-slate-700 dark:text-slate-300">
+        <span class="text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" aria-hidden="true">✓</span>
+        <span>Weather-aware tips</span>
+      </li>
+      <li class="flex items-start gap-3 text-slate-700 dark:text-slate-300">
+        <span class="text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" aria-hidden="true">✓</span>
+        <span>Permanent history</span>
+      </li>
     </ul>
 
+    <!-- CTA Button -->
     {% if is_authenticated %}
-      <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary btn-block">
-        Go to Dashboard
+      <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary w-full">
+        <span aria-hidden="true">🏡</span> Go to Dashboard
       </a>
     {% else %}
-      <a href="{{ url_for('auth.signup') }}" class="btn btn-primary btn-block">
-        Sign Up Free
+      <a href="{{ url_for('auth.signup') }}" class="btn btn-primary w-full">
+        <span aria-hidden="true">🌱</span> Sign Up Free
       </a>
     {% endif %}
   </div>
 
   <!-- Future: Premium Features -->
-  <div class="pricing-card">
-    <div class="pricing-header">
-      <h3 class="pricing-title">Premium</h3>
-      <div class="pricing-price">
-        <span class="price-amount">Coming Soon</span>
+  <div class="card border-2 border-slate-200 dark:border-slate-700">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h3 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">Premium</h3>
+      <div class="mb-2">
+        <span class="text-3xl font-bold text-slate-600 dark:text-slate-400">Coming Soon</span>
       </div>
-      <p class="pricing-description">Advanced features for power users</p>
+      <p class="text-slate-600 dark:text-slate-400">Advanced features for power users</p>
     </div>
 
-    <ul class="pricing-features benefits-list">
-      <li class="benefit-item">Everything in Free</li>
-      <li class="benefit-item">Unlimited plants</li>
-      <li class="benefit-item">AI image diagnosis</li>
-      <li class="benefit-item">CSV/PDF export</li>
-      <li class="benefit-item">Seasonal care automation</li>
-      <li class="benefit-item">Custom themes</li>
-      <li class="benefit-item">Priority support</li>
-      <li class="benefit-item">Early access to new features</li>
+    <!-- Features -->
+    <ul class="space-y-3 mb-8">
+      <li class="flex items-start gap-3 text-slate-700 dark:text-slate-300">
+        <span class="text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" aria-hidden="true">✓</span>
+        <span><strong>Everything in Free</strong></span>
+      </li>
+      <li class="flex items-start gap-3 text-slate-700 dark:text-slate-300">
+        <span class="text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" aria-hidden="true">✓</span>
+        <span>Unlimited plants</span>
+      </li>
+      <li class="flex items-start gap-3 text-slate-700 dark:text-slate-300">
+        <span class="text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" aria-hidden="true">✓</span>
+        <span>AI image diagnosis</span>
+      </li>
+      <li class="flex items-start gap-3 text-slate-700 dark:text-slate-300">
+        <span class="text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" aria-hidden="true">✓</span>
+        <span>CSV/PDF export</span>
+      </li>
+      <li class="flex items-start gap-3 text-slate-700 dark:text-slate-300">
+        <span class="text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" aria-hidden="true">✓</span>
+        <span>Seasonal care automation</span>
+      </li>
+      <li class="flex items-start gap-3 text-slate-700 dark:text-slate-300">
+        <span class="text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" aria-hidden="true">✓</span>
+        <span>Custom themes</span>
+      </li>
+      <li class="flex items-start gap-3 text-slate-700 dark:text-slate-300">
+        <span class="text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" aria-hidden="true">✓</span>
+        <span>Priority support</span>
+      </li>
+      <li class="flex items-start gap-3 text-slate-700 dark:text-slate-300">
+        <span class="text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" aria-hidden="true">✓</span>
+        <span>Early access to new features</span>
+      </li>
     </ul>
 
-    <button class="btn btn-outline btn-block" disabled>
+    <!-- CTA Button -->
+    <button class="btn btn-secondary w-full opacity-60 cursor-not-allowed" disabled>
       Join Waitlist (Coming Soon)
     </button>
   </div>
 </div>
 
 <!-- FAQ Section -->
-<section class="card pricing-faq">
-  <h3 class="section-title text-center">Frequently Asked Questions</h3>
+<section class="card max-w-3xl mx-auto">
+  <h3 class="section-title text-center mb-8">Frequently Asked Questions</h3>
 
-  <details class="faq-item">
-    <summary>Is it really free forever?</summary>
-    <p>Yes! Our core features will always be free. We're building this for plant parents, and we want everyone to have access to quality plant care tools.</p>
-  </details>
+  <div class="space-y-4">
+    <details class="rounded-xl border border-slate-200 dark:border-slate-700">
+      <summary class="px-4 py-3 cursor-pointer font-medium text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors rounded-xl">
+        Is it really free forever?
+      </summary>
+      <div class="px-4 pb-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+        <p class="text-slate-600 dark:text-slate-400">
+          Yes! Our core features will always be free. We're building this for plant parents, and we want everyone to have access to quality plant care tools.
+        </p>
+      </div>
+    </details>
 
-  <details class="faq-item">
-    <summary>Why is it free? What's the catch?</summary>
-    <p>No catch! We're focused on building features users love first. Once we launch premium features (like AI image diagnosis and unlimited plants), those will be optional paid add-ons. The free tier stays free, always.</p>
-  </details>
+    <details class="rounded-xl border border-slate-200 dark:border-slate-700">
+      <summary class="px-4 py-3 cursor-pointer font-medium text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors rounded-xl">
+        Why is it free? What's the catch?
+      </summary>
+      <div class="px-4 pb-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+        <p class="text-slate-600 dark:text-slate-400">
+          No catch! We're focused on building features users love first. Once we launch premium features (like AI image diagnosis and unlimited plants), those will be optional paid add-ons. The free tier stays free, always.
+        </p>
+      </div>
+    </details>
 
-  <details class="faq-item">
-    <summary>When will Premium features launch?</summary>
-    <p>We're currently in active development. Premium features (AI image diagnosis, unlimited plants, export tools, etc.) will launch once our free tier is solid and users love it. Want early access? Join our waitlist (coming soon)!</p>
-  </details>
+    <details class="rounded-xl border border-slate-200 dark:border-slate-700">
+      <summary class="px-4 py-3 cursor-pointer font-medium text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors rounded-xl">
+        When will Premium features launch?
+      </summary>
+      <div class="px-4 pb-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+        <p class="text-slate-600 dark:text-slate-400">
+          We're currently in active development. Premium features (AI image diagnosis, unlimited plants, export tools, etc.) will launch once our free tier is solid and users love it. Want early access? Join our waitlist (coming soon)!
+        </p>
+      </div>
+    </details>
 
-  <details class="faq-item">
-    <summary>Will I lose my plants if Premium launches?</summary>
-    <p>Never! Your free tier will always include 20 plants. Any plants you add now will stay in your account forever.</p>
-  </details>
+    <details class="rounded-xl border border-slate-200 dark:border-slate-700">
+      <summary class="px-4 py-3 cursor-pointer font-medium text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors rounded-xl">
+        Will I lose my plants if Premium launches?
+      </summary>
+      <div class="px-4 pb-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+        <p class="text-slate-600 dark:text-slate-400">
+          Never! Your free tier will always include 20 plants. Any plants you add now will stay in your account forever.
+        </p>
+      </div>
+    </details>
 
-  <details class="faq-item">
-    <summary>Is my data safe?</summary>
-    <p>Yes! Your data is encrypted at rest and in transit. We never share your information with third parties. Read our <a href="/privacy">Privacy Policy</a>.</p>
-  </details>
+    <details class="rounded-xl border border-slate-200 dark:border-slate-700">
+      <summary class="px-4 py-3 cursor-pointer font-medium text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors rounded-xl">
+        Is my data safe?
+      </summary>
+      <div class="px-4 pb-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+        <p class="text-slate-600 dark:text-slate-400">
+          Yes! Your data is encrypted at rest and in transit. We never share your information with third parties. Read our <a href="/privacy" class="text-emerald-600 dark:text-emerald-400 hover:underline">Privacy Policy</a>.
+        </p>
+      </div>
+    </details>
 
-  <details class="faq-item">
-    <summary>How can I support this project?</summary>
-    <p>Thank you for asking! You can <a href="https://buymeacoffee.com/edhdev" target="_blank" rel="noopener">buy me a coffee ☕</a> to help cover server costs. The best support is using the app and sharing it with fellow plant parents!</p>
-  </details>
+    <details class="rounded-xl border border-slate-200 dark:border-slate-700">
+      <summary class="px-4 py-3 cursor-pointer font-medium text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors rounded-xl">
+        How can I support this project?
+      </summary>
+      <div class="px-4 pb-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+        <p class="text-slate-600 dark:text-slate-400">
+          Thank you for asking! You can <a href="https://buymeacoffee.com/edhdev" target="_blank" rel="noopener" class="text-emerald-600 dark:text-emerald-400 hover:underline">buy me a coffee ☕</a> to help cover server costs. The best support is using the app and sharing it with fellow plant parents!
+        </p>
+      </div>
+    </details>
+  </div>
 </section>
 
 {% endblock %}

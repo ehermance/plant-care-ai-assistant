@@ -3,115 +3,129 @@
 {% block title %}Account Settings - Plant Care AI Assistant - PlantCareAI{% endblock %}
 
 {% block content %}
-<!-- Breadcrumb Navigation (WCAG 2.4.8) -->
-<nav aria-label="Breadcrumb" class="breadcrumb">
-  <ol>
-    <li><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
-    <li aria-current="page">Account Settings</li>
+<!-- Breadcrumb Navigation -->
+<nav aria-label="Breadcrumb" class="mb-6">
+  <ol class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+    <li><a href="{{ url_for('dashboard.index') }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Dashboard</a></li>
+    <li aria-hidden="true">→</li>
+    <li aria-current="page" class="text-slate-900 dark:text-slate-100 font-medium">Account Settings</li>
   </ol>
 </nav>
 
 <!-- Page Header -->
-<section class="dashboard-hero">
-  <h2 class="dashboard-greeting">Account Settings</h2>
-  <p class="dashboard-subtitle">Manage your profile, plan, and preferences.</p>
-</section>
+<div class="mb-8">
+  <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+    Account Settings <span class="inline-block" aria-hidden="true">⚙️</span>
+  </h2>
+  <p class="text-lg text-slate-600 dark:text-slate-400">
+    Manage your profile, plan, and preferences.
+  </p>
+</div>
 
 <!-- Account Information -->
-<section class="card" aria-labelledby="account-info-title">
+<section class="card mb-8" aria-labelledby="account-info-title">
   <h3 id="account-info-title" class="section-title">Account Information</h3>
 
-  <dl class="info-list">
-    <div class="info-item">
-      <dt>Email Address</dt>
-      <dd>{{ profile.email if profile else current_user.email }}</dd>
+  <dl class="space-y-4">
+    <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
+      <dt class="text-2xl flex-shrink-0" aria-hidden="true">📧</dt>
+      <div class="flex-1">
+        <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Email Address</dt>
+        <dd class="mt-1 text-base text-slate-900 dark:text-slate-100">{{ profile.email if profile else current_user.email }}</dd>
+      </div>
     </div>
 
-    <div class="info-item">
-      <dt>Account ID</dt>
-      <dd><code class="code-snippet">{{ current_user.id[:8] }}...</code></dd>
+    <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
+      <dt class="text-2xl flex-shrink-0" aria-hidden="true">🆔</dt>
+      <div class="flex-1">
+        <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Account ID</dt>
+        <dd class="mt-1 text-base font-mono text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded inline-block">{{ current_user.id[:8] }}...</dd>
+      </div>
     </div>
 
-    <div class="info-item">
-      <dt>Member Since</dt>
-      <dd>{{ current_user.created_at.strftime('%B %d, %Y') if current_user.created_at else 'Recently' }}</dd>
+    <div class="flex items-start gap-3">
+      <dt class="text-2xl flex-shrink-0" aria-hidden="true">📅</dt>
+      <div class="flex-1">
+        <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Member Since</dt>
+        <dd class="mt-1 text-base text-slate-900 dark:text-slate-100">{{ current_user.created_at.strftime('%B %d, %Y') if current_user.created_at else 'Recently' }}</dd>
+      </div>
     </div>
   </dl>
 </section>
 
 <!-- Subscription & Plan -->
-<section class="card" aria-labelledby="subscription-title">
+<section class="card mb-8" aria-labelledby="subscription-title">
   <h3 id="subscription-title" class="section-title">Subscription & Plan</h3>
 
-  <div class="plan-status">
-    <!-- Current: Free Forever -->
-    <div class="plan-badge plan-badge-starter">
-      <span class="badge-icon" aria-hidden="true">🌱</span>
-      <div class="badge-content">
-        <strong>Starter Plan</strong>
-        <span class="badge-subtitle">Free forever, up to 20 plants</span>
-      </div>
-    </div>
-
-    <div class="plan-details">
-      <p>You're on the <strong>Starter</strong> plan (free forever).</p>
-      <p class="small muted">All core features included. Premium options will be available in the future for power users who want advanced features like unlimited plants, AI image diagnosis, and export tools.</p>
+  <!-- Current Plan Badge -->
+  <div class="flex items-center gap-4 p-4 mb-4 bg-gradient-to-r from-emerald-50 to-cyan-50 dark:from-emerald-900/20 dark:to-cyan-900/20 rounded-xl border-2 border-emerald-200 dark:border-emerald-700">
+    <span class="text-4xl" aria-hidden="true">🌱</span>
+    <div>
+      <strong class="text-lg text-slate-900 dark:text-slate-100">Starter Plan</strong>
+      <p class="text-sm text-slate-600 dark:text-slate-400">Free forever, up to 20 plants</p>
     </div>
   </div>
 
+  <div class="mb-4">
+    <p class="text-slate-900 dark:text-slate-100 mb-2">You're on the <strong>Starter</strong> plan (free forever).</p>
+    <p class="text-sm text-slate-500 dark:text-slate-400">All core features included. Premium options will be available in the future for power users who want advanced features like unlimited plants, AI image diagnosis, and export tools.</p>
+  </div>
+
   <!-- Plan Comparison -->
-  <details class="plan-comparison">
-    <summary>Compare plans</summary>
-    <div class="comparison-table">
-      <table>
-        <caption class="visually-hidden">Plan feature comparison</caption>
+  <details class="rounded-xl border border-slate-200 dark:border-slate-700">
+    <summary class="px-4 py-3 cursor-pointer font-medium text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors rounded-xl">
+      Compare plans
+    </summary>
+    <div class="px-4 pb-4 border-t border-slate-200 dark:border-slate-700 overflow-x-auto">
+      <table class="w-full mt-4">
+        <caption class="sr-only">Plan feature comparison</caption>
         <thead>
-          <tr>
-            <th scope="col">Feature</th>
-            <th scope="col">Starter</th>
-            <th scope="col">Premium</th>
+          <tr class="border-b border-slate-200 dark:border-slate-700">
+            <th scope="col" class="text-left py-2 px-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Feature</th>
+            <th scope="col" class="text-center py-2 px-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Starter</th>
+            <th scope="col" class="text-center py-2 px-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Premium</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <th scope="row">Plants</th>
-            <td>Up to 20</td>
-            <td>Unlimited</td>
+        <tbody class="text-sm">
+          <tr class="border-b border-slate-200 dark:border-slate-700">
+            <th scope="row" class="text-left py-2 px-3 font-medium text-slate-900 dark:text-slate-100">Plants</th>
+            <td class="text-center py-2 px-3 text-slate-700 dark:text-slate-300">Up to 20</td>
+            <td class="text-center py-2 px-3 text-slate-700 dark:text-slate-300">Unlimited</td>
+          </tr>
+          <tr class="border-b border-slate-200 dark:border-slate-700">
+            <th scope="row" class="text-left py-2 px-3 font-medium text-slate-900 dark:text-slate-100">Care reminders</th>
+            <td class="text-center py-2 px-3">✓</td>
+            <td class="text-center py-2 px-3">✓</td>
+          </tr>
+          <tr class="border-b border-slate-200 dark:border-slate-700">
+            <th scope="row" class="text-left py-2 px-3 font-medium text-slate-900 dark:text-slate-100">AI assistant</th>
+            <td class="text-center py-2 px-3">✓</td>
+            <td class="text-center py-2 px-3">✓</td>
+          </tr>
+          <tr class="border-b border-slate-200 dark:border-slate-700">
+            <th scope="row" class="text-left py-2 px-3 font-medium text-slate-900 dark:text-slate-100">Photo uploads</th>
+            <td class="text-center py-2 px-3">✓</td>
+            <td class="text-center py-2 px-3">✓</td>
+          </tr>
+          <tr class="border-b border-slate-200 dark:border-slate-700">
+            <th scope="row" class="text-left py-2 px-3 font-medium text-slate-900 dark:text-slate-100">AI image diagnosis</th>
+            <td class="text-center py-2 px-3 text-slate-400">—</td>
+            <td class="text-center py-2 px-3 text-slate-700 dark:text-slate-300">Coming soon</td>
+          </tr>
+          <tr class="border-b border-slate-200 dark:border-slate-700">
+            <th scope="row" class="text-left py-2 px-3 font-medium text-slate-900 dark:text-slate-100">CSV/PDF export</th>
+            <td class="text-center py-2 px-3 text-slate-400">—</td>
+            <td class="text-center py-2 px-3">✓</td>
+          </tr>
+          <tr class="border-b border-slate-200 dark:border-slate-700">
+            <th scope="row" class="text-left py-2 px-3 font-medium text-slate-900 dark:text-slate-100">Seasonal task generator</th>
+            <td class="text-center py-2 px-3 text-slate-400">—</td>
+            <td class="text-center py-2 px-3">✓</td>
           </tr>
           <tr>
-            <th scope="row">Care reminders</th>
-            <td>✓</td>
-            <td>✓</td>
-          </tr>
-          <tr>
-            <th scope="row">AI assistant</th>
-            <td>✓</td>
-            <td>✓</td>
-          </tr>
-          <tr>
-            <th scope="row">Photo uploads</th>
-            <td>✓</td>
-            <td>✓</td>
-          </tr>
-          <tr>
-            <th scope="row">AI image diagnosis</th>
-            <td>—</td>
-            <td>Coming soon</td>
-          </tr>
-          <tr>
-            <th scope="row">CSV/PDF export</th>
-            <td>—</td>
-            <td>✓</td>
-          </tr>
-          <tr>
-            <th scope="row">Seasonal task generator</th>
-            <td>—</td>
-            <td>✓</td>
-          </tr>
-          <tr>
-            <th scope="row">Priority support</th>
-            <td>—</td>
-            <td>✓</td>
+            <th scope="row" class="text-left py-2 px-3 font-medium text-slate-900 dark:text-slate-100">Priority support</th>
+            <td class="text-center py-2 px-3 text-slate-400">—</td>
+            <td class="text-center py-2 px-3">✓</td>
           </tr>
         </tbody>
       </table>
@@ -120,18 +134,18 @@
 </section>
 
 <!-- Preferences -->
-<section class="card" aria-labelledby="preferences-title">
+<section class="card mb-8" aria-labelledby="preferences-title">
   <h3 id="preferences-title" class="section-title">Preferences</h3>
 
-  <form method="POST" action="{{ url_for('dashboard.account') }}" class="settings-form">
+  <form method="POST" action="{{ url_for('dashboard.account') }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
-    <div class="form-group">
-      <label for="city" class="form-label">
-        Location
-        <span class="label-optional">(optional)</span>
+    <!-- Location -->
+    <div class="mb-6">
+      <label for="city" class="label">
+        Location <span class="text-sm font-normal text-slate-500 dark:text-slate-400">(Optional)</span>
       </label>
-      <p id="city-help" class="form-help">
+      <p id="city-help" class="help-text">
         Enter your city or ZIP code for weather-aware reminder adjustments.
         <br>
         <em>Example: Austin, TX or 78701</em>
@@ -140,7 +154,7 @@
         type="text"
         id="city"
         name="city"
-        class="form-input"
+        class="input"
         value="{{ profile.city if profile and profile.city else '' }}"
         placeholder="Enter city or ZIP code"
         aria-describedby="city-help"
@@ -148,15 +162,16 @@
       />
     </div>
 
-    <div class="form-group">
-      <label class="form-label">
+    <!-- Theme Preference -->
+    <div class="mb-8">
+      <label class="label">
         Theme Preference
       </label>
-      <p id="theme-help" class="form-help">
+      <p id="theme-help" class="help-text">
         Choose your preferred color scheme. "Auto" follows your device's system setting.
       </p>
 
-      <div class="radio-group" role="radiogroup" aria-describedby="theme-help">
+      <div class="space-y-3" role="radiogroup" aria-describedby="theme-help">
         <label class="radio-label">
           <input
             type="radio"
@@ -172,7 +187,7 @@
             <span>
               <strong>Light Mode</strong>
               <br>
-              <span class="small muted">Bright, clean interface</span>
+              <span class="text-sm text-slate-500 dark:text-slate-400">Bright, clean interface</span>
             </span>
           </span>
         </label>
@@ -192,7 +207,7 @@
             <span>
               <strong>Dark Mode</strong>
               <br>
-              <span class="small muted">Easy on the eyes at night</span>
+              <span class="text-sm text-slate-500 dark:text-slate-400">Easy on the eyes at night</span>
             </span>
           </span>
         </label>
@@ -212,51 +227,59 @@
             <span>
               <strong>Auto (System)</strong>
               <br>
-              <span class="small muted">Matches your device setting</span>
+              <span class="text-sm text-slate-500 dark:text-slate-400">Matches your device setting</span>
             </span>
           </span>
         </label>
       </div>
     </div>
 
-    <div class="form-actions">
+    <!-- Submit Button -->
+    <div class="mb-6">
       <button type="submit" class="btn btn-primary">
-        Save Preferences
+        <span aria-hidden="true">💾</span> Save Preferences
       </button>
     </div>
   </form>
 
-  <details class="settings-details" style="margin-top: 1.5rem;">
-    <summary class="small muted">How is my location used?</summary>
-    <p class="small muted" style="margin-top: 0.5rem;">
-      Your location is used to provide weather-based watering adjustments for outdoor plants.
-      We fetch current weather conditions from OpenWeather API to help optimize your plant care schedule.
-      Your location is never shared with third parties and you can clear it at any time.
-    </p>
+  <!-- Privacy Info -->
+  <details class="rounded-xl border border-slate-200 dark:border-slate-700">
+    <summary class="px-4 py-3 cursor-pointer text-sm text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors rounded-xl">
+      How is my location used?
+    </summary>
+    <div class="px-4 pb-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+      <p class="text-sm text-slate-500 dark:text-slate-400">
+        Your location is used to provide weather-based watering adjustments for outdoor plants.
+        We fetch current weather conditions from OpenWeather API to help optimize your plant care schedule.
+        Your location is never shared with third parties and you can clear it at any time.
+      </p>
+    </div>
   </details>
 </section>
 
-<!-- Danger Zone -->
-<section class="card card-danger" aria-labelledby="danger-title">
+<!-- Account Management -->
+<section class="card mb-8 border-2 border-rose-200 dark:border-rose-800" aria-labelledby="danger-title">
   <h3 id="danger-title" class="section-title">Account Management</h3>
 
-  <div class="danger-actions">
-    <div class="danger-item">
+  <div class="space-y-4">
+    <!-- Log Out -->
+    <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
       <div>
-        <strong>Log Out</strong>
-        <p class="small muted">Sign out of your account on this device.</p>
+        <strong class="text-slate-900 dark:text-slate-100">Log Out</strong>
+        <p class="text-sm text-slate-500 dark:text-slate-400">Sign out of your account on this device.</p>
       </div>
-      <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary btn-small">
+      <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary flex-shrink-0">
         Log Out
       </a>
     </div>
 
-    <div class="danger-item">
+    <!-- Delete Account -->
+    <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
       <div>
-        <strong>Delete Account</strong>
-        <p class="small muted">Permanently delete your account and all data. This action cannot be undone.</p>
+        <strong class="text-slate-900 dark:text-slate-100">Delete Account</strong>
+        <p class="text-sm text-slate-500 dark:text-slate-400">Permanently delete your account and all data. This action cannot be undone.</p>
       </div>
-      <button class="btn btn-outline btn-small" disabled>
+      <button class="btn btn-secondary flex-shrink-0" disabled>
         Delete Account (Coming Soon)
       </button>
     </div>
@@ -264,9 +287,9 @@
 </section>
 
 <!-- Back to Dashboard -->
-<div class="page-actions">
-  <a href="{{ url_for('dashboard.index') }}" class="muted-link">
-    ← Back to Dashboard
+<div class="mb-8">
+  <a href="{{ url_for('dashboard.index') }}" class="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+    <span aria-hidden="true">←</span> Back to Dashboard
   </a>
 </div>
 

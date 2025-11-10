@@ -4,138 +4,142 @@
 {% block description %}Privacy Policy for the Plant Care AI Assistant, PlantCareAI - how we collect, use, and protect your data.{% endblock %}
 
 {% block content %}
-<section class="card">
-  <h2 class="section-title">Privacy Policy</h2>
-  <p class="small muted">Last updated: October 27, 2025</p>
+<div class="max-w-4xl mx-auto">
+  <section class="card">
+    <h2 class="section-title">Privacy Policy</h2>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mb-8">Last updated: October 27, 2025</p>
 
-  <div class="legal-content">
-    <h3>1. Introduction</h3>
-    <p>
-      EDH Dev ("we", "our", or "us") operates the PlantCareAI website and service.
-      This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Service.
-    </p>
+    <div class="prose prose-slate dark:prose-invert max-w-none">
+      <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">1. Introduction</h3>
+      <p class="text-slate-700 dark:text-slate-300 mb-4">
+        EDH Dev ("we", "our", or "us") operates the PlantCareAI website and service.
+        This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Service.
+      </p>
 
-    <h3>2. Information We Collect</h3>
+      <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">2. Information We Collect</h3>
 
-    <h4>Information You Provide</h4>
-    <ul>
-      <li><strong>Email Address:</strong> Required for account creation and magic link authentication</li>
-      <li><strong>Plant Information:</strong> Plant names, descriptions, photos, and care schedules you add</li>
-      <li><strong>Location Data:</strong> Optional city or ZIP code for weather-aware plant care tips</li>
-      <li><strong>Questions and Interactions:</strong> Questions you ask the AI assistant and related information</li>
-    </ul>
+      <h4 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mt-6 mb-3">Information You Provide</h4>
+      <ul class="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300 mb-4">
+        <li><strong>Email Address:</strong> Required for account creation and magic link authentication</li>
+        <li><strong>Plant Information:</strong> Plant names, descriptions, photos, and care schedules you add</li>
+        <li><strong>Location Data:</strong> Optional city or ZIP code for weather-aware plant care tips</li>
+        <li><strong>Questions and Interactions:</strong> Questions you ask the AI assistant and related information</li>
+      </ul>
 
-    <h4>Automatically Collected Information</h4>
-    <ul>
-      <li><strong>Usage Data:</strong> Pages visited, features used, time spent on the Service</li>
-      <li><strong>Device Information:</strong> Browser type, operating system, IP address</li>
-      <li><strong>Analytics:</strong> We use Cloudflare Web Analytics (privacy-preserving, no cookies)</li>
-    </ul>
+      <h4 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mt-6 mb-3">Automatically Collected Information</h4>
+      <ul class="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300 mb-4">
+        <li><strong>Usage Data:</strong> Pages visited, features used, time spent on the Service</li>
+        <li><strong>Device Information:</strong> Browser type, operating system, IP address</li>
+        <li><strong>Analytics:</strong> We use Cloudflare Web Analytics (privacy-preserving, no cookies)</li>
+      </ul>
 
-    <h3>3. How We Use Your Information</h3>
-    <p>We use your information to:</p>
-    <ul>
-      <li>Provide and maintain the Service</li>
-      <li>Authenticate your account via magic links</li>
-      <li>Generate personalized plant care recommendations</li>
-      <li>Provide weather-aware suggestions based on your location</li>
-      <li>Improve and optimize the Service</li>
-      <li>Send you important Service updates (via email)</li>
-      <li>Protect against abuse and unauthorized access</li>
-    </ul>
+      <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">3. How We Use Your Information</h3>
+      <p class="text-slate-700 dark:text-slate-300 mb-4">We use your information to:</p>
+      <ul class="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300 mb-4">
+        <li>Provide and maintain the Service</li>
+        <li>Authenticate your account via magic links</li>
+        <li>Generate personalized plant care recommendations</li>
+        <li>Provide weather-aware suggestions based on your location</li>
+        <li>Improve and optimize the Service</li>
+        <li>Send you important Service updates (via email)</li>
+        <li>Protect against abuse and unauthorized access</li>
+      </ul>
 
-    <h3>4. Data Storage and Security</h3>
-    <p>
-      Your data is stored securely using Supabase (a PostgreSQL database provider) with the following protections:
-    </p>
-    <ul>
-      <li><strong>Encryption:</strong> All data is encrypted at rest and in transit (HTTPS/TLS)</li>
-      <li><strong>Row-Level Security:</strong> Database access is restricted to your own data</li>
-      <li><strong>Rate Limiting:</strong> Protection against brute force and abuse attempts</li>
-      <li><strong>Regular Backups:</strong> Your data is backed up regularly</li>
-    </ul>
+      <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">4. Data Storage and Security</h3>
+      <p class="text-slate-700 dark:text-slate-300 mb-4">
+        Your data is stored securely using Supabase (a PostgreSQL database provider) with the following protections:
+      </p>
+      <ul class="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300 mb-4">
+        <li><strong>Encryption:</strong> All data is encrypted at rest and in transit (HTTPS/TLS)</li>
+        <li><strong>Row-Level Security:</strong> Database access is restricted to your own data</li>
+        <li><strong>Rate Limiting:</strong> Protection against brute force and abuse attempts</li>
+        <li><strong>Regular Backups:</strong> Your data is backed up regularly</li>
+      </ul>
 
-    <h3>5. Third-Party Services</h3>
-    <p>We use the following third-party services:</p>
-    <ul>
-      <li><strong>Supabase:</strong> Database, authentication, and file storage (<a href="https://supabase.com/privacy" target="_blank" rel="noopener">Privacy Policy</a>)</li>
-      <li><strong>OpenAI:</strong> AI-powered plant care recommendations (<a href="https://openai.com/privacy" target="_blank" rel="noopener">Privacy Policy</a>)</li>
-      <li><strong>OpenWeatherMap:</strong> Weather data for care suggestions (<a href="https://openweathermap.org/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>)</li>
-      <li><strong>Cloudflare:</strong> Web analytics (no cookies, privacy-preserving) (<a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Privacy Policy</a>)</li>
-    </ul>
-    <p class="small muted">
-      <strong>Important:</strong> When you ask the AI assistant a question, your question and plant information may be sent to OpenAI's API.
-      OpenAI does not use API data to train their models. See their <a href="https://openai.com/privacy" target="_blank" rel="noopener">Privacy Policy</a> for details.
-    </p>
+      <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">5. Third-Party Services</h3>
+      <p class="text-slate-700 dark:text-slate-300 mb-4">We use the following third-party services:</p>
+      <ul class="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300 mb-4">
+        <li><strong>Supabase:</strong> Database, authentication, and file storage (<a href="https://supabase.com/privacy" target="_blank" rel="noopener" class="text-emerald-600 dark:text-emerald-400 hover:underline">Privacy Policy</a>)</li>
+        <li><strong>OpenAI:</strong> AI-powered plant care recommendations (<a href="https://openai.com/privacy" target="_blank" rel="noopener" class="text-emerald-600 dark:text-emerald-400 hover:underline">Privacy Policy</a>)</li>
+        <li><strong>OpenWeatherMap:</strong> Weather data for care suggestions (<a href="https://openweathermap.org/privacy-policy" target="_blank" rel="noopener" class="text-emerald-600 dark:text-emerald-400 hover:underline">Privacy Policy</a>)</li>
+        <li><strong>Cloudflare:</strong> Web analytics (no cookies, privacy-preserving) (<a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener" class="text-emerald-600 dark:text-emerald-400 hover:underline">Privacy Policy</a>)</li>
+      </ul>
+      <p class="text-sm text-slate-600 dark:text-slate-400 p-4 bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-700 rounded-xl mb-4">
+        <strong>Important:</strong> When you ask the AI assistant a question, your question and plant information may be sent to OpenAI's API.
+        OpenAI does not use API data to train their models. See their <a href="https://openai.com/privacy" target="_blank" rel="noopener" class="text-emerald-600 dark:text-emerald-400 hover:underline">Privacy Policy</a> for details.
+      </p>
 
-    <h3>6. Data Sharing</h3>
-    <p>
-      <strong>We do not sell your personal information to third parties.</strong> We may share your information only in the following circumstances:
-    </p>
-    <ul>
-      <li><strong>With Your Consent:</strong> When you explicitly agree to share information</li>
-      <li><strong>Service Providers:</strong> With trusted third-party services (listed above) necessary to operate the Service</li>
-      <li><strong>Legal Requirements:</strong> If required by law, regulation, or legal process</li>
-      <li><strong>Safety and Security:</strong> To protect the rights, property, or safety of EDH Dev, users, or others</li>
-    </ul>
+      <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">6. Data Sharing</h3>
+      <p class="text-slate-700 dark:text-slate-300 mb-4">
+        <strong>We do not sell your personal information to third parties.</strong> We may share your information only in the following circumstances:
+      </p>
+      <ul class="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300 mb-4">
+        <li><strong>With Your Consent:</strong> When you explicitly agree to share information</li>
+        <li><strong>Service Providers:</strong> With trusted third-party services (listed above) necessary to operate the Service</li>
+        <li><strong>Legal Requirements:</strong> If required by law, regulation, or legal process</li>
+        <li><strong>Safety and Security:</strong> To protect the rights, property, or safety of EDH Dev, users, or others</li>
+      </ul>
 
-    <h3>7. Your Privacy Rights</h3>
-    <p>You have the right to:</p>
-    <ul>
-      <li><strong>Access Your Data:</strong> Request a copy of the personal information we hold about you</li>
-      <li><strong>Correct Your Data:</strong> Update or correct inaccurate information</li>
-      <li><strong>Delete Your Data:</strong> Request deletion of your account and associated data</li>
-      <li><strong>Export Your Data:</strong> Request a copy of your plant data in a portable format (coming soon)</li>
-      <li><strong>Opt-Out:</strong> Opt out of non-essential emails (essential Service emails may still be sent)</li>
-    </ul>
-    <p class="small muted">
-      To exercise these rights, please contact us at <a href="mailto:info@plantcareai.app?subject=Privacy%20Rights">info@plantcareai.app</a>.
-    </p>
+      <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">7. Your Privacy Rights</h3>
+      <p class="text-slate-700 dark:text-slate-300 mb-4">You have the right to:</p>
+      <ul class="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300 mb-4">
+        <li><strong>Access Your Data:</strong> Request a copy of the personal information we hold about you</li>
+        <li><strong>Correct Your Data:</strong> Update or correct inaccurate information</li>
+        <li><strong>Delete Your Data:</strong> Request deletion of your account and associated data</li>
+        <li><strong>Export Your Data:</strong> Request a copy of your plant data in a portable format (coming soon)</li>
+        <li><strong>Opt-Out:</strong> Opt out of non-essential emails (essential Service emails may still be sent)</li>
+      </ul>
+      <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+        To exercise these rights, please contact us at <a href="mailto:info@plantcareai.app?subject=Privacy%20Rights" class="text-emerald-600 dark:text-emerald-400 hover:underline">info@plantcareai.app</a>.
+      </p>
 
-    <h3>8. Data Retention</h3>
-    <p>
-      We retain your information for as long as your account is active or as needed to provide the Service.
-      If you delete your account, we will delete or anonymize your personal information within 30 days, except where
-      we are legally required to retain certain data.
-    </p>
+      <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">8. Data Retention</h3>
+      <p class="text-slate-700 dark:text-slate-300 mb-4">
+        We retain your information for as long as your account is active or as needed to provide the Service.
+        If you delete your account, we will delete or anonymize your personal information within 30 days, except where
+        we are legally required to retain certain data.
+      </p>
 
-    <h3>9. Children's Privacy</h3>
-    <p>
-      The Service is not intended for children under 13 years of age. We do not knowingly collect personal information
-      from children under 13. If you become aware that a child has provided us with personal information, please contact us.
-    </p>
+      <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">9. Children's Privacy</h3>
+      <p class="text-slate-700 dark:text-slate-300 mb-4">
+        The Service is not intended for children under 13 years of age. We do not knowingly collect personal information
+        from children under 13. If you become aware that a child has provided us with personal information, please contact us.
+      </p>
 
-    <h3>10. International Users</h3>
-    <p>
-      The Service is hosted in the United States. If you access the Service from outside the United States, your information
-      may be transferred to, stored, and processed in the United States.
-    </p>
+      <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">10. International Users</h3>
+      <p class="text-slate-700 dark:text-slate-300 mb-4">
+        The Service is hosted in the United States. If you access the Service from outside the United States, your information
+        may be transferred to, stored, and processed in the United States.
+      </p>
 
-    <h3>11. Cookies and Tracking</h3>
-    <p>
-      We use minimal cookies for essential functionality:
-    </p>
-    <ul>
-      <li><strong>Session Cookie:</strong> To keep you logged in (required for authentication)</li>
-      <li><strong>Analytics:</strong> Cloudflare Web Analytics (no cookies, privacy-preserving)</li>
-    </ul>
-    <p>We do not use third-party advertising cookies or tracking pixels.</p>
+      <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">11. Cookies and Tracking</h3>
+      <p class="text-slate-700 dark:text-slate-300 mb-4">
+        We use minimal cookies for essential functionality:
+      </p>
+      <ul class="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300 mb-4">
+        <li><strong>Session Cookie:</strong> To keep you logged in (required for authentication)</li>
+        <li><strong>Analytics:</strong> Cloudflare Web Analytics (no cookies, privacy-preserving)</li>
+      </ul>
+      <p class="text-slate-700 dark:text-slate-300 mb-4">We do not use third-party advertising cookies or tracking pixels.</p>
 
-    <h3>12. Changes to This Privacy Policy</h3>
-    <p>
-      We may update this Privacy Policy from time to time. We will notify you of any material changes by updating the
-      "Last updated" date and, if appropriate, sending you an email notification.
-    </p>
+      <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">12. Changes to This Privacy Policy</h3>
+      <p class="text-slate-700 dark:text-slate-300 mb-4">
+        We may update this Privacy Policy from time to time. We will notify you of any material changes by updating the
+        "Last updated" date and, if appropriate, sending you an email notification.
+      </p>
 
-    <h3>13. Contact Us</h3>
-    <p>
-      If you have questions or concerns about this Privacy Policy, please contact us at
-      <a href="mailto:info@plantcareai.app?subject=Privacy%20Question">info@plantcareai.app</a>.
-    </p>
-  </div>
+      <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">13. Contact Us</h3>
+      <p class="text-slate-700 dark:text-slate-300 mb-4">
+        If you have questions or concerns about this Privacy Policy, please contact us at
+        <a href="mailto:info@plantcareai.app?subject=Privacy%20Question" class="text-emerald-600 dark:text-emerald-400 hover:underline">info@plantcareai.app</a>.
+      </p>
+    </div>
 
-  <div class="page-actions" style="margin-top: 2rem;">
-    <a href="{{ url_for('auth.signup') }}" class="muted-link">← Back to Sign Up</a>
-  </div>
-</section>
+    <div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700">
+      <a href="{{ url_for('auth.signup') }}" class="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+        <span aria-hidden="true">←</span> Back to Sign Up
+      </a>
+    </div>
+  </section>
+</div>
 {% endblock %}

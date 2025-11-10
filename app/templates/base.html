@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>{% block title %}PlantCareAI | Smart Plant Assistant for Weather-Aware Watering & Tips | EDH Dev{% endblock %}</title>
-  
+
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
         content="{% block description %}PlantCareAI helps you keep every plant thriving with AI-powered reminders, weather-aware watering, and personalized care tips. Free to start, built by EDH Dev.{% endblock %}" />
@@ -98,80 +98,113 @@
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "{{ CF_BEACON_TOKEN }}"}'></script>
   {% endif %}
 </head>
-<body>
-  <a class="skip-link" href="#main">Skip to main content</a>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+  <!-- Skip Link for Accessibility -->
+  <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-emerald-600 focus:text-white focus:rounded-lg focus:shadow-lg">
+    Skip to main content
+  </a>
 
   <!-- Site Header -->
-  <header class="site-header" role="banner">
-    <div class="container header-inner">
-      <div class="logo-lockup">
-        <a class="site-logo" href="{{ url_for('web.index') }}" aria-label="PlantCareAI Home Logo">
-          <span class="logo-icon" aria-hidden="true">🌿</span>
-          <span class="visually-hidden">Home</span>
-        </a>
-        <div class="brand-text-wrapper">
-          <a class="brand-text" href="{{ url_for('web.index') }}" aria-label="PlantCareAI Home Banner">
-            <div class="site-title">
-              PlantCareAI <span aria-hidden="true" class="title-decoration">🪴 🌱 🌵</span>
-            </div>
-            <p class="site-tagline">{% block subtitle %}Your plants deserve to thrive. We'll show you how.{% endblock %}</p>
+  <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-40 shadow-sm" role="banner">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex items-center justify-between gap-4">
+        <!-- Logo & Branding -->
+        <div class="flex items-center gap-3 min-w-0">
+          <a href="{{ url_for('web.index') }}" aria-label="PlantCareAI Home Logo" class="flex-shrink-0 text-4xl hover:scale-110 transition-transform">
+            <span aria-hidden="true">🌿</span>
+            <span class="sr-only">Home</span>
           </a>
+          <div class="min-w-0">
+            <a href="{{ url_for('web.index') }}" aria-label="PlantCareAI Home Banner" class="block">
+              <div class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent">
+                PlantCareAI <span aria-hidden="true" class="hidden sm:inline">🪴 🌱 🌵</span>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 truncate">{% block subtitle %}Your plants deserve to thrive. We'll show you how.{% endblock %}</p>
+            </a>
+          </div>
         </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center gap-4" aria-label="Main navigation">
+          {% if is_authenticated %}
+            <a class="px-4 py-2 rounded-lg font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors{% if request.endpoint and request.endpoint.startswith('dashboard.') %} bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400{% endif %}"
+               href="{{ url_for('dashboard.index') }}"
+               {% if request.endpoint and request.endpoint.startswith('dashboard.') %}aria-current="page"{% endif %}>Home</a>
+            <a class="px-4 py-2 rounded-lg font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors{% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %} bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400{% endif %}"
+               href="{{ url_for('web.ask_ai') }}"
+               {% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %}aria-current="page"{% endif %}>Care Assistant</a>
+
+            <!-- User Menu Dropdown -->
+            <div class="relative">
+              <button class="px-4 py-2 rounded-lg font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center gap-1"
+                      aria-expanded="false"
+                      aria-haspopup="true"
+                      id="user-menu-btn">
+                <span aria-label="Account menu for {{ current_user.email }}">{{ current_user.email|truncate(20) }}</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+              <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 hidden"
+                   id="user-menu-dropdown"
+                   role="menu"
+                   aria-labelledby="user-menu-btn">
+                <a href="{{ url_for('dashboard.account') }}"
+                   role="menuitem"
+                   class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-emerald-600 dark:hover:text-emerald-400">
+                  Account Settings
+                </a>
+                <a href="{{ url_for('auth.logout') }}"
+                   role="menuitem"
+                   class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-emerald-600 dark:hover:text-emerald-400">
+                  Log Out
+                </a>
+              </div>
+            </div>
+          {% else %}
+            <a class="px-4 py-2 rounded-lg font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors{% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %} bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400{% endif %}"
+               href="{{ url_for('web.ask_ai') }}"
+               {% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %}aria-current="page"{% endif %}>Care Assistant</a>
+            <a class="px-4 py-2 rounded-lg font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors{% if request.endpoint and request.endpoint.startswith('pricing.') %} bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400{% endif %}"
+               href="{{ url_for('pricing.index') }}"
+               {% if request.endpoint and request.endpoint.startswith('pricing.') %}aria-current="page"{% endif %}>Features</a>
+            <a class="px-4 py-2 rounded-lg font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors{% if request.endpoint and request.endpoint.startswith('auth.login') %} bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400{% endif %}"
+               href="{{ url_for('auth.login') }}"
+               {% if request.endpoint and request.endpoint.startswith('auth.login') %}aria-current="page"{% endif %}>Log In</a>
+            <a class="btn btn-primary" href="{{ url_for('auth.signup') }}">Sign Up Free</a>
+          {% endif %}
+        </nav>
       </div>
 
-      <!-- Main Navigation -->
-      <nav class="site-nav" aria-label="Main navigation">
-        {% if is_authenticated %}
-          <a class="nav-link{% if request.endpoint and request.endpoint.startswith('dashboard.') %} active{% endif %}"
-             href="{{ url_for('dashboard.index') }}"
-             {% if request.endpoint and request.endpoint.startswith('dashboard.') %}aria-current="page"{% endif %}>Home</a>
-          <a class="nav-link{% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %} active{% endif %}"
-             href="{{ url_for('web.ask_ai') }}"
-             {% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %}aria-current="page"{% endif %}>Care Assistant</a>
-          <div class="user-menu">
-            <button class="user-menu-btn" aria-expanded="false" aria-haspopup="true" id="user-menu-btn">
-              <span aria-label="Account menu for {{ current_user.email }}">{{ current_user.email|truncate(20) }} ▾</span>
-            </button>
-            <div class="user-menu-dropdown" hidden id="user-menu-dropdown" role="menu" aria-labelledby="user-menu-btn">
-              <a href="{{ url_for('dashboard.account') }}" role="menuitem">Account Settings</a>
-              <a href="{{ url_for('auth.logout') }}" role="menuitem">Log Out</a>
-            </div>
-          </div>
-        {% else %}
-          <a class="nav-link{% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %} active{% endif %}"
-             href="{{ url_for('web.ask_ai') }}"
-             {% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %}aria-current="page"{% endif %}>Care Assistant</a>
-          <a class="nav-link{% if request.endpoint and request.endpoint.startswith('pricing.') %} active{% endif %}"
-             href="{{ url_for('pricing.index') }}"
-             {% if request.endpoint and request.endpoint.startswith('pricing.') %}aria-current="page"{% endif %}>Features</a>
-          <a class="nav-link{% if request.endpoint and request.endpoint.startswith('auth.login') %} active{% endif %}"
-             href="{{ url_for('auth.login') }}"
-             {% if request.endpoint and request.endpoint.startswith('auth.login') %}aria-current="page"{% endif %}>Log In</a>
-          <a class="btn btn-primary" href="{{ url_for('auth.signup') }}">Sign Up Free</a>
-        {% endif %}
-      </nav>
-
+      <!-- Debug Links -->
       {% set show_debug = (config.UI_DEBUG_LINKS or request.args.get('debug') == 'true') %}
       {% if show_debug %}
-        <p class="small nav-links">
-          <a class="muted-link" href="{{ url_for('web.healthz') }}" target="_blank" rel="noopener">Health check</a>
-          &middot;
-          <a class="muted-link" href="{{ url_for('web.debug_info') }}" target="_blank" rel="noopener">Debug info</a>
-        </p>
+        <div class="mt-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            <a href="{{ url_for('web.healthz') }}" target="_blank" rel="noopener" class="hover:text-emerald-600 dark:hover:text-emerald-400">Health check</a>
+            <span class="mx-2">·</span>
+            <a href="{{ url_for('web.debug_info') }}" target="_blank" rel="noopener" class="hover:text-emerald-600 dark:hover:text-emerald-400">Debug info</a>
+          </p>
+        </div>
       {% endif %}
     </div>
-    <div class="header-watermark" aria-hidden="true"></div>
   </header>
 
   <!-- Flash Messages (WCAG-compliant alerts) -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-      <div class="container">
-        <div class="flash-messages" role="region" aria-label="Notifications">
+      <div class="container mx-auto px-4 py-4">
+        <div role="region" aria-label="Notifications" class="space-y-3">
           {% for category, message in messages %}
-            <div class="flash flash-{{ category }}" role="alert" aria-live="polite">
-              <span class="flash-message">{{ message }}</span>
-              <button class="flash-close" aria-label="Dismiss notification">&times;</button>
+            <div class="flex items-center justify-between gap-4 p-4 rounded-lg border-2 {% if category == 'success' %}bg-emerald-50 dark:bg-emerald-900/20 border-emerald-500 dark:border-emerald-600 text-emerald-800 dark:text-emerald-200{% elif category == 'error' %}bg-rose-50 dark:bg-rose-900/20 border-rose-500 dark:border-rose-600 text-rose-800 dark:text-rose-200{% elif category == 'warning' %}bg-amber-50 dark:bg-amber-900/20 border-amber-500 dark:border-amber-600 text-amber-800 dark:text-amber-200{% else %}bg-blue-50 dark:bg-blue-900/20 border-blue-500 dark:border-blue-600 text-blue-800 dark:text-blue-200{% endif %}"
+                 role="alert"
+                 aria-live="polite">
+              <span class="flex-1">{{ message }}</span>
+              <button class="flex-shrink-0 text-2xl leading-none hover:opacity-70 transition-opacity"
+                      aria-label="Dismiss notification"
+                      onclick="this.parentElement.remove()">
+                &times;
+              </button>
             </div>
           {% endfor %}
         </div>
@@ -180,63 +213,84 @@
   {% endwith %}
 
   <!-- Main Content -->
-  <div class="container">
+  <div class="container mx-auto px-4 py-8 flex-1">
     <main id="main" role="main">
       {% block content %}{% endblock %}
     </main>
   </div>
 
   <!-- Mobile Bottom Navigation (app-like experience) -->
-  <nav class="bottom-nav" aria-label="Mobile navigation">
-    {% if is_authenticated %}
-      {# Authenticated users: Home, Care, Account #}
-      <a href="{{ url_for('dashboard.index') }}" class="bottom-nav-item{% if request.endpoint and request.endpoint.startswith('dashboard.') %} active{% endif %}">
-        <span class="bottom-nav-item-icon" aria-hidden="true">🏠</span>
-        <span>Home</span>
-      </a>
-      <a href="{{ url_for('web.ask_ai') }}" class="bottom-nav-item{% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %} active{% endif %}">
-        <span class="bottom-nav-item-icon" aria-hidden="true">🌿</span>
-        <span>Care</span>
-      </a>
-      <a href="{{ url_for('dashboard.account') }}" class="bottom-nav-item{% if request.endpoint == 'dashboard.account' %} active{% endif %}">
-        <span class="bottom-nav-item-icon" aria-hidden="true">👤</span>
-        <span>Account</span>
-      </a>
-    {% else %}
-      {# Unauthenticated users: Care, Features, Sign Up #}
-      <a href="{{ url_for('web.ask_ai') }}" class="bottom-nav-item{% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %} active{% endif %}">
-        <span class="bottom-nav-item-icon" aria-hidden="true">🌿</span>
-        <span>Care</span>
-      </a>
-      <a href="{{ url_for('pricing.index') }}" class="bottom-nav-item{% if request.endpoint and request.endpoint.startswith('pricing.') %} active{% endif %}">
-        <span class="bottom-nav-item-icon" aria-hidden="true">✨</span>
-        <span>Features</span>
-      </a>
-      <a href="{{ url_for('auth.signup') }}" class="bottom-nav-item{% if request.endpoint and request.endpoint.startswith('auth.signup') %} active{% endif %}">
-        <span class="bottom-nav-item-icon" aria-hidden="true">🌱</span>
-        <span>Sign Up</span>
-      </a>
-    {% endif %}
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-lg z-40" aria-label="Mobile navigation">
+    <div class="flex justify-around items-center h-16">
+      {% if is_authenticated %}
+        {# Authenticated users: Home, Care, Account #}
+        <a href="{{ url_for('dashboard.index') }}"
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-xs font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('dashboard.') %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
+          <span class="text-2xl" aria-hidden="true">🏠</span>
+          <span>Home</span>
+        </a>
+        <a href="{{ url_for('web.ask_ai') }}"
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-xs font-medium transition-colors {% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
+          <span class="text-2xl" aria-hidden="true">🌿</span>
+          <span>Care</span>
+        </a>
+        <a href="{{ url_for('dashboard.account') }}"
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-xs font-medium transition-colors {% if request.endpoint == 'dashboard.account' %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
+          <span class="text-2xl" aria-hidden="true">👤</span>
+          <span>Account</span>
+        </a>
+      {% else %}
+        {# Unauthenticated users: Care, Features, Sign Up #}
+        <a href="{{ url_for('web.ask_ai') }}"
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-xs font-medium transition-colors {% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
+          <span class="text-2xl" aria-hidden="true">🌿</span>
+          <span>Care</span>
+        </a>
+        <a href="{{ url_for('pricing.index') }}"
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-xs font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('pricing.') %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
+          <span class="text-2xl" aria-hidden="true">✨</span>
+          <span>Features</span>
+        </a>
+        <a href="{{ url_for('auth.signup') }}"
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-xs font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('auth.signup') %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
+          <span class="text-2xl" aria-hidden="true">🌱</span>
+          <span>Sign Up</span>
+        </a>
+      {% endif %}
+    </div>
   </nav>
 
   <!-- Footer -->
-  <footer class="site-footer" role="contentinfo">
-    <div class="footer-content">
-      <p class="footer-copyright">PlantCareAI.app
-        <span aria-label="Copyright">&copy;</span> <span id="copyright-year"></span>
-        <span class="footer-tagline"></span>by <a href="https://www.ehermance.com" target="_blank" rel="noopener noreferrer" class="footer-link">EDH Dev</a></span>
-        <span class="footer-divider" aria-hidden="true">—</span>
-        <span class="footer-tagline">Built with care</span>
-      </p>
-      <nav class="footer-links" aria-label="Footer navigation">
-        <a href="{{ url_for('legal.terms') }}" class="footer-link">Terms</a>
-        <span class="footer-divider" aria-hidden="true">•</span>
-        <a href="{{ url_for('legal.privacy') }}" class="footer-link">Privacy</a>
-      </nav>
-      <div class="footer-support">
-        <a href="https://buymeacoffee.com/edhdev" target="_blank" rel="noopener noreferrer" class="support-link" aria-label="Support this project - Buy me a coffee">
-          <span aria-hidden="true">☕</span> Buy Me a Coffee
-        </a>
+  <footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 mt-auto mb-16 md:mb-0" role="contentinfo">
+    <div class="container mx-auto px-4 py-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-600 dark:text-slate-400">
+        <!-- Copyright -->
+        <p class="text-center md:text-left">
+          PlantCareAI.app
+          <span aria-label="Copyright">&copy;</span>
+          <span id="copyright-year"></span>
+          by <a href="https://www.ehermance.com" target="_blank" rel="noopener noreferrer" class="text-emerald-600 dark:text-emerald-400 hover:underline">EDH Dev</a>
+          <span class="hidden sm:inline mx-2">—</span>
+          <span class="hidden sm:inline">Built with care</span>
+        </p>
+
+        <!-- Footer Links -->
+        <nav class="flex items-center gap-4" aria-label="Footer navigation">
+          <a href="{{ url_for('legal.terms') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Terms</a>
+          <span aria-hidden="true">•</span>
+          <a href="{{ url_for('legal.privacy') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Privacy</a>
+        </nav>
+
+        <!-- Support Link -->
+        <div>
+          <a href="https://buymeacoffee.com/edhdev"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors font-medium"
+             aria-label="Support this project - Buy me a coffee">
+            <span aria-hidden="true">☕</span> Buy Me a Coffee
+          </a>
+        </div>
       </div>
     </div>
   </footer>
@@ -250,5 +304,10 @@
   <script src="{{ url_for('static', filename='js/bottom-nav.js') }}"></script>
 
   <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+
+  <!-- Copyright year script -->
+  <script>
+    document.getElementById('copyright-year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
