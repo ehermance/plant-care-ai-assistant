@@ -1,65 +1,78 @@
 {% extends "base.html" %}
 
-{% block title %}Care Calendar - {{ month_name }} {{ year }} - PlantCareAI{% endblock %}
+{% block title %}Care Calendar - {{ month_name }} {{ year }} - Plant Care AI Assistant - PlantCareAI{% endblock %}
+{% block description %}Track all your plant care activities at a glance.{% endblock %}
 
 {% block content %}
-<section class="page-header">
-  <h1 class="page-title">Care Calendar</h1>
-  <p class="page-subtitle">Track all your plant care activities at a glance</p>
-  <div class="page-actions">
-    <a href="{{ url_for('reminders.index') }}" class="btn btn-secondary">
-      ← All Reminders
-    </a>
-    <a href="{{ url_for('reminders.create') }}" class="btn btn-primary">
-      + New Reminder
-    </a>
-  </div>
-</section>
+<!-- Page Header -->
+<div class="mb-8">
+  <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+    Care Calendar <span class="inline-block" aria-hidden="true">📅</span>
+  </h1>
+  <p class="text-lg text-slate-600 dark:text-slate-400">
+    Track all your plant care activities at a glance
+  </p>
+</div>
 
-<!-- Calendar Navigation -->
-<div class="calendar-nav">
-  <a href="{{ url_for('reminders.calendar', year=prev_year, month=prev_month) }}" class="btn btn-secondary">
-    ← Previous
+<!-- Action Buttons -->
+<div class="flex flex-wrap gap-3 mb-8">
+  <a href="{{ url_for('reminders.index') }}" class="btn btn-secondary">
+    <span aria-hidden="true">←</span> All Reminders
   </a>
-  <h2 class="calendar-month-title">{{ month_name }} {{ year }}</h2>
-  <a href="{{ url_for('reminders.calendar', year=next_year, month=next_month) }}" class="btn btn-secondary">
-    Next →
+  <a href="{{ url_for('reminders.create') }}" class="btn btn-primary">
+    <span aria-hidden="true">+</span> New Reminder
   </a>
 </div>
 
+<!-- Calendar Navigation -->
+<div class="card mb-6">
+  <div class="flex items-center justify-between">
+    <a href="{{ url_for('reminders.calendar', year=prev_year, month=prev_month) }}" class="btn btn-secondary">
+      <span aria-hidden="true">←</span> Previous
+    </a>
+    <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100">{{ month_name }} {{ year }}</h2>
+    <a href="{{ url_for('reminders.calendar', year=next_year, month=next_month) }}" class="btn btn-secondary">
+      Next <span aria-hidden="true">→</span>
+    </a>
+  </div>
+</div>
+
 <!-- Calendar Grid -->
-<div class="calendar-wrapper">
-  <table class="calendar-grid" role="grid" aria-label="Care calendar for {{ month_name }} {{ year }}">
+<div class="card mb-6 overflow-x-auto">
+  <table class="w-full border-collapse" role="grid" aria-label="Care calendar for {{ month_name }} {{ year }}">
     <thead>
-      <tr>
-        <th scope="col" abbr="Monday">Mon</th>
-        <th scope="col" abbr="Tuesday">Tue</th>
-        <th scope="col" abbr="Wednesday">Wed</th>
-        <th scope="col" abbr="Thursday">Thu</th>
-        <th scope="col" abbr="Friday">Fri</th>
-        <th scope="col" abbr="Saturday">Sat</th>
-        <th scope="col" abbr="Sunday">Sun</th>
+      <tr class="border-b-2 border-slate-200 dark:border-slate-700">
+        <th scope="col" class="p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Monday">Mon</th>
+        <th scope="col" class="p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Tuesday">Tue</th>
+        <th scope="col" class="p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Wednesday">Wed</th>
+        <th scope="col" class="p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Thursday">Thu</th>
+        <th scope="col" class="p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Friday">Fri</th>
+        <th scope="col" class="p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Saturday">Sat</th>
+        <th scope="col" class="p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Sunday">Sun</th>
       </tr>
     </thead>
     <tbody>
       {% for week in calendar_grid %}
-      <tr>
+      <tr class="border-b border-slate-200 dark:border-slate-700">
         {% for day in week %}
-        <td class="calendar-day {% if day == 0 %}calendar-day-empty{% elif '%04d-%02d-%02d'|format(year, month, day) == today|string %}calendar-day-today{% endif %}{% if day != 0 and reminders_by_date.get('%04d-%02d-%02d'|format(year, month, day)) %} calendar-day-has-reminders{% endif %}">
+        {% set date_key = '%04d-%02d-%02d'|format(year, month, day) %}
+        {% set day_reminders = reminders_by_date.get(date_key, []) %}
+        {% set is_today = date_key == today|string %}
+
+        <td class="align-top p-2 min-h-[120px] {% if day == 0 %}bg-slate-50 dark:bg-slate-900{% elif is_today %}bg-emerald-50 dark:bg-emerald-900/20{% else %}bg-white dark:bg-slate-800{% endif %} border border-slate-200 dark:border-slate-700 transition-colors">
           {% if day != 0 %}
-            <div class="calendar-day-header">
-              <span class="calendar-day-number">{{ day }}</span>
+            <div class="mb-2">
+              <span class="inline-flex items-center justify-center w-7 h-7 text-sm font-semibold rounded-full {% if is_today %}bg-emerald-600 text-white dark:bg-emerald-500{% else %}text-slate-700 dark:text-slate-300{% endif %}">
+                {{ day }}
+              </span>
             </div>
 
-            {% set date_key = '%04d-%02d-%02d'|format(year, month, day) %}
-            {% set day_reminders = reminders_by_date.get(date_key, []) %}
-
             {% if day_reminders %}
-            <div class="calendar-day-reminders">
+            <div class="space-y-1">
               {% for reminder in day_reminders[:3] %}
-              <div class="calendar-reminder calendar-reminder-{{ reminder.reminder_type }}">
-                <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="calendar-reminder-link">
-                  <span class="calendar-reminder-icon" aria-hidden="true">
+              <div class="text-xs rounded-lg px-2 py-1 bg-slate-100 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 hover:border-emerald-500 dark:hover:border-emerald-400 transition-colors">
+                <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="flex items-center gap-1 text-slate-900 dark:text-slate-100 hover:text-emerald-600 dark:hover:text-emerald-400">
+                  <span aria-hidden="true">
                     {% if reminder.reminder_type == 'watering' %}💧
                     {% elif reminder.reminder_type == 'fertilizing' %}🌿
                     {% elif reminder.reminder_type == 'misting' %}💦
@@ -69,7 +82,7 @@
                     {% else %}📝
                     {% endif %}
                   </span>
-                  <span class="calendar-reminder-title">
+                  <span class="truncate">
                     {{ reminder.plants.name if reminder.plants else 'Plant' }}
                   </span>
                 </a>
@@ -77,7 +90,7 @@
               {% endfor %}
 
               {% if day_reminders|length > 3 %}
-              <div class="calendar-reminder-more">
+              <div class="text-xs text-slate-500 dark:text-slate-400 pl-2">
                 +{{ day_reminders|length - 3 }} more
               </div>
               {% endif %}
@@ -93,36 +106,36 @@
 </div>
 
 <!-- Legend -->
-<div class="calendar-legend card">
+<div class="card">
   <h3 class="section-title">Reminder Types</h3>
-  <div class="calendar-legend-items">
-    <div class="calendar-legend-item">
-      <span class="calendar-legend-icon" aria-hidden="true">💧</span>
-      <span>Watering</span>
+  <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
+    <div class="flex items-center gap-2">
+      <span class="text-2xl" aria-hidden="true">💧</span>
+      <span class="text-sm text-slate-700 dark:text-slate-300">Watering</span>
     </div>
-    <div class="calendar-legend-item">
-      <span class="calendar-legend-icon" aria-hidden="true">🌿</span>
-      <span>Fertilizing</span>
+    <div class="flex items-center gap-2">
+      <span class="text-2xl" aria-hidden="true">🌿</span>
+      <span class="text-sm text-slate-700 dark:text-slate-300">Fertilizing</span>
     </div>
-    <div class="calendar-legend-item">
-      <span class="calendar-legend-icon" aria-hidden="true">💦</span>
-      <span>Misting</span>
+    <div class="flex items-center gap-2">
+      <span class="text-2xl" aria-hidden="true">💦</span>
+      <span class="text-sm text-slate-700 dark:text-slate-300">Misting</span>
     </div>
-    <div class="calendar-legend-item">
-      <span class="calendar-legend-icon" aria-hidden="true">✂️</span>
-      <span>Pruning</span>
+    <div class="flex items-center gap-2">
+      <span class="text-2xl" aria-hidden="true">✂️</span>
+      <span class="text-sm text-slate-700 dark:text-slate-300">Pruning</span>
     </div>
-    <div class="calendar-legend-item">
-      <span class="calendar-legend-icon" aria-hidden="true">🪴</span>
-      <span>Repotting</span>
+    <div class="flex items-center gap-2">
+      <span class="text-2xl" aria-hidden="true">🪴</span>
+      <span class="text-sm text-slate-700 dark:text-slate-300">Repotting</span>
     </div>
-    <div class="calendar-legend-item">
-      <span class="calendar-legend-icon" aria-hidden="true">🔍</span>
-      <span>Inspection</span>
+    <div class="flex items-center gap-2">
+      <span class="text-2xl" aria-hidden="true">🔍</span>
+      <span class="text-sm text-slate-700 dark:text-slate-300">Inspection</span>
     </div>
-    <div class="calendar-legend-item">
-      <span class="calendar-legend-icon" aria-hidden="true">📝</span>
-      <span>Custom</span>
+    <div class="flex items-center gap-2">
+      <span class="text-2xl" aria-hidden="true">📝</span>
+      <span class="text-sm text-slate-700 dark:text-slate-300">Custom</span>
     </div>
   </div>
 </div>

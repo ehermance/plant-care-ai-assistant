@@ -1,34 +1,49 @@
 {% extends "base.html" %}
 
-{% block title %}Edit Reminder - PlantCareAI{% endblock %}
+{% block title %}Edit Reminder - Plant Care AI Assistant - PlantCareAI{% endblock %}
+{% block description %}Update your care reminder settings.{% endblock %}
 
 {% block content %}
-<section class="page-header">
-  <h1 class="page-title">Edit Reminder</h1>
-  <p class="page-subtitle">Update your care reminder settings</p>
-</section>
+<!-- Page Header -->
+<div class="mb-8">
+  <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+    Edit Reminder <span class="inline-block" aria-hidden="true">✏️</span>
+  </h1>
+  <p class="text-lg text-slate-600 dark:text-slate-400">
+    Update your care reminder settings
+  </p>
+</div>
 
-<section class="card">
-  <form method="POST" action="{{ url_for('reminders.edit', reminder_id=reminder.id) }}" class="form-vertical">
+<!-- Form -->
+<div class="max-w-2xl">
+  <form method="POST" action="{{ url_for('reminders.edit', reminder_id=reminder.id) }}" class="card">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
     <!-- Title -->
-    <div class="form-group">
-      <label for="title">Reminder Title *</label>
+    <div class="mb-6">
+      <label for="title" class="label label-required">
+        Reminder Title
+      </label>
       <input
         type="text"
         id="title"
         name="title"
+        class="input"
         maxlength="255"
         value="{{ reminder.title }}"
+        placeholder="e.g., Water Monstera"
         required
+        aria-describedby="title-help"
       />
+      <p id="title-help" class="help-text">Give your reminder a descriptive name</p>
     </div>
 
     <!-- Frequency -->
-    <div class="form-group">
-      <label for="frequency">Frequency *</label>
-      <select id="frequency" name="frequency" required onchange="toggleCustomInterval(this)">
+    <div class="mb-6">
+      <label for="frequency" class="label label-required">
+        Frequency
+      </label>
+      <select id="frequency" name="frequency" class="input" required onchange="toggleCustomInterval(this)" aria-describedby="frequency-help">
         <option value="daily" {% if reminder.frequency == 'daily' %}selected{% endif %}>Daily</option>
         <option value="every_2_days" {% if reminder.frequency == 'every_2_days' %}selected{% endif %}>Every 2 Days</option>
         <option value="every_3_days" {% if reminder.frequency == 'every_3_days' %}selected{% endif %}>Every 3 Days</option>
@@ -38,52 +53,73 @@
         <option value="one_time" {% if reminder.frequency == 'one_time' %}selected{% endif %}>One-time Only</option>
         <option value="custom" {% if reminder.frequency == 'custom' %}selected{% endif %}>Custom Interval</option>
       </select>
-      <small class="form-hint">One-time reminders will become inactive after completion</small>
+      <p id="frequency-help" class="help-text">One-time reminders will become inactive after completion</p>
     </div>
 
-    <!-- Custom Interval -->
-    <div class="form-group" id="custom-interval-group" {% if reminder.frequency != 'custom' %}style="display: none;"{% endif %}>
-      <label for="custom_interval_days">Custom Interval (Days) *</label>
+    <!-- Custom Interval (conditionally visible) -->
+    <div class="mb-6 {% if reminder.frequency != 'custom' %}hidden{% endif %}" id="custom-interval-group">
+      <label for="custom_interval_days" class="label label-required">
+        Custom Interval (Days)
+      </label>
       <input
         type="number"
         id="custom_interval_days"
         name="custom_interval_days"
+        class="input"
         min="1"
         max="365"
         value="{{ reminder.custom_interval_days or '' }}"
+        placeholder="e.g., 5"
         {% if reminder.frequency == 'custom' %}required{% endif %}
+        aria-describedby="custom-help"
       />
-      <small class="form-hint">Enter number of days between reminders (1-365)</small>
+      <p id="custom-help" class="help-text">Enter number of days between reminders (1-365)</p>
     </div>
 
     <!-- Notes -->
-    <div class="form-group">
-      <label for="notes">Notes (Optional)</label>
+    <div class="mb-6">
+      <label for="notes" class="label">
+        Notes <span class="text-sm font-normal text-slate-500 dark:text-slate-400">(Optional)</span>
+      </label>
       <textarea
         id="notes"
         name="notes"
+        class="input"
         rows="3"
         maxlength="500"
         placeholder="Add any special instructions or notes..."
+        aria-describedby="notes-help"
       >{{ reminder.notes or '' }}</textarea>
+      <p id="notes-help" class="help-text">Optional care instructions or reminders</p>
     </div>
 
     <!-- Weather Adjustment -->
-    <div class="form-group">
-      <label class="checkbox-label">
-        <input type="checkbox" name="skip_weather_adjustment" {% if reminder.skip_weather_adjustment %}checked{% endif %} />
-        Skip weather adjustments
+    <div class="mb-8">
+      <label class="flex items-start gap-3 cursor-pointer">
+        <input
+          type="checkbox"
+          name="skip_weather_adjustment"
+          {% if reminder.skip_weather_adjustment %}checked{% endif %}
+          class="mt-1 w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-0 dark:bg-slate-700 dark:checked:bg-emerald-500"
+        />
+        <div>
+          <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Skip weather adjustments</span>
+          <p class="text-sm text-slate-500 dark:text-slate-400">If checked, this reminder won't be adjusted based on weather conditions</p>
+        </div>
       </label>
-      <small class="form-hint">If checked, this reminder won't be adjusted based on weather conditions</small>
     </div>
 
     <!-- Actions -->
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary">Save Changes</button>
-      <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="btn btn-secondary">Cancel</a>
+    <div class="flex flex-col sm:flex-row gap-3">
+      <button type="submit" class="btn btn-primary">
+        <span aria-hidden="true">💾</span> Save Changes
+      </button>
+      <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="btn btn-secondary">
+        Cancel
+      </a>
     </div>
   </form>
-</section>
+</div>
 
 <script>
 // Toggle custom interval field
@@ -92,10 +128,10 @@ function toggleCustomInterval(select) {
   const customInput = document.getElementById('custom_interval_days');
 
   if (select.value === 'custom') {
-    customGroup.style.display = 'block';
+    customGroup.classList.remove('hidden');
     customInput.required = true;
   } else {
-    customGroup.style.display = 'none';
+    customGroup.classList.add('hidden');
     customInput.required = false;
   }
 }
