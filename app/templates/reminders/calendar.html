@@ -39,16 +39,16 @@
 
 <!-- Calendar Grid -->
 <div class="card mb-6 overflow-x-auto">
-  <table class="w-full border-collapse" role="grid" aria-label="Care calendar for {{ month_name }} {{ year }}">
+  <table class="w-full table-fixed border-collapse" role="grid" aria-label="Care calendar for {{ month_name }} {{ year }}">
     <thead>
       <tr class="border-b-2 border-slate-200 dark:border-slate-700">
-        <th scope="col" class="p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Monday">Mon</th>
-        <th scope="col" class="p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Tuesday">Tue</th>
-        <th scope="col" class="p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Wednesday">Wed</th>
-        <th scope="col" class="p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Thursday">Thu</th>
-        <th scope="col" class="p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Friday">Fri</th>
-        <th scope="col" class="p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Saturday">Sat</th>
-        <th scope="col" class="p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Sunday">Sun</th>
+        <th scope="col" class="w-1/7 p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Monday">Mon</th>
+        <th scope="col" class="w-1/7 p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Tuesday">Tue</th>
+        <th scope="col" class="w-1/7 p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Wednesday">Wed</th>
+        <th scope="col" class="w-1/7 p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Thursday">Thu</th>
+        <th scope="col" class="w-1/7 p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Friday">Fri</th>
+        <th scope="col" class="w-1/7 p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Saturday">Sat</th>
+        <th scope="col" class="w-1/7 p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Sunday">Sun</th>
       </tr>
     </thead>
     <tbody>
@@ -59,7 +59,7 @@
         {% set day_reminders = reminders_by_date.get(date_key, []) %}
         {% set is_today = date_key == today|string %}
 
-        <td class="align-top p-2 min-h-[120px] {% if day == 0 %}bg-slate-50 dark:bg-slate-900{% elif is_today %}bg-emerald-50 dark:bg-emerald-900/20{% else %}bg-white dark:bg-slate-800{% endif %} border border-slate-200 dark:border-slate-700 transition-colors">
+        <td class="w-1/7 align-top p-2 min-h-[120px] {% if day == 0 %}bg-slate-50 dark:bg-slate-900{% elif is_today %}bg-emerald-50 dark:bg-emerald-900/20{% else %}bg-white dark:bg-slate-800{% endif %} border border-slate-200 dark:border-slate-700 transition-colors">
           {% if day != 0 %}
             <div class="mb-2">
               <span class="inline-flex items-center justify-center w-7 h-7 text-sm font-semibold rounded-full {% if is_today %}bg-emerald-600 text-white dark:bg-emerald-500{% else %}text-slate-700 dark:text-slate-300{% endif %}">

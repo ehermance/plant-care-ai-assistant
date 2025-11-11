@@ -57,7 +57,7 @@
   const statusEl = document.getElementById('status-message');
 
   if (!statusEl) {
-    console.error('Status element not found');
+    // Status element not found, fail silently
     return;
   }
 
@@ -74,7 +74,6 @@
   if (errorCode) {
     stopLoadingRotation();
     statusEl.setAttribute('role', 'alert');
-    console.error('Auth error:', errorCode, errorDescription);
 
     // Provide user-friendly error messages
     let userMessage = '';

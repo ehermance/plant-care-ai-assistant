@@ -1,6 +1,4 @@
-(function() {
-  'use strict';
-  /**
+/**
  * Client-side interactivity.
  *
  * - Prefill form from preset buttons (plant, question, context, optional city)
@@ -9,10 +7,11 @@
  * - After submit, focuses the Answer region and scrolls into view (reduced-motion aware)
  * - Units toggle (°F default, persisted to localStorage) controls presentation only
  * - Restores interactivity on bfcache navigation
- * - Reset button clears fields to a clean state (not just HTML “reset” to initial values)
+ * - Reset button clears fields to a clean state (not just HTML "reset" to initial values)
  */
 
 (function () {
+  'use strict';
   const form = document.getElementById('ask-form');
   const presets = document.getElementById('presets');
 
@@ -184,14 +183,11 @@
   const userMenuDropdown = document.getElementById('user-menu-dropdown');
 
   if (userMenuBtn && userMenuDropdown) {
-    console.log('User menu elements found:', { btn: userMenuBtn, dropdown: userMenuDropdown });
-
     // Toggle dropdown on click
     userMenuBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       e.preventDefault();
       const isExpanded = userMenuBtn.getAttribute('aria-expanded') === 'true';
-      console.log('Menu clicked, isExpanded:', isExpanded);
 
       if (isExpanded) {
         closeUserMenu();
@@ -251,14 +247,11 @@
     });
 
     function openUserMenu() {
-      console.log('Opening menu, classes before:', userMenuDropdown.className);
       userMenuDropdown.classList.remove('hidden');
       userMenuBtn.setAttribute('aria-expanded', 'true');
-      console.log('Opening menu, classes after:', userMenuDropdown.className);
     }
 
     function closeUserMenu() {
-      console.log('Closing menu');
       userMenuDropdown.classList.add('hidden');
       userMenuBtn.setAttribute('aria-expanded', 'false');
     }
@@ -304,5 +297,4 @@
       }, 300);
     }
   }
-})();
 })();

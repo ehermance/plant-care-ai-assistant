@@ -109,7 +109,7 @@
     <div class="container mx-auto px-4 py-4 overflow-visible">
       <div class="flex items-center justify-between gap-4 overflow-visible">
         <!-- Logo & Branding -->
-        <div class="flex items-center gap-1 min-w-1">
+        <div class="flex items-start gap-1 min-w-1">
           <a href="{{ url_for('web.index') }}" aria-label="PlantCareAI Home Logo" class="flex-shrink-0 hover:bg-purple-900/40 rounded-lg p-0.5 transition-all duration-200 group">
             <img src="{{ url_for('static', filename='images/illustrations/custom-leaf.svg') }}"
                  alt=""
@@ -120,9 +120,9 @@
           <div class="min-w-0">
             <a href="{{ url_for('web.index') }}" aria-label="PlantCareAI Home Banner" class="block">
               <div class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-emerald-400 via-lime-300 to-amber-300 bg-clip-text text-transparent drop-shadow-lg">
-                PlantCareAI <span aria-hidden="true" class="hidden sm:inline">🪴 🌱 🌵</span>
+                PlantCareAI <span aria-hidden="true" class="inline md:hidden lg:inline whitespace-nowrap">🪴 🌱 🌵</span>
               </div>
-              <p class="text-xs sm:text-sm text-amber-200/80 truncate">{% block subtitle %}Your plants deserve to thrive. We'll show you how.{% endblock %}</p>
+              <p class="text-xs sm:text-sm text-amber-200/80">{% block subtitle %}Your plants deserve to thrive. <span class="whitespace-nowrap">We'll show you how.</span>{% endblock %}</p>
             </a>
           </div>
         </div>

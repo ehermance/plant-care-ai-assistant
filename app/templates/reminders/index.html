@@ -75,7 +75,7 @@
 
   <div class="space-y-3">
     {% for reminder in due_reminders %}
-    <div class="flex items-start gap-4 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border-2 border-amber-200 dark:border-amber-700 transition-all duration-200 hover:border-amber-400 dark:hover:border-amber-500">
+    <div class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border-2 border-amber-200 dark:border-amber-700 transition-all duration-200 hover:border-amber-400 dark:hover:border-amber-500">
       <div class="text-2xl flex-shrink-0" aria-hidden="true">
         {% if reminder.reminder_type == 'watering' %}💧
         {% elif reminder.reminder_type == 'fertilizing' %}🌿
@@ -107,17 +107,17 @@
         {% endif %}
       </div>
 
-      <div class="flex flex-col sm:flex-row gap-2 flex-shrink-0">
-        <form method="POST" action="{{ url_for('reminders.complete', reminder_id=reminder.id) }}">
+      <div class="flex flex-col sm:flex-row gap-2 flex-shrink-0 w-full sm:w-auto">
+        <form method="POST" action="{{ url_for('reminders.complete', reminder_id=reminder.id) }}" class="w-full sm:w-auto">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-          <button type="submit" class="btn btn-primary" title="Mark complete">
+          <button type="submit" class="btn btn-primary w-full sm:w-auto" title="Mark complete">
             <span aria-hidden="true">✓</span> Done
           </button>
         </form>
-        <form method="POST" action="{{ url_for('reminders.snooze', reminder_id=reminder.id) }}">
+        <form method="POST" action="{{ url_for('reminders.snooze', reminder_id=reminder.id) }}" class="w-full sm:w-auto">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <input type="hidden" name="days" value="1"/>
-          <button type="submit" class="btn btn-secondary" title="Snooze 1 day">
+          <button type="submit" class="btn btn-secondary w-full sm:w-auto" title="Snooze 1 day">
             <span aria-hidden="true">💤</span> Snooze
           </button>
         </form>
@@ -135,7 +135,7 @@
 
   <div class="space-y-3">
     {% for reminder in upcoming_reminders %}
-    <div class="flex items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:border-emerald-500 dark:hover:border-emerald-400">
+    <div class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:border-emerald-500 dark:hover:border-emerald-400">
       <div class="text-2xl flex-shrink-0" aria-hidden="true">
         {% if reminder.reminder_type == 'watering' %}💧
         {% elif reminder.reminder_type == 'fertilizing' %}🌿
@@ -169,8 +169,8 @@
         {% endif %}
       </div>
 
-      <div class="flex-shrink-0">
-        <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="btn btn-secondary">
+      <div class="flex-shrink-0 w-full sm:w-auto">
+        <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="btn btn-secondary w-full sm:w-auto">
           View
         </a>
       </div>
@@ -187,7 +187,7 @@
 
   <div class="space-y-3">
     {% for reminder in all_reminders %}
-    <div class="flex items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:border-emerald-500 dark:hover:border-emerald-400">
+    <div class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:border-emerald-500 dark:hover:border-emerald-400">
       <div class="text-2xl flex-shrink-0" aria-hidden="true">
         {% if reminder.reminder_type == 'watering' %}💧
         {% elif reminder.reminder_type == 'fertilizing' %}🌿
@@ -218,8 +218,8 @@
         {% endif %}
       </div>
 
-      <div class="flex-shrink-0">
-        <a href="{{ url_for('reminders.edit', reminder_id=reminder.id) }}" class="btn btn-secondary">
+      <div class="flex-shrink-0 w-full sm:w-auto">
+        <a href="{{ url_for('reminders.edit', reminder_id=reminder.id) }}" class="btn btn-secondary w-full sm:w-auto">
           Edit
         </a>
       </div>

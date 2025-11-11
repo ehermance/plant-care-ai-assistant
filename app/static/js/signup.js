@@ -20,7 +20,7 @@
       // If honeypot filled, likely a bot
       if (honeypot && honeypot.value !== '') {
         e.preventDefault();
-        console.warn('Suspicious form submission blocked');
+        // Suspicious form submission blocked silently
         return false;
       }
 

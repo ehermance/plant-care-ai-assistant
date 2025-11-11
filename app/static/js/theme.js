@@ -69,7 +69,7 @@ class ThemeManager {
   async setTheme(mode, syncWithServer = true) {
     // Validate input
     if (!['light', 'dark', 'auto'].includes(mode)) {
-      console.error(`Invalid theme mode: ${mode}`);
+      // Invalid theme mode, fail silently
       return;
     }
 
@@ -135,14 +135,13 @@ class ThemeManager {
       const data = await response.json();
 
       if (!data.success) {
-        console.error('Failed to save theme preference:', data.error);
+        // Failed to save theme preference, fail silently
         return false;
       }
 
       return true;
 
     } catch (error) {
-      console.error('Error syncing theme with database:', error);
       // Silently fail - localStorage still works
       return false;
     }

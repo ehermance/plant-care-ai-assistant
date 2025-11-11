@@ -114,7 +114,7 @@
 
   <div class="space-y-3" id="dashboard-reminders-list">
     {% for reminder in due_reminders[:5] %}
-    <div class="flex items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:border-emerald-500 dark:hover:border-emerald-400" data-reminder-id="{{ reminder.id }}">
+    <div class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:border-emerald-500 dark:hover:border-emerald-400" data-reminder-id="{{ reminder.id }}">
       <div class="text-2xl flex-shrink-0">
         {% if reminder.reminder_type == 'watering' %}💧
         {% elif reminder.reminder_type == 'fertilizing' %}🌿
@@ -144,7 +144,7 @@
       </div>
 
       <button
-        class="btn btn-primary flex-shrink-0 quick-complete-btn"
+        class="btn btn-primary flex-shrink-0 w-full sm:w-auto quick-complete-btn"
         data-reminder-id="{{ reminder.id }}"
         data-reminder-title="{{ reminder.title }}"
         title="Mark complete"
@@ -185,94 +185,9 @@
 {% endif %}
 
 <!-- CSRF token for AJAX requests (secure storage) -->
-<div id="csrf-token" data-csrf="{{ csrf_token() }}" style="display:none;"></div>
+<div id="csrf-token" data-csrf="{{ csrf_token() }}" class="hidden"></div>
+{% endblock %}
 
-<script>
-// Quick Complete functionality for dashboard reminders
-document.addEventListener('DOMContentLoaded', function() {
-  // Get CSRF token securely from data attribute
-  const csrfToken = document.getElementById('csrf-token').dataset.csrf;
-  const completeButtons = document.querySelectorAll('.quick-complete-btn');
-
-  completeButtons.forEach(button => {
-    button.addEventListener('click', async function(e) {
-      e.preventDefault();
-
-      const reminderId = this.dataset.reminderId;
-      const reminderTitle = this.dataset.reminderTitle;
-      const reminderItem = this.closest('[data-reminder-id]');
-
-      // Disable button and show loading state
-      this.disabled = true;
-      this.innerHTML = '⏳ Completing...';
-
-      try {
-        const response = await fetch(`/reminders/api/${reminderId}/complete`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken
-          }
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          // Fade out and remove the reminder item
-          reminderItem.style.opacity = '0';
-          reminderItem.style.transition = 'opacity 0.3s ease';
-
-          setTimeout(() => {
-            reminderItem.remove();
-
-            // Check if list is empty
-            const remindersList = document.getElementById('dashboard-reminders-list');
-            if (remindersList && remindersList.children.length === 0) {
-              // Reload page to update stats and show empty state
-              window.location.reload();
-            } else {
-              // Show success message
-              if (window.showToast) {
-                window.showToast(`✓ ${reminderTitle} marked complete!`, 'success');
-              }
-
-              // Update the "Due Today" badge count
-              const badge = document.querySelector('#reminders-title .badge');
-              if (badge) {
-                const currentCount = parseInt(badge.textContent) || 0;
-                const newCount = currentCount - 1;
-                if (newCount > 0) {
-                  badge.textContent = newCount;
-                } else {
-                  badge.remove();
-                }
-              }
-            }
-          }, 300);
-
-        } else {
-          // Show error
-          this.disabled = false;
-          this.innerHTML = '✓ Done';
-          if (window.showToast) {
-            window.showToast(data.error || 'Failed to complete reminder', 'error');
-          } else {
-            alert(data.error || 'Failed to complete reminder');
-          }
-        }
-      } catch (error) {
-        console.error('Error completing reminder:', error);
-        this.disabled = false;
-        this.innerHTML = '✓ Done';
-        if (window.showToast) {
-          window.showToast('Network error. Please try again.', 'error');
-        } else {
-          alert('Network error. Please try again.');
-        }
-      }
-    });
-  });
-});
-</script>
-
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endblock %}
