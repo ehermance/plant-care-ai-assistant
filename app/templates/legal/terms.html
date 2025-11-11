@@ -101,9 +101,15 @@
     </div>
 
     <div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700">
-      <a href="{{ url_for('auth.signup') }}" class="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-        <span aria-hidden="true">←</span> Back to Sign Up
-      </a>
+      {% if is_authenticated %}
+        <a href="{{ url_for('dashboard.index') }}" class="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <span aria-hidden="true">←</span> Back to Dashboard
+        </a>
+      {% else %}
+        <a href="{{ url_for('web.home') }}" class="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <span aria-hidden="true">←</span> Back to Home
+        </a>
+      {% endif %}
     </div>
   </section>
 </div>

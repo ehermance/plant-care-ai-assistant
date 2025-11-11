@@ -28,7 +28,7 @@
   // --- Presets ---
   if (presets) {
     presets.addEventListener('click', (e) => {
-      const btn = e.target.closest('.preset-btn');
+      const btn = e.target.closest('button[data-plant]');
       if (!btn) return;
 
       const { plant, city, question, context } = btn.dataset;
@@ -38,7 +38,8 @@
       if (typeof question === 'string') questionInput.value = question;
       if (typeof context === 'string') contextSelect.value = context;
 
-      questionInput.focus();
+      // Focus submit button after preset selection
+      if (submitBtn) submitBtn.focus();
     });
   }
 

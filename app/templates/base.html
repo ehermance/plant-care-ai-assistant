@@ -120,7 +120,7 @@
           <div class="min-w-0">
             <a href="{{ url_for('web.index') }}" aria-label="PlantCareAI Home Banner" class="block">
               <div class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-emerald-400 via-lime-300 to-amber-300 bg-clip-text text-transparent drop-shadow-lg">
-                PlantCareAI <span aria-hidden="true" class="inline md:hidden lg:inline whitespace-nowrap">🪴 🌱 🌵</span>
+                PlantCareAI <span aria-hidden="true" class="hidden sm:inline md:hidden lg:inline whitespace-nowrap">🪴 🌱 🌵</span>
               </div>
               <p class="text-xs sm:text-sm text-amber-200/80">{% block subtitle %}Your plants deserve to thrive. <span class="whitespace-nowrap">We'll show you how.</span>{% endblock %}</p>
             </a>
@@ -132,10 +132,12 @@
           {% if is_authenticated %}
             <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('dashboard.') %} bg-amber-500/20 text-amber-300{% endif %}"
                href="{{ url_for('dashboard.index') }}"
-               {% if request.endpoint and request.endpoint.startswith('dashboard.') %}aria-current="page"{% endif %}>Home</a>
+               title="View your plant dashboard with reminders and stats"
+               {% if request.endpoint and request.endpoint.startswith('dashboard.') %}aria-current="page"{% endif %}>Dashboard</a>
             <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %} bg-amber-500/20 text-amber-300{% endif %}"
                href="{{ url_for('web.ask_ai') }}"
-               {% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %}aria-current="page"{% endif %}>Care Assistant</a>
+               title="Get AI-powered plant care advice"
+               {% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %}aria-current="page"{% endif %}>Assistant</a>
 
             <!-- User Menu Dropdown -->
             <div class="relative">
@@ -167,14 +169,17 @@
           {% else %}
             <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %} bg-amber-500/20 text-amber-300{% endif %}"
                href="{{ url_for('web.ask_ai') }}"
-               {% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %}aria-current="page"{% endif %}>Care Assistant</a>
+               title="Get AI-powered plant care advice"
+               {% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %}aria-current="page"{% endif %}>Assistant</a>
             <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('pricing.') %} bg-amber-500/20 text-amber-300{% endif %}"
                href="{{ url_for('pricing.index') }}"
+               title="View features and pricing plans"
                {% if request.endpoint and request.endpoint.startswith('pricing.') %}aria-current="page"{% endif %}>Features</a>
             <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('auth.login') %} bg-amber-500/20 text-amber-300{% endif %}"
                href="{{ url_for('auth.login') }}"
+               title="Log in to your account"
                {% if request.endpoint and request.endpoint.startswith('auth.login') %}aria-current="page"{% endif %}>Log In</a>
-            <a class="btn btn-primary" href="{{ url_for('auth.signup') }}">Sign Up Free</a>
+            <a class="btn btn-primary" href="{{ url_for('auth.signup') }}" title="Create a free account">Sign Up Free</a>
           {% endif %}
         </nav>
       </div>
@@ -226,19 +231,20 @@
   <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-lg z-40" aria-label="Mobile navigation">
     <div class="flex justify-around items-center h-16">
       {% if is_authenticated %}
-        {# Authenticated users: Home, Care, Account #}
+        {# Authenticated users: Dashboard, Assistant, Account #}
         <a href="{{ url_for('dashboard.index') }}"
            class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-xs font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('dashboard.') %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
-          <span class="text-2xl" aria-hidden="true">🏠</span>
-          <span>Home</span>
+          <span class="text-3xl" aria-hidden="true">🏡</span>
+          <span>Dashboard</span>
         </a>
         <a href="{{ url_for('web.ask_ai') }}"
            class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-xs font-medium transition-colors {% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
-          <img src="{{ url_for('static', filename='images/illustrations/custom-leaf.svg') }}"
-               alt=""
-               aria-hidden="true"
-               class="h-7 w-7 logo-mobile transition-all duration-300" />
-          <span>Care</span>
+          <span class="text-2xl" aria-hidden="true">
+            <img src="{{ url_for('static', filename='images/illustrations/custom-leaf.svg') }}"
+                 alt=""
+                 class="h-7 w-7 inline-block logo-mobile transition-all duration-300" />
+          </span>
+          <span>Assistant</span>
         </a>
         <a href="{{ url_for('dashboard.account') }}"
            class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-xs font-medium transition-colors {% if request.endpoint == 'dashboard.account' %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
@@ -246,14 +252,15 @@
           <span>Account</span>
         </a>
       {% else %}
-        {# Unauthenticated users: Care, Features, Sign Up #}
+        {# Unauthenticated users: Assistant, Features, Sign Up #}
         <a href="{{ url_for('web.ask_ai') }}"
            class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-xs font-medium transition-colors {% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
-          <img src="{{ url_for('static', filename='images/illustrations/custom-leaf.svg') }}"
-               alt=""
-               aria-hidden="true"
-               class="h-7 w-7 logo-mobile transition-all duration-300" />
-          <span>Care</span>
+          <span class="text-2xl" aria-hidden="true">
+            <img src="{{ url_for('static', filename='images/illustrations/custom-leaf.svg') }}"
+                 alt=""
+                 class="h-7 w-7 inline-block logo-mobile transition-all duration-300" />
+          </span>
+          <span>Assistant</span>
         </a>
         <a href="{{ url_for('pricing.index') }}"
            class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-xs font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('pricing.') %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
