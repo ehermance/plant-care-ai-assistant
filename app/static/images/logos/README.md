@@ -34,13 +34,15 @@ This is the official brand name used in all visual assets, product UI, and marke
   - Use in: Website header, documentation
 
 ### Email Banner
-- **email-banner.png** (600x144px)
-  - Optimized for email templates
-  - Shows "PlantCareAI" branding
-  - Rounded corners, transparent background
-  - Compressed for fast loading (~32KB)
+- **email-banner.png** (600x180px)
+  - Optimized for email templates and marketing emails
+  - Shows "PlantCareAI" branding with emerald leaf logo
+  - Includes tagline: "Your plants deserve to thrive. We'll show you how."
+  - Dark navy gradient background matching header banner
+  - Compressed for fast loading (~49KB)
   - **Public URL**: `https://plantcareai.app/static/images/logos/email-banner.png`
-  - Use in: Transactional emails, newsletters, notifications
+  - **Retina version**: `email-banner@2x.png` (1200x360px) for high-DPI displays
+  - Use in: Transactional emails, newsletters, notifications, landing pages
 
 ### OG Preview
 - **og-preview.png** (1200x630px)
@@ -59,9 +61,9 @@ When creating email templates in Supabase, use the public URL:
 ```html
 <img
   src="https://plantcareai.app/static/images/logos/email-banner.png"
-  alt="PlantCareAI - Your plants deserve to thrive"
+  alt="PlantCareAI - Your plants deserve to thrive. We'll show you how."
   width="600"
-  height="149"
+  height="180"
   style="display: block; max-width: 100%; height: auto;"
 />
 ```
@@ -76,14 +78,29 @@ For Resend API (noreply@plantcareai.app):
     <td style="padding: 20px 0;">
       <img
         src="https://plantcareai.app/static/images/logos/email-banner.png"
-        alt="PlantCareAI"
+        alt="PlantCareAI - Your plants deserve to thrive"
         width="600"
-        height="149"
-        style="display: block; width: 100%; height: auto; border-radius: 16px;"
+        height="180"
+        style="display: block; width: 100%; height: auto;"
       />
     </td>
   </tr>
 </table>
+```
+
+### Retina Display Support
+
+For high-DPI displays (optional enhancement):
+
+```html
+<img
+  src="https://plantcareai.app/static/images/logos/email-banner.png"
+  srcset="https://plantcareai.app/static/images/logos/email-banner@2x.png 2x"
+  alt="PlantCareAI"
+  width="600"
+  height="180"
+  style="display: block; max-width: 100%; height: auto;"
+/>
 ```
 
 ### Email Best Practices
@@ -113,22 +130,27 @@ If you need to regenerate these images:
 | File | Dimensions | Size | Format | Use Case |
 |------|-----------|------|--------|----------|
 | header-banner.png | 1356x327 | ~85KB | PNG | Website header |
-| email-banner.png | 600x144 | ~32KB | PNG | Email templates |
-| og-preview.png | 1200x630 | ~68KB | PNG | Social sharing |
+| email-banner.png | 600x180 | ~49KB | PNG | Email templates, landing pages |
+| email-banner@2x.png | 1200x360 | ~163KB | PNG | Retina display emails |
+| og-preview.png | 1200x630 | ~85KB | PNG | Social sharing |
 
 ## Brand Colors
 
 For reference when creating new assets:
 
-- **Primary Teal**: #0f766e
-- **Teal 600**: #0d9488
-- **Teal 700**: #115e59
-- **Sage Green**: #8BA888
-- **Background**: Gradient from #0d9488 to #115e59
+- **Primary Emerald**: #10b981 (Emerald 500)
+- **Emerald 600**: #059669
+- **Lime Green**: #a3e635 (Lime 400)
+- **Gold**: #fbbf24 (Amber 400)
+- **Navy Background**: #2d3561 to #1a1f3a gradient
+- **Dark Navy**: #1e293b to #0f172a gradient (icons/cards)
+
+**Text Gradient**: Emerald (#10b981) → Lime (#a3e635) → Gold (#fbbf24)
 
 ## Notes
 
-- Email banner is optimized for dark mode email clients
-- Transparent background works on any email background color
-- Rounded corners match site design system (16px)
+- Email banner includes tagline for brand messaging
+- Dark navy background works well in light and dark email clients
+- Leaf logo uses outline style with visible veins for detail
 - All text uses web-safe fonts for email compatibility
+- Retina version (2x) available for high-DPI displays

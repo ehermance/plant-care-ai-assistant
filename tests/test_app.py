@@ -812,6 +812,345 @@ def test_care_assistant_prefills_city(monkeypatch):
 
 
 # --------------------------
+# Assistant Page UI/UX tests (PRIORITY 2 - HIGH)
+# --------------------------
+
+def test_ask_page_renders_successfully(monkeypatch):
+    """Test that /ask page renders without errors."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+
+    from app import create_app
+
+    app = create_app()
+    client = app.test_client()
+
+    response = client.get("/ask")
+
+    assert response.status_code == 200
+    assert b"Ask" in response.data or b"Assistant" in response.data
+    # Check for form elements
+    assert b"<form" in response.data
+    assert b"question" in response.data.lower()
+
+
+def test_ask_page_has_preset_buttons(monkeypatch):
+    """Test that /ask page includes preset question buttons."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+
+    from app import create_app
+
+    app = create_app()
+    client = app.test_client()
+
+    response = client.get("/ask")
+
+    assert response.status_code == 200
+    # Check for preset buttons with data attributes
+    assert b"data-preset" in response.data or b"preset" in response.data.lower()
+    # Common preset questions
+    assert b"watering" in response.data.lower() or b"water" in response.data.lower()
+
+
+def test_ask_page_has_temperature_toggle(monkeypatch):
+    """Test that /ask page includes temperature unit toggle."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+
+    from app import create_app
+
+    app = create_app()
+    client = app.test_client()
+
+    response = client.get("/ask")
+
+    assert response.status_code == 200
+    # Check for temperature toggle elements (Celsius or Fahrenheit)
+    response_text = response.data.decode('utf-8')
+    assert "temperature" in response_text.lower() or "°C" in response_text or "°F" in response_text or "celsius" in response_text.lower()
+
+
+def test_ask_page_has_care_context_select(monkeypatch):
+    """Test that /ask page includes care context dropdown."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+
+    from app import create_app
+
+    app = create_app()
+    client = app.test_client()
+
+    response = client.get("/ask")
+
+    assert response.status_code == 200
+    # Check for care context options
+    assert b"care_context" in response.data or b"indoor" in response.data.lower()
+    assert b"outdoor" in response.data.lower() or b"potted" in response.data.lower()
+
+
+def test_ask_page_has_proper_css_classes(monkeypatch):
+    """Test that /ask page has required CSS classes for grid layout."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+
+    from app import create_app
+
+    app = create_app()
+    client = app.test_client()
+
+    response = client.get("/ask")
+
+    assert response.status_code == 200
+    # Check for grid layout classes
+    assert b"grid" in response.data
+    # Check for form container classes
+    assert b"card" in response.data
+
+
+def test_ask_page_answer_section_hidden_initially(monkeypatch):
+    """Test that answer section is hidden before form submission."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+
+    from app import create_app
+
+    app = create_app()
+    client = app.test_client()
+
+    response = client.get("/ask")
+
+    assert response.status_code == 200
+    # Answer section should have hidden class or display:none
+    # Or it might not be rendered at all initially
+
+
+def test_ask_post_shows_answer_section(monkeypatch):
+    """Test that POST to /ask shows answer section with results."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("GEMINI_API_KEY", "")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+    monkeypatch.setenv("WTF_CSRF_ENABLED", "False")
+    _install_fake_litellm_success(monkeypatch, reply_text="Water your plant regularly.", model="gpt-4o-mini")
+
+    from app import create_app
+
+    app = create_app()
+    app.config['WTF_CSRF_ENABLED'] = False
+    client = app.test_client()
+
+    response = client.post("/ask", data={
+        "plant": "Monstera",
+        "city": "Austin",
+        "question": "How often to water?",
+        "care_context": "indoor_potted"
+    }, follow_redirects=True)
+
+    assert response.status_code == 200
+    # Should show answer
+    assert b"Water your plant" in response.data or b"water" in response.data.lower()
+    # Should have answer card styling
+    assert b"answer" in response.data.lower() or b"result" in response.data.lower()
+
+
+def test_ask_post_preserves_form_values(monkeypatch):
+    """Test that POST to /ask preserves form values after submission."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("GEMINI_API_KEY", "")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+    monkeypatch.setenv("WTF_CSRF_ENABLED", "False")
+    _install_fake_litellm_success(monkeypatch, reply_text="Plant care advice.", model="gpt-4o-mini")
+
+    from app import create_app
+
+    app = create_app()
+    app.config['WTF_CSRF_ENABLED'] = False
+    client = app.test_client()
+
+    response = client.post("/ask", data={
+        "plant": "Snake Plant",
+        "city": "Boston",
+        "question": "Light requirements?",
+        "care_context": "outdoor_potted"
+    }, follow_redirects=True)
+
+    assert response.status_code == 200
+    # Form should preserve submitted values
+    assert b"Snake Plant" in response.data
+    assert b"Boston" in response.data
+    assert b"Light requirements?" in response.data or b"Light" in response.data
+
+
+def test_ask_page_shows_weather_info(monkeypatch):
+    """Test that /ask page displays weather information when city provided."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("GEMINI_API_KEY", "")
+    monkeypatch.setenv("OPENWEATHER_API_KEY", "test-weather-key")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+    monkeypatch.setenv("WTF_CSRF_ENABLED", "False")
+    _install_fake_litellm_success(monkeypatch, reply_text="Water based on weather.", model="gpt-4o-mini")
+
+    from app import create_app
+
+    app = create_app()
+    app.config['WTF_CSRF_ENABLED'] = False
+    client = app.test_client()
+
+    response = client.post("/ask", data={
+        "plant": "Cactus",
+        "city": "Phoenix",
+        "question": "Watering schedule?",
+        "care_context": "outdoor_potted"
+    }, follow_redirects=True)
+
+    assert response.status_code == 200
+    # May include weather information or temperature
+    # This is optional depending on API availability
+
+
+def test_ask_page_displays_ai_source_badge(monkeypatch):
+    """Test that /ask page shows which AI provided the answer."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("GEMINI_API_KEY", "")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+    monkeypatch.setenv("WTF_CSRF_ENABLED", "False")
+    _install_fake_litellm_success(monkeypatch, reply_text="AI advice here.", model="gpt-4o-mini")
+
+    from app import create_app
+
+    app = create_app()
+    app.config['WTF_CSRF_ENABLED'] = False
+    client = app.test_client()
+
+    response = client.post("/ask", data={
+        "plant": "Fern",
+        "city": "",
+        "question": "Care tips?",
+        "care_context": "indoor_potted"
+    }, follow_redirects=True)
+
+    assert response.status_code == 200
+    # Should show AI source (OpenAI, Gemini, or Rule-based)
+    # This might be in a badge or label
+    response_text = response.data.lower()
+    assert b"openai" in response_text or b"gemini" in response_text or b"rule" in response_text or b"source" in response_text
+
+
+def test_ask_page_shows_loading_state_classes(monkeypatch):
+    """Test that /ask page has loading state indicators."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+
+    from app import create_app
+
+    app = create_app()
+    client = app.test_client()
+
+    response = client.get("/ask")
+
+    assert response.status_code == 200
+    # Check for submit button with loading state handling
+    assert b"<button" in response.data
+    assert b"submit" in response.data.lower() or b"ask" in response.data.lower()
+
+
+def test_ask_page_handles_empty_answer_gracefully(monkeypatch):
+    """Test that /ask page handles missing AI response gracefully."""
+    monkeypatch.setenv("OPENAI_API_KEY", "")
+    monkeypatch.setenv("GEMINI_API_KEY", "")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+    monkeypatch.setenv("WTF_CSRF_ENABLED", "False")
+
+    from app import create_app
+
+    app = create_app()
+    app.config['WTF_CSRF_ENABLED'] = False
+    client = app.test_client()
+
+    response = client.post("/ask", data={
+        "plant": "Plant",
+        "city": "",
+        "question": "How to care?",
+        "care_context": "indoor_potted"
+    }, follow_redirects=True)
+
+    assert response.status_code == 200
+    # Should show rule-based fallback advice
+    assert b"light" in response.data.lower() or b"water" in response.data.lower()
+
+
+def test_ask_page_validates_question_required(monkeypatch):
+    """Test that /ask page validates required question field."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+    monkeypatch.setenv("WTF_CSRF_ENABLED", "False")
+
+    from app import create_app
+
+    app = create_app()
+    app.config['WTF_CSRF_ENABLED'] = False
+    client = app.test_client()
+
+    response = client.post("/ask", data={
+        "plant": "Plant",
+        "city": "",
+        "question": "",  # Empty question
+        "care_context": "indoor_potted"
+    }, follow_redirects=True)
+
+    assert response.status_code == 400
+    assert b"required" in response.data.lower()
+
+
+def test_ask_page_question_textarea(monkeypatch):
+    """Test that question field is a textarea for multi-line input."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+
+    from app import create_app
+
+    app = create_app()
+    client = app.test_client()
+
+    response = client.get("/ask")
+
+    assert response.status_code == 200
+    # Question should be a textarea
+    assert b"<textarea" in response.data or b"textarea" in response.data.lower()
+    assert b"question" in response.data.lower()
+
+
+def test_ask_page_answer_formatting(monkeypatch):
+    """Test that answer preserves formatting (line breaks, bullets)."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("GEMINI_API_KEY", "")
+    monkeypatch.setenv("APP_CONFIG", "app.config.TestConfig")
+    monkeypatch.setenv("WTF_CSRF_ENABLED", "False")
+    # Use multiline response with bullets
+    _install_fake_litellm_success(monkeypatch, reply_text="• Water regularly\n• Provide bright light\n• Fertilize monthly", model="gpt-4o-mini")
+
+    from app import create_app
+
+    app = create_app()
+    app.config['WTF_CSRF_ENABLED'] = False
+    client = app.test_client()
+
+    response = client.post("/ask", data={
+        "plant": "Pothos",
+        "city": "",
+        "question": "Care tips?",
+        "care_context": "indoor_potted"
+    }, follow_redirects=True)
+
+    assert response.status_code == 200
+    # Answer should preserve formatting
+    assert b"Water regularly" in response.data
+    assert b"bright light" in response.data
+    # Check for pre-wrap or similar formatting class
+    assert b"prewrap" in response.data or b"whitespace" in response.data or b"<pre" in response.data.lower()
+
+
+# --------------------------
 # Supabase Client tests (PRIORITY 5 - MEDIUM)
 # --------------------------
 

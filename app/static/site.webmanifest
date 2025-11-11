@@ -10,7 +10,7 @@
     { "src":"images/icons/maskable-icon-512x512.png", "sizes":"512x512", "type":"image/png", "purpose":"any maskable" },
     { "src":"images/icons/favicon.svg", "sizes": "any", "type":"image/svg+xml" }
   ],
-  "theme_color": "#0f766e",
-  "background_color": "#F8F9F6",
+  "theme_color": "#059669",
+  "background_color": "#0f172a",
   "display": "standalone"
 }
