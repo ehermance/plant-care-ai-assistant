@@ -106,8 +106,8 @@
 
   <!-- Site Header -->
   <header class="relative cosmic-header border-b border-purple-700/30 sticky top-0 z-40 shadow-lg shadow-purple-900/50 overflow-visible backdrop-blur-sm" role="banner">
-    <div class="container mx-auto px-4 py-4 overflow-visible">
-      <div class="flex items-center justify-between gap-4 overflow-visible">
+    <div class="container mx-auto px-1 py-7 overflow-visible">
+      <div class="flex items-center justify-between gap-1 overflow-visible">
         <!-- Logo & Branding -->
         <div class="flex items-start gap-1 min-w-1">
           <a href="{{ url_for('web.index') }}" aria-label="PlantCareAI Home Logo" class="flex-shrink-0 hover:bg-purple-900/40 rounded-lg p-0.5 transition-all duration-200 group">
@@ -128,7 +128,7 @@
         </div>
 
         <!-- Desktop Navigation -->
-        <nav class="hidden md:flex items-center gap-4 overflow-visible" aria-label="Main navigation">
+        <nav class="hidden md:flex items-center gap-3 overflow-visible" aria-label="Main navigation">
           {% if is_authenticated %}
             <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('dashboard.') %} bg-amber-500/20 text-amber-300{% endif %}"
                href="{{ url_for('dashboard.index') }}"
@@ -175,11 +175,11 @@
                href="{{ url_for('pricing.index') }}"
                title="View features and pricing plans"
                {% if request.endpoint and request.endpoint.startswith('pricing.') %}aria-current="page"{% endif %}>Features</a>
-            <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('auth.login') %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors whitespace-nowrap{% if request.endpoint and request.endpoint.startswith('auth.login') %} bg-amber-500/20 text-amber-300{% endif %}"
                href="{{ url_for('auth.login') }}"
                title="Log in to your account"
                {% if request.endpoint and request.endpoint.startswith('auth.login') %}aria-current="page"{% endif %}>Log In</a>
-            <a class="btn btn-primary" href="{{ url_for('auth.signup') }}" title="Create a free account">Sign Up Free</a>
+            <a class="btn btn-primary whitespace-nowrap" href="{{ url_for('auth.signup') }}" title="Create a free account">Sign Up Free</a>
           {% endif %}
         </nav>
       </div>
@@ -239,7 +239,7 @@
         </a>
         <a href="{{ url_for('web.ask_ai') }}"
            class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-xs font-medium transition-colors {% if request.endpoint == 'web.ask_ai' or request.endpoint == 'web.ask' %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
-          <span class="text-2xl" aria-hidden="true">
+          <span class="text-2xl dark:filter drop-shadow-[0_0_1px_rgba(0,120,84,1)] dark:drop-shadow-[0_0_1px_rgba(5,150,105,1)]" aria-hidden="true">
             <img src="{{ url_for('static', filename='images/illustrations/custom-leaf.svg') }}"
                  alt=""
                  class="h-7 w-7 inline-block logo-mobile transition-all duration-300" />
@@ -248,7 +248,7 @@
         </a>
         <a href="{{ url_for('dashboard.account') }}"
            class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-xs font-medium transition-colors {% if request.endpoint == 'dashboard.account' %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
-          <span class="text-2xl" aria-hidden="true">👤</span>
+          <span class="text-2xl dark:filter dark:drop-shadow-[0_0_1px_rgba(255,255,255,1)]" aria-hidden="true">👤</span>
           <span>Account</span>
         </a>
       {% else %}
