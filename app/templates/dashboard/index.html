@@ -52,7 +52,7 @@
   <h3 id="actions-title" class="section-title">Quick Actions</h3>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-    <a href="/plants/add" class="btn btn-primary">
+    <a href="{{ url_for('plants.add') }}" class="btn btn-primary">
       <span aria-hidden="true">🪴</span> Add Plant
     </a>
     <a href="{{ url_for('reminders.create') }}" class="btn btn-primary">
@@ -61,7 +61,7 @@
     <a href="{{ url_for('web.ask_ai') }}" class="btn btn-secondary">
       <span aria-hidden="true">🤖</span> Care Assistant
     </a>
-    <a href="/plants" class="btn btn-secondary">
+    <a href="{{ url_for('plants.index') }}" class="btn btn-secondary">
       <span aria-hidden="true">🌿</span> View All Plants
     </a>
   </div>
@@ -72,11 +72,26 @@
 <section class="card mb-8" aria-labelledby="plants-title">
   <div class="flex items-center justify-between mb-4">
     <h3 id="plants-title" class="section-title !mb-0">My Plants</h3>
-    <a href="/plants" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+    <a href="{{ url_for('plants.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
       View all →
     </a>
   </div>
-  <p class="text-slate-500 dark:text-slate-400">Your plants will appear here once you add them.</p>
+  
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 place-items-center">
+    {% for plant in plants %}
+    <a href="{{ url_for('plants.view', plant_id=plant.id) }}" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
+      {{ plant.name }}{% if plant.nickname %} "{{ plant.nickname }}"{% endif %}
+    </a>
+    {% endfor %}
+  </div>
+
+  {% if plant_count > 4 %}
+  <div class="text-center text-sm text-slate-500 dark:text-slate-400 mt-4">
+    <a href="{{ url_for('plants.index') }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+      + {{ plant_count - 4 }} more plants
+    </a>
+  </div>
+  {% endif %}
 </section>
 {% else %}
 <section class="empty-state mb-8" aria-labelledby="empty-title">
@@ -90,7 +105,7 @@
   <p class="text-slate-600 dark:text-slate-400 mb-6 max-w-md">
     Add your first plant to get personalized care reminders and track its growth.
   </p>
-  <a href="/plants/add" class="btn btn-primary">
+  <a href="{{ url_for('plants.add') }}" class="btn btn-primary">
     <span aria-hidden="true">🌱</span> Add Your First Plant
   </a>
 </section>
