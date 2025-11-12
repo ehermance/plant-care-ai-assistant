@@ -7,6 +7,33 @@
   'use strict';
 
   document.addEventListener('DOMContentLoaded', function() {
+    
+    function updateGreeting() {
+        // Get the current local hour using the client's system clock
+        const now = new Date();
+        const hour = now.getHours(); // getHours() returns 0-23
+        let greetingMessage;
+
+        // Determine the appropriate greeting based on the hour
+        if (hour < 12) {
+            greetingMessage = "Good morning";
+        } else if (hour < 18) {
+            greetingMessage = "Good afternoon";
+        } else {
+            greetingMessage = "Good evening";
+        }
+
+        const greetingElement = document.getElementById('greeting-display'); 
+        if (greetingElement) {
+            greetingElement.textContent = greetingMessage + "!";
+        } else {
+            console.error("Error: Could not find element with ID 'greeting-display'.");
+        }
+    }
+
+    // Call the greeting function immediately when the DOM is ready
+    updateGreeting();
+
     // Get CSRF token securely from data attribute
     const csrfTokenEl = document.getElementById('csrf-token');
     if (!csrfTokenEl) return; // No CSRF token, no reminders to complete

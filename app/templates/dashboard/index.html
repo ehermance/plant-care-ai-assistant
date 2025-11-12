@@ -6,8 +6,7 @@
 <!-- Welcome Section -->
 <section class="mb-8">
   <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-    {% set hour = now().hour %}
-    {% if hour < 12 %}Good morning{% elif hour < 18 %}Good afternoon{% else %}Good evening{% endif %}!
+    <span id="greeting-display">Welcome!</span>
     <span class="inline-block animate-float" aria-hidden="true">🌱</span>
   </h2>
   <p class="text-lg text-slate-600 dark:text-slate-400">
