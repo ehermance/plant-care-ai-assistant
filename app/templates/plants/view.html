@@ -82,9 +82,90 @@
   </div>
 </div>
 
+<!-- Care Statistics -->
+{% if stats and stats.total_actions > 0 %}
+<div class="card mb-8">
+  <h2 class="section-title">Care Statistics</h2>
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+    <div class="text-center p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+      <div class="text-3xl mb-2">💧</div>
+      <div class="text-2xl font-bold text-slate-900 dark:text-slate-100">{{ stats.watering_count }}</div>
+      <div class="text-xs text-slate-600 dark:text-slate-400">Waterings</div>
+    </div>
+    <div class="text-center p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+      <div class="text-3xl mb-2">🌿</div>
+      <div class="text-2xl font-bold text-slate-900 dark:text-slate-100">{{ stats.fertilizing_count }}</div>
+      <div class="text-xs text-slate-600 dark:text-slate-400">Fertilizations</div>
+    </div>
+    <div class="text-center p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+      <div class="text-3xl mb-2">🪴</div>
+      <div class="text-2xl font-bold text-slate-900 dark:text-slate-100">{{ stats.repotting_count }}</div>
+      <div class="text-xs text-slate-600 dark:text-slate-400">Repottings</div>
+    </div>
+    <div class="text-center p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+      <div class="text-3xl mb-2">✂️</div>
+      <div class="text-2xl font-bold text-slate-900 dark:text-slate-100">{{ stats.pruning_count }}</div>
+      <div class="text-xs text-slate-600 dark:text-slate-400">Prunings</div>
+    </div>
+    <div class="text-center p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+      <div class="text-3xl mb-2">📝</div>
+      <div class="text-2xl font-bold text-slate-900 dark:text-slate-100">{{ stats.total_actions }}</div>
+      <div class="text-xs text-slate-600 dark:text-slate-400">Total Entries</div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Recent Care History -->
+<div class="card mb-8">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="section-title !mb-0">Recent Care History</h2>
+    <a href="{{ url_for('journal.view_plant_journal', plant_id=plant.id) }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+      View all →
+    </a>
+  </div>
+
+  {% if recent_actions %}
+    <div class="space-y-3 mb-6">
+      {% for action in recent_actions %}
+      <div class="flex items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+        <div class="text-2xl flex-shrink-0">
+          {{ action_type_emojis.get(action.action_type, '📝') }}
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="font-semibold text-slate-900 dark:text-slate-100">
+              {{ action_type_names.get(action.action_type, action.action_type) }}
+            </span>
+            {% if action.amount_ml %}
+              <span class="text-sm text-slate-600 dark:text-slate-400">({{ action.amount_ml }} ml)</span>
+            {% endif %}
+          </div>
+          {% if action.notes %}
+            <p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-1">{{ action.notes }}</p>
+          {% endif %}
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            {{ action.action_at[:10] if action.action_at else 'Unknown date' }}
+          </p>
+        </div>
+        {% if action.photo_url %}
+          <img src="{{ action.photo_url }}" alt="Care photo" class="w-16 h-16 object-cover rounded-lg flex-shrink-0">
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-slate-500 dark:text-slate-400 mb-6">No care history yet. Start logging care activities to track your plant's health!</p>
+  {% endif %}
+
+  <a href="{{ url_for('journal.add_entry', plant_id=plant.id) }}" class="btn btn-primary">
+    <span aria-hidden="true">📝</span> Log Care Activity
+  </a>
+</div>
+
 <!-- Action Buttons -->
 <div class="flex flex-wrap gap-3">
-  <a href="{{ url_for('plants.edit', plant_id=plant.id) }}" class="btn btn-primary">
+  <a href="{{ url_for('plants.edit', plant_id=plant.id) }}" class="btn btn-secondary">
     <span aria-hidden="true">✏️</span> Edit Plant
   </a>
   <a href="{{ url_for('plants.index') }}" class="btn btn-secondary">

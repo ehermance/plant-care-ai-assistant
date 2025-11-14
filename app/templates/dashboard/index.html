@@ -47,6 +47,89 @@
   </a>
 </div>
 
+<!-- Today's Focus -->
+{% if due_reminders %}
+<section class="card mb-8 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/10 dark:to-cyan-900/10 border-2 border-emerald-200 dark:border-emerald-700" aria-labelledby="focus-title">
+  <div class="flex items-center gap-3 mb-6">
+    <div class="text-4xl" aria-hidden="true">🎯</div>
+    <div>
+      <h3 id="focus-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">Today's Focus</h3>
+      <p class="text-sm text-slate-600 dark:text-slate-400">Your top priorities for today</p>
+    </div>
+  </div>
+
+  <div class="space-y-3" id="todays-focus-list">
+    {% for reminder in due_reminders[:3] %}
+    <div class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:shadow-md hover:border-emerald-400 dark:hover:border-emerald-500" data-reminder-id="{{ reminder.id }}">
+      <div class="text-3xl flex-shrink-0">
+        {% if reminder.reminder_type == 'watering' %}💧
+        {% elif reminder.reminder_type == 'fertilizing' %}🌿
+        {% elif reminder.reminder_type == 'misting' %}💦
+        {% elif reminder.reminder_type == 'pruning' %}✂️
+        {% elif reminder.reminder_type == 'repotting' %}🪴
+        {% elif reminder.reminder_type == 'inspection' %}🔍
+        {% else %}📝{% endif %}
+      </div>
+
+      <div class="flex-1 min-w-0">
+        <h4 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+          {{ reminder.title }}
+        </h4>
+        <p class="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2 flex-wrap mb-2">
+          <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
+            {{ reminder.plant_name }}{% if reminder.plant_nickname %} "{{ reminder.plant_nickname }}"{% endif %}
+          </a>
+          {% if reminder.weather_adjustment_reason %}
+          <span class="badge-cyan text-xs" title="{{ reminder.weather_adjustment_reason }}">
+            <span aria-hidden="true">🌤️</span> Weather adjusted
+          </span>
+          {% endif %}
+        </p>
+        {% if reminder.notes %}
+        <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">{{ reminder.notes }}</p>
+        {% endif %}
+      </div>
+
+      <button
+        class="btn btn-primary flex-shrink-0 w-full sm:w-auto quick-complete-btn"
+        data-reminder-id="{{ reminder.id }}"
+        data-reminder-title="{{ reminder.title }}"
+        title="Mark complete"
+      >
+        <span aria-hidden="true">✓</span> Complete
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if reminder_stats.due_today > 3 %}
+  <div class="text-center text-sm text-slate-600 dark:text-slate-400 mt-4 pt-4 border-t border-emerald-200 dark:border-emerald-700">
+    <a href="{{ url_for('reminders.index') }}" class="font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+      + {{ reminder_stats.due_today - 3 }} more tasks due today →
+    </a>
+  </div>
+  {% endif %}
+</section>
+{% elif plant_count > 0 %}
+<section class="card mb-8 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/10 dark:to-cyan-900/10 border-2 border-emerald-200 dark:border-emerald-700" aria-labelledby="focus-title">
+  <div class="flex items-center gap-3 mb-4">
+    <div class="text-4xl" aria-hidden="true">✨</div>
+    <div>
+      <h3 id="focus-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">All Clear!</h3>
+      <p class="text-sm text-slate-600 dark:text-slate-400">No tasks due today. Great job staying on top of your plant care!</p>
+    </div>
+  </div>
+  <div class="flex gap-3 flex-wrap">
+    <a href="{{ url_for('web.ask_ai') }}" class="btn btn-secondary">
+      <span aria-hidden="true">🤖</span> Ask Care Assistant
+    </a>
+    <a href="{{ url_for('plants.index') }}" class="btn btn-secondary">
+      <span aria-hidden="true">🌿</span> Check Your Plants
+    </a>
+  </div>
+</section>
+{% endif %}
+
 <!-- Quick Actions -->
 <section class="card mb-8" aria-labelledby="actions-title">
   <h3 id="actions-title" class="section-title">Quick Actions</h3>

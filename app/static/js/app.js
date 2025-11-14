@@ -25,6 +25,39 @@
   const gridTwo = document.querySelector('.grid-two');
   const answerCard = document.querySelector('.answer-card');
 
+  // --- User Plants Selection (Plant-Aware AI) ---
+  const userPlantsGrid = document.getElementById('user-plants-grid');
+  if (userPlantsGrid) {
+    userPlantsGrid.addEventListener('click', (e) => {
+      const btn = e.target.closest('.plant-select-btn');
+      if (!btn) return;
+
+      const { plantName, plantSpecies, plantLocation } = btn.dataset;
+
+      // Fill form with plant data
+      if (plantInput && plantName) {
+        // Use species if available, otherwise just name
+        plantInput.value = plantSpecies && plantSpecies.trim() !== ''
+          ? `${plantName} (${plantSpecies})`
+          : plantName;
+      }
+
+      // Set location context
+      if (contextSelect && plantLocation) {
+        contextSelect.value = plantLocation;
+      }
+
+      // Visual feedback - highlight selected plant
+      document.querySelectorAll('.plant-select-btn').forEach(btn => {
+        btn.classList.remove('!border-emerald-500', '!dark:border-emerald-400', '!bg-emerald-50', '!dark:bg-emerald-900/20');
+      });
+      btn.classList.add('!border-emerald-500', '!dark:border-emerald-400', '!bg-emerald-50', '!dark:bg-emerald-900/20');
+
+      // Focus question input for quick typing
+      if (questionInput) questionInput.focus();
+    });
+  }
+
   // --- Presets ---
   if (presets) {
     presets.addEventListener('click', (e) => {
@@ -37,6 +70,13 @@
       if (typeof city === 'string' && city.trim() !== '') cityInput.value = city;
       if (typeof question === 'string') questionInput.value = question;
       if (typeof context === 'string') contextSelect.value = context;
+
+      // Clear plant selection highlight when using presets
+      if (userPlantsGrid) {
+        document.querySelectorAll('.plant-select-btn').forEach(btn => {
+          btn.classList.remove('!border-emerald-500', '!dark:border-emerald-400', '!bg-emerald-50', '!dark:bg-emerald-900/20');
+        });
+      }
 
       // Focus submit button after preset selection
       if (submitBtn) submitBtn.focus();
@@ -51,6 +91,13 @@
       if (cityInput) cityInput.value = '';
       if (questionInput) questionInput.value = '';
       if (contextSelect) contextSelect.value = 'indoor_potted';
+
+      // Clear plant selection highlight
+      if (userPlantsGrid) {
+        document.querySelectorAll('.plant-select-btn').forEach(btn => {
+          btn.classList.remove('!border-emerald-500', '!dark:border-emerald-400', '!bg-emerald-50', '!dark:bg-emerald-900/20');
+        });
+      }
 
       // Put focus in the first field for quick typing
       plantInput?.focus();

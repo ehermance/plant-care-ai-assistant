@@ -13,6 +13,7 @@ from flask import Blueprint, render_template, flash, redirect, url_for, request,
 from werkzeug.utils import secure_filename
 from app.utils.auth import require_auth, get_current_user_id
 from app.services import supabase_client
+from app.services import analytics
 from PIL import Image
 from io import BytesIO
 import os
@@ -141,6 +142,12 @@ def add():
 
         plant = supabase_client.create_plant(user_id, plant_data)
         if plant:
+            # Track analytics event
+            analytics.track_event(
+                user_id,
+                analytics.EVENT_PLANT_ADDED,
+                {"plant_id": plant["id"], "plant_name": name}
+            )
             flash(f"🌱 {name} added successfully!", "success")
             return redirect(url_for("plants.view", plant_id=plant["id"]))
         else:
@@ -152,7 +159,7 @@ def add():
 @plants_bp.route("/<plant_id>")
 @require_auth
 def view(plant_id):
-    """View a single plant's details."""
+    """View a single plant's details with journal entries."""
     user_id = get_current_user_id()
     if not user_id:
         flash("Please log in to view plants.", "error")
@@ -163,7 +170,19 @@ def view(plant_id):
         flash("Plant not found.", "error")
         return redirect(url_for("plants.index"))
 
-    return render_template("plants/view.html", plant=plant)
+    # Get journal data
+    from app.services import journal as journal_service
+    recent_actions = journal_service.get_plant_actions(plant_id, user_id, limit=5)
+    stats = journal_service.get_action_stats(plant_id, user_id)
+
+    return render_template(
+        "plants/view.html",
+        plant=plant,
+        recent_actions=recent_actions,
+        stats=stats,
+        action_type_names=journal_service.ACTION_TYPE_NAMES,
+        action_type_emojis=journal_service.ACTION_TYPE_EMOJIS,
+    )
 
 
 @plants_bp.route("/<plant_id>/edit", methods=["GET", "POST"])

@@ -84,10 +84,15 @@
             }
 
             function handlePostRemoval() {
-              // Check if list is empty
+              // Check if Today's Focus or Reminders list is empty
+              const focusList = document.getElementById('todays-focus-list');
               const remindersList = document.getElementById('dashboard-reminders-list');
-              if (remindersList && remindersList.children.length === 0) {
-                // Reload page to update stats and show empty state
+
+              const focusEmpty = focusList && focusList.children.length === 0;
+              const remindersEmpty = remindersList && remindersList.children.length === 0;
+
+              // Reload page if either list becomes empty to show proper empty state
+              if (focusEmpty || remindersEmpty) {
                 window.location.reload();
               } else {
                 // Show success message

@@ -11,6 +11,7 @@ from datetime import datetime
 from ..extensions import limiter
 from ..services.ai import generate_advice, AI_LAST_ERROR
 from ..services.moderation import run_moderation
+from ..services import analytics
 from ..utils.validation import validate_inputs, display_sanitize_short
 
 # Optional forecast import (kept safe for environments/tests without it)
@@ -142,18 +143,22 @@ def ask_ai():
     Render the Ask AI page on GET. The template uses these variables to decide
     what to show; passing explicit None keeps Jinja conditional logic simple.
 
-    If user is authenticated, pre-fill city from their profile.
+    If user is authenticated, pre-fill city from their profile and show user plants.
     """
     from ..utils.auth import get_current_user_id
-    from ..services.supabase_client import get_user_profile
+    from ..services.supabase_client import get_user_profile, get_user_plants
 
     # Get user profile to pre-fill city if authenticated
     default_city = None
+    user_plants = []
     user_id = get_current_user_id()
     if user_id:
         profile = get_user_profile(user_id)
         if profile:
             default_city = profile.get("city")
+
+        # Get user's plants for plant-aware AI
+        user_plants = get_user_plants(user_id)
 
     today_str = datetime.now().strftime("%Y-%m-%d")
     return render_template(
@@ -168,6 +173,7 @@ def ask_ai():
         source=None,
         ai_error=None,
         today_str=today_str,
+        user_plants=user_plants,
     )
 
 # Read rate string from config at request time (supports env/config changes)
@@ -187,6 +193,15 @@ def ask():
     - Store a compact history item
     - Re-render the page with the answer and context
     """
+    from ..utils.auth import get_current_user_id
+    from ..services.supabase_client import get_user_plants
+
+    # Get user plants for plant-aware context
+    user_plants = []
+    user_id = get_current_user_id()
+    if user_id:
+        user_plants = get_user_plants(user_id)
+
     payload, err_msg = validate_inputs(request.form)
 
     if err_msg:
@@ -208,6 +223,7 @@ def ask():
             source="rule",
             ai_error=None,
             today_str=today_str,
+            user_plants=user_plants,
         ), 400
 
     plant = payload["plant"]
@@ -230,6 +246,7 @@ def ask():
             source="rule",
             ai_error=None,
             today_str=today_str,
+            user_plants=user_plants,
         ), 400
 
     # Advice engine returns (answer, weather, source)
@@ -277,6 +294,18 @@ def ask():
         "source": source,
     })
 
+    # Track analytics event
+    if user_id:
+        analytics.track_event(
+            user_id,
+            analytics.EVENT_AI_QUESTION_ASKED,
+            {
+                "plant": plant,
+                "care_context": care_context,
+                "source": source
+            }
+        )
+
     today_str = datetime.now().strftime("%Y-%m-%d")
     return render_template(
         "index.html",
@@ -290,4 +319,5 @@ def ask():
         source=source,
         ai_error=AI_LAST_ERROR,
         today_str=today_str,
+        user_plants=user_plants,
     )

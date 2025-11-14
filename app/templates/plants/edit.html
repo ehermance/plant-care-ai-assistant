@@ -77,17 +77,16 @@
       <!-- Location -->
       <div>
         <label for="location" class="label">
-          Location
+          Where is the plant?
         </label>
-        <input
-          type="text"
-          id="location"
-          name="location"
-          class="input"
-          value="{{ plant.location or '' }}"
-          placeholder="e.g., Living room window"
-          maxlength="50"
-        />
+        <select id="location" name="location" class="input">
+          <option value="">Select location</option>
+          <option value="indoor_potted" {% if plant.location == 'indoor_potted' %}selected{% endif %}>Indoor (potted)</option>
+          <option value="outdoor_potted" {% if plant.location == 'outdoor_potted' %}selected{% endif %}>Outdoor (potted)</option>
+          <option value="outdoor_bed" {% if plant.location == 'outdoor_bed' %}selected{% endif %}>Outdoor (in-ground bed)</option>
+          <option value="greenhouse" {% if plant.location == 'greenhouse' %}selected{% endif %}>Greenhouse</option>
+          <option value="office" {% if plant.location == 'office' %}selected{% endif %}>Office</option>
+        </select>
       </div>
 
       <!-- Light Conditions -->
@@ -97,9 +96,10 @@
         </label>
         <select id="light" name="light" class="input">
           <option value="">Select light level</option>
-          <option value="Low" {% if plant.light == 'Low' %}selected{% endif %}>Low (Indirect light)</option>
-          <option value="Medium" {% if plant.light == 'Medium' %}selected{% endif %}>Medium (Bright indirect)</option>
-          <option value="High" {% if plant.light == 'High' %}selected{% endif %}>High (Direct sunlight)</option>
+          <option value="low" {% if plant.light == 'low' %}selected{% endif %}>Low light (north-facing, no direct sun)</option>
+          <option value="medium" {% if plant.light == 'medium' %}selected{% endif %}>Medium light (east/west-facing, some direct sun)</option>
+          <option value="bright" {% if plant.light == 'bright' %}selected{% endif %}>Bright indirect light</option>
+          <option value="direct" {% if plant.light == 'direct' %}selected{% endif %}>Direct sunlight (south-facing)</option>
         </select>
       </div>
     </div>

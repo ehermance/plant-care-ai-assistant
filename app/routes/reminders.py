@@ -8,6 +8,7 @@ from __future__ import annotations
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from app.utils.auth import require_auth, get_current_user_id
 from app.services import reminders as reminder_service
+from app.services import analytics
 from app.services.supabase_client import get_user_profile
 
 reminders_bp = Blueprint("reminders", __name__, url_prefix="/reminders")
@@ -123,6 +124,17 @@ def create():
             flash(f"Error creating reminder: {error}", "error")
             return redirect(url_for("reminders.create"))
 
+        # Track analytics event
+        analytics.track_event(
+            user_id,
+            analytics.EVENT_REMINDER_CREATED,
+            {
+                "reminder_id": reminder["id"],
+                "reminder_type": reminder_type,
+                "frequency": frequency
+            }
+        )
+
         flash(f"Reminder created: {title}", "success")
         return redirect(url_for("reminders.index"))
 
@@ -236,6 +248,13 @@ def complete(reminder_id):
         flash(f"Error completing reminder: {error}", "error")
         return redirect(request.referrer or url_for("reminders.index"))
 
+    # Track analytics event
+    analytics.track_event(
+        user_id,
+        analytics.EVENT_REMINDER_COMPLETED,
+        {"reminder_id": reminder_id}
+    )
+
     flash("Reminder marked complete! Next reminder scheduled.", "success")
     return redirect(request.referrer or url_for("reminders.index"))
 
@@ -290,6 +309,13 @@ def snooze(reminder_id):
     if not success:
         flash(f"Error snoozing reminder: {error}", "error")
         return redirect(request.referrer or url_for("reminders.index"))
+
+    # Track analytics event
+    analytics.track_event(
+        user_id,
+        analytics.EVENT_REMINDER_SNOOZED,
+        {"reminder_id": reminder_id, "snooze_days": days}
+    )
 
     flash(f"Reminder snoozed for {days} day(s).", "success")
     return redirect(request.referrer or url_for("reminders.index"))

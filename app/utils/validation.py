@@ -22,7 +22,13 @@ MAX_CITY_LEN = 80
 MAX_QUESTION_LEN = 1200
 
 # Allowed values for the care-context select. Anything else is coerced to the default.
-CARE_CONTEXT_CHOICES = {"indoor_potted", "outdoor_potted", "outdoor_bed"}
+# Import from constants to ensure consistency across the app
+try:
+    from app.constants import PLANT_LOCATIONS
+    CARE_CONTEXT_CHOICES = {loc[0] for loc in PLANT_LOCATIONS}
+except ImportError:
+    # Fallback for tests or if constants module doesn't exist
+    CARE_CONTEXT_CHOICES = {"indoor_potted", "outdoor_potted", "outdoor_bed", "greenhouse", "office"}
 
 
 def _soft_sanitize(text: str, max_len: int) -> str:
