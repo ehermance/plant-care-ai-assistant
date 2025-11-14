@@ -12,7 +12,7 @@ Tracks user behavior events for product metrics:
 
 from typing import Dict, Any, Optional, Tuple
 from datetime import datetime, date, timedelta
-from app.services.supabase_client import get_supabase
+from app.services.supabase_client import get_admin_client
 
 
 # Event type constants
@@ -48,7 +48,7 @@ def track_event(
         event_data = {}
 
     try:
-        supabase = get_supabase()
+        supabase = get_admin_client()
 
         # Call database function to track event
         result = supabase.rpc(
@@ -90,7 +90,7 @@ def get_activation_rate(
         end_date = date.today()
 
     try:
-        supabase = get_supabase()
+        supabase = get_admin_client()
 
         result = supabase.rpc(
             "get_activation_rate",
@@ -124,7 +124,7 @@ def get_weekly_active_users(end_date: Optional[date] = None) -> Tuple[Optional[i
         end_date = date.today()
 
     try:
-        supabase = get_supabase()
+        supabase = get_admin_client()
 
         result = supabase.rpc(
             "get_weekly_active_users", {"p_end_date": end_date.isoformat()}
@@ -154,7 +154,7 @@ def get_monthly_active_users(end_date: Optional[date] = None) -> Tuple[Optional[
         end_date = date.today()
 
     try:
-        supabase = get_supabase()
+        supabase = get_admin_client()
 
         result = supabase.rpc(
             "get_monthly_active_users", {"p_end_date": end_date.isoformat()}
@@ -184,7 +184,7 @@ def get_stickiness(end_date: Optional[date] = None) -> Tuple[Optional[float], Op
         end_date = date.today()
 
     try:
-        supabase = get_supabase()
+        supabase = get_admin_client()
 
         result = supabase.rpc("get_stickiness", {"p_end_date": end_date.isoformat()}).execute()
 
@@ -218,7 +218,7 @@ def get_reminder_completion_rate(
         end_date = date.today()
 
     try:
-        supabase = get_supabase()
+        supabase = get_admin_client()
 
         result = supabase.rpc(
             "get_reminder_completion_rate",
@@ -258,7 +258,7 @@ def get_d30_retention(
         cohort_end_date = date.today() - timedelta(days=30)
 
     try:
-        supabase = get_supabase()
+        supabase = get_admin_client()
 
         result = supabase.rpc(
             "get_d30_retention",

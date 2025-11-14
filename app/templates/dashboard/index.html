@@ -105,7 +105,7 @@
   {% if reminder_stats.due_today > 3 %}
   <div class="text-center text-sm text-slate-600 dark:text-slate-400 mt-4 pt-4 border-t border-emerald-200 dark:border-emerald-700">
     <a href="{{ url_for('reminders.index') }}" class="font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
-      + {{ reminder_stats.due_today - 3 }} more tasks due today →
+      + {{ reminder_stats.due_today - 3 }} more task{% if reminder_stats.due_today > 4 %}s{% endif %} due today →
     </a>
   </div>
   {% endif %}
@@ -150,7 +150,7 @@
   </div>
 </section>
 
-<!-- Placeholder for Plants (will be implemented in Phase 4) -->
+<!-- Plants -->
 {% if plant_count > 0 %}
 <section class="card mb-8" aria-labelledby="plants-title">
   <div class="flex items-center justify-between mb-4">
@@ -160,18 +160,30 @@
     </a>
   </div>
   
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 place-items-center">
-    {% for plant in plants %}
-    <a href="{{ url_for('plants.view', plant_id=plant.id) }}" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
-      {{ plant.name }}{% if plant.nickname %} "{{ plant.nickname }}"{% endif %}
-    </a>
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 place-items-center">
+    {% for plant in latest_plants %}
+    <button type="button" class="plant-select-btn flex flex-col items-center p-3 bg-slate-50 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200">
+      {% if plant.photo_url %}
+        <img src="{{ plant.photo_url }}" alt="{{ plant.name }}" class="w-16 h-16 object-cover rounded-lg mb-2">
+      {% else %}
+        <div class="w-16 h-16 bg-gradient-to-br from-emerald-100 to-cyan-100 dark:from-emerald-900/30 dark:to-cyan-900/30 rounded-lg flex items-center justify-center mb-2 text-3xl">
+          🪴
+        </div>
+      {% endif %}
+      <span class="text-sm font-medium text-slate-900 dark:text-slate-100 text-center line-clamp-2">
+        {{ plant.name }}
+      </span>
+      {% if plant.nickname %}
+        <span class="text-xs text-slate-500 dark:text-slate-400 mt-1">"{{ plant.nickname }}"</span>
+      {% endif %}
+    </button>
     {% endfor %}
   </div>
 
-  {% if plant_count > 4 %}
+  {% if plant_count > 6 %}
   <div class="text-center text-sm text-slate-500 dark:text-slate-400 mt-4">
     <a href="{{ url_for('plants.index') }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-      + {{ plant_count - 4 }} more plants
+      + {{ plant_count - 6 }} more plant{% if plant_count > 7 %}s{% endif %}
     </a>
   </div>
   {% endif %}
@@ -255,7 +267,7 @@
   {% if reminder_stats.due_today > 5 %}
   <div class="text-center text-sm text-slate-500 dark:text-slate-400 mt-4">
     <a href="{{ url_for('reminders.index') }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-      + {{ reminder_stats.due_today - 5 }} more reminders
+      + {{ reminder_stats.due_today - 5 }} more reminder{% if reminder_stats.due_today > 6 %}s{% endif %}
     </a>
   </div>
   {% endif %}

@@ -41,8 +41,8 @@ def index():
     trial_days = supabase_client.trial_days_remaining(user_id)
     has_premium_access = supabase_client.has_premium_access(user_id)
 
-    # Get user plants
-    plants = supabase_client.get_user_plants(user_id, 4, 0)
+    # Get user's 6 latest plants
+    latest_plants = supabase_client.get_user_plants(user_id, 6, 0)
 
     # Get reminder stats and due reminders
     reminder_stats = reminder_service.get_reminder_stats(user_id)
@@ -56,7 +56,7 @@ def index():
         is_in_trial=is_in_trial,
         trial_days=trial_days,
         has_premium_access=has_premium_access,
-        plants=plants,
+        latest_plants=latest_plants,
         reminder_stats=reminder_stats,
         due_reminders=due_reminders,
     )

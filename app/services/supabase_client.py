@@ -502,6 +502,9 @@ def can_add_plant(user_id: str) -> tuple[bool, str]:
     current_count = get_plant_count(user_id)
     if current_count >= 20:
         return False, f"You've reached your 20-plant limit. Upgrade to Premium for unlimited plants."
+ 
+    if current_count == 19:
+        return True, f"You can add 1 more plant"
 
     return True, f"You can add {20 - current_count} more plants"
 
