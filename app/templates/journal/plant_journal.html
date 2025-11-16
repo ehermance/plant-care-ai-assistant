@@ -98,8 +98,8 @@
           </div>
 
           <!-- Photo -->
-          {% if action.photo_url %}
-            <img src="{{ action.photo_url }}" alt="Care photo" class="w-24 h-24 object-cover rounded-lg flex-shrink-0">
+          {% if action.photo_url_thumb or action.photo_url %}
+            <img src="{{ action.photo_url_thumb or action.photo_url }}" alt="Care photo" class="w-24 h-24 object-cover rounded-lg flex-shrink-0">
           {% endif %}
 
           <!-- Delete Button -->

@@ -33,10 +33,10 @@
 
       <!-- Plant Info -->
       <div class="flex items-start gap-4 mb-6 pb-6 border-b border-slate-200 dark:border-slate-700">
-        {% if reminder.plants.photo_url %}
+        {% if reminder.plants.photo_url_thumb or reminder.plants.photo_url %}
         <div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
           <img
-            src="{{ reminder.plants.photo_url }}"
+            src="{{ reminder.plants.photo_url_thumb or reminder.plants.photo_url }}"
             alt="{{ reminder.plants.name }}"
             class="w-full h-full object-cover"
           />

@@ -31,31 +31,46 @@
       Manage plants →
     </a>
   </div>
-  <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Select a plant to ask questions about it:</p>
-  <div id="user-plants-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
-    {% for plant in user_plants %}
-    <button type="button"
-            class="plant-select-btn flex flex-col items-center p-3 bg-slate-50 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200"
-            data-plant-id="{{ plant.id }}"
-            data-plant-name="{{ plant.name }}"
-            data-plant-species="{{ plant.species or '' }}"
-            data-plant-location="{{ plant.location or 'indoor_potted' }}"
-            aria-label="Select {{ plant.name }}">
-      {% if plant.photo_url %}
-        <img src="{{ plant.photo_url }}" alt="{{ plant.name }}" class="w-16 h-16 object-cover rounded-lg mb-2" loading="lazy" decoding="async">
-      {% else %}
-        <div class="w-16 h-16 bg-gradient-to-br from-emerald-100 to-cyan-100 dark:from-emerald-900/30 dark:to-cyan-900/30 rounded-lg flex items-center justify-center mb-2 text-3xl">
-          🪴
-        </div>
-      {% endif %}
-      <span class="text-sm font-medium text-slate-900 dark:text-slate-100 text-center line-clamp-2">
-        {{ plant.name }}
-      </span>
-      {% if plant.nickname %}
-        <span class="text-xs text-slate-500 dark:text-slate-400 mt-1">"{{ plant.nickname }}"</span>
-      {% endif %}
-    </button>
-    {% endfor %}
+  <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+    Select a plant to ask questions about it:
+    <span class="text-xs text-slate-500 dark:text-slate-500 ml-1">(scroll to see all {{ user_plants|length }} plants)</span>
+  </p>
+
+  <!-- Horizontal scrollable plant carousel -->
+  <div class="relative -mx-4 px-4" role="region" aria-label="Your plants carousel" tabindex="0">
+    <!-- Scroll gradient indicators -->
+    <div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white dark:from-slate-900 to-transparent pointer-events-none z-10" aria-hidden="true"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-slate-900 to-transparent pointer-events-none z-10" aria-hidden="true"></div>
+
+    <div class="overflow-x-auto scroll-smooth -mx-2 px-2 pb-2"
+         style="scrollbar-width: thin; scrollbar-color: rgb(16 185 129) transparent;">
+      <div id="user-plants-grid" class="flex gap-3" role="list">
+        {% for plant in user_plants %}
+        <button type="button"
+                class="plant-select-btn flex flex-col items-center p-3 bg-slate-50 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 flex-shrink-0 w-28"
+                data-plant-id="{{ plant.id }}"
+                data-plant-name="{{ plant.name }}"
+                data-plant-species="{{ plant.species or '' }}"
+                data-plant-location="{{ plant.location or 'indoor_potted' }}"
+                role="listitem"
+                aria-label="Select {{ plant.name }}{% if plant.nickname %}, also known as {{ plant.nickname }}{% endif %}">
+          {% if plant.photo_url_thumb or plant.photo_url %}
+            <img src="{{ plant.photo_url_thumb or plant.photo_url }}" alt="{{ plant.name }}" class="w-16 h-16 object-cover rounded-lg mb-2" loading="lazy" decoding="async">
+          {% else %}
+            <div class="w-16 h-16 bg-gradient-to-br from-emerald-100 to-cyan-100 dark:from-emerald-900/30 dark:to-cyan-900/30 rounded-lg flex items-center justify-center mb-2 text-3xl" aria-hidden="true">
+              🪴
+            </div>
+          {% endif %}
+          <span class="text-sm font-medium text-slate-900 dark:text-slate-100 text-center line-clamp-2">
+            {{ plant.name }}
+          </span>
+          {% if plant.nickname %}
+            <span class="text-xs text-slate-500 dark:text-slate-400 mt-1">"{{ plant.nickname }}"</span>
+          {% endif %}
+        </button>
+        {% endfor %}
+      </div>
+    </div>
   </div>
 </section>
 {% endif %}

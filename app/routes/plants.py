@@ -124,6 +124,8 @@ def add():
 
         # Handle photo upload
         photo_url = None
+        photo_url_original = None
+        photo_url_thumb = None
         if "photo" in request.files:
             file = request.files["photo"]
             if file and file.filename and allowed_file(file.filename):
@@ -142,13 +144,18 @@ def add():
                     flash("Invalid image file. Please upload a valid image.", "error")
                     return render_template("plants/add.html")
 
-                photo_url = supabase_client.upload_plant_photo(
+                # Upload photo with optimized versions (original, display, thumbnail)
+                photo_urls = supabase_client.upload_plant_photo_versions(
                     file_bytes,
                     user_id,
                     secure_filename(file.filename)
                 )
 
-                if not photo_url:
+                if photo_urls:
+                    photo_url = photo_urls['display']
+                    photo_url_original = photo_urls['original']
+                    photo_url_thumb = photo_urls['thumbnail']
+                else:
                     flash("Failed to upload photo. Please try again.", "error")
 
         # Create plant
@@ -159,7 +166,9 @@ def add():
             "location": location,
             "light": light,
             "notes": notes,
-            "photo_url": photo_url
+            "photo_url": photo_url,
+            "photo_url_original": photo_url_original if photo_url else None,
+            "photo_url_thumb": photo_url_thumb if photo_url else None
         }
 
         plant = supabase_client.create_plant(user_id, plant_data)
@@ -235,8 +244,11 @@ def edit(plant_id):
             flash("Plant name is required.", "error")
             return render_template("plants/edit.html", plant=plant)
 
-        # Handle photo upload
-        photo_url = plant.get("photo_url")  # Keep existing photo by default
+        # Handle photo upload - keep existing photos by default
+        photo_url = plant.get("photo_url")
+        photo_url_original = plant.get("photo_url_original")
+        photo_url_thumb = plant.get("photo_url_thumb")
+
         if "photo" in request.files:
             file = request.files["photo"]
             if file and file.filename and allowed_file(file.filename):
@@ -255,17 +267,26 @@ def edit(plant_id):
                     flash("Invalid image file. Please upload a valid image.", "error")
                     return render_template("plants/edit.html", plant=plant)
 
-                new_photo_url = supabase_client.upload_plant_photo(
+                # Upload new photo with optimized versions
+                new_photo_urls = supabase_client.upload_plant_photo_versions(
                     file_bytes,
                     user_id,
                     secure_filename(file.filename)
                 )
 
-                if new_photo_url:
-                    # Delete old photo if it exists
+                if new_photo_urls:
+                    # Delete old photos if they exist
                     if photo_url:
                         supabase_client.delete_plant_photo(photo_url)
-                    photo_url = new_photo_url
+                    if photo_url_original:
+                        supabase_client.delete_plant_photo(photo_url_original)
+                    if photo_url_thumb:
+                        supabase_client.delete_plant_photo(photo_url_thumb)
+
+                    # Set new photo URLs
+                    photo_url = new_photo_urls['display']
+                    photo_url_original = new_photo_urls['original']
+                    photo_url_thumb = new_photo_urls['thumbnail']
                 else:
                     flash("Failed to upload new photo.", "error")
 
@@ -277,7 +298,9 @@ def edit(plant_id):
             "location": location,
             "light": light,
             "notes": notes,
-            "photo_url": photo_url
+            "photo_url": photo_url,
+            "photo_url_original": photo_url_original,
+            "photo_url_thumb": photo_url_thumb
         }
 
         updated_plant = supabase_client.update_plant(plant_id, user_id, plant_data)

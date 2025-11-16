@@ -160,7 +160,7 @@ def assistant():
     from ..utils.auth import get_current_user_id
     from ..services.supabase_client import get_user_profile, get_user_plants
 
-    # Get user's 8 most recent plants for plant-aware AI (performance optimization)
+    # Get all user's plants for plant-aware AI
     user_plants = []
     user_id = get_current_user_id()
     default_city = None
@@ -170,8 +170,8 @@ def assistant():
         profile = get_user_profile(user_id)
         if profile:
             default_city = profile.get("city")
-        # Get user's plants
-        user_plants = get_user_plants(user_id, limit=8)
+        # Get all user's plants (will display in horizontal scrollable carousel)
+        user_plants = get_user_plants(user_id)
 
     # Handle GET request - render form
     if request.method == "GET":

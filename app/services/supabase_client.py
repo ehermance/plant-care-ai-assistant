@@ -679,9 +679,129 @@ def delete_plant(plant_id: str, user_id: str) -> bool:
         return False
 
 
+def create_image_versions(file_bytes: bytes) -> dict[str, bytes] | None:
+    """
+    Create multiple versions of an image for different display contexts.
+
+    Args:
+        file_bytes: Original image file bytes
+
+    Returns:
+        Dictionary with 3 versions:
+        - 'original': Full resolution (preserved as-is)
+        - 'display': Optimized for grid/detail views (max 900px width, 80% quality)
+        - 'thumbnail': Small version for buttons (128x128, 85% quality)
+        Returns None if image processing fails
+    """
+    try:
+        from PIL import Image
+        from io import BytesIO
+
+        # Open original image
+        img = Image.open(BytesIO(file_bytes))
+
+        # Convert RGBA/LA/P to RGB (JPEG doesn't support transparency)
+        if img.mode in ('RGBA', 'LA', 'P'):
+            # Create white background
+            background = Image.new('RGB', img.size, (255, 255, 255))
+            # Paste image with alpha channel as mask if RGBA
+            if img.mode == 'RGBA':
+                background.paste(img, mask=img.split()[-1])
+            else:
+                background.paste(img)
+            img = background
+
+        versions = {}
+
+        # Original - keep as-is for archival
+        versions['original'] = file_bytes
+
+        # Display version - optimize for web (max 900px width)
+        display_img = img.copy()
+        if display_img.width > 900 or display_img.height > 900:
+            display_img.thumbnail((900, 900), Image.Resampling.LANCZOS)
+
+        display_output = BytesIO()
+        display_img.save(display_output, format='JPEG', quality=80, optimize=True)
+        versions['display'] = display_output.getvalue()
+
+        # Thumbnail - 128x128 for retina displays (shown at 64x64)
+        thumb_img = img.copy()
+        thumb_img.thumbnail((128, 128), Image.Resampling.LANCZOS)
+
+        thumb_output = BytesIO()
+        thumb_img.save(thumb_output, format='JPEG', quality=85, optimize=True)
+        versions['thumbnail'] = thumb_output.getvalue()
+
+        return versions
+
+    except Exception as e:
+        _safe_log_error(f"Error creating image versions: {e}")
+        return None
+
+
+def upload_plant_photo_versions(file_bytes: bytes, user_id: str, filename: str) -> dict[str, str] | None:
+    """
+    Upload plant photo with multiple optimized versions (original, display, thumbnail).
+
+    Args:
+        file_bytes: Original image file bytes
+        user_id: User UUID (for organizing files)
+        filename: Original filename (used for extension detection)
+
+    Returns:
+        Dictionary with public URLs for each version:
+        - 'original': Full resolution URL
+        - 'display': Optimized version URL (max 900px)
+        - 'thumbnail': Small thumbnail URL (128x128)
+        Returns None if upload fails
+    """
+    if not _supabase_client:
+        return None
+
+    try:
+        import uuid
+        from pathlib import Path
+
+        # Generate unique base filename (without extension)
+        base_uuid = str(uuid.uuid4())
+
+        # Create optimized versions
+        versions = create_image_versions(file_bytes)
+        if not versions:
+            _safe_log_error("Failed to create image versions")
+            return None
+
+        # Upload all versions
+        urls = {}
+        for version_name, version_bytes in versions.items():
+            # Create filename for this version
+            version_filename = f"{user_id}/{base_uuid}-{version_name}.jpg"
+
+            # Upload to plant-photos bucket
+            response = _supabase_client.storage.from_("plant-photos").upload(
+                version_filename,
+                version_bytes,
+                file_options={"content-type": "image/jpeg"}
+            )
+
+            # Get public URL
+            public_url = _supabase_client.storage.from_("plant-photos").get_public_url(version_filename)
+            urls[version_name] = public_url
+
+        return urls
+
+    except Exception as e:
+        _safe_log_error(f"Error uploading plant photo versions: {e}")
+        return None
+
+
 def upload_plant_photo(file_bytes: bytes, user_id: str, filename: str) -> str | None:
     """
-    Upload a plant photo to Supabase Storage.
+    Upload a plant photo to Supabase Storage (legacy single-version upload).
+
+    NOTE: This function is deprecated. Use upload_plant_photo_versions() instead
+    for optimized multi-version uploads (original + display + thumbnail).
 
     Args:
         file_bytes: Image file bytes

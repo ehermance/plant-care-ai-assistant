@@ -9,7 +9,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from app.utils.auth import require_auth, get_current_user_id
 from app.services import journal as journal_service
 from app.services import analytics
-from app.services.supabase_client import get_plant_by_id, upload_plant_photo, delete_plant_photo
+from app.services.supabase_client import get_plant_by_id, upload_plant_photo, upload_plant_photo_versions, delete_plant_photo
 from werkzeug.utils import secure_filename
 from PIL import Image
 from io import BytesIO
@@ -119,6 +119,8 @@ def add_entry(plant_id):
 
         # Handle photo upload
         photo_url = None
+        photo_url_original = None
+        photo_url_thumb = None
         if "photo" in request.files:
             file = request.files["photo"]
             if file and file.filename and allowed_file(file.filename):
@@ -145,13 +147,18 @@ def add_entry(plant_id):
                         action_types=journal_service.ACTION_TYPE_NAMES,
                     )
 
-                photo_url = upload_plant_photo(
+                # Upload photo with optimized versions (original, display, thumbnail)
+                photo_urls = upload_plant_photo_versions(
                     file_bytes,
                     user_id,
                     secure_filename(file.filename)
                 )
 
-                if not photo_url:
+                if photo_urls:
+                    photo_url = photo_urls['display']
+                    photo_url_original = photo_urls['original']
+                    photo_url_thumb = photo_urls['thumbnail']
+                else:
                     flash("Failed to upload photo. Please try again.", "error")
 
         # Create journal entry
@@ -162,6 +169,8 @@ def add_entry(plant_id):
             notes=notes or None,
             amount_ml=amount_ml,
             photo_url=photo_url,
+            photo_url_original=photo_url_original,
+            photo_url_thumb=photo_url_thumb,
         )
 
         if error:
@@ -236,9 +245,13 @@ def delete_entry(action_id):
 
     plant_id = action.get("plant_id")
 
-    # Delete photo if it exists
+    # Delete all photo versions if they exist
     if action.get("photo_url"):
         delete_plant_photo(action["photo_url"])
+    if action.get("photo_url_original"):
+        delete_plant_photo(action["photo_url_original"])
+    if action.get("photo_url_thumb"):
+        delete_plant_photo(action["photo_url_thumb"])
 
     # Delete action
     success, error = journal_service.delete_action(action_id, user_id)
