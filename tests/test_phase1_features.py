@@ -19,11 +19,11 @@ class TestPlantAwareAI:
 
     def test_ask_page_shows_user_plants(self, client, monkeypatch):
         """Ask page should display user's plants when logged in."""
-        # Mock authentication
+        # Mock authentication (must patch at source module, not route module)
         def mock_get_user_id():
             return "test-user-id"
 
-        def mock_get_plants(user_id):
+        def mock_get_plants(user_id, limit=None):
             return [
                 {
                     "id": "plant-1",
@@ -39,8 +39,8 @@ class TestPlantAwareAI:
                 }
             ]
 
-        monkeypatch.setattr("app.routes.web.get_current_user_id", mock_get_user_id)
-        monkeypatch.setattr("app.routes.web.get_user_plants", mock_get_plants)
+        monkeypatch.setattr("app.utils.auth.get_current_user_id", mock_get_user_id)
+        monkeypatch.setattr("app.services.supabase_client.get_user_plants", mock_get_plants)
 
         response = client.get("/ask")
         html = response.data.decode()
@@ -60,14 +60,15 @@ class TestPlantAwareAI:
 
     def test_generic_presets_hidden_when_logged_in(self, client, monkeypatch):
         """Generic presets should be hidden when user has plants."""
+        # Mock authentication (must patch at source module, not route module)
         def mock_get_user_id():
             return "test-user-id"
 
-        def mock_get_plants(user_id):
+        def mock_get_plants(user_id, limit=None):
             return [{"id": "plant-1", "name": "Monstera"}]
 
-        monkeypatch.setattr("app.routes.web.get_current_user_id", mock_get_user_id)
-        monkeypatch.setattr("app.routes.web.get_user_plants", mock_get_plants)
+        monkeypatch.setattr("app.utils.auth.get_current_user_id", mock_get_user_id)
+        monkeypatch.setattr("app.services.supabase_client.get_user_plants", mock_get_plants)
 
         response = client.get("/ask")
         html = response.data.decode()
@@ -81,11 +82,15 @@ class TestTodaysFocus:
 
     def test_dashboard_shows_todays_focus_section(self, client, monkeypatch):
         """Dashboard should have Today's Focus section."""
-        # Mock authentication
+        # Mock authentication - need to mock is_authenticated() for @require_auth decorator
+        def mock_is_authenticated():
+            return True
+
         def mock_get_user_id():
             return "test-user-id"
 
-        monkeypatch.setattr("app.routes.dashboard.get_current_user_id", mock_get_user_id)
+        monkeypatch.setattr("app.utils.auth.is_authenticated", mock_is_authenticated)
+        monkeypatch.setattr("app.utils.auth.get_current_user_id", mock_get_user_id)
 
         # Mock reminder service to return due reminders
         def mock_get_due_reminders(user_id):
@@ -109,10 +114,15 @@ class TestTodaysFocus:
 
     def test_todays_focus_shows_top_3_tasks(self, client, monkeypatch):
         """Today's Focus should show maximum 3 priority tasks."""
+        # Mock authentication - need to mock is_authenticated() for @require_auth decorator
+        def mock_is_authenticated():
+            return True
+
         def mock_get_user_id():
             return "test-user-id"
 
-        monkeypatch.setattr("app.routes.dashboard.get_current_user_id", mock_get_user_id)
+        monkeypatch.setattr("app.utils.auth.is_authenticated", mock_is_authenticated)
+        monkeypatch.setattr("app.utils.auth.get_current_user_id", mock_get_user_id)
 
         # Mock 5 due reminders
         def mock_get_due_reminders(user_id):
@@ -131,10 +141,15 @@ class TestTodaysFocus:
 
     def test_all_clear_state_when_no_tasks(self, client, monkeypatch):
         """Should show 'All Clear!' when no tasks due."""
+        # Mock authentication - need to mock is_authenticated() for @require_auth decorator
+        def mock_is_authenticated():
+            return True
+
         def mock_get_user_id():
             return "test-user-id"
 
-        monkeypatch.setattr("app.routes.dashboard.get_current_user_id", mock_get_user_id)
+        monkeypatch.setattr("app.utils.auth.is_authenticated", mock_is_authenticated)
+        monkeypatch.setattr("app.utils.auth.get_current_user_id", mock_get_user_id)
 
         def mock_get_due_reminders(user_id):
             return []  # No due reminders
@@ -169,13 +184,18 @@ class TestReminderCompletion:
 
         monkeypatch.setattr("app.routes.reminders.analytics.track_event", mock_track_event)
 
+        # Mock authentication for @require_auth decorator
+        def mock_is_authenticated():
+            return True
+
         def mock_get_user_id():
             return "test-user-id"
 
         def mock_mark_complete(reminder_id, user_id):
             return True, None
 
-        monkeypatch.setattr("app.routes.reminders.get_current_user_id", mock_get_user_id)
+        monkeypatch.setattr("app.utils.auth.is_authenticated", mock_is_authenticated)
+        monkeypatch.setattr("app.utils.auth.get_current_user_id", mock_get_user_id)
         monkeypatch.setattr("app.routes.reminders.reminder_service.mark_reminder_complete", mock_mark_complete)
 
         response = client.post("/reminders/test-reminder/complete")
@@ -206,6 +226,7 @@ class TestJournaling:
 
     def test_plant_view_shows_care_statistics(self, client, monkeypatch):
         """Plant view should show care statistics."""
+        # Mock authentication (patch at source for consistency)
         def mock_get_user_id():
             return "test-user-id"
 
@@ -230,10 +251,11 @@ class TestJournaling:
                 "total_count": 11
             }
 
-        monkeypatch.setattr("app.routes.plants.get_current_user_id", mock_get_user_id)
+        monkeypatch.setattr("app.utils.auth.get_current_user_id", mock_get_user_id)
         monkeypatch.setattr("app.routes.plants.supabase_client.get_plant_by_id", mock_get_plant)
-        monkeypatch.setattr("app.routes.plants.journal_service.get_plant_actions", mock_get_actions)
-        monkeypatch.setattr("app.routes.plants.journal_service.get_action_stats", mock_get_stats)
+        # Patch at source module since journal_service is imported inside the function
+        monkeypatch.setattr("app.services.journal.get_plant_actions", mock_get_actions)
+        monkeypatch.setattr("app.services.journal.get_action_stats", mock_get_stats)
 
         response = client.get("/plants/plant-1")
 
@@ -252,6 +274,10 @@ class TestJournaling:
 
         monkeypatch.setattr("app.routes.journal.analytics.track_event", mock_track_event)
 
+        # Mock authentication for @require_auth decorator
+        def mock_is_authenticated():
+            return True
+
         def mock_get_user_id():
             return "test-user-id"
 
@@ -261,7 +287,8 @@ class TestJournaling:
         def mock_create_action(*args, **kwargs):
             return {"id": "action-123"}, None
 
-        monkeypatch.setattr("app.routes.journal.get_current_user_id", mock_get_user_id)
+        monkeypatch.setattr("app.utils.auth.is_authenticated", mock_is_authenticated)
+        monkeypatch.setattr("app.utils.auth.get_current_user_id", mock_get_user_id)
         monkeypatch.setattr("app.routes.journal.get_plant_by_id", mock_get_plant)
         monkeypatch.setattr("app.routes.journal.journal_service.create_plant_action", mock_create_action)
 
@@ -318,6 +345,10 @@ class TestAnalytics:
 
         monkeypatch.setattr("app.routes.plants.analytics.track_event", mock_track_event)
 
+        # Mock authentication for @require_auth decorator
+        def mock_is_authenticated():
+            return True
+
         def mock_get_user_id():
             return "test-user-id"
 
@@ -327,7 +358,8 @@ class TestAnalytics:
         def mock_create_plant(user_id, data):
             return {"id": "plant-123", "name": data["name"]}
 
-        monkeypatch.setattr("app.routes.plants.get_current_user_id", mock_get_user_id)
+        monkeypatch.setattr("app.utils.auth.is_authenticated", mock_is_authenticated)
+        monkeypatch.setattr("app.utils.auth.get_current_user_id", mock_get_user_id)
         monkeypatch.setattr("app.routes.plants.supabase_client.can_add_plant", mock_can_add)
         monkeypatch.setattr("app.routes.plants.supabase_client.create_plant", mock_create_plant)
 
@@ -350,17 +382,18 @@ class TestAnalytics:
 
         monkeypatch.setattr("app.routes.web.analytics.track_event", mock_track_event)
 
+        # Mock authentication (must patch at source module, not route module)
         def mock_get_user_id():
             return "test-user-id"
 
-        def mock_get_plants(user_id):
+        def mock_get_plants(user_id, limit=None):
             return []
 
         def mock_generate_advice(*args, **kwargs):
             return "Water your plant", None, "ai"
 
-        monkeypatch.setattr("app.routes.web.get_current_user_id", mock_get_user_id)
-        monkeypatch.setattr("app.routes.web.get_user_plants", mock_get_plants)
+        monkeypatch.setattr("app.utils.auth.get_current_user_id", mock_get_user_id)
+        monkeypatch.setattr("app.services.supabase_client.get_user_plants", mock_get_plants)
         monkeypatch.setattr("app.routes.web.generate_advice", mock_generate_advice)
 
         response = client.post("/ask", data={

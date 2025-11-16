@@ -36,6 +36,7 @@ def _soft_sanitize(text: str, max_len: int) -> str:
     Normalizes names/locations:
     - strip whitespace
     - bound length
+    - remove dangerous HTML event handlers and keywords
     - remove disallowed characters via allowlist
     - collapse double spaces
     """
@@ -43,6 +44,17 @@ def _soft_sanitize(text: str, max_len: int) -> str:
     if not t:
         return ""
     t = t[:max_len]
+
+    # Remove HTML event handlers and dangerous keywords (XSS protection)
+    dangerous_keywords = [
+        'onerror', 'onload', 'onclick', 'onmouseover', 'onmouseout',
+        'onmousemove', 'onmousedown', 'onmouseup', 'onfocus', 'onblur',
+        'onchange', 'onsubmit', 'javascript:', 'data:', 'vbscript:'
+    ]
+    for keyword in dangerous_keywords:
+        t = re.sub(keyword, '', t, flags=re.IGNORECASE)
+
+    # Remove disallowed characters via allowlist
     t = _SAFE_CHARS_PATTERN.sub("", t)
     t = re.sub(r"\s{2,}", " ", t)
     return t

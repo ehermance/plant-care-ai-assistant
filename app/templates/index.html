@@ -42,7 +42,7 @@
             data-plant-location="{{ plant.location or 'indoor_potted' }}"
             aria-label="Select {{ plant.name }}">
       {% if plant.photo_url %}
-        <img src="{{ plant.photo_url }}" alt="{{ plant.name }}" class="w-16 h-16 object-cover rounded-lg mb-2">
+        <img src="{{ plant.photo_url }}" alt="{{ plant.name }}" class="w-16 h-16 object-cover rounded-lg mb-2" loading="lazy" decoding="async">
       {% else %}
         <div class="w-16 h-16 bg-gradient-to-br from-emerald-100 to-cyan-100 dark:from-emerald-900/30 dark:to-cyan-900/30 rounded-lg flex items-center justify-center mb-2 text-3xl">
           🪴
@@ -109,7 +109,7 @@
   <div class="card" aria-labelledby="form-title">
     <h2 id="form-title" class="section-title">Get Plant Care Advice</h2>
 
-    <form id="ask-form" action="{{ url_for('web.ask') }}" method="post" novalidate>
+    <form id="ask-form" action="{{ url_for('web.assistant') }}" method="post" novalidate>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
       <!-- Plant & City (Two Columns) -->

@@ -24,16 +24,14 @@ def is_admin(user_id: str) -> bool:
     """
     Check if user has admin privileges.
 
-    For now, checks if user has 'premium' or 'pro' plan.
-    TODO: Add proper admin role in database.
+    Uses the 'is_admin' column from the profiles table.
+    Set via migration 010_add_admin_role.sql
     """
     profile = get_user_profile(user_id)
     if not profile:
         return False
 
-    # Temporary: treat premium/pro users as admins
-    # In production, add an 'is_admin' column to profiles table
-    return profile.get("plan") in ["premium", "pro"]
+    return profile.get("is_admin", False)
 
 
 @admin_bp.route("/")

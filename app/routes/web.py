@@ -117,7 +117,7 @@ def debug_info():
 def clear_history():
     session.pop("history", None)  # only this user's session history
     session.modified = True
-    return redirect(url_for("web.ask_ai"))
+    return redirect(url_for("web.assistant"))
 
 
 @web_bp.route("/")
@@ -137,71 +137,61 @@ def index():
         return redirect(url_for("auth.signup"))
 
 
-@web_bp.route("/ask", methods=["GET"])
-def ask_ai():
+# Read rate string from config at request time (supports env/config changes)
+def _ask_rate():
+    return current_app.config.get("RATELIMIT_ASK", "8 per minute; 1 per 2 seconds; 200 per day")
+
+
+# URL: /ask
+# Endpoint: web.assistant
+# Purpose: AI-powered plant care advice (GET: render form, POST: process question)
+# UI Label: "Assistant" or "Care Assistant"
+@web_bp.route("/ask", methods=["GET", "POST"])
+@limiter.limit(_ask_rate, methods=["POST"])  # Only rate-limit POST requests
+def assistant():
     """
-    Render the Ask AI page on GET. The template uses these variables to decide
-    what to show; passing explicit None keeps Jinja conditional logic simple.
+    AI Plant Care Assistant page.
+
+    GET: Render the assistant form with user's plants (if logged in)
+    POST: Process AI question and return advice
 
     If user is authenticated, pre-fill city from their profile and show user plants.
     """
     from ..utils.auth import get_current_user_id
     from ..services.supabase_client import get_user_profile, get_user_plants
 
-    # Get user profile to pre-fill city if authenticated
-    default_city = None
+    # Get user's 8 most recent plants for plant-aware AI (performance optimization)
     user_plants = []
     user_id = get_current_user_id()
+    default_city = None
+
     if user_id:
+        # Get user profile to pre-fill city
         profile = get_user_profile(user_id)
         if profile:
             default_city = profile.get("city")
+        # Get user's plants
+        user_plants = get_user_plants(user_id, limit=8)
 
-        # Get user's plants for plant-aware AI
-        user_plants = get_user_plants(user_id)
+    # Handle GET request - render form
+    if request.method == "GET":
+        today_str = datetime.now().strftime("%Y-%m-%d")
+        return render_template(
+            "index.html",
+            answer=None,
+            weather=None,
+            forecast=None,
+            hourly=None,
+            form_values={"city": default_city} if default_city else None,
+            history=_get_history(),
+            has_history=len(_get_history()) > 0,
+            source=None,
+            ai_error=None,
+            today_str=today_str,
+            user_plants=user_plants,
+        )
 
-    today_str = datetime.now().strftime("%Y-%m-%d")
-    return render_template(
-        "index.html",
-        answer=None,
-        weather=None,
-        forecast=None,
-        hourly=None,
-        form_values={"city": default_city} if default_city else None,
-        history=_get_history(),
-        has_history=len(_get_history()) > 0,
-        source=None,
-        ai_error=None,
-        today_str=today_str,
-        user_plants=user_plants,
-    )
-
-# Read rate string from config at request time (supports env/config changes)
-def _ask_rate():
-    return current_app.config.get("RATELIMIT_ASK", "8 per minute; 1 per 2 seconds; 200 per day")
-
-@web_bp.route("/ask", methods=["POST"])
-@limiter.limit(_ask_rate)  # protects the form handler from burst abuse
-def ask():
-    """
-    Process a submission:
-    - Validate/normalize form fields
-    - Block unsafe content via moderation
-    - Generate advice (AI-first, rule fallback)
-    - Fetch a 5-day forecast (best-effort)
-    - Derive an hourly list for the rest of today (best-effort)
-    - Store a compact history item
-    - Re-render the page with the answer and context
-    """
-    from ..utils.auth import get_current_user_id
-    from ..services.supabase_client import get_user_plants
-
-    # Get user plants for plant-aware context
-    user_plants = []
-    user_id = get_current_user_id()
-    if user_id:
-        user_plants = get_user_plants(user_id)
-
+    # Handle POST request - process form submission
     payload, err_msg = validate_inputs(request.form)
 
     if err_msg:

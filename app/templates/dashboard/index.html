@@ -120,7 +120,7 @@
     </div>
   </div>
   <div class="flex gap-3 flex-wrap">
-    <a href="{{ url_for('web.ask_ai') }}" class="btn btn-secondary">
+    <a href="{{ url_for('web.assistant') }}" class="btn btn-secondary">
       <span aria-hidden="true">🤖</span> Ask Care Assistant
     </a>
     <a href="{{ url_for('plants.index') }}" class="btn btn-secondary">
@@ -141,7 +141,7 @@
     <a href="{{ url_for('reminders.create') }}" class="btn btn-primary">
       <span aria-hidden="true">📝</span> New Reminder
     </a>
-    <a href="{{ url_for('web.ask_ai') }}" class="btn btn-secondary">
+    <a href="{{ url_for('web.assistant') }}" class="btn btn-secondary">
       <span aria-hidden="true">🤖</span> Care Assistant
     </a>
     <a href="{{ url_for('plants.index') }}" class="btn btn-secondary">
@@ -164,7 +164,7 @@
     {% for plant in latest_plants %}
     <button type="button" class="plant-select-btn flex flex-col items-center p-3 bg-slate-50 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200">
       {% if plant.photo_url %}
-        <img src="{{ plant.photo_url }}" alt="{{ plant.name }}" class="w-16 h-16 object-cover rounded-lg mb-2">
+        <img src="{{ plant.photo_url }}" alt="{{ plant.name }}" class="w-16 h-16 object-cover rounded-lg mb-2" loading="lazy" decoding="async">
       {% else %}
         <div class="w-16 h-16 bg-gradient-to-br from-emerald-100 to-cyan-100 dark:from-emerald-900/30 dark:to-cyan-900/30 rounded-lg flex items-center justify-center mb-2 text-3xl">
           🪴

@@ -27,8 +27,30 @@ MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
 
 def allowed_file(filename: str) -> bool:
-    """Check if filename has an allowed extension."""
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    """
+    Check if filename has an allowed extension and no dangerous double extensions.
+
+    Prevents double extension attacks like 'image.php.jpg' where the server
+    might execute the .php part even though the final extension is .jpg.
+    """
+    if '.' not in filename:
+        return False
+
+    # Get final extension
+    ext = filename.rsplit('.', 1)[1].lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        return False
+
+    # Check for double extension attack (e.g., image.php.jpg)
+    # Count dots - if more than 1, check second-to-last extension isn't dangerous
+    parts = filename.lower().split('.')
+    if len(parts) > 2:
+        # Check second-to-last extension isn't a dangerous executable type
+        dangerous_exts = {'php', 'phtml', 'php3', 'php4', 'php5', 'exe', 'sh', 'bat', 'cmd', 'js', 'py', 'rb', 'pl', 'cgi'}
+        if parts[-2] in dangerous_exts:
+            return False
+
+    return True
 
 
 def validate_image_content(file_bytes: bytes) -> bool:

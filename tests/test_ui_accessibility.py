@@ -89,7 +89,8 @@ class TestWCAGCompliance:
 
     def test_skip_to_main_content_link(self, client):
         """Page should have skip to main content link for keyboard users."""
-        response = client.get("/")
+        # Test /ask page which is accessible to anonymous users
+        response = client.get("/ask")
         html = response.data.decode()
 
         # Look for skip link pattern
@@ -101,7 +102,8 @@ class TestSemanticHTML:
 
     def test_main_landmark_exists(self, client):
         """Page should have a main landmark."""
-        response = client.get("/")
+        # Test /ask page which is accessible to anonymous users
+        response = client.get("/ask")
         soup = BeautifulSoup(response.data, "html.parser")
 
         main = soup.find("main")
@@ -109,7 +111,8 @@ class TestSemanticHTML:
 
     def test_navigation_landmark_exists(self, client):
         """Page should have navigation landmark."""
-        response = client.get("/")
+        # Test /ask page which is accessible to anonymous users
+        response = client.get("/ask")
         soup = BeautifulSoup(response.data, "html.parser")
 
         nav = soup.find("nav")
@@ -230,7 +233,8 @@ class TestResponsiveDesign:
 
     def test_viewport_meta_tag_exists(self, client):
         """Page should have viewport meta tag for mobile."""
-        response = client.get("/")
+        # Test /ask page which is accessible to anonymous users
+        response = client.get("/ask")
         html = response.data.decode()
 
         assert 'name="viewport"' in html, "Page should have viewport meta tag"
@@ -238,7 +242,8 @@ class TestResponsiveDesign:
 
     def test_responsive_css_classes(self, client):
         """Page should use responsive CSS classes."""
-        response = client.get("/")
+        # Test /ask page which is accessible to anonymous users
+        response = client.get("/ask")
         html = response.data.decode()
 
         # Check for responsive utility classes (Tailwind-style)
@@ -332,7 +337,8 @@ class TestColorContrast:
 
     def test_text_has_sufficient_contrast_classes(self, client):
         """Text should use high-contrast color classes."""
-        response = client.get("/")
+        # Test /ask page which is accessible to anonymous users
+        response = client.get("/ask")
         html = response.data.decode()
 
         # Check for dark mode support
@@ -413,7 +419,8 @@ class TestMobileUsability:
 
     def test_no_horizontal_scrolling(self, client):
         """Page should not require horizontal scrolling on mobile."""
-        response = client.get("/")
+        # Test /ask page which is accessible to anonymous users
+        response = client.get("/ask")
         html = response.data.decode()
 
         # Check for responsive container classes
