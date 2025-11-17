@@ -329,9 +329,13 @@ def delete(plant_id):
 
     plant_name = plant.get("name", "Plant")
 
-    # Delete photo if it exists
+    # Delete all photo versions if they exist
     if plant.get("photo_url"):
         supabase_client.delete_plant_photo(plant["photo_url"])
+    if plant.get("photo_url_original"):
+        supabase_client.delete_plant_photo(plant["photo_url_original"])
+    if plant.get("photo_url_thumb"):
+        supabase_client.delete_plant_photo(plant["photo_url_thumb"])
 
     # Delete plant
     if supabase_client.delete_plant(plant_id, user_id):

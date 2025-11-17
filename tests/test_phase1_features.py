@@ -23,7 +23,7 @@ class TestPlantAwareAI:
         def mock_get_user_id():
             return "test-user-id"
 
-        def mock_get_plants(user_id, limit=None):
+        def mock_get_plants(user_id, limit=None, offset=None, fields="*", use_cache=True):
             return [
                 {
                     "id": "plant-1",
@@ -64,7 +64,7 @@ class TestPlantAwareAI:
         def mock_get_user_id():
             return "test-user-id"
 
-        def mock_get_plants(user_id, limit=None):
+        def mock_get_plants(user_id, limit=None, offset=None, fields="*", use_cache=True):
             return [{"id": "plant-1", "name": "Monstera"}]
 
         monkeypatch.setattr("app.utils.auth.get_current_user_id", mock_get_user_id)
@@ -386,7 +386,7 @@ class TestAnalytics:
         def mock_get_user_id():
             return "test-user-id"
 
-        def mock_get_plants(user_id, limit=None):
+        def mock_get_plants(user_id, limit=None, offset=None, fields="*", use_cache=True):
             return []
 
         def mock_generate_advice(*args, **kwargs):

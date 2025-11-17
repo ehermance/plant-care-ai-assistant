@@ -42,6 +42,11 @@ def _safe_log_info(message: str) -> None:
 _supabase_client: Optional[Client] = None  # User client (anon key)
 _supabase_admin: Optional[Client] = None   # Admin client (service role key)
 
+# In-memory cache for plant queries (simple dict-based cache)
+# Format: {cache_key: (data, timestamp)}
+_PLANT_CACHE: Dict[str, tuple[list[dict], datetime]] = {}
+_CACHE_TTL_SECONDS = 300  # 5 minutes
+
 
 def init_supabase(app) -> None:
     """
@@ -509,7 +514,50 @@ def can_add_plant(user_id: str) -> tuple[bool, str]:
     return True, f"You can add {20 - current_count} more plants"
 
 
-def get_user_plants(user_id: str, limit: int = 100, offset: int = 0) -> list[dict]:
+def _get_cache_key(user_id: str, limit: int, offset: int, fields: str) -> str:
+    """Generate cache key for plant query."""
+    return f"plants:{user_id}:{limit}:{offset}:{fields}"
+
+
+def _get_cached_plants(cache_key: str) -> list[dict] | None:
+    """
+    Get plants from cache if valid.
+
+    Returns:
+        Cached plant list if valid, None if cache miss or expired
+    """
+    if cache_key not in _PLANT_CACHE:
+        return None
+
+    cached_data, cached_at = _PLANT_CACHE[cache_key]
+    age_seconds = (datetime.now() - cached_at).total_seconds()
+
+    if age_seconds > _CACHE_TTL_SECONDS:
+        # Cache expired, remove it
+        del _PLANT_CACHE[cache_key]
+        return None
+
+    return cached_data
+
+
+def _cache_plants(cache_key: str, plants: list[dict]) -> None:
+    """Store plants in cache with current timestamp."""
+    _PLANT_CACHE[cache_key] = (plants, datetime.now())
+
+
+def invalidate_plant_cache(user_id: str) -> None:
+    """
+    Invalidate all cached plant queries for a user.
+
+    Call this when plants are added, updated, or deleted.
+    """
+    # Remove all cache entries for this user
+    keys_to_remove = [key for key in _PLANT_CACHE.keys() if key.startswith(f"plants:{user_id}:")]
+    for key in keys_to_remove:
+        del _PLANT_CACHE[key]
+
+
+def get_user_plants(user_id: str, limit: int = 100, offset: int = 0, fields: str = "*", use_cache: bool = True) -> list[dict]:
     """
     Get all plants for a user with pagination.
 
@@ -517,6 +565,11 @@ def get_user_plants(user_id: str, limit: int = 100, offset: int = 0) -> list[dic
         user_id: Supabase user UUID
         limit: Maximum number of plants to return
         offset: Number of plants to skip (for pagination)
+        fields: Comma-separated list of fields to select (default: "*" for all)
+                For optimal performance, specify only needed fields.
+                Example: "id,name,nickname,photo_url_thumb"
+        use_cache: Whether to use in-memory cache (default: True)
+                   Set to False when you need fresh data immediately after updates
 
     Returns:
         List of plant dictionaries, empty list if error
@@ -524,16 +577,30 @@ def get_user_plants(user_id: str, limit: int = 100, offset: int = 0) -> list[dic
     if not _supabase_client:
         return []
 
+    # Check cache first (if enabled)
+    if use_cache:
+        cache_key = _get_cache_key(user_id, limit, offset, fields)
+        cached_plants = _get_cached_plants(cache_key)
+        if cached_plants is not None:
+            return cached_plants
+
     try:
         response = (_supabase_client
                    .table("plants")
-                   .select("*")
+                   .select(fields)
                    .eq("user_id", user_id)
                    .order("created_at", desc=True)
                    .limit(limit)
                    .offset(offset)
                    .execute())
-        return response.data or []
+        plants = response.data or []
+
+        # Cache the results (if caching enabled)
+        if use_cache:
+            cache_key = _get_cache_key(user_id, limit, offset, fields)
+            _cache_plants(cache_key, plants)
+
+        return plants
     except Exception as e:
         _safe_log_error(f"Error getting user plants: {e}")
         return []
@@ -597,6 +664,8 @@ def create_plant(user_id: str, plant_data: dict) -> dict | None:
         response = _supabase_client.table("plants").insert(data).execute()
 
         if response.data and len(response.data) > 0:
+            # Invalidate cache so fresh data is fetched
+            invalidate_plant_cache(user_id)
             return response.data[0]
         return None
     except Exception as e:
@@ -645,6 +714,8 @@ def update_plant(plant_id: str, user_id: str, plant_data: dict) -> dict | None:
                    .execute())
 
         if response.data and len(response.data) > 0:
+            # Invalidate cache so fresh data is fetched
+            invalidate_plant_cache(user_id)
             return response.data[0]
         return None
     except Exception as e:
@@ -673,6 +744,8 @@ def delete_plant(plant_id: str, user_id: str) -> bool:
                    .eq("id", plant_id)
                    .eq("user_id", user_id)  # Ownership check
                    .execute())
+        # Invalidate cache so fresh data is fetched
+        invalidate_plant_cache(user_id)
         return True
     except Exception as e:
         _safe_log_error(f"Error deleting plant {plant_id}: {e}")
@@ -772,14 +845,15 @@ def upload_plant_photo_versions(file_bytes: bytes, user_id: str, filename: str) 
             _safe_log_error("Failed to create image versions")
             return None
 
-        # Upload all versions
-        urls = {}
-        for version_name, version_bytes in versions.items():
-            # Create filename for this version
+        # Upload all versions in parallel for 3× faster uploads
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+
+        def upload_single_version(version_name: str, version_bytes: bytes) -> tuple[str, str]:
+            """Upload a single version and return (version_name, public_url)."""
             version_filename = f"{user_id}/{base_uuid}-{version_name}.jpg"
 
             # Upload to plant-photos bucket
-            response = _supabase_client.storage.from_("plant-photos").upload(
+            _supabase_client.storage.from_("plant-photos").upload(
                 version_filename,
                 version_bytes,
                 file_options={"content-type": "image/jpeg"}
@@ -787,7 +861,21 @@ def upload_plant_photo_versions(file_bytes: bytes, user_id: str, filename: str) 
 
             # Get public URL
             public_url = _supabase_client.storage.from_("plant-photos").get_public_url(version_filename)
-            urls[version_name] = public_url
+            return (version_name, public_url)
+
+        # Upload all 3 versions concurrently
+        urls = {}
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            # Submit all upload tasks
+            future_to_version = {
+                executor.submit(upload_single_version, version_name, version_bytes): version_name
+                for version_name, version_bytes in versions.items()
+            }
+
+            # Collect results as they complete
+            for future in as_completed(future_to_version):
+                version_name, public_url = future.result()
+                urls[version_name] = public_url
 
         return urls
 
