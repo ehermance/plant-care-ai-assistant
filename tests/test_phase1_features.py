@@ -106,7 +106,7 @@ class TestTodaysFocus:
 
         monkeypatch.setattr("app.routes.dashboard.reminder_service.get_due_reminders", mock_get_due_reminders)
 
-        response = client.get("/dashboard")
+        response = client.get("/dashboard/")
 
         assert response.status_code == 200
         html = response.data.decode()
@@ -133,7 +133,7 @@ class TestTodaysFocus:
 
         monkeypatch.setattr("app.routes.dashboard.reminder_service.get_due_reminders", mock_get_due_reminders)
 
-        response = client.get("/dashboard")
+        response = client.get("/dashboard/")
         html = response.data.decode()
 
         # Should only show top 3 in focus section
@@ -151,12 +151,25 @@ class TestTodaysFocus:
         monkeypatch.setattr("app.utils.auth.is_authenticated", mock_is_authenticated)
         monkeypatch.setattr("app.utils.auth.get_current_user_id", mock_get_user_id)
 
+        # Mock all Supabase client calls that dashboard makes
+        monkeypatch.setattr("app.routes.dashboard.supabase_client.get_user_profile", lambda user_id: {"id": "test-user-id", "email": "test@example.com"})
+        monkeypatch.setattr("app.routes.dashboard.supabase_client.get_plant_count", lambda user_id: 5)
+        monkeypatch.setattr("app.routes.dashboard.supabase_client.is_premium", lambda user_id: False)
+        monkeypatch.setattr("app.routes.dashboard.supabase_client.is_in_trial", lambda user_id: False)
+        monkeypatch.setattr("app.routes.dashboard.supabase_client.trial_days_remaining", lambda user_id: 0)
+        monkeypatch.setattr("app.routes.dashboard.supabase_client.has_premium_access", lambda user_id: False)
+        monkeypatch.setattr("app.routes.dashboard.supabase_client.get_user_plants", lambda user_id, limit, offset: [])
+
         def mock_get_due_reminders(user_id):
             return []  # No due reminders
 
-        monkeypatch.setattr("app.routes.dashboard.reminder_service.get_due_reminders", mock_get_due_reminders)
+        def mock_get_reminder_stats(user_id):
+            return {"due_today": 0, "upcoming_7_days": 0, "active_reminders": 0}
 
-        response = client.get("/dashboard")
+        monkeypatch.setattr("app.routes.dashboard.reminder_service.get_due_reminders", mock_get_due_reminders)
+        monkeypatch.setattr("app.routes.dashboard.reminder_service.get_reminder_stats", mock_get_reminder_stats)
+
+        response = client.get("/dashboard/")
         html = response.data.decode()
 
         assert response.status_code == 200
@@ -182,7 +195,7 @@ class TestReminderCompletion:
             tracked_events.append({"user_id": user_id, "type": event_type, "data": event_data})
             return "event-123", None
 
-        monkeypatch.setattr("app.routes.reminders.analytics.track_event", mock_track_event)
+        monkeypatch.setattr("app.services.analytics.track_event", mock_track_event)
 
         # Mock authentication for @require_auth decorator
         def mock_is_authenticated():
@@ -227,6 +240,9 @@ class TestJournaling:
     def test_plant_view_shows_care_statistics(self, client, monkeypatch):
         """Plant view should show care statistics."""
         # Mock authentication (patch at source for consistency)
+        def mock_is_authenticated():
+            return True
+
         def mock_get_user_id():
             return "test-user-id"
 
@@ -248,10 +264,12 @@ class TestJournaling:
                 "prune_count": 0,
                 "note_count": 3,
                 "pest_count": 0,
-                "total_count": 11
+                "total_actions": 11  # Fixed: template uses total_actions not total_count
             }
 
+        monkeypatch.setattr("app.utils.auth.is_authenticated", mock_is_authenticated)
         monkeypatch.setattr("app.utils.auth.get_current_user_id", mock_get_user_id)
+        monkeypatch.setattr("app.routes.plants.get_current_user_id", mock_get_user_id)  # Patch where it's imported
         monkeypatch.setattr("app.routes.plants.supabase_client.get_plant_by_id", mock_get_plant)
         # Patch at source module since journal_service is imported inside the function
         monkeypatch.setattr("app.services.journal.get_plant_actions", mock_get_actions)
@@ -272,7 +290,7 @@ class TestJournaling:
             tracked_events.append({"type": event_type})
             return "event-123", None
 
-        monkeypatch.setattr("app.routes.journal.analytics.track_event", mock_track_event)
+        monkeypatch.setattr("app.services.analytics.track_event", mock_track_event)
 
         # Mock authentication for @require_auth decorator
         def mock_is_authenticated():
@@ -343,7 +361,7 @@ class TestAnalytics:
             tracked_events.append({"type": event_type, "data": event_data})
             return "event-123", None
 
-        monkeypatch.setattr("app.routes.plants.analytics.track_event", mock_track_event)
+        monkeypatch.setattr("app.services.analytics.track_event", mock_track_event)
 
         # Mock authentication for @require_auth decorator
         def mock_is_authenticated():
@@ -380,7 +398,7 @@ class TestAnalytics:
             tracked_events.append({"type": event_type})
             return "event-123", None
 
-        monkeypatch.setattr("app.routes.web.analytics.track_event", mock_track_event)
+        monkeypatch.setattr("app.services.analytics.track_event", mock_track_event)
 
         # Mock authentication (must patch at source module, not route module)
         def mock_get_user_id():

@@ -156,37 +156,115 @@
   <div class="flex items-center justify-between mb-4">
     <h3 id="plants-title" class="section-title !mb-0">My Plants</h3>
     <a href="{{ url_for('plants.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
-      View all →
+      Manage plants →
     </a>
-  </div>
-  
-  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 place-items-center">
-    {% for plant in latest_plants %}
-    <button type="button" class="plant-select-btn flex flex-col items-center p-3 bg-slate-50 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200">
-      {% if plant.photo_url_thumb or plant.photo_url %}
-        <img src="{{ plant.photo_url_thumb or plant.photo_url }}" alt="{{ plant.name }}" class="w-16 h-16 object-cover rounded-lg mb-2" loading="lazy" decoding="async">
-      {% else %}
-        <div class="w-16 h-16 bg-gradient-to-br from-emerald-100 to-cyan-100 dark:from-emerald-900/30 dark:to-cyan-900/30 rounded-lg flex items-center justify-center mb-2 text-3xl">
-          🪴
-        </div>
-      {% endif %}
-      <span class="text-sm font-medium text-slate-900 dark:text-slate-100 text-center line-clamp-2">
-        {{ plant.name }}
-      </span>
-      {% if plant.nickname %}
-        <span class="text-xs text-slate-500 dark:text-slate-400 mt-1">"{{ plant.nickname }}"</span>
-      {% endif %}
-    </button>
-    {% endfor %}
   </div>
 
-  {% if plant_count > 6 %}
-  <div class="text-center text-sm text-slate-500 dark:text-slate-400 mt-4">
-    <a href="{{ url_for('plants.index') }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-      + {{ plant_count - 6 }} more plant{% if plant_count > 7 %}s{% endif %}
-    </a>
+  <!-- Plant count and scroll controls -->
+  <div class="flex items-center justify-between mb-4 gap-3">
+    <div class="flex items-center gap-3 flex-wrap">
+      <p class="text-sm text-slate-600 dark:text-slate-400">
+        Your collection:
+      </p>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1
+                   bg-emerald-100 dark:bg-emerald-900/30
+                   text-emerald-700 dark:text-emerald-300
+                   text-sm font-medium rounded-full border border-emerald-200 dark:border-emerald-700/50"
+            role="status"
+            aria-live="polite">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        {{ plant_count }} plant{{ 's' if plant_count != 1 else '' }}
+      </span>
+    </div>
+
+    <!-- Scroll arrow buttons (mobile only) -->
+    <div class="flex sm:hidden items-center gap-1" role="group" aria-label="Scroll controls">
+      <button type="button"
+              id="dashboard-scroll-left-btn"
+              class="p-2 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500
+                     hover:text-emerald-600 dark:hover:text-emerald-400
+                     hover:bg-emerald-50 dark:hover:bg-emerald-900/20
+                     rounded-lg border border-slate-200 dark:border-slate-700
+                     transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed
+                     focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+              aria-label="Scroll plants left"
+              disabled>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <button type="button"
+              id="dashboard-scroll-right-btn"
+              class="p-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300
+                     hover:text-emerald-600 dark:hover:text-emerald-400
+                     hover:bg-emerald-50 dark:hover:bg-emerald-900/20
+                     rounded-lg border border-slate-200 dark:border-slate-700
+                     transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed
+                     focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+              aria-label="Scroll plants right">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
   </div>
-  {% endif %}
+
+  <!-- Horizontal scrollable plant carousel -->
+  <div class="relative -mx-4 px-4">
+    <!-- Left gradient indicator (outside scroll container to stay fixed) -->
+    <div id="dashboard-gradient-left"
+         class="absolute left-0 top-0 bottom-0 w-4 sm:w-8
+                bg-gradient-to-r from-white via-white/90 to-transparent
+                dark:from-slate-900 dark:via-slate-900/90 dark:to-transparent
+                shadow-[inset_-4px_0_8px_-4px_rgba(0,0,0,0.1)]
+                dark:shadow-[inset_-4px_0_8px_-4px_rgba(0,0,0,0.3)]
+                pointer-events-none z-10 opacity-0 transition-opacity duration-200"
+         aria-hidden="true">
+    </div>
+
+    <!-- Right gradient indicator -->
+    <div id="dashboard-gradient-right"
+         class="absolute right-0 top-0 bottom-0 w-4 sm:w-8
+                bg-gradient-to-l from-white via-white/90 to-transparent
+                dark:from-slate-900 dark:via-slate-900/90 dark:to-transparent
+                shadow-[inset_4px_0_8px_-4px_rgba(0,0,0,0.1)]
+                dark:shadow-[inset_4px_0_8px_-4px_rgba(0,0,0,0.3)]
+                pointer-events-none z-10 transition-opacity duration-200"
+         aria-hidden="true">
+    </div>
+
+    <!-- Scrollable container -->
+    <div id="dashboard-plants-scroll-container"
+         class="overflow-x-auto scroll-smooth -mx-2 px-2 pb-2"
+         style="scrollbar-width: thin; scrollbar-color: rgb(16 185 129) transparent;"
+         role="region"
+         aria-label="Your plants carousel"
+         tabindex="0">
+      <div class="flex gap-3">
+        {% for plant in latest_plants %}
+        <a href="{{ url_for('plants.view', plant_id=plant.id) }}"
+           class="flex flex-col items-center p-2 bg-slate-50 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 flex-shrink-0 w-28"
+           aria-label="View {{ plant.name }}{% if plant.nickname %}, also known as {{ plant.nickname }}{% endif %}">
+          {% if plant.photo_url_thumb or plant.photo_url %}
+            <img src="{{ plant.photo_url_thumb or plant.photo_url }}" alt="{{ plant.name }}" class="w-16 h-16 object-cover rounded-lg mb-2" loading="lazy" decoding="async">
+          {% else %}
+            <div class="w-16 h-16 bg-gradient-to-br from-emerald-100 to-cyan-100 dark:from-emerald-900/30 dark:to-cyan-900/30 rounded-lg flex items-center justify-center mb-2 text-3xl" aria-hidden="true">
+              🪴
+            </div>
+          {% endif %}
+          <span class="text-sm font-medium text-slate-900 dark:text-slate-100 text-center line-clamp-2">
+            {{ plant.name }}
+          </span>
+          {% if plant.nickname %}
+            <span class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">"{{ plant.nickname }}"</span>
+          {% endif %}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
 </section>
 {% else %}
 <section class="empty-state mb-8" aria-labelledby="empty-title">

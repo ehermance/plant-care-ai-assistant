@@ -176,7 +176,41 @@
   }
 
   if (form) {
-    form.addEventListener('submit', () => {
+    form.addEventListener('submit', (e) => {
+      // Validate question field before submission
+      const questionValue = questionInput ? questionInput.value.trim() : '';
+
+      if (!questionValue) {
+        e.preventDefault();
+
+        // Focus the question field
+        if (questionInput) questionInput.focus();
+
+        // Show validation message (browser will handle with HTML5 required attribute)
+        if (questionInput && questionInput.reportValidity) {
+          questionInput.reportValidity();
+        }
+
+        return false;
+      }
+
+      // Check maxlength (1200 characters)
+      if (questionValue.length > 1200) {
+        e.preventDefault();
+
+        if (questionInput) {
+          questionInput.focus();
+          questionInput.setCustomValidity('Question must be under 1200 characters.');
+          questionInput.reportValidity();
+          questionInput.setCustomValidity(''); // Clear after showing
+        }
+
+        return false;
+      }
+
+      // Clear any custom validity before submitting
+      if (questionInput) questionInput.setCustomValidity('');
+
       try { sessionStorage.setItem('pcai-just-submitted', '1'); } catch (_) {}
       setSubmitting(true);
     });

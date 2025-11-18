@@ -34,6 +34,57 @@
     // Call the greeting function immediately when the DOM is ready
     updateGreeting();
 
+    // Plant carousel scroll functionality with gradient indicators
+    const scrollContainer = document.getElementById('dashboard-plants-scroll-container');
+    const scrollLeftBtn = document.getElementById('dashboard-scroll-left-btn');
+    const scrollRightBtn = document.getElementById('dashboard-scroll-right-btn');
+    const gradientLeft = document.getElementById('dashboard-gradient-left');
+    const gradientRight = document.getElementById('dashboard-gradient-right');
+
+    if (scrollContainer && scrollLeftBtn && scrollRightBtn) {
+      // Scroll distance (approximately 3 plant cards)
+      const scrollDistance = 300;
+
+      // Update button states and gradient visibility based on scroll position
+      function updateScrollState() {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollContainer;
+        const maxScroll = scrollWidth - clientWidth;
+
+        // Update button states
+        scrollLeftBtn.disabled = scrollLeft <= 1;
+        scrollRightBtn.disabled = scrollLeft >= maxScroll - 1;
+
+        // Update gradient indicators
+        if (gradientLeft) {
+          gradientLeft.style.opacity = scrollLeft > 10 ? '1' : '0';
+        }
+        if (gradientRight) {
+          gradientRight.style.opacity = scrollLeft < maxScroll - 10 ? '1' : '0';
+        }
+      }
+
+      // Scroll left
+      scrollLeftBtn.addEventListener('click', () => {
+        scrollContainer.scrollBy({ left: -scrollDistance, behavior: 'smooth' });
+      });
+
+      // Scroll right
+      scrollRightBtn.addEventListener('click', () => {
+        scrollContainer.scrollBy({ left: scrollDistance, behavior: 'smooth' });
+      });
+
+      // Update states on scroll
+      scrollContainer.addEventListener('scroll', updateScrollState);
+
+      // Initial state
+      updateScrollState();
+
+      // Re-check after images load (they might affect scrollWidth)
+      window.addEventListener('load', () => {
+        setTimeout(updateScrollState, 100);
+      });
+    }
+
     // Get CSRF token securely from data attribute
     const csrfTokenEl = document.getElementById('csrf-token');
     if (!csrfTokenEl) return; // No CSRF token, no reminders to complete

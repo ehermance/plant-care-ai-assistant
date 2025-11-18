@@ -41,8 +41,8 @@ def index():
     trial_days = supabase_client.trial_days_remaining(user_id)
     has_premium_access = supabase_client.has_premium_access(user_id)
 
-    # Get user's 6 latest plants
-    latest_plants = supabase_client.get_user_plants(user_id, 6, 0)
+    # Get user's plants for carousel (limit 20 for performance)
+    latest_plants = supabase_client.get_user_plants(user_id, 20, 0)
 
     # Get reminder stats and due reminders
     reminder_stats = reminder_service.get_reminder_stats(user_id)
