@@ -70,11 +70,17 @@ def set_session(user: Dict[str, Any], access_token: str, refresh_token: Optional
     """
     Store user session data.
 
+    Security: Regenerates session ID to prevent session fixation attacks.
+
     Args:
         user: User dict from Supabase Auth
         access_token: JWT access token
         refresh_token: Optional refresh token for session renewal
     """
+    # Regenerate session ID to prevent session fixation
+    session.clear()
+    session.modified = True
+
     session[SESSION_USER_KEY] = {
         "id": user.get("id"),
         "email": user.get("email"),
@@ -153,6 +159,41 @@ def require_premium(f):
         if not supabase_client.has_premium_access(user_id):
             flash("This feature requires a Premium plan. Upgrade to get unlimited access!", "warning")
             return redirect(url_for("pricing.index"))
+
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
+def require_admin(f):
+    """
+    Decorator to require admin privileges for a route.
+
+    Checks if user is authenticated AND has admin role.
+    If not authenticated, redirects to signup page.
+    If not admin, redirects to dashboard with access denied message.
+
+    Usage:
+        @app.route('/admin/metrics')
+        @require_admin
+        def admin_metrics():
+            # Only admin users can access this
+            return render_template('admin/metrics.html')
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # First check authentication
+        if not is_authenticated():
+            flash("Please sign in to access this page.", "info")
+            return redirect(url_for("auth.signup", next=request.url))
+
+        # Check admin privileges
+        user_id = get_current_user_id()
+        profile = supabase_client.get_user_profile(user_id)
+
+        if not profile or not profile.get("is_admin", False):
+            flash("Access denied. Admin privileges required.", "error")
+            return redirect(url_for("dashboard.index"))
 
         return f(*args, **kwargs)
 

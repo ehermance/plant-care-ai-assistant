@@ -12,66 +12,13 @@ from __future__ import annotations
 from flask import Blueprint, render_template, flash, redirect, url_for, request, current_app
 from werkzeug.utils import secure_filename
 from app.utils.auth import require_auth, get_current_user_id
+from app.utils.file_upload import validate_upload_file
 from app.services import supabase_client
 from app.services import analytics
-from PIL import Image
-from io import BytesIO
-import os
+from app.extensions import limiter
 
 
 plants_bp = Blueprint("plants", __name__, url_prefix="/plants")
-
-# Allowed image file extensions
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
-MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
-
-
-def allowed_file(filename: str) -> bool:
-    """
-    Check if filename has an allowed extension and no dangerous double extensions.
-
-    Prevents double extension attacks like 'image.php.jpg' where the server
-    might execute the .php part even though the final extension is .jpg.
-    """
-    if '.' not in filename:
-        return False
-
-    # Get final extension
-    ext = filename.rsplit('.', 1)[1].lower()
-    if ext not in ALLOWED_EXTENSIONS:
-        return False
-
-    # Check for double extension attack (e.g., image.php.jpg)
-    # Count dots - if more than 1, check second-to-last extension isn't dangerous
-    parts = filename.lower().split('.')
-    if len(parts) > 2:
-        # Check second-to-last extension isn't a dangerous executable type
-        dangerous_exts = {'php', 'phtml', 'php3', 'php4', 'php5', 'exe', 'sh', 'bat', 'cmd', 'js', 'py', 'rb', 'pl', 'cgi'}
-        if parts[-2] in dangerous_exts:
-            return False
-
-    return True
-
-
-def validate_image_content(file_bytes: bytes) -> bool:
-    """
-    Validate that file content is actually a valid image.
-
-    This prevents malicious files with spoofed extensions by checking
-    the actual file content (magic numbers/file signature).
-
-    Args:
-        file_bytes: The file content as bytes
-
-    Returns:
-        True if valid image, False otherwise
-    """
-    try:
-        img = Image.open(BytesIO(file_bytes))
-        img.verify()  # Verify it's a valid image
-        return True
-    except Exception:
-        return False
 
 
 @plants_bp.route("/")
@@ -95,6 +42,7 @@ def index():
 
 @plants_bp.route("/add", methods=["GET", "POST"])
 @require_auth
+@limiter.limit("20 per hour")
 def add():
     """Add a new plant to the user's collection."""
     user_id = get_current_user_id()
@@ -126,37 +74,27 @@ def add():
         photo_url = None
         photo_url_original = None
         photo_url_thumb = None
-        if "photo" in request.files:
-            file = request.files["photo"]
-            if file and file.filename and allowed_file(file.filename):
-                # Check file size
-                file.seek(0, os.SEEK_END)
-                file_length = file.tell()
-                if file_length > MAX_FILE_SIZE:
-                    flash("Photo must be less than 5MB.", "error")
-                    return render_template("plants/add.html")
+        file = request.files.get("photo")
+        is_valid, error, file_bytes = validate_upload_file(file)
 
-                file.seek(0)  # Reset file pointer
-                file_bytes = file.read()
+        if error:  # Validation failed
+            flash(error, "error")
+            return render_template("plants/add.html")
 
-                # Validate actual file content (prevents malicious files with spoofed extensions)
-                if not validate_image_content(file_bytes):
-                    flash("Invalid image file. Please upload a valid image.", "error")
-                    return render_template("plants/add.html")
+        if is_valid and file_bytes:  # File provided and valid
+            # Upload photo with optimized versions (original, display, thumbnail)
+            photo_urls = supabase_client.upload_plant_photo_versions(
+                file_bytes,
+                user_id,
+                secure_filename(file.filename)
+            )
 
-                # Upload photo with optimized versions (original, display, thumbnail)
-                photo_urls = supabase_client.upload_plant_photo_versions(
-                    file_bytes,
-                    user_id,
-                    secure_filename(file.filename)
-                )
-
-                if photo_urls:
-                    photo_url = photo_urls['display']
-                    photo_url_original = photo_urls['original']
-                    photo_url_thumb = photo_urls['thumbnail']
-                else:
-                    flash("Failed to upload photo. Please try again.", "error")
+            if photo_urls:
+                photo_url = photo_urls['display']
+                photo_url_original = photo_urls['original']
+                photo_url_thumb = photo_urls['thumbnail']
+            else:
+                flash("Failed to upload photo. Please try again.", "error")
 
         # Create plant
         plant_data = {
@@ -218,6 +156,7 @@ def view(plant_id):
 
 @plants_bp.route("/<plant_id>/edit", methods=["GET", "POST"])
 @require_auth
+@limiter.limit("20 per hour")
 def edit(plant_id):
     """Edit plant information."""
     user_id = get_current_user_id()
@@ -249,46 +188,36 @@ def edit(plant_id):
         photo_url_original = plant.get("photo_url_original")
         photo_url_thumb = plant.get("photo_url_thumb")
 
-        if "photo" in request.files:
-            file = request.files["photo"]
-            if file and file.filename and allowed_file(file.filename):
-                # Check file size
-                file.seek(0, os.SEEK_END)
-                file_length = file.tell()
-                if file_length > MAX_FILE_SIZE:
-                    flash("Photo must be less than 5MB.", "error")
-                    return render_template("plants/edit.html", plant=plant)
+        file = request.files.get("photo")
+        is_valid, error, file_bytes = validate_upload_file(file)
 
-                file.seek(0)
-                file_bytes = file.read()
+        if error:  # Validation failed
+            flash(error, "error")
+            return render_template("plants/edit.html", plant=plant)
 
-                # Validate actual file content (prevents malicious files with spoofed extensions)
-                if not validate_image_content(file_bytes):
-                    flash("Invalid image file. Please upload a valid image.", "error")
-                    return render_template("plants/edit.html", plant=plant)
+        if is_valid and file_bytes:  # New photo provided and valid
+            # Upload new photo with optimized versions
+            new_photo_urls = supabase_client.upload_plant_photo_versions(
+                file_bytes,
+                user_id,
+                secure_filename(file.filename)
+            )
 
-                # Upload new photo with optimized versions
-                new_photo_urls = supabase_client.upload_plant_photo_versions(
-                    file_bytes,
-                    user_id,
-                    secure_filename(file.filename)
-                )
+            if new_photo_urls:
+                # Delete old photos if they exist
+                if photo_url:
+                    supabase_client.delete_plant_photo(photo_url)
+                if photo_url_original:
+                    supabase_client.delete_plant_photo(photo_url_original)
+                if photo_url_thumb:
+                    supabase_client.delete_plant_photo(photo_url_thumb)
 
-                if new_photo_urls:
-                    # Delete old photos if they exist
-                    if photo_url:
-                        supabase_client.delete_plant_photo(photo_url)
-                    if photo_url_original:
-                        supabase_client.delete_plant_photo(photo_url_original)
-                    if photo_url_thumb:
-                        supabase_client.delete_plant_photo(photo_url_thumb)
-
-                    # Set new photo URLs
-                    photo_url = new_photo_urls['display']
-                    photo_url_original = new_photo_urls['original']
-                    photo_url_thumb = new_photo_urls['thumbnail']
-                else:
-                    flash("Failed to upload new photo.", "error")
+                # Set new photo URLs
+                photo_url = new_photo_urls['display']
+                photo_url_original = new_photo_urls['original']
+                photo_url_thumb = new_photo_urls['thumbnail']
+            else:
+                flash("Failed to upload new photo.", "error")
 
         # Update plant
         plant_data = {

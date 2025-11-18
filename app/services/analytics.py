@@ -12,7 +12,10 @@ Tracks user behavior events for product metrics:
 
 from typing import Dict, Any, Optional, Tuple
 from datetime import datetime, date, timedelta
+import logging
 from app.services.supabase_client import get_admin_client
+
+logger = logging.getLogger(__name__)
 
 
 # Event type constants
@@ -66,8 +69,8 @@ def track_event(
             return None, "Failed to track event"
 
     except Exception as e:
-        print(f"Error tracking analytics event: {str(e)}")
-        return None, str(e)
+        logger.error(f"Error tracking analytics event: {str(e)}", exc_info=True)
+        return None, "Failed to track event"
 
 
 def get_activation_rate(
@@ -106,8 +109,8 @@ def get_activation_rate(
             return None, "No data available"
 
     except Exception as e:
-        print(f"Error getting activation rate: {str(e)}")
-        return None, str(e)
+        logger.error(f"Error getting activation rate: {str(e)}", exc_info=True)
+        return None, "Failed to get activation rate"
 
 
 def get_weekly_active_users(end_date: Optional[date] = None) -> Tuple[Optional[int], Optional[str]]:
@@ -136,8 +139,8 @@ def get_weekly_active_users(end_date: Optional[date] = None) -> Tuple[Optional[i
             return None, "No data available"
 
     except Exception as e:
-        print(f"Error getting WAU: {str(e)}")
-        return None, str(e)
+        logger.error(f"Error getting WAU: {str(e)}", exc_info=True)
+        return None, "Failed to get WAU"
 
 
 def get_monthly_active_users(end_date: Optional[date] = None) -> Tuple[Optional[int], Optional[str]]:
@@ -166,8 +169,8 @@ def get_monthly_active_users(end_date: Optional[date] = None) -> Tuple[Optional[
             return None, "No data available"
 
     except Exception as e:
-        print(f"Error getting MAU: {str(e)}")
-        return None, str(e)
+        logger.error(f"Error getting MAU: {str(e)}", exc_info=True)
+        return None, "Failed to get MAU"
 
 
 def get_stickiness(end_date: Optional[date] = None) -> Tuple[Optional[float], Optional[str]]:
@@ -194,8 +197,8 @@ def get_stickiness(end_date: Optional[date] = None) -> Tuple[Optional[float], Op
             return None, "No data available"
 
     except Exception as e:
-        print(f"Error getting stickiness: {str(e)}")
-        return None, str(e)
+        logger.error(f"Error getting stickiness: {str(e)}", exc_info=True)
+        return None, "Failed to get stickiness"
 
 
 def get_reminder_completion_rate(
@@ -234,8 +237,8 @@ def get_reminder_completion_rate(
             return None, "No data available"
 
     except Exception as e:
-        print(f"Error getting reminder completion rate: {str(e)}")
-        return None, str(e)
+        logger.error(f"Error getting reminder completion rate: {str(e)}", exc_info=True)
+        return None, "Failed to get reminder completion rate"
 
 
 def get_d30_retention(
@@ -274,8 +277,8 @@ def get_d30_retention(
             return None, "No data available"
 
     except Exception as e:
-        print(f"Error getting D30 retention: {str(e)}")
-        return None, str(e)
+        logger.error(f"Error getting D30 retention: {str(e)}", exc_info=True)
+        return None, "Failed to get D30 retention"
 
 
 def get_all_metrics() -> Dict[str, Any]:

@@ -8,9 +8,13 @@ weather-based adjustments for outdoor plants.
 from __future__ import annotations
 from typing import Optional, Dict, Any, List, Tuple
 from datetime import date, datetime, timedelta
+import logging
 from flask import current_app, has_app_context
 from app.services.supabase_client import get_client, get_admin_client
 from app.services.weather import get_weather_for_city
+from app.utils.cache import cache_calendar_data, invalidate_user_calendar_cache
+
+logger = logging.getLogger(__name__)
 
 
 def _safe_log_error(message: str) -> None:
@@ -18,8 +22,8 @@ def _safe_log_error(message: str) -> None:
     if has_app_context():
         current_app.logger.error(message)
     else:
-        # Fallback to print for testing/non-Flask contexts
-        print(f"[ERROR] {message}")
+        # Fallback to logging module for testing/non-Flask contexts
+        logger.error(message)
 
 
 # Frequency mappings to days
@@ -112,6 +116,8 @@ def create_reminder(
         }).execute()
 
         if response.data:
+            # Invalidate calendar cache for this user
+            invalidate_user_calendar_cache(user_id)
             return response.data[0], None
         return None, "Failed to create reminder"
 
@@ -264,6 +270,8 @@ def mark_reminder_complete(reminder_id: str, user_id: str) -> Tuple[bool, Option
         if response.data and len(response.data) > 0:
             result = response.data[0]
             if result.get("success"):
+                # Invalidate calendar cache for this user
+                invalidate_user_calendar_cache(user_id)
                 return True, None
             return False, result.get("message", "Failed to complete reminder")
 
@@ -307,6 +315,8 @@ def snooze_reminder(
         if response.data and len(response.data) > 0:
             result = response.data[0]
             if result.get("success"):
+                # Invalidate calendar cache for this user
+                invalidate_user_calendar_cache(user_id)
                 return True, None
             return False, result.get("message", "Failed to snooze reminder")
 
@@ -349,6 +359,8 @@ def update_reminder(
         ).eq("user_id", user_id).execute()
 
         if response.data:
+            # Invalidate calendar cache for this user
+            invalidate_user_calendar_cache(user_id)
             return response.data[0], None
         return None, "Failed to update reminder"
 
@@ -378,6 +390,8 @@ def delete_reminder(reminder_id: str, user_id: str) -> Tuple[bool, Optional[str]
         }).eq("id", reminder_id).eq("user_id", user_id).execute()
 
         if response.data:
+            # Invalidate calendar cache for this user
+            invalidate_user_calendar_cache(user_id)
             return True, None
         return False, "Reminder not found or unauthorized"
 
@@ -427,6 +441,8 @@ def toggle_reminder_status(reminder_id: str, user_id: str) -> Tuple[bool, Option
         response = supabase.table("reminders").update(update_data).eq("id", reminder_id).eq("user_id", user_id).execute()
 
         if response.data:
+            # Invalidate calendar cache for this user
+            invalidate_user_calendar_cache(user_id)
             return True, None
         return False, "Failed to toggle reminder status"
 
@@ -657,9 +673,13 @@ def batch_adjust_reminders_for_weather(
     return stats
 
 
+@cache_calendar_data
 def get_reminders_for_month(user_id: str, year: int, month: int) -> List[Dict[str, Any]]:
     """
     Get all active reminders with next_due dates in the specified month.
+
+    Performance: Results are cached for 5 minutes to improve calendar load times.
+    Cache is automatically invalidated when reminders are created/updated/deleted.
 
     Args:
         user_id: User's UUID
@@ -681,8 +701,9 @@ def get_reminders_for_month(user_id: str, year: int, month: int) -> List[Dict[st
         last_day = date(year, month, last_day_num)
 
         # Get all active reminders with next_due in this month
+        # Optimized query: only select fields actually used in calendar view
         response = supabase.table("reminders") \
-            .select("*, plants(id, name, nickname, photo_url, location)") \
+            .select("id, plant_id, reminder_type, next_due, plants(id, name, nickname)") \
             .eq("user_id", user_id) \
             .eq("is_active", True) \
             .gte("next_due", first_day.isoformat()) \

@@ -11,42 +11,18 @@ Provides dashboard for:
 """
 
 from __future__ import annotations
-from flask import Blueprint, render_template, redirect, url_for, flash
-from app.utils.auth import require_auth, get_current_user_id
+from flask import Blueprint, render_template
+from app.utils.auth import require_admin
 from app.services import analytics
-from app.services.supabase_client import get_user_profile
 from datetime import date, timedelta
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 
-def is_admin(user_id: str) -> bool:
-    """
-    Check if user has admin privileges.
-
-    Uses the 'is_admin' column from the profiles table.
-    Set via migration 010_add_admin_role.sql
-    """
-    profile = get_user_profile(user_id)
-    if not profile:
-        return False
-
-    return profile.get("is_admin", False)
-
-
 @admin_bp.route("/")
-@require_auth
+@require_admin
 def index():
     """Admin dashboard showing all key metrics."""
-    user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to access admin panel.", "error")
-        return redirect(url_for("auth.login"))
-
-    # Check admin privileges
-    if not is_admin(user_id):
-        flash("Access denied. Admin privileges required.", "error")
-        return redirect(url_for("dashboard.index"))
 
     # Get all metrics
     metrics = analytics.get_all_metrics()
@@ -67,19 +43,9 @@ def index():
 
 
 @admin_bp.route("/metrics")
-@require_auth
+@require_admin
 def metrics():
     """Detailed metrics page with custom date ranges."""
-    user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to access metrics.", "error")
-        return redirect(url_for("auth.login"))
-
-    # Check admin privileges
-    if not is_admin(user_id):
-        flash("Access denied. Admin privileges required.", "error")
-        return redirect(url_for("dashboard.index"))
-
     # Get individual metrics with defaults
     today = date.today()
 

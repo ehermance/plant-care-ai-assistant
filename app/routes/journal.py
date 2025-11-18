@@ -7,34 +7,15 @@ Handles creating, viewing, and managing plant care activities.
 from __future__ import annotations
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from app.utils.auth import require_auth, get_current_user_id
+from app.utils.file_upload import validate_upload_file
+from app.utils.errors import sanitize_error, log_info
 from app.services import journal as journal_service
 from app.services import analytics
-from app.services.supabase_client import get_plant_by_id, upload_plant_photo, upload_plant_photo_versions, delete_plant_photo
+from app.services.supabase_client import get_plant_by_id, upload_plant_photo_versions, delete_plant_photo
+from app.extensions import limiter
 from werkzeug.utils import secure_filename
-from PIL import Image
-from io import BytesIO
-import os
 
 journal_bp = Blueprint("journal", __name__, url_prefix="/journal")
-
-# Allowed image file extensions
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
-MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
-
-
-def allowed_file(filename: str) -> bool:
-    """Check if filename has an allowed extension."""
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-def validate_image_content(file_bytes: bytes) -> bool:
-    """Validate that file content is actually a valid image."""
-    try:
-        img = Image.open(BytesIO(file_bytes))
-        img.verify()
-        return True
-    except Exception:
-        return False
 
 
 @journal_bp.route("/plant/<plant_id>")
@@ -68,6 +49,7 @@ def view_plant_journal(plant_id):
 
 @journal_bp.route("/plant/<plant_id>/add", methods=["GET", "POST"])
 @require_auth
+@limiter.limit("20 per hour")
 def add_entry(plant_id):
     """Add a new journal entry for a plant."""
     user_id = get_current_user_id()
@@ -121,45 +103,31 @@ def add_entry(plant_id):
         photo_url = None
         photo_url_original = None
         photo_url_thumb = None
-        if "photo" in request.files:
-            file = request.files["photo"]
-            if file and file.filename and allowed_file(file.filename):
-                # Check file size
-                file.seek(0, os.SEEK_END)
-                file_length = file.tell()
-                if file_length > MAX_FILE_SIZE:
-                    flash("Photo must be less than 5MB.", "error")
-                    return render_template(
-                        "journal/add_entry.html",
-                        plant=plant,
-                        action_types=journal_service.ACTION_TYPE_NAMES,
-                    )
+        file = request.files.get("photo")
+        is_valid, error, file_bytes = validate_upload_file(file)
 
-                file.seek(0)
-                file_bytes = file.read()
+        if error:  # Validation failed
+            flash(error, "error")
+            return render_template(
+                "journal/add_entry.html",
+                plant=plant,
+                action_types=journal_service.ACTION_TYPE_NAMES,
+            )
 
-                # Validate actual file content
-                if not validate_image_content(file_bytes):
-                    flash("Invalid image file. Please upload a valid image.", "error")
-                    return render_template(
-                        "journal/add_entry.html",
-                        plant=plant,
-                        action_types=journal_service.ACTION_TYPE_NAMES,
-                    )
+        if is_valid and file_bytes:  # File provided and valid
+            # Upload photo with optimized versions (original, display, thumbnail)
+            photo_urls = upload_plant_photo_versions(
+                file_bytes,
+                user_id,
+                secure_filename(file.filename)
+            )
 
-                # Upload photo with optimized versions (original, display, thumbnail)
-                photo_urls = upload_plant_photo_versions(
-                    file_bytes,
-                    user_id,
-                    secure_filename(file.filename)
-                )
-
-                if photo_urls:
-                    photo_url = photo_urls['display']
-                    photo_url_original = photo_urls['original']
-                    photo_url_thumb = photo_urls['thumbnail']
-                else:
-                    flash("Failed to upload photo. Please try again.", "error")
+            if photo_urls:
+                photo_url = photo_urls['display']
+                photo_url_original = photo_urls['original']
+                photo_url_thumb = photo_urls['thumbnail']
+            else:
+                flash("Failed to upload photo. Please try again.", "error")
 
         # Create journal entry
         action, error = journal_service.create_plant_action(
@@ -271,6 +239,9 @@ def api_quick_log():
     """
     Quick log an action via JSON API.
 
+    Security: CSRF token required via X-CSRFToken header
+    (automatically validated by Flask-WTF CSRFProtect)
+
     Request body:
         {
             "plant_id": "uuid",
@@ -320,4 +291,6 @@ def api_quick_log():
         })
 
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+        # Log the actual error for debugging
+        sanitized_msg = sanitize_error(e, "database", "API quick-log failed")
+        return jsonify({"success": False, "error": sanitized_msg}), 500

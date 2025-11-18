@@ -29,6 +29,7 @@ class BaseConfig:
 
     # Feature flags
     UI_DEBUG_LINKS = os.getenv("UI_DEBUG_LINKS", "").strip().lower() in {"1", "true", "yes"}
+    DEBUG_ENDPOINTS_ENABLED = os.getenv("DEBUG_ENDPOINTS_ENABLED", "false").lower() == "true"
 
     # Third-party keys
     OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "")
@@ -62,6 +63,7 @@ class DevConfig(BaseConfig):
     """Developer-friendly settings."""
     ENV = "development"
     DEBUG = True
+    DEBUG_ENDPOINTS_ENABLED = True  # Enable debug endpoint in development
     TEMPLATES_AUTO_RELOAD = True
     # Disable aggressive static caching in dev
     SEND_FILE_MAX_AGE_DEFAULT = 0

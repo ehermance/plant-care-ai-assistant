@@ -8,8 +8,11 @@ notes, photos, etc.) using the plant_actions table.
 from __future__ import annotations
 from typing import Optional, Dict, Any, List, Tuple
 from datetime import datetime
+import logging
 from flask import current_app, has_app_context
 from app.services.supabase_client import get_admin_client
+
+logger = logging.getLogger(__name__)
 
 
 def _safe_log_error(message: str) -> None:
@@ -17,7 +20,7 @@ def _safe_log_error(message: str) -> None:
     if has_app_context():
         current_app.logger.error(message)
     else:
-        print(f"[ERROR] {message}")
+        logger.error(message)
 
 
 # Action type display names

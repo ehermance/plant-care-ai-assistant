@@ -7,6 +7,7 @@ Also exposes /user/theme for updating user theme preferences.
 from flask import Blueprint, request, jsonify
 from ..utils.presets import infer_region_from_latlon, infer_region_from_city, region_presets
 from ..utils.auth import require_auth, get_current_user_id
+from ..utils.errors import sanitize_error, GENERIC_MESSAGES
 from ..services import supabase_client
 
 
@@ -85,11 +86,11 @@ def update_theme():
         if success:
             return jsonify({"success": True}), 200
         else:
-            return jsonify({"success": False, "error": error}), 500
+            # Sanitize service layer error
+            sanitized_msg = GENERIC_MESSAGES["database"]
+            return jsonify({"success": False, "error": sanitized_msg}), 500
 
     except Exception as e:
-        # Log error but don't expose internal details
-        return jsonify({
-            "success": False,
-            "error": "An error occurred while updating theme preference"
-        }), 500
+        # Log the actual error for debugging, return sanitized message
+        sanitized_msg = sanitize_error(e, "database", "Theme update failed")
+        return jsonify({"success": False, "error": sanitized_msg}), 500

@@ -77,13 +77,11 @@ def debug_info():
     SECURITY:
     - Only available in DEBUG mode
     - Requires authentication
-    - Can be completely disabled via DEBUG_ENDPOINTS_ENABLED env var
+    - Disabled by default (must enable DEBUG_ENDPOINTS_ENABLED in config)
     - Does not expose full API keys, only lengths
     """
-    import os
-
-    # Check if debug endpoints are enabled (can be disabled in production)
-    if not os.getenv("DEBUG_ENDPOINTS_ENABLED", "true").lower() == "true":
+    # Check if debug endpoints are enabled (disabled by default for security)
+    if not current_app.config.get("DEBUG_ENDPOINTS_ENABLED", False):
         return {"error": "Debug endpoints disabled"}, 404
 
     # Restrict to development environment only

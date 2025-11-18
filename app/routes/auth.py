@@ -9,7 +9,7 @@ Handles:
 """
 
 from __future__ import annotations
-import re
+from email_validator import validate_email, EmailNotValidError
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
 from app.services import supabase_client
 from app.utils.auth import set_session, clear_session, get_current_user, require_auth
@@ -17,6 +17,51 @@ from app.extensions import limiter
 
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+
+# Whitelist of allowed redirect paths for security
+ALLOWED_REDIRECT_PREFIXES = [
+    '/dashboard',
+    '/plants',
+    '/reminders',
+    '/journal',
+    '/ask',
+    '/pricing',
+    '/admin',
+]
+
+
+def is_safe_redirect_url(url: str) -> bool:
+    """
+    Validate redirect URL for open redirect protection.
+
+    Uses whitelist approach - only allows URLs that:
+    1. Are relative (no scheme or netloc)
+    2. Start with '/' but not '//'
+    3. Match allowed path prefixes
+
+    Args:
+        url: URL to validate
+
+    Returns:
+        True if URL is safe to redirect to, False otherwise
+    """
+    if not url or not isinstance(url, str):
+        return False
+
+    from urllib.parse import urlparse
+    # Parse URL
+    parsed = urlparse(url)
+
+    # Must not have scheme or netloc (prevents absolute URLs)
+    if parsed.scheme or parsed.netloc:
+        return False
+
+    # Must start with / but not // (prevents protocol-relative URLs)
+    if not url.startswith('/') or url.startswith('//'):
+        return False
+
+    # Must match one of the allowed prefixes
+    return any(url.startswith(prefix) for prefix in ALLOWED_REDIRECT_PREFIXES)
 
 
 @auth_bp.route("/signup", methods=["GET", "POST"])
@@ -56,15 +101,12 @@ def signup():
         flash("Please enter your email address.", "error")
         return redirect(url_for("auth.signup"))
 
-    # Email validation
-    # RFC 5322 simplified pattern
-    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-
-    if len(email) > 320:  # RFC 5321 max email length
-        flash("Email address is too long.", "error")
-        return redirect(url_for("auth.signup"))
-
-    if not re.match(email_pattern, email):
+    # Email validation using email-validator library (RFC 5322 compliant)
+    try:
+        # Validate and normalize email
+        valid = validate_email(email, check_deliverability=False)
+        email = valid.normalized  # Use normalized form (lowercase, etc.)
+    except EmailNotValidError as e:
         flash("Please enter a valid email address.", "error")
         return redirect(url_for("auth.signup"))
 
@@ -154,16 +196,12 @@ def callback():
 
     # Redirect to dashboard or 'next' URL (with open redirect protection)
     next_url = request.args.get("next", "")
-    if next_url:
-        from urllib.parse import urlparse
-        parsed = urlparse(next_url)
-        # Only allow relative URLs with no scheme or netloc (prevents //evil.com)
-        if parsed.scheme == '' and parsed.netloc == '' and next_url.startswith("/") and not next_url.startswith("//"):
-            flash(f"Welcome back, {email}!", "success")
-            return redirect(next_url)
+    if next_url and is_safe_redirect_url(next_url):
+        flash(f"Welcome back, {email}!", "success")
+        return redirect(next_url)
 
     # Check if this is a new signup (profile just created)
-    is_new_user = profile is None or not supabase_client.is_onboarding_completed(user_id)
+    is_new_user = profile is None
 
     if is_new_user:
         flash(f"Welcome to PlantCareAI! Let's add your first plant 🌱", "success")

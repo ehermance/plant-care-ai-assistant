@@ -47,7 +47,7 @@ def create_app() -> Flask:
     try:
         app.config.from_object(cfg_path)
     except (ImportError, AttributeError) as e:
-        print(f"[WARN] Could not load config object {cfg_path}: {e}")
+        app.logger.warning(f"Could not load config object {cfg_path}: {e}")
 
     limiter.init_app(app)
 
