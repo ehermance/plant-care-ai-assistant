@@ -228,47 +228,39 @@
   </div>
 
   <!-- Mobile Bottom Navigation (app-like experience) -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-lg z-40" aria-label="Mobile navigation">
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 cosmic-header border-t border-purple-700/30 shadow-lg shadow-purple-900/50 z-40" aria-label="Mobile navigation">
     <div class="flex justify-around items-center h-16">
       {% if is_authenticated %}
         {# Authenticated users: Dashboard, Assistant, Account #}
         <a href="{{ url_for('dashboard.index') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('dashboard.') and request.endpoint != 'dashboard.account' %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('dashboard.') and request.endpoint != 'dashboard.account' %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}">
           <span class="text-3xl" aria-hidden="true">🏡</span>
           <span>Dashboard</span>
         </a>
         <a href="{{ url_for('web.assistant') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint == 'web.assistant' %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
-          <span class="text-2xl dark:filter drop-shadow-[0_0_1px_rgba(0,120,84,1)] dark:drop-shadow-[0_0_1px_rgba(5,150,105,1)]" aria-hidden="true">
-            <img src="{{ url_for('static', filename='images/illustrations/custom-leaf.svg') }}"
-                 alt=""
-                 class="h-7 w-7 inline-block logo-mobile transition-all duration-300" />
-          </span>
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint == 'web.assistant' %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}">
+          <span class="text-3xl" aria-hidden="true">💡</span>
           <span>Assistant</span>
         </a>
         <a href="{{ url_for('dashboard.account') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint == 'dashboard.account' %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
-          <span class="text-2xl dark:filter dark:drop-shadow-[0_0_2px_rgba(255,255,255,1)]" aria-hidden="true">👤</span>
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint == 'dashboard.account' %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}">
+          <span class="text-2xl" aria-hidden="true">👤</span>
           <span>Account</span>
         </a>
       {% else %}
         {# Unauthenticated users: Assistant, Features, Sign Up #}
         <a href="{{ url_for('web.assistant') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint == 'web.assistant' %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
-          <span class="text-2xl" aria-hidden="true">
-            <img src="{{ url_for('static', filename='images/illustrations/custom-leaf.svg') }}"
-                 alt=""
-                 class="h-7 w-7 inline-block logo-mobile transition-all duration-300" />
-          </span>
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint == 'web.assistant' %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}">
+          <span class="text-3xl" aria-hidden="true">💡</span>
           <span>Assistant</span>
         </a>
         <a href="{{ url_for('pricing.index') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('pricing.') %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('pricing.') %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}">
           <span class="text-2xl" aria-hidden="true">✨</span>
           <span>Features</span>
         </a>
         <a href="{{ url_for('auth.signup') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('auth.signup') %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400{% endif %}">
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('auth.signup') %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}">
           <span class="text-2xl" aria-hidden="true">🌱</span>
           <span>Sign Up</span>
         </a>

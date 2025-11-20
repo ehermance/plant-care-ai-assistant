@@ -118,7 +118,7 @@
 
 <!-- Recent Care History -->
 <div class="card mb-8">
-  <div class="flex items-center justify-between mb-6">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
     <h2 class="section-title !mb-0">Recent Care History</h2>
     <a href="{{ url_for('journal.view_plant_journal', plant_id=plant.id) }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
       View all →
@@ -154,13 +154,26 @@
       </div>
       {% endfor %}
     </div>
+    <a href="{{ url_for('journal.add_entry', plant_id=plant.id) }}" class="btn btn-primary">
+      <span aria-hidden="true">📝</span> Log Care Activity
+    </a>
   {% else %}
-    <p class="text-slate-500 dark:text-slate-400 mb-6">No care history yet. Start logging care activities to track your plant's health!</p>
+    <!-- Empty State -->
+    <div class="flex flex-col items-center justify-center text-center py-8">
+      <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-100 to-emerald-100 dark:from-cyan-900/30 dark:to-emerald-900/30 flex items-center justify-center">
+        <span class="text-5xl opacity-60" aria-hidden="true">📝</span>
+      </div>
+      <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
+        No care history yet
+      </h3>
+      <p class="text-slate-600 dark:text-slate-400 mb-6 max-w-sm">
+        Start logging care activities to track {{ plant.name }}'s health and growth over time.
+      </p>
+      <a href="{{ url_for('journal.add_entry', plant_id=plant.id) }}" class="btn btn-primary">
+        <span aria-hidden="true">📝</span> Log First Activity
+      </a>
+    </div>
   {% endif %}
-
-  <a href="{{ url_for('journal.add_entry', plant_id=plant.id) }}" class="btn btn-primary">
-    <span aria-hidden="true">📝</span> Log Care Activity
-  </a>
 </div>
 
 <!-- Action Buttons -->

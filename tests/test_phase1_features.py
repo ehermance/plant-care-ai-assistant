@@ -195,20 +195,16 @@ class TestReminderCompletion:
             tracked_events.append({"user_id": user_id, "type": event_type, "data": event_data})
             return "event-123", None
 
-        monkeypatch.setattr("app.services.analytics.track_event", mock_track_event)
+        monkeypatch.setattr("app.routes.reminders.analytics.track_event", mock_track_event)
 
         # Mock authentication for @require_auth decorator
-        def mock_is_authenticated():
-            return True
-
-        def mock_get_user_id():
-            return "test-user-id"
+        def mock_get_current_user():
+            return {"id": "test-user-id", "email": "test@example.com"}
 
         def mock_mark_complete(reminder_id, user_id):
             return True, None
 
-        monkeypatch.setattr("app.utils.auth.is_authenticated", mock_is_authenticated)
-        monkeypatch.setattr("app.utils.auth.get_current_user_id", mock_get_user_id)
+        monkeypatch.setattr("app.utils.auth.get_current_user", mock_get_current_user)
         monkeypatch.setattr("app.routes.reminders.reminder_service.mark_reminder_complete", mock_mark_complete)
 
         response = client.post("/reminders/test-reminder/complete")
@@ -290,14 +286,11 @@ class TestJournaling:
             tracked_events.append({"type": event_type})
             return "event-123", None
 
-        monkeypatch.setattr("app.services.analytics.track_event", mock_track_event)
+        monkeypatch.setattr("app.routes.journal.analytics.track_event", mock_track_event)
 
         # Mock authentication for @require_auth decorator
-        def mock_is_authenticated():
-            return True
-
-        def mock_get_user_id():
-            return "test-user-id"
+        def mock_get_current_user():
+            return {"id": "test-user-id", "email": "test@example.com"}
 
         def mock_get_plant(plant_id, user_id):
             return {"id": "plant-1", "name": "Monstera"}
@@ -305,8 +298,7 @@ class TestJournaling:
         def mock_create_action(*args, **kwargs):
             return {"id": "action-123"}, None
 
-        monkeypatch.setattr("app.utils.auth.is_authenticated", mock_is_authenticated)
-        monkeypatch.setattr("app.utils.auth.get_current_user_id", mock_get_user_id)
+        monkeypatch.setattr("app.utils.auth.get_current_user", mock_get_current_user)
         monkeypatch.setattr("app.routes.journal.get_plant_by_id", mock_get_plant)
         monkeypatch.setattr("app.routes.journal.journal_service.create_plant_action", mock_create_action)
 
@@ -361,23 +353,19 @@ class TestAnalytics:
             tracked_events.append({"type": event_type, "data": event_data})
             return "event-123", None
 
-        monkeypatch.setattr("app.services.analytics.track_event", mock_track_event)
+        monkeypatch.setattr("app.routes.plants.analytics.track_event", mock_track_event)
 
         # Mock authentication for @require_auth decorator
-        def mock_is_authenticated():
-            return True
+        def mock_get_current_user():
+            return {"id": "test-user-id", "email": "test@example.com"}
 
-        def mock_get_user_id():
-            return "test-user-id"
-
-        def mock_can_add():
+        def mock_can_add(user_id):
             return True, None
 
         def mock_create_plant(user_id, data):
             return {"id": "plant-123", "name": data["name"]}
 
-        monkeypatch.setattr("app.utils.auth.is_authenticated", mock_is_authenticated)
-        monkeypatch.setattr("app.utils.auth.get_current_user_id", mock_get_user_id)
+        monkeypatch.setattr("app.utils.auth.get_current_user", mock_get_current_user)
         monkeypatch.setattr("app.routes.plants.supabase_client.can_add_plant", mock_can_add)
         monkeypatch.setattr("app.routes.plants.supabase_client.create_plant", mock_create_plant)
 
@@ -398,7 +386,7 @@ class TestAnalytics:
             tracked_events.append({"type": event_type})
             return "event-123", None
 
-        monkeypatch.setattr("app.services.analytics.track_event", mock_track_event)
+        monkeypatch.setattr("app.routes.web.analytics.track_event", mock_track_event)
 
         # Mock authentication (must patch at source module, not route module)
         def mock_get_user_id():

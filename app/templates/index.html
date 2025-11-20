@@ -178,7 +178,7 @@
 <!-- Your Plants Section (Compact, below form) -->
 {% if user_plants %}
 <section class="card mb-8" aria-labelledby="your-plants-title">
-  <div class="flex items-center justify-between mb-4">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
     <h2 id="your-plants-title" class="section-title !mb-0">Select a plant</h2>
     <a href="{{ url_for('plants.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
       Manage plants →
@@ -186,7 +186,7 @@
   </div>
 
   <!-- Plant count and scroll controls -->
-  <div class="flex items-center justify-between mb-4 gap-3">
+  <div class="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-3 mb-4">
     <div class="flex items-center gap-3 flex-wrap">
       <p class="text-sm text-slate-600 dark:text-slate-400">
         Choose a plant for plant-specific advice:
@@ -420,7 +420,7 @@
 
 <!-- Recent Q&A History -->
 <section class="card" aria-labelledby="history-title">
-  <div class="flex items-center justify-between mb-6">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
     <h2 id="history-title" class="section-title !mb-0">Recent Q&amp;A</h2>
     {% if has_history %}
       <a class="text-sm text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors" href="{{ url_for('web.clear_history') }}">Clear</a>

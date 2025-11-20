@@ -24,6 +24,23 @@
   </a>
 </div>
 
+{% if not reminders_by_date %}
+<!-- Empty State -->
+<div class="flex flex-col items-center justify-center text-center py-12">
+  <div class="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-cyan-100 to-emerald-100 dark:from-cyan-900/30 dark:to-emerald-900/30 flex items-center justify-center">
+    <span class="text-6xl opacity-60" aria-hidden="true">📅</span>
+  </div>
+  <h2 class="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
+    No reminders this month
+  </h2>
+  <p class="text-slate-600 dark:text-slate-400 mb-6 max-w-md">
+    {{ month_name }} {{ year }} doesn't have any scheduled care reminders yet. Create your first reminder to start tracking your plant care activities.
+  </p>
+  <a href="{{ url_for('reminders.create') }}" class="btn btn-primary">
+    <span aria-hidden="true">+</span> Create Reminder
+  </a>
+</div>
+{% else %}
 <!-- Calendar Grid -->
 <div class="card mb-6 overflow-x-auto">
   <!-- Inline calendar navigation -->
@@ -155,5 +172,6 @@
     </div>
   </div>
 </div>
+{% endif %}
 
 {% endblock %}

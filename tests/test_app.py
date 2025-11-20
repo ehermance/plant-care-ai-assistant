@@ -2054,7 +2054,7 @@ def test_upload_file_with_fake_extension(monkeypatch):
     def mock_upload(*args, **kwargs):
         return None
 
-    monkeypatch.setattr("app.services.supabase_client.upload_plant_photo", mock_upload)
+    monkeypatch.setattr("app.services.supabase_client.upload_plant_photo_versions", mock_upload)
 
     response = client.post('/plants/add', data=data, follow_redirects=True,
                           content_type='multipart/form-data')
@@ -2108,7 +2108,7 @@ def test_upload_oversized_file(monkeypatch):
     def mock_upload(*args, **kwargs):
         return None
 
-    monkeypatch.setattr("app.services.supabase_client.upload_plant_photo", mock_upload)
+    monkeypatch.setattr("app.services.supabase_client.upload_plant_photo_versions", mock_upload)
 
     response = client.post('/plants/add', data=data, follow_redirects=True,
                           content_type='multipart/form-data')
@@ -2147,7 +2147,7 @@ def test_upload_invalid_image_content(monkeypatch):
     def mock_upload(*args, **kwargs):
         return None
 
-    monkeypatch.setattr("app.services.supabase_client.upload_plant_photo", mock_upload)
+    monkeypatch.setattr("app.services.supabase_client.upload_plant_photo_versions", mock_upload)
 
     response = client.post('/plants/add', data=data, follow_redirects=True,
                           content_type='multipart/form-data')
@@ -2190,7 +2190,7 @@ def test_upload_file_without_extension(monkeypatch):
     def mock_upload(*args, **kwargs):
         return None
 
-    monkeypatch.setattr("app.services.supabase_client.upload_plant_photo", mock_upload)
+    monkeypatch.setattr("app.services.supabase_client.upload_plant_photo_versions", mock_upload)
 
     response = client.post('/plants/add', data=data, follow_redirects=True,
                           content_type='multipart/form-data')
@@ -2235,8 +2235,12 @@ def test_upload_valid_image_succeeds(monkeypatch):
 
     # Mock Supabase to return success
     def mock_upload(file_bytes, user_id, filename):
-        # Return fake URL to simulate successful upload
-        return 'https://fake-storage.example.com/plants/test.png'
+        # Return fake URLs dict to simulate successful upload
+        return {
+            'original': 'https://fake-storage.example.com/plants/test-original.png',
+            'display': 'https://fake-storage.example.com/plants/test-display.png',
+            'thumbnail': 'https://fake-storage.example.com/plants/test-thumb.png'
+        }
 
     def mock_create_plant(user_id, plant_data):
         # Return fake plant object
@@ -2246,7 +2250,7 @@ def test_upload_valid_image_succeeds(monkeypatch):
             'photo_url': plant_data.get('photo_url')
         }
 
-    monkeypatch.setattr("app.services.supabase_client.upload_plant_photo", mock_upload)
+    monkeypatch.setattr("app.services.supabase_client.upload_plant_photo_versions", mock_upload)
     monkeypatch.setattr("app.services.supabase_client.create_plant", mock_create_plant)
 
     response = client.post('/plants/add', data=data, follow_redirects=True,

@@ -503,15 +503,16 @@ def can_add_plant(user_id: str) -> tuple[bool, str]:
     if has_premium_access(user_id):
         return True, "Premium access - unlimited plants"
 
-    # Starter users limited to 20 plants
+    # Starter users limited to configured plant limit
+    plant_limit = current_app.config['FREE_TIER_PLANT_LIMIT']
     current_count = get_plant_count(user_id)
-    if current_count >= 20:
-        return False, f"You've reached your 20-plant limit. Upgrade to Premium for unlimited plants."
- 
-    if current_count == 19:
+    if current_count >= plant_limit:
+        return False, f"You've reached your {plant_limit}-plant limit. Upgrade to Premium for unlimited plants."
+
+    if current_count == plant_limit - 1:
         return True, f"You can add 1 more plant"
 
-    return True, f"You can add {20 - current_count} more plants"
+    return True, f"You can add {plant_limit - current_count} more plants"
 
 
 def _get_cache_key(user_id: str, limit: int, offset: int, fields: str) -> str:
@@ -881,47 +882,6 @@ def upload_plant_photo_versions(file_bytes: bytes, user_id: str, filename: str) 
 
     except Exception as e:
         _safe_log_error(f"Error uploading plant photo versions: {e}")
-        return None
-
-
-def upload_plant_photo(file_bytes: bytes, user_id: str, filename: str) -> str | None:
-    """
-    Upload a plant photo to Supabase Storage (legacy single-version upload).
-
-    NOTE: This function is deprecated. Use upload_plant_photo_versions() instead
-    for optimized multi-version uploads (original + display + thumbnail).
-
-    Args:
-        file_bytes: Image file bytes
-        user_id: User UUID (for organizing files)
-        filename: Original filename
-
-    Returns:
-        Public URL of uploaded image, or None if error
-    """
-    if not _supabase_client:
-        return None
-
-    try:
-        import uuid
-        from pathlib import Path
-
-        # Generate unique filename
-        file_ext = Path(filename).suffix.lower()
-        unique_filename = f"{user_id}/{uuid.uuid4()}{file_ext}"
-
-        # Upload to plant-photos bucket
-        response = _supabase_client.storage.from_("plant-photos").upload(
-            unique_filename,
-            file_bytes,
-            file_options={"content-type": f"image/{file_ext.lstrip('.')}" if file_ext else "image/jpeg"}
-        )
-
-        # Get public URL
-        public_url = _supabase_client.storage.from_("plant-photos").get_public_url(unique_filename)
-        return public_url
-    except Exception as e:
-        _safe_log_error(f"Error uploading plant photo: {e}")
         return None
 
 

@@ -65,7 +65,7 @@ def is_safe_redirect_url(url: str) -> bool:
 
 
 @auth_bp.route("/signup", methods=["GET", "POST"])
-@limiter.limit("5 per minute; 20 per hour")  # Protect against bot signups
+@limiter.limit(lambda: current_app.config['SIGNUP_RATE_LIMIT'])  # Protect against bot signups
 def signup():
     """
     Show signup form or send magic link.

@@ -153,7 +153,7 @@
 <!-- Plants -->
 {% if plant_count > 0 %}
 <section class="card mb-8" aria-labelledby="plants-title">
-  <div class="flex items-center justify-between mb-4">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
     <h3 id="plants-title" class="section-title !mb-0">My Plants</h3>
     <a href="{{ url_for('plants.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
       Manage plants →
@@ -161,7 +161,7 @@
   </div>
 
   <!-- Plant count and scroll controls -->
-  <div class="flex items-center justify-between mb-4 gap-3">
+  <div class="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-3 mb-4">
     <div class="flex items-center gap-3 flex-wrap">
       <p class="text-sm text-slate-600 dark:text-slate-400">
         Your collection:
@@ -287,9 +287,9 @@
 <!-- Care Reminders Due Today -->
 {% if due_reminders %}
 <section class="card mb-8" aria-labelledby="reminders-title">
-  <div class="flex items-center justify-between mb-6">
-    <h3 id="reminders-title" class="section-title !mb-0 flex items-center gap-3">
-      Care Reminders Due Today
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+    <h3 id="reminders-title" class="section-title !mb-0 flex items-center gap-3 flex-wrap">
+      <span>Care Reminders Due Today</span>
       {% if reminder_stats.due_today > 0 %}
       <span class="badge-amber">{{ reminder_stats.due_today }}</span>
       {% endif %}
@@ -352,7 +352,7 @@
 </section>
 {% elif reminder_stats.active_reminders > 0 %}
 <section class="card mb-8" aria-labelledby="reminders-title">
-  <div class="flex items-center justify-between mb-4">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
     <h3 id="reminders-title" class="section-title !mb-0">Care Reminders</h3>
     <a href="{{ url_for('reminders.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
       View all →

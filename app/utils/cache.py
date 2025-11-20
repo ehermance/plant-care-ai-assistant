@@ -10,9 +10,13 @@ from typing import Callable, Any, Hashable
 from functools import wraps
 import threading
 
+# Cache configuration constants
+CALENDAR_CACHE_TTL_SECONDS = 300  # 5 minutes
+CALENDAR_CACHE_MAX_ENTRIES = 1000
+
 # Thread-safe calendar cache (5-minute TTL, max 1000 entries)
 # Key format: "calendar:{user_id}:{year}:{month}"
-_calendar_cache = TTLCache(maxsize=1000, ttl=300)  # 5 minutes
+_calendar_cache = TTLCache(maxsize=CALENDAR_CACHE_MAX_ENTRIES, ttl=CALENDAR_CACHE_TTL_SECONDS)
 _cache_lock = threading.Lock()
 
 

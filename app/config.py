@@ -51,6 +51,13 @@ class BaseConfig:
     # File uploads
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10MB max upload size
 
+    # Plant limits
+    FREE_TIER_PLANT_LIMIT = 20  # Maximum plants for free tier users
+
+    # Rate limiting
+    UPLOAD_RATE_LIMIT = "20 per hour"  # Rate limit for plant/journal photo uploads
+    SIGNUP_RATE_LIMIT = "5 per minute; 20 per hour"  # Rate limit for signup attempts
+
     # Misc
     PREFERRED_URL_SCHEME = os.getenv("PREFERRED_URL_SCHEME", "https")
     SEND_FILE_MAX_AGE_DEFAULT = int(os.getenv("SEND_FILE_MAX_AGE_DEFAULT", "3600"))

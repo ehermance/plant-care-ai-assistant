@@ -34,6 +34,7 @@
         placeholder="e.g., Snake Plant, Monstera"
         maxlength="100"
         aria-describedby="name-help"
+        autocomplete="off"
       />
       <p id="name-help" class="help-text">What kind of plant is this?</p>
     </div>
@@ -52,6 +53,7 @@
         placeholder="e.g., Planty McPlantface"
         maxlength="50"
         aria-describedby="nickname-help"
+        autocomplete="off"
       />
       <p id="nickname-help" class="help-text">Give your plant a fun name!</p>
     </div>
@@ -69,6 +71,7 @@
         value="{{ plant.species or '' }}"
         placeholder="e.g., Sansevieria trifasciata"
         maxlength="100"
+        autocomplete="off"
       />
     </div>
 
@@ -116,6 +119,7 @@
         rows="4"
         placeholder="Any special care instructions, watering schedule, or observations..."
         maxlength="500"
+        autocomplete="off"
       >{{ plant.notes or '' }}</textarea>
     </div>
 

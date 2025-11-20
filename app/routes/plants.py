@@ -42,7 +42,7 @@ def index():
 
 @plants_bp.route("/add", methods=["GET", "POST"])
 @require_auth
-@limiter.limit("20 per hour")
+@limiter.limit(lambda: current_app.config['UPLOAD_RATE_LIMIT'])
 def add():
     """Add a new plant to the user's collection."""
     user_id = get_current_user_id()
@@ -156,7 +156,7 @@ def view(plant_id):
 
 @plants_bp.route("/<plant_id>/edit", methods=["GET", "POST"])
 @require_auth
-@limiter.limit("20 per hour")
+@limiter.limit(lambda: current_app.config['UPLOAD_RATE_LIMIT'])
 def edit(plant_id):
     """Edit plant information."""
     user_id = get_current_user_id()

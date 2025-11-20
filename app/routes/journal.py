@@ -5,7 +5,7 @@ Handles creating, viewing, and managing plant care activities.
 """
 
 from __future__ import annotations
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
 from app.utils.auth import require_auth, get_current_user_id
 from app.utils.file_upload import validate_upload_file
 from app.utils.errors import sanitize_error, log_info
@@ -49,7 +49,7 @@ def view_plant_journal(plant_id):
 
 @journal_bp.route("/plant/<plant_id>/add", methods=["GET", "POST"])
 @require_auth
-@limiter.limit("20 per hour")
+@limiter.limit(lambda: current_app.config['UPLOAD_RATE_LIMIT'])
 def add_entry(plant_id):
     """Add a new journal entry for a plant."""
     user_id = get_current_user_id()
