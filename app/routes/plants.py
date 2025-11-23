@@ -50,6 +50,14 @@ def add():
         flash("Please log in to add plants.", "error")
         return redirect(url_for("auth.login"))
 
+    # Redirect first-time users to onboarding
+    plants = supabase_client.get_user_plants(user_id)
+    if not plants or len(plants) == 0:
+        # Check if onboarding is incomplete
+        profile = supabase_client.get_user_profile(user_id)
+        if profile and not profile.get("onboarding_completed", False):
+            return redirect(url_for("plants.onboarding"))
+
     # Check if user can add more plants
     can_add, message = supabase_client.can_add_plant(user_id)
     if not can_add:
@@ -273,3 +281,170 @@ def delete(plant_id):
         flash("Failed to delete plant. Please try again.", "error")
 
     return redirect(url_for("plants.index"))
+
+
+@plants_bp.route("/onboarding", methods=["GET", "POST"])
+@require_auth
+def onboarding():
+    """
+    First-plant onboarding wizard.
+
+    GET: Display the 3-step wizard
+    POST: Handle step 2 (plant creation) and step 3 (reminder creation)
+    """
+    user_id = get_current_user_id()
+    if not user_id:
+        flash("Please log in to continue.", "error")
+        return redirect(url_for("auth.login"))
+
+    if request.method == "GET":
+        # Check if user already has plants - skip onboarding if they do
+        plants = supabase_client.get_user_plants(user_id)
+        if plants and len(plants) > 0:
+            flash("You've already added plants! Welcome back.", "info")
+            return redirect(url_for("dashboard.index"))
+
+        return render_template("plants/onboarding.html")
+
+    # POST request - handle step submission
+    step = request.form.get("step", "2")
+
+    if step == "2":
+        # Step 2: Create plant
+        name = request.form.get("name", "").strip()
+        nickname = request.form.get("nickname", "").strip()
+        location = request.form.get("location", "indoor_potted").strip()
+        light = request.form.get("light", "").strip()
+
+        # Validation
+        if not name:
+            from flask import jsonify
+            return jsonify({"success": False, "message": "Plant name is required."}), 400
+
+        # Handle photo upload
+        photo_url = None
+        photo_url_original = None
+        photo_url_thumb = None
+        file = request.files.get("photo")
+
+        if file and file.filename:
+            is_valid, error, file_bytes = validate_upload_file(file)
+
+            if error:
+                from flask import jsonify
+                return jsonify({"success": False, "message": error}), 400
+
+            if is_valid and file_bytes:
+                photo_urls = supabase_client.upload_plant_photo_versions(
+                    file_bytes,
+                    user_id,
+                    secure_filename(file.filename)
+                )
+
+                if photo_urls:
+                    photo_url = photo_urls['display']
+                    photo_url_original = photo_urls['original']
+                    photo_url_thumb = photo_urls['thumbnail']
+
+        # Create plant
+        plant_data = {
+            "name": name,
+            "nickname": nickname,
+            "location": location,
+            "light": light,
+            "photo_url": photo_url,
+            "photo_url_original": photo_url_original if photo_url else None,
+            "photo_url_thumb": photo_url_thumb if photo_url else None
+        }
+
+        plant = supabase_client.create_plant(user_id, plant_data)
+
+        if plant:
+            # Track first plant event
+            analytics.track_event(
+                user_id,
+                analytics.EVENT_FIRST_PLANT_ADDED,
+                {"plant_id": plant["id"], "plant_name": name}
+            )
+
+            # Return JSON response for AJAX call
+            from flask import jsonify
+            return jsonify({
+                "success": True,
+                "plant_id": plant["id"],
+                "message": f"{name} added successfully!"
+            })
+        else:
+            from flask import jsonify
+            return jsonify({
+                "success": False,
+                "message": "Failed to create plant. Please try again."
+            }), 500
+
+    elif step == "3":
+        # Step 3: Create reminder and complete onboarding
+        watering_frequency = request.form.get("watering_frequency", "").strip()
+        skip_reminder = request.form.get("skip_reminder") == "on"
+
+        # Get the plant_id from the previous step (should be in session or passed as hidden field)
+        # For now, get the user's most recent plant
+        plants = supabase_client.get_user_plants(user_id)
+        if not plants or len(plants) == 0:
+            flash("No plant found. Please start over.", "error")
+            return redirect(url_for("plants.onboarding"))
+
+        plant = plants[0]  # Most recent plant
+        plant_id = plant["id"]
+        plant_name = plant["name"]
+
+        # Create reminder if not skipped
+        if not skip_reminder and watering_frequency:
+            from app.services import reminders as reminder_service
+
+            reminder_data = {
+                "user_id": user_id,
+                "plant_id": plant_id,
+                "reminder_type": "watering",
+                "title": f"Water {plant_name}",
+                "frequency": watering_frequency,
+                "skip_weather_adjustment": False
+            }
+
+            reminder, error = reminder_service.create_reminder(**reminder_data)
+
+            if reminder:
+                analytics.track_event(
+                    user_id,
+                    analytics.EVENT_REMINDER_CREATED,
+                    {
+                        "reminder_id": reminder["id"],
+                        "reminder_type": "watering",
+                        "frequency": watering_frequency
+                    }
+                )
+
+        # Mark onboarding as complete
+        supabase_client.mark_onboarding_complete(user_id)
+
+        flash(f"🎉 Welcome to PlantCareAI! Your plant {plant_name} is all set up.", "success")
+        return redirect(url_for("plants.view", plant_id=plant_id))
+
+    # Invalid step
+    flash("Invalid request.", "error")
+    return redirect(url_for("plants.onboarding"))
+
+
+@plants_bp.route("/onboarding/skip", methods=["GET"])
+@require_auth
+def onboarding_skip():
+    """Skip onboarding and mark it as complete without creating a plant."""
+    user_id = get_current_user_id()
+    if not user_id:
+        flash("Please log in to continue.", "error")
+        return redirect(url_for("auth.login"))
+
+    # Mark onboarding as complete
+    supabase_client.mark_onboarding_complete(user_id)
+
+    flash("You can add your first plant anytime from the dashboard!", "info")
+    return redirect(url_for("dashboard.index"))

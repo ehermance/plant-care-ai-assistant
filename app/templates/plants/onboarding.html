@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to PlantCareAI - Getting Started{% endblock %}
+{% block description %}Set up your first plant and start your plant care journey.{% endblock %}
+
+{% block content %}
+<!-- Onboarding Container -->
+<div class="max-w-3xl mx-auto">
+  <!-- Progress Bar -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-sm font-semibold text-slate-600 dark:text-slate-400">Getting Started</h2>
+      <span class="text-sm text-slate-500 dark:text-slate-400">
+        Step <span id="current-step">1</span> of 3
+      </span>
+    </div>
+    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+      <div id="progress-bar" class="bg-emerald-500 h-2 rounded-full transition-all duration-300" style="width: 33.33%"></div>
+    </div>
+  </div>
+
+  <!-- Step 1: Welcome -->
+  <div id="step-1" class="step-content">
+    <div class="card text-center">
+      <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-emerald-100 to-cyan-100 dark:from-emerald-900/30 dark:to-cyan-900/30 flex items-center justify-center">
+        <span class="text-5xl" aria-hidden="true">🌱</span>
+      </div>
+
+      <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+        Welcome to PlantCareAI!
+      </h1>
+
+      <p class="text-lg text-slate-600 dark:text-slate-400 mb-8 max-w-2xl mx-auto">
+        Let's set up your first plant together. This will only take a minute, and you'll be ready to:
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10 text-left">
+        <div class="flex flex-col items-center text-center">
+          <div class="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-3">
+            <span class="text-2xl" aria-hidden="true">💧</span>
+          </div>
+          <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">Track Care</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400">Get reminded when to water, fertilize, and more</p>
+        </div>
+
+        <div class="flex flex-col items-center text-center">
+          <div class="w-12 h-12 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center mb-3">
+            <span class="text-2xl" aria-hidden="true">🤖</span>
+          </div>
+          <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">Ask AI</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400">Get personalized plant care advice anytime</p>
+        </div>
+
+        <div class="flex flex-col items-center text-center">
+          <div class="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-3">
+            <span class="text-2xl" aria-hidden="true">📔</span>
+          </div>
+          <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">Journal</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400">Track progress with photos and notes</p>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <button onclick="nextStep()" class="btn btn-primary">
+          Get Started <span aria-hidden="true">→</span>
+        </button>
+        <a href="{{ url_for('plants.onboarding_skip') }}" class="btn btn-secondary">
+          Skip for Now
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Add Plant Basics -->
+  <div id="step-2" class="step-content hidden">
+    <div class="card">
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+          Tell Us About Your Plant <span class="inline-block" aria-hidden="true">🪴</span>
+        </h1>
+        <p class="text-slate-600 dark:text-slate-400">
+          Just the basics - you can add more details later!
+        </p>
+      </div>
+
+      <form id="onboarding-form" method="POST" action="{{ url_for('plants.onboarding') }}" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="step" value="2" id="form-step"/>
+
+        <!-- Plant Name (Required) -->
+        <div class="mb-6">
+          <label for="name" class="label label-required">
+            What kind of plant is it?
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            class="input"
+            required
+            placeholder="e.g., Snake Plant, Pothos, Fiddle Leaf Fig"
+            maxlength="100"
+            aria-describedby="name-help"
+            autocomplete="off"
+            value="{{ request.form.get('name', '') }}"
+          />
+          <p id="name-help" class="help-text">The common or scientific name of your plant</p>
+        </div>
+
+        <!-- Nickname (Optional) -->
+        <div class="mb-6">
+          <label for="nickname" class="label">
+            Give it a nickname <span class="text-sm font-normal text-slate-500 dark:text-slate-400">(Optional)</span>
+          </label>
+          <input
+            type="text"
+            id="nickname"
+            name="nickname"
+            class="input"
+            placeholder="e.g., Planty, Green Friend, Bob"
+            maxlength="50"
+            autocomplete="off"
+            value="{{ request.form.get('nickname', '') }}"
+          />
+          <p class="help-text">Makes it more personal!</p>
+        </div>
+
+        <!-- Location & Light -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+          <div>
+            <label for="location" class="label">
+              Where is it?
+            </label>
+            <select id="location" name="location" class="input">
+              <option value="indoor_potted" {% if request.form.get('location') == 'indoor_potted' %}selected{% endif %}>Indoor (potted)</option>
+              <option value="outdoor_potted" {% if request.form.get('location') == 'outdoor_potted' %}selected{% endif %}>Outdoor (potted)</option>
+              <option value="outdoor_bed" {% if request.form.get('location') == 'outdoor_bed' %}selected{% endif %}>Outdoor (in-ground)</option>
+              <option value="greenhouse" {% if request.form.get('location') == 'greenhouse' %}selected{% endif %}>Greenhouse</option>
+              <option value="office" {% if request.form.get('location') == 'office' %}selected{% endif %}>Office</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="light" class="label">
+              Light level
+            </label>
+            <select id="light" name="light" class="input">
+              <option value="">Not sure yet</option>
+              <option value="low" {% if request.form.get('light') == 'low' %}selected{% endif %}>Low light</option>
+              <option value="medium" {% if request.form.get('light') == 'medium' %}selected{% endif %}>Medium light</option>
+              <option value="bright" {% if request.form.get('light') == 'bright' %}selected{% endif %}>Bright indirect</option>
+              <option value="direct" {% if request.form.get('light') == 'direct' %}selected{% endif %}>Direct sunlight</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Photo (Optional) -->
+        <div class="mb-8">
+          <label for="photo" class="label">
+            Add a photo <span class="text-sm font-normal text-slate-500 dark:text-slate-400">(Optional)</span>
+          </label>
+          <input
+            type="file"
+            id="photo"
+            name="photo"
+            class="input file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 dark:file:bg-emerald-900/30 dark:file:text-emerald-400 dark:hover:file:bg-emerald-900/50 file:cursor-pointer"
+            accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+          />
+          <p class="help-text">Max 5MB</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button type="button" onclick="submitAndContinue()" class="btn btn-primary">
+            Continue <span aria-hidden="true">→</span>
+          </button>
+          <button type="button" onclick="prevStep()" class="btn btn-secondary">
+            <span aria-hidden="true">←</span> Back
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Step 3: Set Up First Reminder -->
+  <div id="step-3" class="step-content hidden">
+    <div class="card">
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+          Set Your First Reminder <span class="inline-block" aria-hidden="true">💧</span>
+        </h1>
+        <p class="text-slate-600 dark:text-slate-400">
+          We'll remind you when it's time to water. You can add more reminders later!
+        </p>
+      </div>
+
+      <form id="reminder-form" method="POST" action="{{ url_for('plants.onboarding') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="step" value="3"/>
+
+        <!-- Watering Frequency -->
+        <div class="mb-6">
+          <label for="watering_frequency" class="label label-required">
+            How often should we remind you to water?
+          </label>
+          <select id="watering_frequency" name="watering_frequency" class="input" required>
+            <option value="">Choose a frequency</option>
+            <option value="daily">Every day</option>
+            <option value="every_2_days">Every 2 days</option>
+            <option value="every_3_days">Every 3 days</option>
+            <option value="weekly" selected>Once a week</option>
+            <option value="biweekly">Every 2 weeks</option>
+            <option value="monthly">Once a month</option>
+          </select>
+          <p class="help-text">Don't worry, you can always adjust this later!</p>
+        </div>
+
+        <!-- Skip Reminder Option -->
+        <div class="mb-8 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
+          <label class="flex items-start cursor-pointer">
+            <input
+              type="checkbox"
+              name="skip_reminder"
+              id="skip_reminder"
+              class="mt-1 h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-slate-300 rounded"
+              onchange="toggleReminderFields(this.checked)"
+            />
+            <span class="ml-3 text-sm text-slate-700 dark:text-slate-300">
+              Skip setting up a reminder for now (I'll add one later)
+            </span>
+          </label>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button type="submit" class="btn btn-primary">
+            <span aria-hidden="true">✓</span> Finish Setup
+          </button>
+          <button type="button" onclick="prevStep()" class="btn btn-secondary">
+            <span aria-hidden="true">←</span> Back
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentStep = 1;
+  const totalSteps = 3;
+  let plantId = null; // Will be set after step 2 submission
+
+  function updateProgress() {
+    document.getElementById('current-step').textContent = currentStep;
+    document.getElementById('progress-bar').style.width = `${(currentStep / totalSteps) * 100}%`;
+  }
+
+  function showStep(step) {
+    // Hide all steps
+    document.querySelectorAll('.step-content').forEach(el => {
+      el.classList.add('hidden');
+    });
+
+    // Show current step
+    document.getElementById(`step-${step}`).classList.remove('hidden');
+
+    // Update progress
+    updateProgress();
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function nextStep() {
+    if (currentStep < totalSteps) {
+      currentStep++;
+      showStep(currentStep);
+    }
+  }
+
+  function prevStep() {
+    if (currentStep > 1) {
+      currentStep--;
+      showStep(currentStep);
+    }
+  }
+
+  function submitAndContinue() {
+    const form = document.getElementById('onboarding-form');
+    const formData = new FormData(form);
+
+    // Validate required fields
+    const nameInput = document.getElementById('name');
+    if (!nameInput.value.trim()) {
+      nameInput.focus();
+      nameInput.reportValidity();
+      return;
+    }
+
+    // Submit form via fetch to avoid page reload
+    fetch(form.action, {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Store plant ID for step 3
+        plantId = data.plant_id;
+
+        // Move to step 3
+        nextStep();
+      } else {
+        alert(data.message || 'Error creating plant. Please try again.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error creating plant. Please try again.');
+    });
+  }
+
+  function toggleReminderFields(skipChecked) {
+    const frequencySelect = document.getElementById('watering_frequency');
+    if (skipChecked) {
+      frequencySelect.removeAttribute('required');
+      frequencySelect.disabled = true;
+    } else {
+      frequencySelect.setAttribute('required', 'required');
+      frequencySelect.disabled = false;
+    }
+  }
+
+  // Initialize
+  showStep(1);
+</script>
+{% endblock %}

@@ -220,6 +220,9 @@ def assistant():
     care_context = payload["care_context"]
     question = payload["question"]
 
+    # Get selected plant ID for context (if user clicked a plant card)
+    selected_plant_id = request.form.get("selected_plant_id")
+
     allowed, reason = run_moderation(question)
     if not allowed:
         today_str = datetime.now().strftime("%Y-%m-%d")
@@ -239,11 +242,14 @@ def assistant():
         ), 400
 
     # Advice engine returns (answer, weather, source)
+    # Pass user_id and selected_plant_id for AI context integration
     answer, weather, source = generate_advice(
         question=question,
         plant=plant,
         city=city,
         care_context=care_context,
+        user_id=user_id,  # NEW: Enable AI context
+        selected_plant_id=selected_plant_id,  # NEW: Plant-specific context
     )
 
     # Hourly (best-effort): if the weather payload includes an 'hourly' list

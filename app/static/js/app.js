@@ -32,7 +32,13 @@
       const btn = e.target.closest('.plant-select-btn');
       if (!btn) return;
 
-      const { plantName, plantSpecies, plantLocation } = btn.dataset;
+      const { plantId, plantName, plantSpecies, plantLocation } = btn.dataset;
+
+      // Store selected plant ID for AI context
+      const selectedPlantInput = document.getElementById('selected_plant_id');
+      if (selectedPlantInput && plantId) {
+        selectedPlantInput.value = plantId;
+      }
 
       // Fill form with plant data
       if (plantInput && plantName) {
@@ -78,6 +84,10 @@
         });
       }
 
+      // Clear selected plant ID (presets don't provide plant context)
+      const selectedPlantInput = document.getElementById('selected_plant_id');
+      if (selectedPlantInput) selectedPlantInput.value = '';
+
       // Focus submit button after preset selection
       if (submitBtn) submitBtn.focus();
     });
@@ -98,6 +108,10 @@
           btn.classList.remove('!border-emerald-500', '!dark:border-emerald-400', '!bg-emerald-50', '!dark:bg-emerald-900/20');
         });
       }
+
+      // Clear selected plant ID
+      const selectedPlantInput = document.getElementById('selected_plant_id');
+      if (selectedPlantInput) selectedPlantInput.value = '';
 
       // Put focus in the first field for quick typing
       plantInput?.focus();

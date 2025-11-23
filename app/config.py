@@ -77,6 +77,8 @@ class DevConfig(BaseConfig):
     PREFERRED_URL_SCHEME = "http"
     # Allow cookies over HTTP in dev
     SESSION_COOKIE_SECURE = False
+    # Relaxed rate limits for development/testing
+    SIGNUP_RATE_LIMIT = "100 per minute; 500 per hour"  # Much higher for dev testing
 
 class TestConfig(BaseConfig):
     """CI/pytest settings."""

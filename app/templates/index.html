@@ -40,6 +40,8 @@
 
     <form id="ask-form" action="{{ url_for('web.assistant') }}" method="post" novalidate>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <!-- Hidden field to store selected plant ID for AI context -->
+      <input type="hidden" id="selected_plant_id" name="selected_plant_id" value=""/>
 
       <!-- Plant & City (Two Columns) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">

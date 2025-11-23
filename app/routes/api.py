@@ -1,14 +1,19 @@
 """
-Defines JSON endpoints used by the front end. Currently exposes /presets,
-which returns regional plant presets using geolocation or city as hints.
-Also exposes /user/theme for updating user theme preferences.
+Defines JSON endpoints used by the front end.
+
+Endpoints:
+- /presets: Regional plant presets using geolocation or city
+- /user/theme: Update user theme preferences
+- /user/context: Get user context for AI (plants, reminders, activities)
+- /user/plant/<id>/context: Get detailed context for specific plant
 """
 
 from flask import Blueprint, request, jsonify
 from ..utils.presets import infer_region_from_latlon, infer_region_from_city, region_presets
 from ..utils.auth import require_auth, get_current_user_id
 from ..utils.errors import sanitize_error, GENERIC_MESSAGES
-from ..services import supabase_client
+from ..services import supabase_client, user_context
+from ..extensions import limiter
 
 
 api_bp = Blueprint("api", __name__)
@@ -94,3 +99,114 @@ def update_theme():
         # Log the actual error for debugging, return sanitized message
         sanitized_msg = sanitize_error(e, "database", "Theme update failed")
         return jsonify({"success": False, "error": sanitized_msg}), 500
+
+
+@api_bp.route("/user/context", methods=["GET"])
+@require_auth
+@limiter.limit("10 per minute")
+def get_user_context():
+    """
+    Get consolidated user context for AI.
+
+    Returns comprehensive context including:
+    - User's plants (name, location, light)
+    - Reminders (overdue, due today, upcoming week)
+    - Recent care activities (last 7 days)
+    - Summary statistics
+
+    **Authentication required**
+
+    Rate limit: 10 requests per minute
+
+    Returns:
+        200: JSON with user context
+        401: Not authenticated
+        429: Rate limit exceeded
+
+    Example response:
+        {
+            "success": true,
+            "context": {
+                "plants": [...],
+                "reminders": {...},
+                "recent_activities": [...],
+                "stats": {...}
+            }
+        }
+    """
+    user_id = get_current_user_id()
+
+    try:
+        context = user_context.get_user_context(user_id)
+        return jsonify({
+            "success": True,
+            "context": context
+        }), 200
+    except Exception as e:
+        sanitized_msg = sanitize_error(e, "database", "Failed to get user context")
+        return jsonify({
+            "success": False,
+            "error": sanitized_msg
+        }), 500
+
+
+@api_bp.route("/user/plant/<plant_id>/context", methods=["GET"])
+@require_auth
+@limiter.limit("10 per minute")
+def get_plant_context(plant_id: str):
+    """
+    Get detailed context for specific plant.
+
+    Returns plant-specific context including:
+    - Full plant details
+    - Last 14 days of care activities
+    - All active reminders for this plant
+    - Plant-specific statistics
+
+    **Authentication required**
+
+    Rate limit: 10 requests per minute
+
+    Args:
+        plant_id: UUID of the plant
+
+    Returns:
+        200: JSON with plant context
+        401: Not authenticated
+        403: Access denied (not user's plant)
+        404: Plant not found
+        429: Rate limit exceeded
+
+    Example response:
+        {
+            "success": true,
+            "context": {
+                "plant": {...},
+                "activities": [...],
+                "reminders": [...],
+                "stats": {...}
+            }
+        }
+    """
+    user_id = get_current_user_id()
+
+    try:
+        context = user_context.get_plant_context(user_id, plant_id)
+
+        # Check if plant was found
+        if context.get("error"):
+            return jsonify({
+                "success": False,
+                "error": context["error"]
+            }), 404 if "not found" in context["error"].lower() else 403
+
+        return jsonify({
+            "success": True,
+            "context": context
+        }), 200
+    except Exception as e:
+        sanitized_msg = sanitize_error(e, "database", "Failed to get plant context")
+        return jsonify({
+            "success": False,
+            "error": sanitized_msg
+        }), 500

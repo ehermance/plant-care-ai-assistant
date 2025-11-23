@@ -8,10 +8,11 @@ OpenAI usage is isolated and failures never break the request flow.
 
 from __future__ import annotations
 import os
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Dict, Any
 
 from flask import current_app, has_app_context
 from .weather import get_weather_for_city
+from . import user_context
 
 # Most recent AI error (shown in UI/Debug to help diagnose model/key issues)
 
@@ -180,7 +181,94 @@ def _basic_plant_tip(question: str, plant: Optional[str], care_context: str) -> 
     return f"For {loc}, aim for bright-indirect light, water when the top inch is dry, and ensure good drainage."
 
 
-def _ai_advice(question: str, plant: Optional[str], weather: Optional[dict], care_context: str) -> Tuple[Optional[str], Optional[str]]:
+def build_system_prompt(user_context_data: Optional[Dict[str, Any]] = None) -> str:
+    """
+    Build AI system prompt with optional user context.
+
+    Args:
+        user_context_data: Optional user context from user_context.get_user_context()
+                          or user_context.get_plant_context()
+
+    Returns:
+        System prompt string with user context appended (if available)
+    """
+    base = (
+        "You are a helpful plant-care expert with calm persona. "
+        "Provide safe, concise, accurate, and practical steps. "
+        "If uncertain, say so."
+    )
+
+    if not user_context_data:
+        return base
+
+    # Build user context summary for prompt
+    context_lines = []
+
+    # Add user's plants
+    plants = user_context_data.get("plants", [])
+    if plants:
+        plant_names = []
+        for p in plants[:5]:  # Limit to 5 plants max
+            name = p.get("name", "Unknown")
+            if p.get("species"):
+                plant_names.append(f"{name} ({p['species']})")
+            else:
+                plant_names.append(name)
+        if plant_names:
+            context_lines.append(f"User's plants: {', '.join(plant_names)}")
+
+    # Add reminders due today
+    reminders = user_context_data.get("reminders", {})
+    if reminders:
+        due_today = reminders.get("due_today", [])
+        if due_today:
+            tasks = [r["title"] for r in due_today[:3]]  # Max 3
+            context_lines.append(f"Care due today: {', '.join(tasks)}")
+
+        # Add overdue reminders if any
+        overdue = reminders.get("overdue", [])
+        if overdue:
+            overdue_count = len(overdue)
+            context_lines.append(f"Overdue tasks: {overdue_count}")
+
+    # Add recent care activities
+    recent_activities = user_context_data.get("recent_activities", [])
+    if recent_activities:
+        recent_summary = []
+        for activity in recent_activities[:3]:  # Max 3 recent activities
+            plant_name = activity.get("plant_name", "Plant")
+            action_type = activity.get("action_type", "care")
+            days_ago = activity.get("days_ago", 0)
+            recent_summary.append(f"{plant_name} {action_type} {days_ago}d ago")
+        if recent_summary:
+            context_lines.append(f"Recent care: {'; '.join(recent_summary)}")
+
+    # Add specific plant context (if available from get_plant_context)
+    plant_details = user_context_data.get("plant")
+    if plant_details:
+        plant_name = plant_details.get("name", "Plant")
+        context_lines.append(f"Selected plant: {plant_name}")
+
+        # Add last watered info if available
+        stats = user_context_data.get("stats", {})
+        last_watered = stats.get("last_watered_days_ago")
+        if last_watered is not None:
+            context_lines.append(f"Last watered: {last_watered} days ago")
+
+        # Add plant notes if available
+        if plant_details.get("notes"):
+            notes = plant_details["notes"][:100]  # Truncate to 100 chars
+            context_lines.append(f"Notes: {notes}")
+
+    # Build context section
+    if context_lines:
+        context_section = "\n\nUser Context:\n" + "\n".join(f"- {line}" for line in context_lines)
+        return base + context_section
+
+    return base
+
+
+def _ai_advice(question: str, plant: Optional[str], weather: Optional[dict], care_context: str, user_context_data: Optional[Dict[str, Any]] = None) -> Tuple[Optional[str], Optional[str]]:
     """
     Calls AI providers using LiteLLM Router (OpenAI primary, Gemini fallback).
     Returns (response_text, provider_name) or (None, None) if all providers fail.
@@ -236,10 +324,9 @@ def _ai_advice(question: str, plant: Optional[str], weather: Optional[dict], car
     }
     context_str = context_map.get(care_context, "potted house plant (indoors)")
 
-    sys_msg = (
-        "You are a helpful plant-care expert with calm persona. Provide safe, concise, accurate, and practical steps. "
-        "If uncertain, say so."
-    )
+    # Build system message with user context
+    sys_msg = build_system_prompt(user_context_data)
+
     user_msg = (
         f"Plant: {(plant or '').strip() or 'unspecified'}\n"
         f"Care context: {context_str}\n"
@@ -295,7 +382,7 @@ def ai_advice(
     Back-compat shim for any code/tests that import ai_advice directly.
     Returns just the text response, discarding the provider information.
     """
-    text, _provider = _ai_advice(question, plant, weather, care_context or "indoor_potted")
+    text, _provider = _ai_advice(question, plant, weather, care_context or "indoor_potted", None)
     return text
 
 
@@ -304,17 +391,46 @@ def generate_advice(
     plant: Optional[str],
     city: Optional[str],
     care_context: str,
+    user_id: Optional[str] = None,
+    selected_plant_id: Optional[str] = None,
 ) -> Tuple[str, Optional[dict], str]:
     """
-    Orchestrates advice generation:
-      1) Best-effort weather fetch (does not block if it fails)
-      2) Try AI providers (OpenAI primary, Gemini fallback); on failure, fall back to rules
-      3) Append a short weather hint when available
-    Returns (answer, weather, source: "openai"|"gemini"|"rule")
+    Orchestrates advice generation with optional user context integration.
+
+    Steps:
+      1) Fetch user context if authenticated (plants, reminders, recent activities)
+      2) Best-effort weather fetch (does not block if it fails)
+      3) Try AI providers (OpenAI primary, Gemini fallback) with context; on failure, fall back to rules
+      4) Append a short weather hint when available
+
+    Args:
+        question: User's plant care question
+        plant: Plant name or species
+        city: City for weather data
+        care_context: indoor_potted, outdoor_potted, or outdoor_bed
+        user_id: Optional user ID for context fetching (NEW)
+        selected_plant_id: Optional specific plant ID for detailed context (NEW)
+
+    Returns:
+        Tuple of (answer, weather, source: "openai"|"gemini"|"rule")
     """
     weather = get_weather_for_city(city) if city else None
 
-    ai_text, provider = _ai_advice(question, plant, weather, care_context)
+    # Fetch user context if authenticated
+    user_context_data = None
+    if user_id:
+        try:
+            if selected_plant_id:
+                # Get detailed context for specific plant
+                user_context_data = user_context.get_plant_context(user_id, selected_plant_id)
+            else:
+                # Get general user context
+                user_context_data = user_context.get_user_context(user_id)
+        except Exception:
+            # If context fetch fails, continue without it (graceful degradation)
+            user_context_data = None
+
+    ai_text, provider = _ai_advice(question, plant, weather, care_context, user_context_data)
     if ai_text and provider:
         answer = ai_text
         source = provider  # "openai" or "gemini"

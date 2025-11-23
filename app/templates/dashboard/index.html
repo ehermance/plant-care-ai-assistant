@@ -128,6 +128,30 @@
     </a>
   </div>
 </section>
+{% else %}
+<!-- First Plant CTA -->
+<section class="card mb-8 text-center bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/10 dark:to-cyan-900/10 border-2 border-emerald-200 dark:border-emerald-700" aria-labelledby="first-plant-title">
+  <div class="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-emerald-100 to-cyan-100 dark:from-emerald-900/30 dark:to-cyan-900/30 flex items-center justify-center">
+    <span class="text-6xl" aria-hidden="true">🌱</span>
+  </div>
+
+  <h3 id="first-plant-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+    Let's Add Your First Plant!
+  </h3>
+
+  <p class="text-lg text-slate-600 dark:text-slate-400 mb-8 max-w-2xl mx-auto">
+    Start your plant care journey today. We'll help you set up reminders, track care activities, and get personalized AI advice for your plants.
+  </p>
+
+  <div class="flex flex-col sm:flex-row gap-3 justify-center">
+    <a href="{{ url_for('plants.add') }}" class="btn btn-primary btn-lg">
+      <span aria-hidden="true">🪴</span> Add Your First Plant
+    </a>
+    <a href="{{ url_for('web.assistant') }}" class="btn btn-secondary">
+      <span aria-hidden="true">🤖</span> Learn About Plant Care
+    </a>
+  </div>
+</section>
 {% endif %}
 
 <!-- Quick Actions -->

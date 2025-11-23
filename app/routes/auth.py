@@ -110,19 +110,20 @@ def signup():
         flash("Please enter a valid email address.", "error")
         return redirect(url_for("auth.signup"))
 
-    # Send magic link via Supabase
-    result = supabase_client.send_magic_link(email)
+    # Send OTP code via Supabase (using OTP instead of magic link to avoid spam filtering)
+    result = supabase_client.send_otp_code(email)
 
     if result["success"]:
-        # Store email in session for display on check_email page
+        # Store email in session for OTP verification page
         from flask import session
         session["pending_email"] = email
 
-        return redirect(url_for("auth.check_email"))
+        # Redirect to OTP verification page
+        return redirect(url_for("auth.verify_otp"))
     else:
         # Use the user-friendly error message from supabase_client
-        error_message = result.get("message", "Failed to send magic link. Please try again.")
-        current_app.logger.error(f"Failed to send magic link: {result.get('error')} - {error_message}")
+        error_message = result.get("message", "Failed to send verification code. Please try again.")
+        current_app.logger.error(f"Failed to send OTP code: {result.get('error')} - {error_message}")
         flash(error_message, "error")
         return redirect(url_for("auth.signup"))
 
@@ -141,11 +142,101 @@ def login():
 def check_email():
     """
     Show "check your email" page after magic link sent.
+    (Legacy route - keeping for backward compatibility if needed)
     """
     from flask import session
     email = session.get("pending_email", "your email")
 
     return render_template("auth/check_email.html", email=email)
+
+
+@auth_bp.route("/verify-otp", methods=["GET", "POST"])
+@limiter.limit(lambda: current_app.config['SIGNUP_RATE_LIMIT'])  # Protect against brute force
+def verify_otp():
+    """
+    Verify OTP code page.
+
+    GET: Show OTP code input form
+    POST: Verify code and create session
+    """
+    from flask import session
+
+    if request.method == "GET":
+        # Get email from session
+        email = session.get("pending_email")
+        if not email:
+            flash("Please enter your email first.", "error")
+            return redirect(url_for("auth.signup"))
+
+        return render_template("auth/verify_otp.html", email=email)
+
+    # POST: Verify OTP code
+    email = session.get("pending_email")
+    if not email:
+        flash("Session expired. Please request a new code.", "error")
+        return redirect(url_for("auth.signup"))
+
+    code = request.form.get("code", "").strip()
+
+    if not code:
+        flash("Please enter the verification code.", "error")
+        return render_template("auth/verify_otp.html", email=email)
+
+    # Verify OTP code
+    result = supabase_client.verify_otp_code(email, code)
+
+    if not result["success"]:
+        error_message = result.get("message", "Invalid code. Please try again.")
+        current_app.logger.error(f"Failed to verify OTP: {result.get('error')} - {error_message}")
+        flash(error_message, "error")
+        return render_template("auth/verify_otp.html", email=email)
+
+    # OTP verified successfully
+    user = result["user"]
+    session_data = result["session"]
+    access_token = session_data["access_token"]
+    refresh_token = session_data["refresh_token"]
+
+    # Set session with both tokens
+    set_session(user, access_token, refresh_token)
+
+    # Clear pending email from session
+    session.pop("pending_email", None)
+
+    # Get or create user profile
+    user_id = user.get("id")
+    email = user.get("email")
+
+    profile = supabase_client.get_user_profile(user_id)
+
+    if not profile:
+        # Profile doesn't exist (trigger should have created it, but fallback)
+        current_app.logger.warning(f"Profile not found for user {user_id}, creating...")
+        supabase_client.create_user_profile(user_id, email)
+
+    # Check if onboarding completed
+    if not supabase_client.is_onboarding_completed(user_id):
+        # Get user's plants to check if they have any
+        plants = supabase_client.get_user_plants(user_id)
+        if not plants or len(plants) == 0:
+            flash(f"Welcome to PlantCareAI! Let's add your first plant 🌱", "success")
+            return redirect(url_for("plants.onboarding"))
+
+    # Redirect to dashboard or 'next' URL (with open redirect protection)
+    next_url = request.args.get("next", "")
+    if next_url and is_safe_redirect_url(next_url):
+        flash(f"Welcome back!", "success")
+        return redirect(next_url)
+
+    # Check if this is a new signup (profile just created)
+    is_new_user = profile is None
+
+    if is_new_user:
+        flash(f"Welcome to PlantCareAI!", "success")
+    else:
+        flash(f"Welcome back!", "success")
+
+    return redirect(url_for("dashboard.index"))
 
 
 @auth_bp.route("/callback")
