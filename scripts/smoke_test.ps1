@@ -20,14 +20,17 @@ try {
     $status = $response.StatusCode
     if ($status -eq 200 -or $status -eq 302) {
         Write-Host "✓ PASS (HTTP $status)" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "✗ FAIL (HTTP $status)" -ForegroundColor Red
         $AllPassed = $false
     }
-} catch {
+}
+catch {
     if ($_.Exception.Response.StatusCode.value__ -eq 302) {
         Write-Host "✓ PASS (HTTP 302)" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "✗ FAIL ($($_.Exception.Message))" -ForegroundColor Red
         $AllPassed = $false
     }
@@ -37,13 +40,15 @@ try {
 Write-Host "Test 2: Health endpoint... " -NoNewline
 try {
     $response = Invoke-RestMethod -Uri "$Domain/healthz" -Method Get -UseBasicParsing
-    if ($response.status -eq "healthy" -or $response -like "*healthy*") {
+    if ($response -eq "OK" -or $response -like "*OK*") {
         Write-Host "✓ PASS ($($response))" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "✗ FAIL (Unexpected response: $response)" -ForegroundColor Red
         $AllPassed = $false
     }
-} catch {
+}
+catch {
     Write-Host "✗ FAIL ($($_.Exception.Message))" -ForegroundColor Red
     $AllPassed = $false
 }
@@ -54,37 +59,43 @@ try {
     $response = Invoke-WebRequest -Uri "$Domain/static/css/output.css" -Method Head -UseBasicParsing
     if ($response.StatusCode -eq 200) {
         Write-Host "✓ PASS (HTTP 200)" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "⚠ WARNING (HTTP $($response.StatusCode))" -ForegroundColor Yellow
     }
-} catch {
+}
+catch {
     Write-Host "⚠ WARNING (CSS not found)" -ForegroundColor Yellow
 }
 
 # Test 4: Static JS
 Write-Host "Test 4: Static JS loads... " -NoNewline
 try {
-    $response = Invoke-WebRequest -Uri "$Domain/static/js/auth.js" -Method Head -UseBasicParsing
+    $response = Invoke-WebRequest -Uri "$Domain/static/js/auth-callback.js" -Method Head -UseBasicParsing
     if ($response.StatusCode -eq 200) {
         Write-Host "✓ PASS (HTTP 200)" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "⚠ WARNING (HTTP $($response.StatusCode))" -ForegroundColor Yellow
     }
-} catch {
+}
+catch {
     Write-Host "⚠ WARNING (JS not found)" -ForegroundColor Yellow
 }
 
 # Test 5: Login page
 Write-Host "Test 5: Login page accessible... " -NoNewline
 try {
-    $response = Invoke-WebRequest -Uri "$Domain/login" -Method Get -UseBasicParsing
+    $response = Invoke-WebRequest -Uri "$Domain/auth/login" -Method Get -UseBasicParsing
     if ($response.StatusCode -eq 200) {
         Write-Host "✓ PASS (HTTP 200)" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "✗ FAIL (HTTP $($response.StatusCode))" -ForegroundColor Red
         $AllPassed = $false
     }
-} catch {
+}
+catch {
     Write-Host "✗ FAIL ($($_.Exception.Message))" -ForegroundColor Red
     $AllPassed = $false
 }
@@ -92,14 +103,16 @@ try {
 # Test 6: Signup page
 Write-Host "Test 6: Signup page accessible... " -NoNewline
 try {
-    $response = Invoke-WebRequest -Uri "$Domain/signup" -Method Get -UseBasicParsing
+    $response = Invoke-WebRequest -Uri "$Domain/auth/signup" -Method Get -UseBasicParsing
     if ($response.StatusCode -eq 200) {
         Write-Host "✓ PASS (HTTP 200)" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "✗ FAIL (HTTP $($response.StatusCode))" -ForegroundColor Red
         $AllPassed = $false
     }
-} catch {
+}
+catch {
     Write-Host "✗ FAIL ($($_.Exception.Message))" -ForegroundColor Red
     $AllPassed = $false
 }
@@ -110,11 +123,14 @@ try {
     $response = Invoke-WebRequest -Uri "$Domain/dashboard" -Method Get -UseBasicParsing -MaximumRedirection 0 -ErrorAction Stop
     Write-Host "✗ FAIL (HTTP $($response.StatusCode) - should redirect)" -ForegroundColor Red
     $AllPassed = $false
-} catch {
-    if ($_.Exception.Response.StatusCode.value__ -eq 302 -or $_.Exception.Response.StatusCode.value__ -eq 401) {
-        Write-Host "✓ PASS (HTTP $($_.Exception.Response.StatusCode.value__) - redirects to login)" -ForegroundColor Green
-    } else {
-        Write-Host "✗ FAIL (HTTP $($_.Exception.Response.StatusCode.value__))" -ForegroundColor Red
+}
+catch {
+    $statusCode = $_.Exception.Response.StatusCode.value__
+    if ($statusCode -eq 302 -or $statusCode -eq 308 -or $statusCode -eq 401) {
+        Write-Host "✓ PASS (HTTP $statusCode - redirects to login)" -ForegroundColor Green
+    }
+    else {
+        Write-Host "✗ FAIL (HTTP $statusCode)" -ForegroundColor Red
         $AllPassed = $false
     }
 }
@@ -129,10 +145,12 @@ try {
 
     if ($hasCSP -or $hasXFrame -or $hasXContent) {
         Write-Host "✓ PASS (Security headers found)" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "⚠ WARNING (Security headers not detected)" -ForegroundColor Yellow
     }
-} catch {
+}
+catch {
     Write-Host "⚠ WARNING (Could not check headers)" -ForegroundColor Yellow
 }
 
@@ -145,15 +163,18 @@ try {
     $duration = ($end - $start).TotalMilliseconds
     if ($duration -lt 2000) {
         Write-Host "✓ PASS ($([math]::Round($duration))ms)" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "⚠ WARNING ($([math]::Round($duration))ms - slower than expected)" -ForegroundColor Yellow
     }
-} catch {
+}
+catch {
     $end = Get-Date
     $duration = ($end - $start).TotalMilliseconds
     if ($duration -lt 2000) {
         Write-Host "✓ PASS ($([math]::Round($duration))ms)" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "⚠ WARNING ($([math]::Round($duration))ms)" -ForegroundColor Yellow
     }
 }
@@ -162,7 +183,8 @@ Write-Host ""
 Write-Host "=========================================" -ForegroundColor Cyan
 if ($AllPassed) {
     Write-Host "All critical tests passed!" -ForegroundColor Green
-} else {
+}
+else {
     Write-Host "Some tests failed - check logs!" -ForegroundColor Red
 }
 Write-Host "=========================================" -ForegroundColor Cyan

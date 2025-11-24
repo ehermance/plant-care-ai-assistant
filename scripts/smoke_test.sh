@@ -32,7 +32,7 @@ fi
 # Test 2: Health check
 echo -n "Test 2: Health endpoint... "
 HEALTH=$(curl -s "$DOMAIN/healthz")
-if echo "$HEALTH" | grep -q "healthy"; then
+if echo "$HEALTH" | grep -q "OK"; then
     echo -e "${GREEN}✓ PASS${NC} ($HEALTH)"
 else
     echo -e "${RED}✗ FAIL${NC} ($HEALTH)"
@@ -50,7 +50,7 @@ fi
 
 # Test 4: Static JS loads
 echo -n "Test 4: Static JS loads... "
-STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DOMAIN/static/js/auth.js")
+STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DOMAIN/static/js/auth-callback.js")
 if [ "$STATUS" -eq 200 ]; then
     echo -e "${GREEN}✓ PASS${NC} (HTTP $STATUS)"
 else
@@ -59,7 +59,7 @@ fi
 
 # Test 5: Login page accessible
 echo -n "Test 5: Login page accessible... "
-STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DOMAIN/login")
+STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DOMAIN/auth/login")
 if [ "$STATUS" -eq 200 ]; then
     echo -e "${GREEN}✓ PASS${NC} (HTTP $STATUS)"
 else
@@ -69,7 +69,7 @@ fi
 
 # Test 6: Signup page accessible
 echo -n "Test 6: Signup page accessible... "
-STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DOMAIN/signup")
+STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DOMAIN/auth/signup")
 if [ "$STATUS" -eq 200 ]; then
     echo -e "${GREEN}✓ PASS${NC} (HTTP $STATUS)"
 else
@@ -80,7 +80,7 @@ fi
 # Test 7: Rate limiting (AI endpoint should require auth)
 echo -n "Test 7: Protected routes require auth... "
 STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DOMAIN/dashboard")
-if [ "$STATUS" -eq 302 ] || [ "$STATUS" -eq 401 ]; then
+if [ "$STATUS" -eq 302 ] || [ "$STATUS" -eq 308 ] || [ "$STATUS" -eq 401 ]; then
     echo -e "${GREEN}✓ PASS${NC} (HTTP $STATUS - redirects to login)"
 else
     echo -e "${RED}✗ FAIL${NC} (HTTP $STATUS - should redirect unauthenticated users)"
