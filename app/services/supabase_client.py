@@ -1137,18 +1137,20 @@ def create_image_versions(file_bytes: bytes) -> dict[str, bytes] | None:
         file_bytes: Original image file bytes
 
     Returns:
-        Dictionary with 3 versions:
-        - 'original': Full resolution (preserved as-is)
+        Dictionary with 2 versions:
         - 'display': Optimized for grid/detail views (max 900px width, 80% quality)
         - 'thumbnail': Small version for buttons (128x128, 85% quality)
         Returns None if image processing fails
     """
     try:
-        from PIL import Image
+        from PIL import Image, ImageOps
         from io import BytesIO
 
         # Open original image
         img = Image.open(BytesIO(file_bytes))
+
+        # Fix orientation based on EXIF data (handles sideways photos from phones)
+        img = ImageOps.exif_transpose(img)
 
         # Convert RGBA/LA/P to RGB (JPEG doesn't support transparency)
         if img.mode in ('RGBA', 'LA', 'P'):
@@ -1162,9 +1164,6 @@ def create_image_versions(file_bytes: bytes) -> dict[str, bytes] | None:
             img = background
 
         versions = {}
-
-        # Original - keep as-is for archival
-        versions['original'] = file_bytes
 
         # Display version - optimize for web (max 900px width)
         display_img = img.copy()
@@ -1190,9 +1189,9 @@ def create_image_versions(file_bytes: bytes) -> dict[str, bytes] | None:
         return None
 
 
-def upload_plant_photo_versions(file_bytes: bytes, user_id: str, filename: str) -> dict[str, str] | None:
+def upload_plant_photo_versions(file_bytes: bytes, user_id: str, filename: str) -> tuple[dict[str, str] | None, str | None]:
     """
-    Upload plant photo with multiple optimized versions (original, display, thumbnail).
+    Upload plant photo with multiple optimized versions (display, thumbnail).
 
     Args:
         file_bytes: Original image file bytes
@@ -1200,14 +1199,21 @@ def upload_plant_photo_versions(file_bytes: bytes, user_id: str, filename: str) 
         filename: Original filename (used for extension detection)
 
     Returns:
-        Dictionary with public URLs for each version:
-        - 'original': Full resolution URL
-        - 'display': Optimized version URL (max 900px)
-        - 'thumbnail': Small thumbnail URL (128x128)
-        Returns None if upload fails
+        Tuple of (urls_dict, error_message):
+        - urls_dict: Dictionary with public URLs for each version on success, None on failure
+          - 'display': Optimized version URL (max 900px)
+          - 'thumbnail': Small thumbnail URL (128x128)
+        - error_message: None on success, specific error description on failure
+
+    Examples:
+        >>> urls, error = upload_plant_photo_versions(file_bytes, user_id, "photo.jpg")
+        >>> if error:
+        ...     print(f"Upload failed: {error}")
+        >>> else:
+        ...     print(f"Success! URLs: {urls}")
     """
     if not _supabase_client:
-        return None
+        return None, "Photo upload service not available. Please check your connection."
 
     try:
         import uuid
@@ -1219,10 +1225,11 @@ def upload_plant_photo_versions(file_bytes: bytes, user_id: str, filename: str) 
         # Create optimized versions
         versions = create_image_versions(file_bytes)
         if not versions:
-            _safe_log_error("Failed to create image versions")
-            return None
+            error_msg = "Failed to process image. File may be corrupted or in an unsupported format."
+            _safe_log_error(f"Failed to create image versions: {error_msg}")
+            return None, error_msg
 
-        # Upload all versions in parallel for 3× faster uploads
+        # Upload all versions in parallel for 2× faster uploads
         from concurrent.futures import ThreadPoolExecutor, as_completed
 
         def upload_single_version(version_name: str, version_bytes: bytes) -> tuple[str, str]:
@@ -1240,9 +1247,9 @@ def upload_plant_photo_versions(file_bytes: bytes, user_id: str, filename: str) 
             public_url = _supabase_client.storage.from_("plant-photos").get_public_url(version_filename)
             return (version_name, public_url)
 
-        # Upload all 3 versions concurrently
+        # Upload all 2 versions concurrently
         urls = {}
-        with ThreadPoolExecutor(max_workers=3) as executor:
+        with ThreadPoolExecutor(max_workers=2) as executor:
             # Submit all upload tasks
             future_to_version = {
                 executor.submit(upload_single_version, version_name, version_bytes): version_name
@@ -1254,11 +1261,12 @@ def upload_plant_photo_versions(file_bytes: bytes, user_id: str, filename: str) 
                 version_name, public_url = future.result()
                 urls[version_name] = public_url
 
-        return urls
+        return urls, None  # Success - return URLs and no error
 
     except Exception as e:
+        error_msg = f"Upload failed: {str(e)}"
         _safe_log_error(f"Error uploading plant photo versions: {e}")
-        return None
+        return None, error_msg
 
 
 def delete_plant_photo(photo_url: str) -> bool:
@@ -1272,6 +1280,7 @@ def delete_plant_photo(photo_url: str) -> bool:
         True if deleted successfully, False otherwise
     """
     if not _supabase_client or not photo_url:
+        _safe_log_error(f"Cannot delete photo: client={bool(_supabase_client)}, url={bool(photo_url)}")
         return False
 
     try:
@@ -1279,11 +1288,18 @@ def delete_plant_photo(photo_url: str) -> bool:
         # URL format: https://{project}.supabase.co/storage/v1/object/public/plant-photos/{path}
         if "/plant-photos/" in photo_url:
             file_path = photo_url.split("/plant-photos/")[1]
-            _supabase_client.storage.from_("plant-photos").remove([file_path])
+            _safe_log_info(f"Attempting to delete photo: {file_path}")
+
+            result = _supabase_client.storage.from_("plant-photos").remove([file_path])
+            _safe_log_info(f"Delete result: {result}")
             return True
-        return False
+        else:
+            _safe_log_error(f"Invalid photo URL format (missing /plant-photos/): {photo_url}")
+            return False
     except Exception as e:
-        _safe_log_error(f"Error deleting plant photo: {e}")
+        _safe_log_error(f"Error deleting plant photo {photo_url}: {e}")
+        import traceback
+        _safe_log_error(f"Traceback: {traceback.format_exc()}")
         return False
 
 

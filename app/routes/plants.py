@@ -13,6 +13,7 @@ from flask import Blueprint, render_template, flash, redirect, url_for, request,
 from werkzeug.utils import secure_filename
 from app.utils.auth import require_auth, get_current_user_id
 from app.utils.photo_handler import handle_photo_upload, delete_all_photo_versions
+from app.utils.file_upload import validate_upload_file
 from app.services import supabase_client
 from app.services import analytics
 from app.extensions import limiter
@@ -74,7 +75,7 @@ def add():
 
         # Handle photo upload (consolidated helper)
         file = request.files.get("photo")
-        photo_url, photo_url_original, photo_url_thumb = handle_photo_upload(file, user_id)
+        photo_url, photo_url_thumb = handle_photo_upload(file, user_id)
 
         # If upload failed with error, return early
         if file and file.filename and not photo_url:
@@ -89,7 +90,6 @@ def add():
             "light": light,
             "notes": notes,
             "photo_url": photo_url,
-            "photo_url_original": photo_url_original if photo_url else None,
             "photo_url_thumb": photo_url_thumb if photo_url else None
         }
 
@@ -163,8 +163,24 @@ def edit(plant_id):
 
         # Handle photo upload - keep existing photos by default
         photo_url = plant.get("photo_url")
-        photo_url_original = plant.get("photo_url_original")
         photo_url_thumb = plant.get("photo_url_thumb")
+
+        # Check if user wants to delete current photo
+        delete_photo = request.form.get("delete_photo") == "true"
+        if delete_photo and photo_url:
+            # Delete all photo versions (display, thumbnail)
+            current_app.logger.info(f"Photo URLs to delete: display={bool(photo_url)}, thumb={bool(photo_url_thumb)}")
+            old_photo_obj = {
+                "photo_url": photo_url,
+                "photo_url_thumb": photo_url_thumb,
+                # Include original URL for backwards compatibility (if it exists in database)
+                "photo_url_original": plant.get("photo_url_original")
+            }
+            delete_all_photo_versions(old_photo_obj)
+
+            # Clear photo URLs
+            photo_url = None
+            photo_url_thumb = None
 
         file = request.files.get("photo")
         is_valid, error, file_bytes = validate_upload_file(file)
@@ -175,27 +191,33 @@ def edit(plant_id):
 
         if is_valid and file_bytes:  # New photo provided and valid
             # Upload new photo with optimized versions
-            new_photo_urls = supabase_client.upload_plant_photo_versions(
+            new_photo_urls, upload_error = supabase_client.upload_plant_photo_versions(
                 file_bytes,
                 user_id,
                 secure_filename(file.filename)
             )
 
-            if new_photo_urls:
+            if upload_error:
+                # Show specific error message and return early (don't update plant)
+                flash(f"Photo upload failed: {upload_error}", "error")
+                return render_template("plants/edit.html", plant=plant)
+            elif new_photo_urls:
                 # Delete old photos if they exist (consolidated helper)
                 old_photo_obj = {
                     "photo_url": photo_url,
-                    "photo_url_original": photo_url_original,
-                    "photo_url_thumb": photo_url_thumb
+                    "photo_url_thumb": photo_url_thumb,
+                    # Include original URL for backwards compatibility (if it exists in database)
+                    "photo_url_original": plant.get("photo_url_original")
                 }
                 delete_all_photo_versions(old_photo_obj)
 
                 # Set new photo URLs
                 photo_url = new_photo_urls['display']
-                photo_url_original = new_photo_urls['original']
                 photo_url_thumb = new_photo_urls['thumbnail']
             else:
+                # Fallback error (shouldn't happen, but just in case)
                 flash("Failed to upload new photo.", "error")
+                return render_template("plants/edit.html", plant=plant)
 
         # Update plant
         plant_data = {
@@ -206,7 +228,6 @@ def edit(plant_id):
             "light": light,
             "notes": notes,
             "photo_url": photo_url,
-            "photo_url_original": photo_url_original,
             "photo_url_thumb": photo_url_thumb
         }
 
@@ -282,7 +303,6 @@ def onboarding():
 
         # Handle photo upload
         photo_url = None
-        photo_url_original = None
         photo_url_thumb = None
         file = request.files.get("photo")
 
@@ -294,15 +314,17 @@ def onboarding():
                 return jsonify({"success": False, "message": error}), 400
 
             if is_valid and file_bytes:
-                photo_urls = supabase_client.upload_plant_photo_versions(
+                photo_urls, upload_error = supabase_client.upload_plant_photo_versions(
                     file_bytes,
                     user_id,
                     secure_filename(file.filename)
                 )
 
-                if photo_urls:
+                if upload_error:
+                    from flask import jsonify
+                    return jsonify({"success": False, "message": f"Photo upload failed: {upload_error}"}), 400
+                elif photo_urls:
                     photo_url = photo_urls['display']
-                    photo_url_original = photo_urls['original']
                     photo_url_thumb = photo_urls['thumbnail']
 
         # Create plant
@@ -312,7 +334,6 @@ def onboarding():
             "location": location,
             "light": light,
             "photo_url": photo_url,
-            "photo_url_original": photo_url_original if photo_url else None,
             "photo_url_thumb": photo_url_thumb if photo_url else None
         }
 

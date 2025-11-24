@@ -51,7 +51,6 @@ def create_plant_action(
     notes: Optional[str] = None,
     amount_ml: Optional[int] = None,
     photo_url: Optional[str] = None,
-    photo_url_original: Optional[str] = None,
     photo_url_thumb: Optional[str] = None,
     action_at: Optional[datetime] = None,
 ) -> Tuple[Optional[Dict[str, Any]], Optional[str]]:
@@ -65,7 +64,6 @@ def create_plant_action(
         notes: Optional notes about the action
         amount_ml: Optional amount in milliliters (for watering/fertilizing)
         photo_url: Optional photo URL (display version)
-        photo_url_original: Optional original full-resolution photo URL
         photo_url_thumb: Optional thumbnail photo URL (128x128)
         action_at: Optional timestamp (defaults to now)
 
@@ -90,7 +88,6 @@ def create_plant_action(
             "notes": notes,
             "amount_ml": amount_ml,
             "photo_url": photo_url,
-            "photo_url_original": photo_url_original,
             "photo_url_thumb": photo_url_thumb,
         }
 

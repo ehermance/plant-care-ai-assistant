@@ -95,7 +95,7 @@ def add_entry(plant_id):
 
         # Handle photo upload (consolidated helper)
         file = request.files.get("photo")
-        photo_url, photo_url_original, photo_url_thumb = handle_photo_upload(file, user_id)
+        photo_url, photo_url_thumb = handle_photo_upload(file, user_id)
 
         # If upload failed with error, return early
         if file and file.filename and not photo_url:
@@ -113,7 +113,6 @@ def add_entry(plant_id):
             notes=notes or None,
             amount_ml=amount_ml,
             photo_url=photo_url,
-            photo_url_original=photo_url_original,
             photo_url_thumb=photo_url_thumb,
         )
 
