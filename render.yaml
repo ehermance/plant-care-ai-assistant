@@ -21,7 +21,11 @@ services:
         sync: false
       - key: OPENAI_API_KEY
         sync: false
+      - key: GEMINI_API_KEY
+        sync: false
       - key: OPENWEATHER_API_KEY
+        sync: false
+      - key: RESEND_API_KEY
         sync: false
       - key: RATELIMIT_ENABLED
         value: "true"
