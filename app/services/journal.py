@@ -108,6 +108,55 @@ def create_plant_action(
         return None, f"Error creating action: {str(e)}"
 
 
+def get_user_actions(
+    user_id: str,
+    limit: int = 100,
+    offset: int = 0,
+) -> List[Dict[str, Any]]:
+    """
+    Get all actions for all of a user's plants in a single query.
+
+    This is more efficient than calling get_plant_actions() for each plant
+    when you need activities across multiple plants (avoids N+1 queries).
+
+    Args:
+        user_id: User's UUID
+        limit: Maximum number of actions to return
+        offset: Number of actions to skip
+
+    Returns:
+        List of action dictionaries with plant_name joined, sorted by most recent first
+    """
+    supabase = get_admin_client()
+    if not supabase:
+        return []
+
+    try:
+        # Single query to get all user's activities with plant names joined
+        response = supabase.table("plant_actions") \
+            .select("*, plants!inner(name)") \
+            .eq("user_id", user_id) \
+            .order("action_at", desc=True) \
+            .limit(limit) \
+            .range(offset, offset + limit - 1) \
+            .execute()
+
+        if response.data:
+            # Flatten the nested plant data
+            activities = []
+            for action in response.data:
+                # Extract plant name from joined data
+                plant_data = action.pop("plants", {})
+                action["plant_name"] = plant_data.get("name", "Unknown")
+                activities.append(action)
+            return activities
+        return []
+
+    except Exception as e:
+        _safe_log_error(f"Error fetching user actions: {str(e)}")
+        return []
+
+
 def get_plant_actions(
     plant_id: str,
     user_id: str,

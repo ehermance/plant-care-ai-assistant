@@ -19,9 +19,6 @@ reminders_bp = Blueprint("reminders", __name__, url_prefix="/reminders")
 def index():
     """Display all user's reminders (due, upcoming, and all)."""
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to view reminders.", "error")
-        return redirect(url_for("auth.login"))
 
     # Get reminders
     due_reminders = reminder_service.get_due_reminders(user_id)
@@ -43,9 +40,6 @@ def index():
 def history():
     """Display completed/inactive reminders history."""
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to view reminders.", "error")
-        return redirect(url_for("auth.login"))
 
     # Get inactive reminders
     inactive_reminders = reminder_service.get_user_reminders(user_id, active_only=False)
@@ -72,9 +66,6 @@ def history():
 def create():
     """Create a new reminder."""
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to create reminders.", "error")
-        return redirect(url_for("auth.login"))
 
     if request.method == "POST":
         # Get form data
@@ -159,9 +150,6 @@ def create():
 def view(reminder_id):
     """View a single reminder."""
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to view reminders.", "error")
-        return redirect(url_for("auth.login"))
 
     reminder = reminder_service.get_reminder_by_id(reminder_id, user_id)
 
@@ -177,9 +165,6 @@ def view(reminder_id):
 def edit(reminder_id):
     """Edit a reminder."""
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to edit reminders.", "error")
-        return redirect(url_for("auth.login"))
 
     reminder = reminder_service.get_reminder_by_id(reminder_id, user_id)
 
@@ -239,8 +224,6 @@ def edit(reminder_id):
 def complete(reminder_id):
     """Mark a reminder as complete."""
     user_id = get_current_user_id()
-    if not user_id:
-        return jsonify({"success": False, "error": "Unauthorized"}), 401
 
     success, error = reminder_service.mark_reminder_complete(reminder_id, user_id)
 
@@ -264,9 +247,6 @@ def complete(reminder_id):
 def bulk_complete():
     """Mark all due reminders as complete."""
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to complete reminders.", "error")
-        return redirect(url_for("auth.login"))
 
     # Get all due reminders
     due_reminders = reminder_service.get_due_reminders(user_id)
@@ -295,8 +275,6 @@ def bulk_complete():
 def snooze(reminder_id):
     """Snooze a reminder by N days."""
     user_id = get_current_user_id()
-    if not user_id:
-        return jsonify({"success": False, "error": "Unauthorized"}), 401
 
     # Get snooze days from form (default 1)
     try:
@@ -326,8 +304,6 @@ def snooze(reminder_id):
 def delete(reminder_id):
     """Delete (deactivate) a reminder."""
     user_id = get_current_user_id()
-    if not user_id:
-        return jsonify({"success": False, "error": "Unauthorized"}), 401
 
     success, error = reminder_service.delete_reminder(reminder_id, user_id)
 
@@ -363,8 +339,6 @@ def toggle_status(reminder_id):
 def adjust_weather(reminder_id):
     """Manually trigger weather adjustment for a reminder."""
     user_id = get_current_user_id()
-    if not user_id:
-        return jsonify({"success": False, "error": "Unauthorized"}), 401
 
     # Get city from form or user profile
     city = request.form.get("city")
@@ -402,8 +376,6 @@ def adjust_weather(reminder_id):
 def clear_weather(reminder_id):
     """Clear weather adjustment and revert to original schedule."""
     user_id = get_current_user_id()
-    if not user_id:
-        return jsonify({"success": False, "error": "Unauthorized"}), 401
 
     success, error = reminder_service.clear_weather_adjustment(reminder_id, user_id)
 
@@ -423,8 +395,6 @@ def clear_weather(reminder_id):
 def api_due_today():
     """Get due reminders as JSON (for AJAX/widgets)."""
     user_id = get_current_user_id()
-    if not user_id:
-        return jsonify({"error": "Unauthorized"}), 401
 
     due_reminders = reminder_service.get_due_reminders(user_id)
 
@@ -440,8 +410,6 @@ def api_due_today():
 def api_upcoming():
     """Get upcoming reminders as JSON (for calendar view)."""
     user_id = get_current_user_id()
-    if not user_id:
-        return jsonify({"error": "Unauthorized"}), 401
 
     days = request.args.get("days", 7, type=int)
     upcoming = reminder_service.get_upcoming_reminders(user_id, days)
@@ -458,8 +426,6 @@ def api_upcoming():
 def api_stats():
     """Get reminder statistics as JSON."""
     user_id = get_current_user_id()
-    if not user_id:
-        return jsonify({"error": "Unauthorized"}), 401
 
     stats = reminder_service.get_reminder_stats(user_id)
 
@@ -479,8 +445,6 @@ def api_complete(reminder_id):
     (automatically validated by Flask-WTF CSRFProtect)
     """
     user_id = get_current_user_id()
-    if not user_id:
-        return jsonify({"success": False, "error": "Unauthorized"}), 401
 
     # Validate reminder_id format (UUID)
     import re
@@ -512,9 +476,6 @@ def calendar(year=None, month=None):
     from calendar import monthcalendar, month_name
 
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to view calendar.", "error")
-        return redirect(url_for("auth.login"))
 
     # Default to current month if not specified
     today = datetime.now()

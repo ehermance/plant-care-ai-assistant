@@ -7,7 +7,7 @@ Handles creating, viewing, and managing plant care activities.
 from __future__ import annotations
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
 from app.utils.auth import require_auth, get_current_user_id
-from app.utils.file_upload import validate_upload_file
+from app.utils.photo_handler import handle_photo_upload, delete_all_photo_versions
 from app.utils.errors import sanitize_error, log_info
 from app.services import journal as journal_service
 from app.services import analytics
@@ -23,9 +23,6 @@ journal_bp = Blueprint("journal", __name__, url_prefix="/journal")
 def view_plant_journal(plant_id):
     """View all journal entries for a specific plant."""
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to view journal.", "error")
-        return redirect(url_for("auth.login"))
 
     # Get plant details
     plant = get_plant_by_id(plant_id, user_id)
@@ -53,9 +50,6 @@ def view_plant_journal(plant_id):
 def add_entry(plant_id):
     """Add a new journal entry for a plant."""
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to add journal entries.", "error")
-        return redirect(url_for("auth.login"))
 
     # Get plant details
     plant = get_plant_by_id(plant_id, user_id)
@@ -99,35 +93,17 @@ def add_entry(plant_id):
         else:
             amount_ml = None
 
-        # Handle photo upload
-        photo_url = None
-        photo_url_original = None
-        photo_url_thumb = None
+        # Handle photo upload (consolidated helper)
         file = request.files.get("photo")
-        is_valid, error, file_bytes = validate_upload_file(file)
+        photo_url, photo_url_original, photo_url_thumb = handle_photo_upload(file, user_id)
 
-        if error:  # Validation failed
-            flash(error, "error")
+        # If upload failed with error, return early
+        if file and file.filename and not photo_url:
             return render_template(
                 "journal/add_entry.html",
                 plant=plant,
                 action_types=journal_service.ACTION_TYPE_NAMES,
             )
-
-        if is_valid and file_bytes:  # File provided and valid
-            # Upload photo with optimized versions (original, display, thumbnail)
-            photo_urls = upload_plant_photo_versions(
-                file_bytes,
-                user_id,
-                secure_filename(file.filename)
-            )
-
-            if photo_urls:
-                photo_url = photo_urls['display']
-                photo_url_original = photo_urls['original']
-                photo_url_thumb = photo_urls['thumbnail']
-            else:
-                flash("Failed to upload photo. Please try again.", "error")
 
         # Create journal entry
         action, error = journal_service.create_plant_action(
@@ -177,9 +153,6 @@ def add_entry(plant_id):
 def recent_activity():
     """View recent activity across all plants."""
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to view activity.", "error")
-        return redirect(url_for("auth.login"))
 
     days = request.args.get("days", 7, type=int)
     if days < 1 or days > 90:
@@ -201,9 +174,6 @@ def recent_activity():
 def delete_entry(action_id):
     """Delete a journal entry."""
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to delete entries.", "error")
-        return redirect(url_for("auth.login"))
 
     # Get action to find plant_id and photo_url
     action = journal_service.get_action_by_id(action_id, user_id)
@@ -213,13 +183,8 @@ def delete_entry(action_id):
 
     plant_id = action.get("plant_id")
 
-    # Delete all photo versions if they exist
-    if action.get("photo_url"):
-        delete_plant_photo(action["photo_url"])
-    if action.get("photo_url_original"):
-        delete_plant_photo(action["photo_url_original"])
-    if action.get("photo_url_thumb"):
-        delete_plant_photo(action["photo_url_thumb"])
+    # Delete all photo versions if they exist (consolidated helper)
+    delete_all_photo_versions(action, delete_func=delete_plant_photo)
 
     # Delete action
     success, error = journal_service.delete_action(action_id, user_id)
@@ -251,8 +216,6 @@ def api_quick_log():
         }
     """
     user_id = get_current_user_id()
-    if not user_id:
-        return jsonify({"success": False, "error": "Unauthorized"}), 401
 
     try:
         data = request.get_json()

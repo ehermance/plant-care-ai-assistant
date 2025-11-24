@@ -330,8 +330,6 @@ def me():
         JSON with user info, profile, trial status
     """
     user = get_current_user()
-    if not user:
-        return jsonify({"error": "Not authenticated"}), 401
 
     user_id = user.get("id")
     profile = supabase_client.get_user_profile(user_id)

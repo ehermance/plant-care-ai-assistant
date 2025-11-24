@@ -12,7 +12,7 @@ from __future__ import annotations
 from flask import Blueprint, render_template, flash, redirect, url_for, request, current_app
 from werkzeug.utils import secure_filename
 from app.utils.auth import require_auth, get_current_user_id
-from app.utils.file_upload import validate_upload_file
+from app.utils.photo_handler import handle_photo_upload, delete_all_photo_versions
 from app.services import supabase_client
 from app.services import analytics
 from app.extensions import limiter
@@ -26,9 +26,6 @@ plants_bp = Blueprint("plants", __name__, url_prefix="/plants")
 def index():
     """Plant library - list all user's plants in grid view."""
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to view your plants.", "error")
-        return redirect(url_for("auth.login"))
 
     plants = supabase_client.get_user_plants(user_id)
     plant_count = len(plants)
@@ -46,9 +43,6 @@ def index():
 def add():
     """Add a new plant to the user's collection."""
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to add plants.", "error")
-        return redirect(url_for("auth.login"))
 
     # Redirect first-time users to onboarding
     plants = supabase_client.get_user_plants(user_id)
@@ -78,31 +72,13 @@ def add():
             flash("Plant name is required.", "error")
             return render_template("plants/add.html")
 
-        # Handle photo upload
-        photo_url = None
-        photo_url_original = None
-        photo_url_thumb = None
+        # Handle photo upload (consolidated helper)
         file = request.files.get("photo")
-        is_valid, error, file_bytes = validate_upload_file(file)
+        photo_url, photo_url_original, photo_url_thumb = handle_photo_upload(file, user_id)
 
-        if error:  # Validation failed
-            flash(error, "error")
+        # If upload failed with error, return early
+        if file and file.filename and not photo_url:
             return render_template("plants/add.html")
-
-        if is_valid and file_bytes:  # File provided and valid
-            # Upload photo with optimized versions (original, display, thumbnail)
-            photo_urls = supabase_client.upload_plant_photo_versions(
-                file_bytes,
-                user_id,
-                secure_filename(file.filename)
-            )
-
-            if photo_urls:
-                photo_url = photo_urls['display']
-                photo_url_original = photo_urls['original']
-                photo_url_thumb = photo_urls['thumbnail']
-            else:
-                flash("Failed to upload photo. Please try again.", "error")
 
         # Create plant
         plant_data = {
@@ -138,9 +114,6 @@ def add():
 def view(plant_id):
     """View a single plant's details with journal entries."""
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to view plants.", "error")
-        return redirect(url_for("auth.login"))
 
     plant = supabase_client.get_plant_by_id(plant_id, user_id)
     if not plant:
@@ -168,9 +141,6 @@ def view(plant_id):
 def edit(plant_id):
     """Edit plant information."""
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to edit plants.", "error")
-        return redirect(url_for("auth.login"))
 
     plant = supabase_client.get_plant_by_id(plant_id, user_id)
     if not plant:
@@ -212,13 +182,13 @@ def edit(plant_id):
             )
 
             if new_photo_urls:
-                # Delete old photos if they exist
-                if photo_url:
-                    supabase_client.delete_plant_photo(photo_url)
-                if photo_url_original:
-                    supabase_client.delete_plant_photo(photo_url_original)
-                if photo_url_thumb:
-                    supabase_client.delete_plant_photo(photo_url_thumb)
+                # Delete old photos if they exist (consolidated helper)
+                old_photo_obj = {
+                    "photo_url": photo_url,
+                    "photo_url_original": photo_url_original,
+                    "photo_url_thumb": photo_url_thumb
+                }
+                delete_all_photo_versions(old_photo_obj)
 
                 # Set new photo URLs
                 photo_url = new_photo_urls['display']
@@ -255,9 +225,6 @@ def edit(plant_id):
 def delete(plant_id):
     """Delete a plant from the user's collection."""
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to delete plants.", "error")
-        return redirect(url_for("auth.login"))
 
     plant = supabase_client.get_plant_by_id(plant_id, user_id)
     if not plant:
@@ -266,13 +233,8 @@ def delete(plant_id):
 
     plant_name = plant.get("name", "Plant")
 
-    # Delete all photo versions if they exist
-    if plant.get("photo_url"):
-        supabase_client.delete_plant_photo(plant["photo_url"])
-    if plant.get("photo_url_original"):
-        supabase_client.delete_plant_photo(plant["photo_url_original"])
-    if plant.get("photo_url_thumb"):
-        supabase_client.delete_plant_photo(plant["photo_url_thumb"])
+    # Delete all photo versions if they exist (consolidated helper)
+    delete_all_photo_versions(plant)
 
     # Delete plant
     if supabase_client.delete_plant(plant_id, user_id):
@@ -293,9 +255,6 @@ def onboarding():
     POST: Handle step 2 (plant creation) and step 3 (reminder creation)
     """
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to continue.", "error")
-        return redirect(url_for("auth.login"))
 
     if request.method == "GET":
         # Check if user already has plants - skip onboarding if they do
@@ -439,9 +398,6 @@ def onboarding():
 def onboarding_skip():
     """Skip onboarding and mark it as complete without creating a plant."""
     user_id = get_current_user_id()
-    if not user_id:
-        flash("Please log in to continue.", "error")
-        return redirect(url_for("auth.login"))
 
     # Mark onboarding as complete
     supabase_client.mark_onboarding_complete(user_id)
