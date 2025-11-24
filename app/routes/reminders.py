@@ -473,7 +473,7 @@ def calendar(year=None, month=None):
         month: Month to display (defaults to current month)
     """
     from datetime import datetime
-    from calendar import monthcalendar, month_name
+    from calendar import monthcalendar, month_name, setfirstweekday, SUNDAY
 
     user_id = get_current_user_id()
 
@@ -500,6 +500,9 @@ def calendar(year=None, month=None):
             # Extract date from next_due (format: YYYY-MM-DD)
             due_date = reminder["next_due"]
             reminders_by_date[due_date].append(reminder)
+
+    # Set Sunday as first day of week (US convention)
+    setfirstweekday(SUNDAY)
 
     # Get calendar grid (list of weeks, each week is a list of days)
     calendar_grid = monthcalendar(year, month)
