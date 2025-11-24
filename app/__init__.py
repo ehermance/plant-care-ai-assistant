@@ -30,6 +30,77 @@ from .services import supabase_client
 from .utils import auth
 
 
+def _validate_production_security(app: Flask, cfg_path: str) -> None:
+    """
+    Validate critical security settings in production environments.
+
+    Raises RuntimeError if production security requirements are not met.
+    This prevents the app from starting with insecure configurations.
+
+    Checks:
+    - SESSION_COOKIE_SECURE must be True (cookies only over HTTPS)
+    - SECRET_KEY must be set and strong (>= 32 characters)
+    - DEBUG must be False (no debug mode in production)
+    - PREFERRED_URL_SCHEME should be "https"
+
+    Args:
+        app: Flask application instance
+        cfg_path: Config path being used (e.g., "app.config.ProdConfig")
+    """
+    # Only validate if running production config
+    is_production = "ProdConfig" in cfg_path
+    is_test = app.config.get("TESTING", False)
+
+    # Skip validation in test/dev environments
+    if not is_production or is_test:
+        return
+
+    errors = []
+
+    # Check SESSION_COOKIE_SECURE
+    if not app.config.get("SESSION_COOKIE_SECURE", False):
+        errors.append(
+            "SESSION_COOKIE_SECURE must be True in production. "
+            "Cookies must only be sent over HTTPS to prevent session hijacking."
+        )
+
+    # Check SECRET_KEY strength
+    secret_key = app.config.get("SECRET_KEY", "")
+    if not secret_key:
+        errors.append(
+            "SECRET_KEY is not set. Set FLASK_SECRET_KEY environment variable. "
+            "Generate with: python -c 'import secrets; print(secrets.token_hex(32))'"
+        )
+    elif len(secret_key) < 32:
+        errors.append(
+            f"SECRET_KEY is too weak ({len(secret_key)} chars). "
+            "Must be at least 32 characters for production security."
+        )
+
+    # Check DEBUG mode
+    if app.config.get("DEBUG", False):
+        errors.append(
+            "DEBUG must be False in production. Debug mode exposes sensitive information "
+            "and should never be enabled in production environments."
+        )
+
+    # Check HTTPS enforcement
+    if app.config.get("PREFERRED_URL_SCHEME", "http") != "https":
+        errors.append(
+            "PREFERRED_URL_SCHEME should be 'https' in production. "
+            "Set PREFERRED_URL_SCHEME=https environment variable."
+        )
+
+    # If any errors, raise exception to prevent app startup
+    if errors:
+        error_msg = "\n\n[ERROR] PRODUCTION SECURITY VALIDATION FAILED:\n\n" + "\n\n".join(f"  * {err}" for err in errors)
+        error_msg += "\n\n[WARNING] The application will not start until these security issues are resolved.\n"
+        raise RuntimeError(error_msg)
+
+    # Log success
+    app.logger.info("[OK] Production security validation passed")
+
+
 def create_app() -> Flask:
     # Load .env early (for local dev)
     # Use override=True to ensure .env values take precedence over system environment
@@ -48,6 +119,10 @@ def create_app() -> Flask:
         app.config.from_object(cfg_path)
     except (ImportError, AttributeError) as e:
         app.logger.warning(f"Could not load config object {cfg_path}: {e}")
+
+    # --- Production Security Validation ---
+    # Validate critical security settings in production to prevent misconfigurations
+    _validate_production_security(app, cfg_path)
 
     limiter.init_app(app)
 
