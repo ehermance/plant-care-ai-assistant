@@ -495,6 +495,48 @@
     });
   });
 
+  // Plant selection click handlers (authenticated users)
+  document.querySelectorAll('.plant-select-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+
+      // Get data attributes
+      const plantId = this.dataset.plantId;
+      const plantName = this.dataset.plantName;
+      const plantLocation = this.dataset.plantLocation || 'indoor_potted';
+
+      // Get form fields
+      const plantField = document.getElementById('plant');
+      const contextField = document.getElementById('care_context');
+      const selectedPlantIdField = document.getElementById('selected_plant_id');
+      const questionField = document.getElementById('question');
+
+      // Fill plant name (always overwrite to ensure consistency)
+      if (plantName) {
+        plantField.value = plantName;
+      }
+
+      // Fill care context from plant's location
+      if (plantLocation) {
+        contextField.value = plantLocation;
+      }
+
+      // Store selected plant ID for AI context
+      if (plantId && selectedPlantIdField) {
+        selectedPlantIdField.value = plantId;
+      }
+
+      // Visual feedback: highlight selected plant
+      document.querySelectorAll('.plant-select-btn').forEach(function(b) {
+        b.classList.remove('ring-2', 'ring-emerald-500', 'dark:ring-emerald-400');
+      });
+      this.classList.add('ring-2', 'ring-emerald-500', 'dark:ring-emerald-400');
+
+      // Focus the question field (most likely next action)
+      questionField.focus();
+    });
+  });
+
   // Plant carousel scroll functionality with gradient indicators
   (function() {
     const scrollContainer = document.getElementById('plants-scroll-container');

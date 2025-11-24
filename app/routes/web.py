@@ -169,8 +169,8 @@ def assistant():
         if profile:
             default_city = profile.get("city")
         # Get all user's plants (will display in horizontal scrollable carousel)
-        # Only fetch minimal fields needed for carousel (61% smaller payload)
-        user_plants = get_user_plants(user_id, fields="id,name,nickname,photo_url,photo_url_thumb")
+        # Only fetch minimal fields needed for carousel + location for AI context
+        user_plants = get_user_plants(user_id, fields="id,name,nickname,photo_url,photo_url_thumb,location")
 
     # Handle GET request - render form
     if request.method == "GET":
