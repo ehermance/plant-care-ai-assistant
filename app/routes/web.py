@@ -76,9 +76,9 @@ def debug_info():
 
     SECURITY:
     - Only available in DEBUG mode
-    - Requires authentication
+    - Requires admin privileges (admin role)
     - Disabled by default (must enable DEBUG_ENDPOINTS_ENABLED in config)
-    - Does not expose full API keys, only lengths
+    - Does not expose full API keys, only configuration status
     """
     # Check if debug endpoints are enabled (disabled by default for security)
     if not current_app.config.get("DEBUG_ENDPOINTS_ENABLED", False):
@@ -88,11 +88,14 @@ def debug_info():
     if not current_app.config.get("DEBUG", False):
         return {"error": "Not available in production"}, 404
 
-    # Require authentication for additional security
-    from app.utils.auth import get_current_user_id
+    # Require admin privileges for access
+    from app.utils.auth import get_current_user_id, is_admin
     user_id = get_current_user_id()
     if not user_id:
         return {"error": "Authentication required"}, 401
+
+    if not is_admin(user_id):
+        return {"error": "Admin privileges required"}, 403
 
     loaded_keys = [k for k in ("FLASK_SECRET_KEY", "OPENWEATHER_API_KEY", "OPENAI_API_KEY") if current_app.config.get(k)]
 

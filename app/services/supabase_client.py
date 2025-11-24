@@ -14,6 +14,7 @@ from flask import current_app, has_app_context, request
 from supabase import create_client, Client
 import secrets
 import string
+import hashlib
 
 
 def _safe_log_error(message: str) -> None:
@@ -120,13 +121,36 @@ def _generate_otp_code() -> str:
     return ''.join(secrets.choice(string.digits) for _ in range(6))
 
 
+def _hash_otp_code(code: str) -> str:
+    """
+    Hash OTP code using SHA-256 for secure storage.
+
+    OTP codes are hashed before database storage so that if the database
+    is compromised, attackers cannot see active codes. SHA-256 is used
+    instead of bcrypt/argon2 because:
+    1. OTP codes are short-lived (5 minutes)
+    2. They're already high-entropy (6 random digits = 1 million combinations)
+    3. Fast hashing is acceptable since brute force is impractical
+
+    Args:
+        code: 6-digit OTP code
+
+    Returns:
+        Hexadecimal hash string (64 characters)
+    """
+    return hashlib.sha256(code.encode('utf-8')).hexdigest()
+
+
 def _store_otp_code(email: str, code: str, expiration_minutes: int = 5) -> Dict[str, Any]:
     """
     Store OTP code in database with expiration.
 
+    The code is hashed using SHA-256 before storage for security.
+    If the database is compromised, attackers cannot see active codes.
+
     Args:
         email: User's email address
-        code: 6-digit OTP code
+        code: 6-digit OTP code (will be hashed before storage)
         expiration_minutes: Minutes until code expires (default 5)
 
     Returns:
@@ -149,10 +173,14 @@ def _store_otp_code(email: str, code: str, expiration_minutes: int = 5) -> Dict[
         # Calculate expiration timestamp
         expires_at = datetime.utcnow() + timedelta(minutes=expiration_minutes)
 
+        # Hash the OTP code before storage for security
+        # If database is compromised, attackers won't see active codes
+        code_hash = _hash_otp_code(code)
+
         # Insert OTP code into database (using admin client for RLS bypass)
         result = _supabase_admin.table("otp_codes").insert({
             "email": email.lower(),
-            "code": code,
+            "code": code_hash,  # Store hash, not plaintext
             "expires_at": expires_at.isoformat(),
             "ip_address": ip_address,
             "user_agent": user_agent
@@ -189,11 +217,14 @@ def _verify_otp_from_database(email: str, code: str) -> Dict[str, Any]:
         return {"success": False, "error": "admin_client_not_configured"}
 
     try:
+        # Hash the input code to compare with stored hash
+        code_hash = _hash_otp_code(code)
+
         # Look up OTP code (using admin client for RLS bypass)
         result = _supabase_admin.table("otp_codes") \
             .select("*") \
             .eq("email", email.lower()) \
-            .eq("code", code) \
+            .eq("code", code_hash) \
             .eq("used", False) \
             .order("created_at", desc=True) \
             .limit(1) \
