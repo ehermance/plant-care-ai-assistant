@@ -2,7 +2,13 @@
 User Context Service for AI Integration.
 
 Provides consolidated user plant and reminder context for AI prompts.
-Optimized for token efficiency (targeting 300-800 tokens depending on detail level).
+Optimized for token efficiency (targeting 500-1200 tokens depending on detail level).
+
+Enhanced with:
+- Plant notes and observations
+- Care pattern analysis
+- Health trend detection
+- Weather-aware insights
 """
 
 from __future__ import annotations
@@ -15,6 +21,7 @@ from .supabase_client import (
 )
 from .reminders import get_due_reminders, get_upcoming_reminders
 from .journal import get_plant_actions, get_user_actions
+from . import ai_insights
 
 
 def get_user_context(user_id: str) -> Dict[str, Any]:
@@ -279,3 +286,341 @@ def _calculate_plant_stats(plant_id: str, user_id: str, activities: List[Dict[st
         "last_watered_days_ago": last_watered_days,
         "action_counts": action_counts
     }
+
+
+# ============================================================================
+# ENHANCED CONTEXT FUNCTIONS (Tier 2 & 3 - Rich & Diagnostic)
+# ============================================================================
+
+def get_enhanced_user_context(
+    user_id: str,
+    weather: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    """
+    Enhanced user context with rich plant data and weather awareness (Tier 2 - Default).
+
+    Replaces basic get_user_context() with richer information:
+    - Plant notes summary (first 150 chars)
+    - Care patterns (watering frequency)
+    - Recent observations with health keywords
+    - Weather-aware context
+    - Health pattern aggregations
+
+    Target: 500-800 tokens (appropriate for default free tier)
+
+    Args:
+        user_id: User UUID
+        weather: Optional weather dict for weather-aware insights
+
+    Returns:
+        Dict with enhanced plants, reminders, observations, patterns, weather_context
+    """
+    # Get all plants with notes field
+    plants = get_user_plants(user_id, fields="id,name,species,nickname,location,light,notes")
+
+    # Get reminders
+    due_today = get_due_reminders(user_id)
+    upcoming = get_upcoming_reminders(user_id, days=7)
+
+    # Filter overdue from due_today
+    today = datetime.now().date()
+    overdue = []
+    due_today_filtered = []
+
+    for reminder in due_today:
+        effective_due = reminder.get("effective_due_date")
+        if effective_due:
+            if isinstance(effective_due, str):
+                effective_due = datetime.fromisoformat(effective_due).date()
+
+            if effective_due < today:
+                overdue.append(_format_reminder_context(reminder))
+            else:
+                due_today_filtered.append(_format_reminder_context(reminder))
+        else:
+            due_today_filtered.append(_format_reminder_context(reminder))
+
+    # Format upcoming reminders
+    upcoming_formatted = []
+    for reminder in upcoming[:10]:
+        formatted = _format_reminder_context(reminder)
+        effective_due = reminder.get("effective_due_date")
+        if effective_due:
+            if isinstance(effective_due, str):
+                effective_due = datetime.fromisoformat(effective_due).date()
+            days_until = (effective_due - today).days
+            formatted["days_until"] = days_until
+        upcoming_formatted.append(formatted)
+
+    # Get recent activities WITH notes (last 7-14 days)
+    recent_activities_raw = get_user_actions(user_id, limit=100)
+    cutoff_date = datetime.now() - timedelta(days=14)
+
+    activities_with_notes = []
+    for activity in recent_activities_raw:
+        action_at = activity.get("action_at")
+        if action_at:
+            if isinstance(action_at, str):
+                action_at = datetime.fromisoformat(action_at.replace('Z', '+00:00'))
+
+            if action_at >= cutoff_date:
+                days_ago = (datetime.now(action_at.tzinfo) - action_at).days
+                note_text = activity.get("notes")
+
+                # Extract keywords if notes present
+                keywords = ai_insights.extract_health_keywords(note_text) if note_text else []
+
+                activities_with_notes.append({
+                    "plant_name": activity.get("plant_name", "Unknown"),
+                    "action_type": activity.get("action_type"),
+                    "days_ago": days_ago,
+                    "notes": note_text[:100] if note_text else None,  # Truncate to 100 chars
+                    "keywords": keywords
+                })
+
+    # Sort and get most recent observations
+    recent_observations = ai_insights.summarize_recent_observations(
+        activities_with_notes,
+        max_observations=3
+    )
+
+    # Format plants with enhanced context
+    enhanced_plants = []
+    for plant in plants[:10]:  # Limit to 10 plants for token budget
+        plant_dict = {
+            "id": plant.get("id"),
+            "name": plant.get("name"),
+            "species": plant.get("species"),
+            "location": plant.get("location", "indoor_potted"),
+            "light": plant.get("light")
+        }
+
+        # Add notes summary (first 150 chars)
+        notes = plant.get("notes")
+        if notes and notes.strip():
+            plant_dict["notes_summary"] = notes[:150]
+            if len(notes) > 150:
+                plant_dict["notes_summary"] += "..."
+
+        # Calculate watering pattern for this plant
+        plant_id = plant.get("id")
+        if plant_id:
+            plant_activities_raw = get_plant_actions(plant_id, user_id, limit=50)
+            plant_activities = []
+            for act in plant_activities_raw:
+                if act.get("action_type") == "water":
+                    plant_activities.append(act)
+
+            pattern = ai_insights.calculate_watering_pattern(plant_activities)
+            if pattern.get("avg_interval_days"):
+                plant_dict["watering_pattern"] = f"~{pattern['avg_interval_days']}d avg ({pattern['consistency']})"
+
+        enhanced_plants.append(plant_dict)
+
+    # Extract weather context summary if available
+    weather_context = None
+    if weather:
+        weather_context = ai_insights.extract_weather_context_summary(weather)
+
+    # Calculate health patterns across all plants
+    all_concerns = set()
+    for obs in recent_observations:
+        all_concerns.update(obs.get("keywords", []))
+
+    negative_keywords = ["yellow_leaves", "brown_tips", "droopy", "wilting", "pest_spotted", "overwatered"]
+    recent_issues = [c for c in all_concerns if c in negative_keywords]
+
+    health_patterns = {
+        "plants_with_recent_observations": len([o for o in recent_observations if o.get("note_preview")]),
+        "recent_concern_keywords": recent_issues,
+        "overall_activity_level": "active" if len(activities_with_notes) >= 5 else "moderate"
+    }
+
+    # Calculate stats
+    stats = {
+        "total_plants": len(plants),
+        "active_reminders": len(due_today) + len(upcoming),
+        "overdue_count": len(overdue),
+        "due_today_count": len(due_today_filtered)
+    }
+
+    return {
+        "plants": enhanced_plants,
+        "reminders": {
+            "overdue": overdue,
+            "due_today": due_today_filtered,
+            "upcoming_week": upcoming_formatted
+        },
+        "recent_observations": recent_observations,
+        "health_patterns": health_patterns,
+        "weather_context": weather_context,
+        "stats": stats
+    }
+
+
+def get_enhanced_plant_context(
+    user_id: str,
+    plant_id: str,
+    weather: Optional[Dict[str, Any]] = None,
+    is_premium: bool = False
+) -> Dict[str, Any]:
+    """
+    Enhanced plant-specific context with optional premium diagnostic features (Tier 2/3).
+
+    Tier 2 (Default): Full plant notes, care patterns, recent observations
+    Tier 3 (Premium): + Health trends, comparative insights, extended history
+
+    Target: 500-800 tokens (Tier 2), 800-1200 tokens (Tier 3)
+
+    Args:
+        user_id: User UUID
+        plant_id: Plant UUID
+        weather: Optional weather dict
+        is_premium: If True, include premium diagnostic features (Tier 3)
+
+    Returns:
+        Dict with enhanced plant details, patterns, insights, weather context
+    """
+    # Get plant details with all fields
+    plant = get_plant_by_id(plant_id, user_id)
+    if not plant:
+        return {
+            "error": "Plant not found or access denied",
+            "plant": None,
+            "activities": [],
+            "reminders": [],
+            "patterns": {},
+            "stats": {}
+        }
+
+    # Get activities (last 14 days for standard, 30 days for premium)
+    days = 30 if is_premium else 14
+    cutoff_date = datetime.now() - timedelta(days=days)
+
+    activities_raw = get_plant_actions(plant_id, user_id, limit=100)
+    activities = []
+
+    for activity in activities_raw:
+        action_at = activity.get("action_at")
+        if action_at:
+            if isinstance(action_at, str):
+                action_at = datetime.fromisoformat(action_at.replace('Z', '+00:00'))
+
+            if action_at >= cutoff_date:
+                days_ago = (datetime.now(action_at.tzinfo) - action_at).days
+                activities.append({
+                    "action_type": activity.get("action_type"),
+                    "action_at": activity.get("action_at"),
+                    "days_ago": days_ago,
+                    "amount_ml": activity.get("amount_ml"),
+                    "notes": activity.get("notes")
+                })
+
+    # Get reminders for this plant
+    all_reminders = get_due_reminders(user_id) + get_upcoming_reminders(user_id, days=14)
+    plant_reminders = [
+        _format_reminder_context(r)
+        for r in all_reminders
+        if r.get("plant_id") == plant_id
+    ]
+
+    # Calculate care patterns
+    watering_pattern = ai_insights.calculate_watering_pattern(activities)
+
+    # Get recent observations
+    recent_obs = ai_insights.summarize_recent_observations(activities, max_observations=5)
+
+    # Calculate care completeness
+    care_analysis = ai_insights.analyze_care_completeness(
+        plant_id,
+        activities,
+        [r for r in all_reminders if r.get("plant_id") == plant_id]
+    )
+
+    # Build plant context
+    plant_context = {
+        "id": plant.get("id"),
+        "name": plant.get("name"),
+        "species": plant.get("species"),
+        "nickname": plant.get("nickname"),
+        "location": plant.get("location"),
+        "light": plant.get("light"),
+        "notes_full": plant.get("notes")[:500] if plant.get("notes") else None,  # Truncate to 500
+        "care_history_summary": {
+            "avg_watering_interval_days": watering_pattern.get("avg_interval_days"),
+            "watering_consistency": watering_pattern.get("consistency"),
+            "watering_trend": watering_pattern.get("recent_trend"),
+            "total_activities_period": len(activities),
+            "care_level": care_analysis.get("care_level"),
+            "on_schedule": care_analysis.get("on_schedule")
+        }
+    }
+
+    # Extract weather context
+    weather_context = None
+    if weather:
+        weather_context = ai_insights.extract_weather_context_summary(weather)
+
+    # Base stats
+    stats = {
+        "total_activities": len(activities),
+        "last_watered_days_ago": watering_pattern.get("avg_interval_days"),
+        "care_completion_rate": care_analysis.get("completion_rate"),
+        "missed_care_types": care_analysis.get("missed_care_types", [])
+    }
+
+    result = {
+        "plant": plant_context,
+        "activities_detailed": activities[:20],  # Limit to recent 20
+        "recent_observations": recent_obs,
+        "reminders": plant_reminders,
+        "patterns": {
+            "watering": watering_pattern,
+            "care_level": care_analysis.get("care_level")
+        },
+        "weather_context": weather_context,
+        "stats": stats
+    }
+
+    # PREMIUM FEATURES (Tier 3)
+    if is_premium:
+        # Health trend analysis
+        health_trends = ai_insights.identify_health_trends(activities)
+
+        # Comparative insights (vs user's other plants)
+        all_user_plants = get_user_plants(user_id, fields="id")
+        if len(all_user_plants) > 1:
+            # Calculate average watering interval across all plants
+            all_intervals = []
+            for other_plant in all_user_plants:
+                other_id = other_plant.get("id")
+                if other_id != plant_id:
+                    other_activities = get_plant_actions(other_id, user_id, limit=50)
+                    other_pattern = ai_insights.calculate_watering_pattern(other_activities)
+                    if other_pattern.get("avg_interval_days"):
+                        all_intervals.append(other_pattern["avg_interval_days"])
+
+            if all_intervals:
+                avg_user_interval = sum(all_intervals) / len(all_intervals)
+                this_interval = watering_pattern.get("avg_interval_days", avg_user_interval)
+
+                if this_interval < avg_user_interval * 0.8:
+                    comparative = "more_frequent_than_others"
+                elif this_interval > avg_user_interval * 1.2:
+                    comparative = "less_frequent_than_others"
+                else:
+                    comparative = "similar_to_others"
+
+                result["comparative_insights"] = {
+                    "watering_vs_user_avg": comparative,
+                    "user_avg_interval": round(avg_user_interval, 1)
+                }
+
+        result["health_trends"] = {
+            "recent_concerns": health_trends.get("recent_concerns", []),
+            "improving": health_trends.get("improving", False),
+            "deteriorating": health_trends.get("deteriorating", False),
+            "timeline": health_trends.get("timeline", [])
+        }
+
+    return result

@@ -193,6 +193,48 @@ def get_plant_actions(
         return []
 
 
+def get_last_watered_date(
+    plant_id: str,
+    user_id: str,
+) -> Optional[datetime]:
+    """
+    Get the datetime of the last watering for a specific plant.
+
+    Args:
+        plant_id: Plant's UUID
+        user_id: User's UUID (for authorization)
+
+    Returns:
+        datetime of last watering, or None if never watered
+    """
+    supabase = get_admin_client()
+    if not supabase:
+        return None
+
+    try:
+        response = supabase.table("plant_actions") \
+            .select("action_at") \
+            .eq("plant_id", plant_id) \
+            .eq("user_id", user_id) \
+            .eq("action_type", "water") \
+            .order("action_at", desc=True) \
+            .limit(1) \
+            .execute()
+
+        if response.data and len(response.data) > 0:
+            action_at = response.data[0].get("action_at")
+            if action_at:
+                # Parse ISO format datetime string
+                if isinstance(action_at, str):
+                    return datetime.fromisoformat(action_at.replace('Z', '+00:00'))
+                return action_at
+        return None
+
+    except Exception as e:
+        _safe_log_error(f"Error fetching last watered date: {e}")
+        return None
+
+
 def get_recent_actions(
     user_id: str,
     days: int = 7,

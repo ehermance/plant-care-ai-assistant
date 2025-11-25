@@ -58,6 +58,28 @@ class BaseConfig:
     UPLOAD_RATE_LIMIT = "20 per hour"  # Rate limit for plant/journal photo uploads
     SIGNUP_RATE_LIMIT = "5 per minute; 20 per hour"  # Rate limit for signup attempts
 
+    # AI Context Configuration
+    AI_CONTEXT_DEFAULT_TIER = os.getenv("AI_CONTEXT_DEFAULT_TIER", "rich")  # "basic" or "rich"
+    AI_CONTEXT_RICH_MAX_PLANTS = 10  # Max plants to include in rich context
+    AI_CONTEXT_RICH_MAX_OBSERVATIONS = 3  # Max recent observations in rich context
+    AI_CONTEXT_NOTES_TRUNCATE_LENGTH = 500  # Truncate plant notes to this length
+    AI_CONTEXT_OBSERVATION_TRUNCATE_LENGTH = 100  # Truncate observation notes
+    AI_CONTEXT_ENABLE_WEATHER = True  # Include weather-aware context
+    AI_CONTEXT_ENABLE_PATTERNS = True  # Include care pattern analysis
+    AI_CONTEXT_TOKEN_BUDGET_RICH = 800  # Target token count for rich context
+    AI_CONTEXT_TOKEN_BUDGET_DIAGNOSTIC = 1200  # Target token count for diagnostic context
+
+    # Watering Intelligence Configuration
+    WATERING_INTELLIGENCE_ENABLED = os.getenv("WATERING_INTELLIGENCE_ENABLED", "true").lower() == "true"
+    WATERING_ELIGIBILITY_MIN_HOURS = 48  # Minimum hours between waterings
+    WATERING_STRESS_THRESHOLD_HOUSEPLANT = 2  # Stress score threshold for houseplants
+    WATERING_STRESS_THRESHOLD_SHRUB = 2  # Stress score threshold for shrubs
+    WATERING_STRESS_THRESHOLD_WILDFLOWER_GERMINATION = 2  # Weeks 1-3
+    WATERING_STRESS_THRESHOLD_WILDFLOWER_ESTABLISHED = 3  # Week 4+
+    WATERING_AUTO_ADJUST_REMINDERS = False  # Auto-adjust reminders based on weather (disabled)
+    WATERING_RAIN_THRESHOLD_INCHES = 0.25  # Minimum rain to trigger skip
+    WATERING_RAIN_SKIP_WINDOW_HOURS = 48  # Hours to skip after significant rain
+
     # Misc
     PREFERRED_URL_SCHEME = os.getenv("PREFERRED_URL_SCHEME", "https")
     SEND_FILE_MAX_AGE_DEFAULT = int(os.getenv("SEND_FILE_MAX_AGE_DEFAULT", "3600"))

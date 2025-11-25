@@ -181,86 +181,205 @@ def _basic_plant_tip(question: str, plant: Optional[str], care_context: str) -> 
     return f"For {loc}, aim for bright-indirect light, water when the top inch is dry, and ensure good drainage."
 
 
-def build_system_prompt(user_context_data: Optional[Dict[str, Any]] = None) -> str:
+def detect_question_type(question: str, selected_plant_id: Optional[str]) -> str:
     """
-    Build AI system prompt with optional user context.
+    Detect question type to determine appropriate context level.
+
+    Returns "plant" (Tier 2) or "diagnosis" (Tier 3 premium) based on question content.
+    All questions default to rich plant-aware context (Tier 2).
+    Diagnosis questions with health concerns trigger premium diagnostic features (Tier 3).
 
     Args:
-        user_context_data: Optional user context from user_context.get_user_context()
-                          or user_context.get_plant_context()
+        question: User's question text
+        selected_plant_id: Whether user selected a specific plant
 
     Returns:
-        System prompt string with user context appended (if available)
+        "plant" - Plant-specific rich context (Tier 2 default)
+        "diagnosis" - Full diagnostic context with health trends (Tier 3 premium)
+
+    Examples:
+        >>> detect_question_type("Why are my leaves yellow?", "plant-123")
+        'diagnosis'
+        >>> detect_question_type("How often should I water?", "plant-123")
+        'plant'
+    """
+    q_lower = question.lower()
+
+    # Diagnosis indicators (trigger premium Tier 3 features)
+    diagnosis_keywords = [
+        "yellow", "brown", "droopy", "drooping", "wilting", "wilt",
+        "dying", "dead", "sick", "unhealthy", "problem", "wrong",
+        "help", "issue", "concern", "worry", "pest", "bug", "disease",
+        "spots", "curling", "crispy", "mushy", "rot"
+    ]
+
+    if any(kw in q_lower for kw in diagnosis_keywords):
+        return "diagnosis"
+
+    # All other questions use rich plant-aware context (Tier 2)
+    return "plant"
+
+
+def is_watering_question(question: str) -> bool:
+    """
+    Detect if question is asking about watering recommendations.
+
+    Args:
+        question: User's question text
+
+    Returns:
+        True if question is about watering
+
+    Examples:
+        >>> is_watering_question("Should I water my plant today?")
+        True
+        >>> is_watering_question("What type of soil should I use?")
+        False
+    """
+    q_lower = question.lower()
+
+    # Watering question patterns
+    watering_keywords = [
+        "should i water", "do i need to water", "time to water",
+        "water today", "water my", "watering", "need water",
+        "how much water", "when to water", "water schedule",
+        "water now", "ready for water", "thirsty",
+        "needs water", "need watering"
+    ]
+
+    return any(keyword in q_lower for keyword in watering_keywords)
+
+
+def build_system_prompt(
+    user_context_data: Optional[Dict[str, Any]] = None,
+    context_level: str = "plant"
+) -> str:
+    """
+    Build AI system prompt with enhanced context and weather awareness.
+
+    Args:
+        user_context_data: Enhanced context from get_enhanced_user_context() or
+                          get_enhanced_plant_context()
+        context_level: "plant" (Tier 2 default) or "diagnosis" (Tier 3 premium)
+
+    Returns:
+        System prompt string with rich context and weather insights
     """
     base = (
         "You are a helpful plant-care expert with calm persona. "
         "Provide safe, concise, accurate, and practical steps. "
+        "Reference the user's specific observations and care history when relevant. "
         "If uncertain, say so."
     )
 
     if not user_context_data:
         return base
 
-    # Build user context summary for prompt
+    # Build enhanced context summary for prompt
     context_lines = []
 
-    # Add user's plants
+    # WEATHER CONTEXT (Phase 2 - Weather-aware AI)
+    weather_context = user_context_data.get("weather_context")
+    if weather_context:
+        context_lines.append(f"Current weather: {weather_context}")
+
+    # WATERING RECOMMENDATION (intelligent stress-based analysis)
+    watering_rec = user_context_data.get("watering_recommendation")
+    if watering_rec:
+        rec_text = watering_rec.get("recommendation", "")
+        reason = watering_rec.get("reason", "")
+        if rec_text:
+            context_lines.append(f"Watering analysis: {rec_text}")
+            if reason:
+                context_lines.append(f"  Reason: {reason}")
+
+    # USER'S PLANTS with notes and patterns
     plants = user_context_data.get("plants", [])
     if plants:
-        plant_names = []
-        for p in plants[:5]:  # Limit to 5 plants max
-            name = p.get("name", "Unknown")
+        for p in plants[:5]:  # Limit to 5 plants
+            plant_info = p.get("name", "Unknown")
             if p.get("species"):
-                plant_names.append(f"{name} ({p['species']})")
-            else:
-                plant_names.append(name)
-        if plant_names:
-            context_lines.append(f"User's plants: {', '.join(plant_names)}")
+                plant_info += f" ({p['species']})"
 
-    # Add reminders due today
-    reminders = user_context_data.get("reminders", {})
-    if reminders:
-        due_today = reminders.get("due_today", [])
-        if due_today:
-            tasks = [r["title"] for r in due_today[:3]]  # Max 3
-            context_lines.append(f"Care due today: {', '.join(tasks)}")
+            # Add notes summary if available
+            if p.get("notes_summary"):
+                plant_info += f" - {p['notes_summary']}"
 
-        # Add overdue reminders if any
-        overdue = reminders.get("overdue", [])
-        if overdue:
-            overdue_count = len(overdue)
-            context_lines.append(f"Overdue tasks: {overdue_count}")
+            # Add watering pattern if available
+            if p.get("watering_pattern"):
+                plant_info += f" [watered {p['watering_pattern']}]"
 
-    # Add recent care activities
-    recent_activities = user_context_data.get("recent_activities", [])
-    if recent_activities:
-        recent_summary = []
-        for activity in recent_activities[:3]:  # Max 3 recent activities
-            plant_name = activity.get("plant_name", "Plant")
-            action_type = activity.get("action_type", "care")
-            days_ago = activity.get("days_ago", 0)
-            recent_summary.append(f"{plant_name} {action_type} {days_ago}d ago")
-        if recent_summary:
-            context_lines.append(f"Recent care: {'; '.join(recent_summary)}")
+            context_lines.append(f"Plant: {plant_info}")
 
-    # Add specific plant context (if available from get_plant_context)
+    # SPECIFIC PLANT CONTEXT (from get_enhanced_plant_context)
     plant_details = user_context_data.get("plant")
     if plant_details:
         plant_name = plant_details.get("name", "Plant")
         context_lines.append(f"Selected plant: {plant_name}")
 
-        # Add last watered info if available
-        stats = user_context_data.get("stats", {})
-        last_watered = stats.get("last_watered_days_ago")
-        if last_watered is not None:
-            context_lines.append(f"Last watered: {last_watered} days ago")
+        # Add full plant notes
+        if plant_details.get("notes_full"):
+            notes = plant_details["notes_full"]
+            context_lines.append(f"Plant notes: {notes}")
 
-        # Add plant notes if available
-        if plant_details.get("notes"):
-            notes = plant_details["notes"][:100]  # Truncate to 100 chars
-            context_lines.append(f"Notes: {notes}")
+        # Add care history summary
+        care_history = plant_details.get("care_history_summary", {})
+        if care_history.get("avg_watering_interval_days"):
+            interval = care_history["avg_watering_interval_days"]
+            consistency = care_history.get("watering_consistency", "")
+            context_lines.append(f"Watering pattern: every ~{interval} days ({consistency})")
 
-    # Build context section
+        if care_history.get("care_level"):
+            care_level = care_history["care_level"]
+            context_lines.append(f"Care level: {care_level}")
+
+    # RECENT OBSERVATIONS with health keywords
+    recent_obs = user_context_data.get("recent_observations", [])
+    if recent_obs:
+        context_lines.append("Recent observations:")
+        for obs in recent_obs[:3]:  # Max 3
+            days_ago = obs.get("days_ago", 0)
+            note = obs.get("note_preview", "")
+            if obs.get("has_concern"):
+                context_lines.append(f"  ⚠ {days_ago}d ago: {note}")
+            else:
+                context_lines.append(f"  • {days_ago}d ago: {note}")
+
+    # HEALTH PATTERNS (for diagnosis context level)
+    if context_level == "diagnosis":
+        health_trends = user_context_data.get("health_trends")
+        if health_trends:
+            concerns = health_trends.get("recent_concerns", [])
+            if concerns:
+                context_lines.append(f"Health concerns: {', '.join(concerns)}")
+
+            if health_trends.get("improving"):
+                context_lines.append("Trend: Improving (fewer issues recently)")
+            elif health_trends.get("deteriorating"):
+                context_lines.append("Trend: Deteriorating (more issues recently)")
+
+        # Comparative insights (premium)
+        comparative = user_context_data.get("comparative_insights")
+        if comparative:
+            vs_avg = comparative.get("watering_vs_user_avg")
+            if vs_avg == "more_frequent_than_others":
+                context_lines.append("This plant is watered more frequently than user's other plants")
+            elif vs_avg == "less_frequent_than_others":
+                context_lines.append("This plant is watered less frequently than user's other plants")
+
+    # REMINDERS
+    reminders = user_context_data.get("reminders", {})
+    if reminders:
+        due_today = reminders.get("due_today", [])
+        if due_today:
+            tasks = [r["title"] for r in due_today[:3]]
+            context_lines.append(f"Care due today: {', '.join(tasks)}")
+
+        overdue = reminders.get("overdue", [])
+        if overdue:
+            context_lines.append(f"Overdue tasks: {len(overdue)}")
+
+    # Build final context section
     if context_lines:
         context_section = "\n\nUser Context:\n" + "\n".join(f"- {line}" for line in context_lines)
         return base + context_section
@@ -268,11 +387,29 @@ def build_system_prompt(user_context_data: Optional[Dict[str, Any]] = None) -> s
     return base
 
 
-def _ai_advice(question: str, plant: Optional[str], weather: Optional[dict], care_context: str, user_context_data: Optional[Dict[str, Any]] = None) -> Tuple[Optional[str], Optional[str]]:
+def _ai_advice(
+    question: str,
+    plant: Optional[str],
+    weather: Optional[dict],
+    care_context: str,
+    user_context_data: Optional[Dict[str, Any]] = None,
+    context_level: str = "plant"
+) -> Tuple[Optional[str], Optional[str]]:
     """
     Calls AI providers using LiteLLM Router (OpenAI primary, Gemini fallback).
     Returns (response_text, provider_name) or (None, None) if all providers fail.
     The caller will use rule-based output if this returns (None, None).
+
+    Args:
+        question: User's question
+        plant: Plant name/species
+        weather: Weather dict
+        care_context: Location context
+        user_context_data: Enhanced context data
+        context_level: "plant" (Tier 2) or "diagnosis" (Tier 3)
+
+    Returns:
+        Tuple of (response_text, provider_name) or (None, None)
     """
     global AI_LAST_ERROR, AI_LAST_PROVIDER
     AI_LAST_ERROR = None
@@ -324,8 +461,8 @@ def _ai_advice(question: str, plant: Optional[str], weather: Optional[dict], car
     }
     context_str = context_map.get(care_context, "potted house plant (indoors)")
 
-    # Build system message with user context
-    sys_msg = build_system_prompt(user_context_data)
+    # Build system message with enhanced user context and context level
+    sys_msg = build_system_prompt(user_context_data, context_level=context_level)
 
     user_msg = (
         f"Plant: {(plant or '').strip() or 'unspecified'}\n"
@@ -395,42 +532,129 @@ def generate_advice(
     selected_plant_id: Optional[str] = None,
 ) -> Tuple[str, Optional[dict], str]:
     """
-    Orchestrates advice generation with optional user context integration.
+    Orchestrates advice generation with enhanced context and weather awareness.
+
+    Enhanced with:
+      - Rich plant-aware context (Tier 2 default for all users)
+      - Premium diagnostic features (Tier 3 for premium users)
+      - Weather-aware insights integrated into context
+      - Pattern recognition from care history
+      - Health trend analysis
 
     Steps:
-      1) Fetch user context if authenticated (plants, reminders, recent activities)
-      2) Best-effort weather fetch (does not block if it fails)
-      3) Try AI providers (OpenAI primary, Gemini fallback) with context; on failure, fall back to rules
-      4) Append a short weather hint when available
+      1) Fetch weather data (best-effort)
+      2) Detect question type (plant vs diagnosis)
+      3) Fetch enhanced user context with weather awareness
+      4) Try AI providers (OpenAI primary, Gemini fallback) with rich context
+      5) Fallback to rules if AI unavailable
 
     Args:
         question: User's plant care question
         plant: Plant name or species
         city: City for weather data
         care_context: indoor_potted, outdoor_potted, or outdoor_bed
-        user_id: Optional user ID for context fetching (NEW)
-        selected_plant_id: Optional specific plant ID for detailed context (NEW)
+        user_id: Optional user ID for context fetching
+        selected_plant_id: Optional specific plant ID for detailed context
 
     Returns:
         Tuple of (answer, weather, source: "openai"|"gemini"|"rule")
     """
+    # Fetch weather first (needed for weather-aware context)
     weather = get_weather_for_city(city) if city else None
 
-    # Fetch user context if authenticated
+    # Detect question type to determine context level
+    context_level = detect_question_type(question, selected_plant_id)
+
+    # Determine if user has premium tier (TODO: integrate with subscription system)
+    # For now, diagnosis questions trigger premium features for all users
+    is_premium = (context_level == "diagnosis")
+
+    # Fetch enhanced user context if authenticated
     user_context_data = None
     if user_id:
         try:
             if selected_plant_id:
-                # Get detailed context for specific plant
-                user_context_data = user_context.get_plant_context(user_id, selected_plant_id)
+                # Get enhanced plant-specific context with weather
+                user_context_data = user_context.get_enhanced_plant_context(
+                    user_id,
+                    selected_plant_id,
+                    weather=weather,
+                    is_premium=is_premium
+                )
             else:
-                # Get general user context
-                user_context_data = user_context.get_user_context(user_id)
-        except Exception:
+                # Get enhanced general user context with weather
+                user_context_data = user_context.get_enhanced_user_context(
+                    user_id,
+                    weather=weather
+                )
+        except Exception as e:
             # If context fetch fails, continue without it (graceful degradation)
+            # Log error for debugging
+            from app.utils.errors import log_info
+            log_info(f"Context fetch failed: {str(e)}")
             user_context_data = None
 
-    ai_text, provider = _ai_advice(question, plant, weather, care_context, user_context_data)
+    # Detect watering questions and generate intelligent recommendations
+    if is_watering_question(question) and selected_plant_id and weather:
+        try:
+            from . import watering_intelligence
+            from .journal import get_last_watered_date
+
+            # Get last watered date for stress calculation
+            last_watered = get_last_watered_date(selected_plant_id, user_id) if user_id else None
+
+            # Calculate hours since watered
+            hours_since_watered = None
+            if last_watered:
+                from datetime import datetime, timezone
+                now = datetime.now(timezone.utc)
+                if last_watered.tzinfo is None:
+                    # Make timezone-aware if naive
+                    from datetime import timezone
+                    last_watered = last_watered.replace(tzinfo=timezone.utc)
+                hours_since_watered = (now - last_watered).total_seconds() / 3600
+
+            # Determine plant type from care_context
+            plant_type = "houseplant"
+            if care_context == "outdoor_bed":
+                # Could be shrubs or wildflowers - default to shrub
+                plant_type = "outdoor_shrub"
+            elif care_context == "outdoor_potted":
+                plant_type = "outdoor_shrub"
+
+            # Generate watering recommendation
+            watering_rec = watering_intelligence.generate_watering_recommendation(
+                plant_name=plant or "Your plant",
+                hours_since_watered=hours_since_watered,
+                weather=weather,
+                plant_type=plant_type,
+                plant_age_weeks=None,  # TODO: Track plant age for wildflowers
+                hours_since_rain=None,  # TODO: Track rain data
+                recent_rain=False,  # TODO: Integrate rain tracking
+                rain_expected=False  # TODO: Check forecast for rain
+            )
+
+            # Add watering recommendation to context
+            if user_context_data is None:
+                user_context_data = {}
+            user_context_data["watering_recommendation"] = watering_rec
+
+        except Exception as e:
+            # If watering intelligence fails, continue without it
+            from app.utils.errors import log_info
+            log_info(f"Watering intelligence failed: {str(e)}")
+            pass
+
+    # Call AI with enhanced context (context_level passed to build_system_prompt)
+    ai_text, provider = _ai_advice(
+        question,
+        plant,
+        weather,
+        care_context,
+        user_context_data,
+        context_level=context_level
+    )
+
     if ai_text and provider:
         answer = ai_text
         source = provider  # "openai" or "gemini"
@@ -438,10 +662,12 @@ def generate_advice(
         answer = _basic_plant_tip(question, plant, care_context)
         source = "rule"
 
-    hint = _weather_tip(weather, plant, care_context)
-    if hint:
-        city_name = weather.get("city") if weather else (city or "")
-        suffix = f"\n\nWeather tip{(' for ' + city_name) if city_name else ''}: {hint}"
-        answer = f"{answer}{suffix}"
+    # Weather tip is now integrated into context, but keep as fallback for non-authenticated
+    if not user_id:
+        hint = _weather_tip(weather, plant, care_context)
+        if hint:
+            city_name = weather.get("city") if weather else (city or "")
+            suffix = f"\n\nWeather tip{(' for ' + city_name) if city_name else ''}: {hint}"
+            answer = f"{answer}{suffix}"
 
     return answer, weather, source
