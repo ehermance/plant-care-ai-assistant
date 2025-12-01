@@ -44,9 +44,9 @@ def index():
     # Get user's plants for carousel (limit 20 for performance)
     latest_plants = supabase_client.get_user_plants(user_id, 20, 0)
 
-    # Get reminder stats and due reminders
+    # Get reminder stats and due reminders with weather adjustments
     reminder_stats = reminder_service.get_reminder_stats(user_id)
-    due_reminders = reminder_service.get_due_reminders(user_id)
+    due_reminders, weather_suggestions = reminder_service.get_due_reminders_with_adjustments(user_id)
 
     return render_template(
         "dashboard/index.html",
@@ -59,6 +59,7 @@ def index():
         latest_plants=latest_plants,
         reminder_stats=reminder_stats,
         due_reminders=due_reminders,
+        weather_suggestions=weather_suggestions,
     )
 
 

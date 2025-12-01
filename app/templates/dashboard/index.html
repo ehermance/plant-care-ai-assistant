@@ -79,14 +79,42 @@
           <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
             {{ reminder.plant_name }}{% if reminder.plant_nickname %} "{{ reminder.plant_nickname }}"{% endif %}
           </a>
-          {% if reminder.weather_adjustment_reason %}
-          <span class="badge-cyan text-xs" title="{{ reminder.weather_adjustment_reason }}">
-            <span aria-hidden="true">🌤️</span> Weather adjusted
+          {% if reminder.adjustment %}
+          <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-700">
+            <span aria-hidden="true">☔</span> Weather adjusted
           </span>
           {% endif %}
         </p>
+
+        {% if reminder.adjustment %}
+        <div class="mt-2 p-2 bg-cyan-50 dark:bg-cyan-900/20 border-l-4 border-cyan-400 dark:border-cyan-500 rounded-r text-xs">
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex-1">
+              <p class="text-slate-700 dark:text-slate-300 font-medium mb-1">
+                {{ reminder.adjustment.reason }}
+              </p>
+              <p class="text-slate-600 dark:text-slate-400">
+                Adjusted to <strong class="font-semibold text-slate-700 dark:text-slate-300">{{ reminder.adjustment.adjusted_due_date }}</strong>
+                {% if reminder.adjustment.days > 0 %}
+                  (+{{ reminder.adjustment.days }} day{% if reminder.adjustment.days > 1 %}s{% endif %})
+                {% elif reminder.adjustment.days < 0 %}
+                  ({{ reminder.adjustment.days }} day{% if reminder.adjustment.days < -1 %}s{% endif %})
+                {% endif %}
+              </p>
+            </div>
+            <button
+              onclick="showAdjustmentDetails({{ reminder.adjustment | tojson }})"
+              class="flex-shrink-0 text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 font-medium transition-colors"
+              title="Show adjustment details"
+            >
+              Why?
+            </button>
+          </div>
+        </div>
+        {% endif %}
+
         {% if reminder.notes %}
-        <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">{{ reminder.notes }}</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 mt-2">{{ reminder.notes }}</p>
         {% endif %}
       </div>
 
@@ -110,6 +138,61 @@
   </div>
   {% endif %}
 </section>
+
+<!-- Weather Suggestions -->
+{% if weather_suggestions %}
+<section class="card mb-8 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 border-2 border-amber-200 dark:border-amber-700" aria-labelledby="suggestions-title">
+  <div class="flex items-center gap-3 mb-6">
+    <div class="text-4xl" aria-hidden="true">🌤️</div>
+    <div>
+      <h3 id="suggestions-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">Weather Suggestions</h3>
+      <p class="text-sm text-slate-600 dark:text-slate-400">Review these weather-based recommendations</p>
+    </div>
+  </div>
+
+  <div class="space-y-3">
+    {% for suggestion in weather_suggestions %}
+    <div class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-amber-200 dark:border-amber-700 transition-all duration-200 hover:shadow-md">
+      <div class="text-3xl flex-shrink-0">
+        {% if 'rain' in suggestion.message.lower() %}☔
+        {% elif 'freeze' in suggestion.message.lower() or 'frost' in suggestion.message.lower() %}❄️
+        {% elif 'heat' in suggestion.message.lower() %}🌡️
+        {% elif 'dormancy' in suggestion.message.lower() %}🍂
+        {% else %}🌤️{% endif %}
+      </div>
+
+      <div class="flex-1 min-w-0">
+        <h4 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+          {{ suggestion.plant_name }}
+        </h4>
+        <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">
+          {{ suggestion.message }}
+        </p>
+      </div>
+
+      <div class="flex gap-2 flex-shrink-0 w-full sm:w-auto">
+        <button
+          class="btn btn-sm btn-primary flex-1 sm:flex-initial weather-accept-btn"
+          data-reminder-id="{{ suggestion.reminder_id }}"
+          data-days="{{ suggestion.days }}"
+          title="Accept suggestion"
+        >
+          {{ suggestion.action_label }}
+        </button>
+        <button
+          class="btn btn-sm btn-secondary weather-dismiss-btn"
+          data-reminder-id="{{ suggestion.reminder_id }}"
+          title="Dismiss suggestion"
+        >
+          Dismiss
+        </button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
 {% elif plant_count > 0 %}
 <section class="card mb-8 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/10 dark:to-cyan-900/10 border-2 border-emerald-200 dark:border-emerald-700" aria-labelledby="focus-title">
   <div class="flex items-center gap-3 mb-4">

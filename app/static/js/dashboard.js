@@ -187,5 +187,239 @@
         }
       });
     });
+
+    // ========================================================================
+    // WEATHER SUGGESTION HANDLERS
+    // ========================================================================
+
+    // Handle weather suggestion accept buttons
+    const acceptButtons = document.querySelectorAll('.weather-accept-btn');
+    acceptButtons.forEach(button => {
+      button.addEventListener('click', async function(e) {
+        e.preventDefault();
+
+        const reminderId = this.dataset.reminderId;
+        const days = parseInt(this.dataset.days || 0);
+        const suggestionCard = this.closest('[data-reminder-id]') || this.closest('.flex');
+
+        // Disable button and show loading state
+        this.disabled = true;
+        const originalText = this.innerHTML;
+        this.innerHTML = '⏳ Applying...';
+
+        try {
+          // Call API to adjust reminder
+          const response = await fetch(`/reminders/api/${reminderId}/adjust`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ days: days })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Fade out and remove suggestion
+            if (suggestionCard) {
+              suggestionCard.style.opacity = '0';
+              suggestionCard.style.transition = 'opacity 0.3s ease';
+
+              setTimeout(() => {
+                suggestionCard.remove();
+
+                // Check if suggestions section is empty
+                const suggestionsSection = document.querySelector('[aria-labelledby="suggestions-title"]');
+                if (suggestionsSection) {
+                  const remainingSuggestions = suggestionsSection.querySelectorAll('.flex.flex-col');
+                  if (remainingSuggestions.length === 0) {
+                    suggestionsSection.remove();
+                  }
+                }
+
+                // Show success toast
+                if (window.showToast) {
+                  window.showToast('✓ Reminder adjusted based on weather', 'success');
+                }
+
+                // Reload to show updated reminder
+                setTimeout(() => window.location.reload(), 500);
+              }, 300);
+            }
+          } else {
+            // Show error
+            this.disabled = false;
+            this.innerHTML = originalText;
+            if (window.showToast) {
+              window.showToast(data.error || 'Failed to adjust reminder', 'error');
+            }
+          }
+        } catch (error) {
+          // Network error
+          this.disabled = false;
+          this.innerHTML = originalText;
+          if (window.showToast) {
+            window.showToast('Network error. Please try again.', 'error');
+          }
+        }
+      });
+    });
+
+    // Handle weather suggestion dismiss buttons
+    const dismissButtons = document.querySelectorAll('.weather-dismiss-btn');
+    dismissButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const suggestionCard = this.closest('[data-reminder-id]') || this.closest('.flex');
+
+        if (suggestionCard) {
+          // Fade out and remove suggestion
+          suggestionCard.style.opacity = '0';
+          suggestionCard.style.transition = 'opacity 0.3s ease';
+
+          setTimeout(() => {
+            suggestionCard.remove();
+
+            // Check if suggestions section is empty
+            const suggestionsSection = document.querySelector('[aria-labelledby="suggestions-title"]');
+            if (suggestionsSection) {
+              const remainingSuggestions = suggestionsSection.querySelectorAll('.flex.flex-col');
+              if (remainingSuggestions.length === 0) {
+                suggestionsSection.remove();
+              }
+            }
+
+            if (window.showToast) {
+              window.showToast('Suggestion dismissed', 'info');
+            }
+          }, 300);
+        }
+      });
+    });
+
+    // ========================================================================
+    // "WHY?" EXPLANATION MODAL
+    // ========================================================================
+
+    // Show adjustment details modal
+    window.showAdjustmentDetails = function(adjustment) {
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-slate-900/50 dark:bg-slate-950/70 flex items-center justify-center z-50 p-4';
+      modal.setAttribute('role', 'dialog');
+      modal.setAttribute('aria-labelledby', 'modal-title');
+      modal.setAttribute('aria-modal', 'true');
+
+      const details = adjustment.details || {};
+
+      // Build details HTML
+      let detailsHTML = '<dl class="space-y-3 mt-4">';
+
+      if (details.weather_condition) {
+        detailsHTML += `
+          <div>
+            <dt class="text-sm font-semibold text-slate-700 dark:text-slate-300">Condition</dt>
+            <dd class="text-sm text-slate-600 dark:text-slate-400 capitalize">${details.weather_condition.replace(/_/g, ' ')}</dd>
+          </div>
+        `;
+      }
+
+      if (details.precipitation_inches !== undefined) {
+        detailsHTML += `
+          <div>
+            <dt class="text-sm font-semibold text-slate-700 dark:text-slate-300">Precipitation</dt>
+            <dd class="text-sm text-slate-600 dark:text-slate-400">${details.precipitation_inches}" expected</dd>
+          </div>
+        `;
+      }
+
+      if (details.temp_min_f !== undefined) {
+        detailsHTML += `
+          <div>
+            <dt class="text-sm font-semibold text-slate-700 dark:text-slate-300">Temperature Range</dt>
+            <dd class="text-sm text-slate-600 dark:text-slate-400">${details.temp_min_f}°F - ${details.temp_max_f || 'N/A'}°F</dd>
+          </div>
+        `;
+      }
+
+      if (details.freeze_risk !== undefined) {
+        detailsHTML += `
+          <div>
+            <dt class="text-sm font-semibold text-slate-700 dark:text-slate-300">Freeze Risk</dt>
+            <dd class="text-sm text-slate-600 dark:text-slate-400">${details.freeze_risk ? 'Yes' : 'No'}</dd>
+          </div>
+        `;
+      }
+
+      if (details.light_factor !== undefined) {
+        detailsHTML += `
+          <div>
+            <dt class="text-sm font-semibold text-slate-700 dark:text-slate-300">Light Adjustment</dt>
+            <dd class="text-sm text-slate-600 dark:text-slate-400">${((details.light_factor - 1) * 100).toFixed(0)}% ${details.light_factor > 1 ? 'more' : 'less'} water needed</dd>
+          </div>
+        `;
+      }
+
+      detailsHTML += '</dl>';
+
+      modal.innerHTML = `
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+          <div class="flex items-start justify-between mb-4">
+            <div>
+              <h3 id="modal-title" class="text-xl font-bold text-slate-900 dark:text-slate-100">
+                Adjustment Details
+              </h3>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                Why this reminder was adjusted
+              </p>
+            </div>
+            <button
+              onclick="this.closest('[role=dialog]').remove()"
+              class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+              aria-label="Close modal"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="p-4 bg-cyan-50 dark:bg-cyan-900/20 border-l-4 border-cyan-400 dark:border-cyan-500 rounded-r mb-4">
+            <p class="text-sm font-medium text-slate-700 dark:text-slate-300">
+              ${adjustment.reason}
+            </p>
+          </div>
+
+          ${detailsHTML}
+
+          <div class="mt-6 flex justify-end gap-3">
+            <button
+              onclick="this.closest('[role=dialog]').remove()"
+              class="btn btn-secondary"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      `;
+
+      // Close on background click
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          modal.remove();
+        }
+      });
+
+      // Close on Escape key
+      document.addEventListener('keydown', function escHandler(e) {
+        if (e.key === 'Escape') {
+          modal.remove();
+          document.removeEventListener('keydown', escHandler);
+        }
+      });
+
+      document.body.appendChild(modal);
+    };
   });
 })();

@@ -291,3 +291,286 @@ def get_weather_alerts_for_city(current: Optional[Dict], forecast: Optional[List
         seen.add(key)
         unique.append(a)
     return unique
+
+
+# ============================================================================
+# WEATHER-AWARE REMINDERS: Enhanced Intelligence Functions
+# ============================================================================
+
+def get_precipitation_last_48h(city: str | None) -> Optional[float]:
+    """
+    Get total precipitation in inches over past 48 hours.
+
+    Note: OpenWeather free tier doesn't include historical data.
+    This function returns None to indicate unavailable data.
+    Reminder adjustment logic should gracefully handle None values.
+
+    Args:
+        city: City name or US ZIP code
+
+    Returns:
+        Total precipitation in inches, or None if unavailable
+    """
+    # OpenWeather free tier limitation: no historical precipitation data
+    # Future enhancement: integrate paid tier or alternative weather service
+    return None
+
+
+def get_precipitation_forecast_24h(city: str | None) -> Optional[float]:
+    """
+    Get expected precipitation in next 24 hours from forecast.
+
+    Args:
+        city: City name or US ZIP code
+
+    Returns:
+        Expected precipitation in inches, or None on error
+
+    Note: Uses 3-hourly forecast data. Precipitation is estimated
+    from weather conditions (rain/snow).
+    """
+    if not city:
+        return None
+    key = _get_api_key()
+    if not key:
+        return None
+
+    coords = _coords_for(city, key)
+    if not coords:
+        return None
+    lat, lon, tz_offset, _ = coords
+
+    url = "https://api.openweathermap.org/data/2.5/forecast"
+    try:
+        r = requests.get(url, params={"lat": lat, "lon": lon, "appid": key, "units": "metric"}, timeout=8)
+        r.raise_for_status()
+        data = r.json()
+        items = data.get("list") or []
+
+        now_utc = datetime.now(timezone.utc)
+        cutoff = now_utc + timedelta(hours=24)
+
+        total_precip_mm = 0.0
+        for it in items:
+            dt_utc = datetime.fromtimestamp(it["dt"], tz=timezone.utc)
+            if now_utc <= dt_utc <= cutoff:
+                # Extract precipitation from rain and snow fields
+                rain_mm = it.get("rain", {}).get("3h", 0)  # 3-hour rainfall
+                snow_mm = it.get("snow", {}).get("3h", 0)  # 3-hour snowfall
+                total_precip_mm += rain_mm + snow_mm
+
+        # Convert mm to inches (1 inch = 25.4 mm)
+        total_precip_inches = total_precip_mm / 25.4
+        return round(total_precip_inches, 2)
+
+    except Exception:
+        return None
+
+
+def get_temperature_extremes_forecast(city: str | None, hours: int = 48) -> Optional[Dict]:
+    """
+    Get min/max temperatures in forecast period.
+
+    Args:
+        city: City name or US ZIP code
+        hours: Forecast period in hours (default: 48)
+
+    Returns:
+        {
+            "temp_min_f": float,
+            "temp_max_f": float,
+            "temp_min_c": float,
+            "temp_max_c": float,
+            "freeze_risk": bool  # True if min temp <= 32°F
+        }
+        or None on error
+    """
+    if not city:
+        return None
+    key = _get_api_key()
+    if not key:
+        return None
+
+    coords = _coords_for(city, key)
+    if not coords:
+        return None
+    lat, lon, tz_offset, _ = coords
+
+    url = "https://api.openweathermap.org/data/2.5/forecast"
+    try:
+        r = requests.get(url, params={"lat": lat, "lon": lon, "appid": key, "units": "metric"}, timeout=8)
+        r.raise_for_status()
+        data = r.json()
+        items = data.get("list") or []
+
+        now_utc = datetime.now(timezone.utc)
+        cutoff = now_utc + timedelta(hours=hours)
+
+        temps_c = []
+        for it in items:
+            dt_utc = datetime.fromtimestamp(it["dt"], tz=timezone.utc)
+            if now_utc <= dt_utc <= cutoff:
+                temp = it.get("main", {}).get("temp")
+                if isinstance(temp, (int, float)):
+                    temps_c.append(temp)
+
+        if not temps_c:
+            return None
+
+        min_c = min(temps_c)
+        max_c = max(temps_c)
+        min_f = (min_c * 9 / 5) + 32
+        max_f = (max_c * 9 / 5) + 32
+
+        return {
+            "temp_min_f": round(min_f, 1),
+            "temp_max_f": round(max_f, 1),
+            "temp_min_c": round(min_c, 1),
+            "temp_max_c": round(max_c, 1),
+            "freeze_risk": min_f <= 32
+        }
+
+    except Exception:
+        return None
+
+
+def get_seasonal_pattern(city: str | None) -> Optional[Dict]:
+    """
+    Determine current season based on actual weather patterns + calendar fallback.
+
+    Hybrid approach:
+    1. Analyzes last 7 days of weather patterns (if available)
+    2. Falls back to U.S. calendar-based seasons
+    3. Detects dormancy periods and frost risk
+
+    Args:
+        city: City name or US ZIP code
+
+    Returns:
+        {
+            "season": "winter|spring|summer|fall",
+            "is_dormancy_period": bool,  # True for winter/late fall
+            "avg_temp_7d": float,  # Average temperature (estimated)
+            "frost_risk": bool,  # True if freezing temps in forecast
+            "method": "weather|calendar"  # Data source used
+        }
+        or None on error
+    """
+    if not city:
+        return None
+
+    # Get current weather and forecast for pattern analysis
+    current = get_weather_for_city(city)
+    extremes = get_temperature_extremes_forecast(city, hours=48)
+
+    # Calendar-based fallback
+    now = datetime.now()
+    month = now.month
+
+    # Meteorological seasons (more aligned with weather patterns)
+    if month in [12, 1, 2]:
+        calendar_season = "winter"
+    elif month in [3, 4, 5]:
+        calendar_season = "spring"
+    elif month in [6, 7, 8]:
+        calendar_season = "summer"
+    else:  # 9, 10, 11
+        calendar_season = "fall"
+
+    if not current or not extremes:
+        # Calendar fallback only
+        return {
+            "season": calendar_season,
+            "is_dormancy_period": calendar_season in ["winter", "fall"] and month in [11, 12, 1, 2],
+            "avg_temp_7d": None,
+            "frost_risk": calendar_season == "winter",
+            "method": "calendar"
+        }
+
+    # Weather-based season detection
+    current_temp = current.get("temp_f", 60)
+    min_forecast = extremes.get("temp_min_f", 32)
+    freeze_risk = extremes.get("freeze_risk", False)
+
+    # Estimate average temperature (current + forecast average)
+    avg_temp = (current_temp + min_forecast + extremes.get("temp_max_f", 80)) / 3
+
+    # Determine season from temperature patterns
+    if avg_temp >= 75:
+        weather_season = "summer"
+    elif avg_temp >= 55:
+        weather_season = "spring" if month in [3, 4, 5, 6] else "fall"
+    elif avg_temp >= 40:
+        weather_season = "spring" if month in [3, 4] else "fall"
+    else:
+        weather_season = "winter"
+
+    # Dormancy period: winter or cold fall/early spring
+    is_dormancy = weather_season == "winter" or (avg_temp < 45 and month in [11, 12, 1, 2, 3])
+
+    return {
+        "season": weather_season,
+        "is_dormancy_period": is_dormancy,
+        "avg_temp_7d": round(avg_temp, 1),
+        "frost_risk": freeze_risk,
+        "method": "weather"
+    }
+
+
+def infer_hardiness_zone(city: str | None, state: str | None = None) -> Optional[str]:
+    """
+    Infer USDA hardiness zone from city coordinates.
+
+    Uses a simplified lookup table based on latitude and average winter temperatures.
+    For production, consider integrating with a comprehensive hardiness zone API.
+
+    Args:
+        city: City name or US ZIP code
+        state: Optional state abbreviation for disambiguation
+
+    Returns:
+        USDA zone string (e.g., "7a", "7b", "8a"), or None if unable to determine
+
+    Note: This is a simplified implementation. For accurate hardiness zones,
+    consider using USDA's official Plant Hardiness Zone Map API or dataset.
+    """
+    if not city:
+        return None
+
+    key = _get_api_key()
+    if not key:
+        return None
+
+    coords = _coords_for(city, key)
+    if not coords:
+        return None
+
+    lat, lon, _, _ = coords
+
+    # Simplified hardiness zone lookup based on latitude (U.S. focused)
+    # Source: USDA Plant Hardiness Zone Map (simplified approximation)
+    # Zones range from 1 (coldest) to 13 (warmest)
+
+    # Latitude-based approximation (rough estimates for U.S.)
+    if lat >= 48:  # Northern border
+        return "3b" if lat >= 49 else "4a"
+    elif lat >= 45:
+        return "5a"
+    elif lat >= 42:
+        return "6a"
+    elif lat >= 39:
+        return "7a"
+    elif lat >= 36:
+        return "7b" if lat >= 37.5 else "8a"
+    elif lat >= 33:
+        return "8b"
+    elif lat >= 30:
+        return "9a" if lat >= 31.5 else "9b"
+    elif lat >= 27:
+        return "10a"
+    elif lat >= 24:
+        return "10b"
+    else:  # Southern Florida, Hawaii
+        return "11a"
+
+    # Future enhancement: Use actual USDA zone data with more precise lookup

@@ -80,6 +80,15 @@ class BaseConfig:
     WATERING_RAIN_THRESHOLD_INCHES = 0.25  # Minimum rain to trigger skip
     WATERING_RAIN_SKIP_WINDOW_HOURS = 48  # Hours to skip after significant rain
 
+    # Weather-Aware Reminder Configuration (Phase 2)
+    WEATHER_REMINDER_ADJUSTMENTS_ENABLED = os.getenv("WEATHER_REMINDER_ADJUSTMENTS_ENABLED", "true").lower() == "true"
+    WEATHER_ADJUSTMENT_RAIN_THRESHOLD_HEAVY = 0.5  # inches for automatic postponement
+    WEATHER_ADJUSTMENT_RAIN_THRESHOLD_LIGHT = 0.25  # inches for suggestion
+    WEATHER_ADJUSTMENT_FREEZE_THRESHOLD = 32  # °F for freeze warnings
+    WEATHER_ADJUSTMENT_EXTREME_HEAT_THRESHOLD = 95  # °F for extreme heat warnings
+    WEATHER_AI_INFERENCE_ENABLED = os.getenv("WEATHER_AI_INFERENCE_ENABLED", "true").lower() == "true"
+    WEATHER_AI_INFERENCE_CACHE_HOURS = 168  # 1 week cache for AI plant inferences
+
     # Misc
     PREFERRED_URL_SCHEME = os.getenv("PREFERRED_URL_SCHEME", "https")
     SEND_FILE_MAX_AGE_DEFAULT = int(os.getenv("SEND_FILE_MAX_AGE_DEFAULT", "3600"))

@@ -10,9 +10,10 @@ from typing import Optional, Dict, Any, List, Tuple
 from datetime import date, datetime, timedelta
 import logging
 from flask import current_app, has_app_context
-from app.services.supabase_client import get_client, get_admin_client
+from app.services.supabase_client import get_client, get_admin_client, get_user_profile
 from app.services.weather import get_weather_for_city
 from app.utils.cache import cache_calendar_data, invalidate_user_calendar_cache
+from app.services import reminder_adjustments
 
 logger = logging.getLogger(__name__)
 
@@ -216,6 +217,71 @@ def get_upcoming_reminders(user_id: str, days: int = 7) -> List[Dict[str, Any]]:
         return []
 
 
+def get_due_reminders_with_adjustments(
+    user_id: str
+) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """
+    Get due reminders with weather-aware automatic adjustments and suggestions.
+
+    Fetches due reminders, applies automatic weather adjustments (heavy rain, freeze warnings),
+    and collects suggestive adjustments for user review.
+
+    Args:
+        user_id: User's UUID
+
+    Returns:
+        Tuple of (adjusted_reminders, suggestions):
+        - adjusted_reminders: List of reminders with automatic adjustments applied
+        - suggestions: List of suggestion notifications for user review
+
+    Example:
+        >>> reminders, suggestions = get_due_reminders_with_adjustments("user-123")
+        >>> for r in reminders:
+        ...     if "adjustment" in r:
+        ...         print(f"Auto-adjusted: {r['adjustment']['reason']}")
+        >>> for s in suggestions:
+        ...     print(f"Suggestion: {s['message']}")
+    """
+    # Get due reminders
+    reminders = get_due_reminders(user_id)
+
+    if not reminders:
+        return [], []
+
+    # Get user profile for city
+    profile = get_user_profile(user_id)
+    user_city = profile.get("city") if profile else None
+
+    if not user_city:
+        # Can't apply weather adjustments without city
+        return reminders, []
+
+    # Build plants_by_id dict from reminder data
+    plants_by_id = {}
+    for reminder in reminders:
+        plant_data = reminder.get("plants")
+        if plant_data:
+            plant_id = plant_data.get("id")
+            if plant_id:
+                plants_by_id[plant_id] = plant_data
+
+    # Apply automatic adjustments
+    adjusted_reminders = reminder_adjustments.apply_automatic_adjustments(
+        reminders,
+        plants_by_id,
+        user_city
+    )
+
+    # Get adjustment suggestions
+    suggestions = reminder_adjustments.get_adjustment_suggestions(
+        reminders,
+        plants_by_id,
+        user_city
+    )
+
+    return adjusted_reminders, suggestions
+
+
 def get_reminder_by_id(reminder_id: str, user_id: str) -> Optional[Dict[str, Any]]:
     """
     Get a single reminder by ID (with ownership check).
@@ -324,6 +390,67 @@ def snooze_reminder(
 
     except Exception as e:
         return False, f"Error snoozing reminder: {str(e)}"
+
+
+def adjust_reminder_by_days(
+    reminder_id: str,
+    user_id: str,
+    days: int
+) -> Tuple[bool, Optional[str]]:
+    """
+    Adjust a reminder's due date by N days (positive to postpone, negative to advance).
+
+    This is used for weather-based reminder adjustments where we may need to
+    postpone (positive days) or advance (negative days) a reminder based on
+    weather conditions.
+
+    Args:
+        reminder_id: Reminder's UUID
+        user_id: User's UUID (for authorization)
+        days: Number of days to adjust (positive = postpone, negative = advance)
+              Valid range: -7 to +30
+
+    Returns:
+        (success, error_message)
+
+    Example:
+        >>> adjust_reminder_by_days("abc-123", "user-456", 2)  # Postpone 2 days
+        (True, None)
+        >>> adjust_reminder_by_days("abc-123", "user-456", -1)  # Advance 1 day
+        (True, None)
+    """
+    supabase = get_admin_client()
+    if not supabase:
+        return False, "Database not configured"
+
+    # Validate days range (allow negative for advancing)
+    if days < -7 or days > 30:
+        return False, "Adjustment days must be between -7 and +30"
+
+    if days == 0:
+        return False, "Cannot adjust by 0 days"
+
+    try:
+        # Use the existing snooze_reminder RPC but with potentially negative days
+        # Note: The database function should handle negative days to advance reminders
+        response = supabase.rpc("snooze_reminder", {
+            "p_reminder_id": reminder_id,
+            "p_user_id": user_id,
+            "p_days": days
+        }).execute()
+
+        if response.data and len(response.data) > 0:
+            result = response.data[0]
+            if result.get("success"):
+                # Invalidate calendar cache for this user
+                invalidate_user_calendar_cache(user_id)
+                return True, None
+            return False, result.get("message", "Failed to adjust reminder")
+
+        return False, "Unexpected response from database"
+
+    except Exception as e:
+        return False, f"Error adjusting reminder: {str(e)}"
 
 
 def update_reminder(

@@ -461,6 +461,69 @@ def api_complete(reminder_id):
         return jsonify({"success": False, "error": safe_error}), 400
 
 
+@reminders_bp.route("/api/<reminder_id>/adjust", methods=["POST"])
+@require_auth
+def api_adjust(reminder_id):
+    """
+    Adjust reminder due date by N days via JSON API (for weather suggestions).
+
+    Accepts positive days (postpone) or negative days (advance).
+    Used when users accept weather-based adjustment suggestions.
+
+    Request body:
+        {
+            "days": 2  // positive = postpone, negative = advance
+        }
+
+    Security: CSRF token required via X-CSRFToken header
+    (automatically validated by Flask-WTF CSRFProtect)
+    """
+    user_id = get_current_user_id()
+
+    # Validate reminder_id format (UUID)
+    import re
+    if not re.match(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', reminder_id, re.IGNORECASE):
+        return jsonify({"success": False, "error": "Invalid reminder ID"}), 400
+
+    # Get days from request body
+    try:
+        data = request.get_json()
+        if not data or "days" not in data:
+            return jsonify({"success": False, "error": "Missing 'days' parameter"}), 400
+
+        days = int(data["days"])
+    except (ValueError, TypeError):
+        return jsonify({"success": False, "error": "Invalid 'days' value - must be an integer"}), 400
+
+    # Validate days range
+    if days < -7 or days > 30:
+        return jsonify({"success": False, "error": "Days must be between -7 and +30"}), 400
+
+    if days == 0:
+        return jsonify({"success": False, "error": "Cannot adjust by 0 days"}), 400
+
+    # Adjust reminder
+    success, error = reminder_service.adjust_reminder_by_days(reminder_id, user_id, days)
+
+    if success:
+        # Track analytics event
+        analytics.track_event(
+            user_id,
+            analytics.EVENT_REMINDER_SNOOZED,  # Reuse snooze event for weather adjustments
+            {"reminder_id": reminder_id, "adjustment_days": days, "source": "weather_suggestion"}
+        )
+
+        action = "postponed" if days > 0 else "advanced"
+        return jsonify({
+            "success": True,
+            "message": f"Reminder {action} by {abs(days)} day(s)"
+        })
+    else:
+        # Sanitize error messages for security
+        safe_error = error if error else "Failed to adjust reminder"
+        return jsonify({"success": False, "error": safe_error}), 400
+
+
 @reminders_bp.route("/calendar")
 @reminders_bp.route("/calendar/<int:year>/<int:month>")
 @require_auth
