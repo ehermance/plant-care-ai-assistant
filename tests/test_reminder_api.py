@@ -101,39 +101,163 @@ class TestAdjustReminderByDays:
         assert "Database error" in error
 
 
-@pytest.mark.skipif(
-    True,
-    reason="Route tests require Flask app context and full integration setup"
-)
 class TestReminderAdjustAPI:
-    """
-    Test the /api/<reminder_id>/adjust endpoint.
+    """Integration tests for the /api/<reminder_id>/adjust endpoint."""
 
-    NOTE: These tests are skipped by default as they require full Flask app setup.
-    Run them with pytest -k test_reminder_api --no-skip to test in integration environment.
-    """
+    @patch('app.utils.auth.get_current_user')
+    @patch('app.routes.reminders.analytics.track_event')
+    @patch('app.routes.reminders.reminder_service.adjust_reminder_by_days')
+    def test_api_adjust_postpone(self, mock_adjust, mock_analytics, mock_auth, app):
+        """Should postpone reminder via API when authenticated."""
+        client = app.test_client()
 
-    def test_api_adjust_postpone(self, client, auth):
-        """Should postpone reminder via API."""
-        # This would require full Flask test client setup
-        pass
+        # Mock authentication
+        mock_auth.return_value = {'id': 'test-user-id', 'email': 'test@example.com'}
 
-    def test_api_adjust_advance(self, client, auth):
-        """Should advance reminder via API."""
-        # This would require full Flask test client setup
-        pass
+        # Mock service function to return success
+        mock_adjust.return_value = (True, None)
 
-    def test_api_adjust_validates_days(self, client, auth):
+        # Make API request
+        response = client.post(
+            '/reminders/api/12345678-1234-1234-1234-123456789012/adjust',
+            json={"days": 2},
+            headers={'Content-Type': 'application/json'}
+        )
+
+        # Assertions
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data['success'] is True
+        assert 'postponed by 2 day' in data['message']
+
+        # Verify service was called correctly
+        mock_adjust.assert_called_once_with(
+            '12345678-1234-1234-1234-123456789012',
+            'test-user-id',
+            2
+        )
+
+        # Verify analytics tracking
+        assert mock_analytics.called
+
+    @patch('app.utils.auth.get_current_user')
+    @patch('app.routes.reminders.analytics.track_event')
+    @patch('app.routes.reminders.reminder_service.adjust_reminder_by_days')
+    def test_api_adjust_advance(self, mock_adjust, mock_analytics, mock_auth, app):
+        """Should advance reminder via API with negative days."""
+        client = app.test_client()
+
+        # Mock authentication
+        mock_auth.return_value = {'id': 'test-user-id', 'email': 'test@example.com'}
+
+        # Mock service function to return success
+        mock_adjust.return_value = (True, None)
+
+        # Make API request with negative days
+        response = client.post(
+            '/reminders/api/12345678-1234-1234-1234-123456789012/adjust',
+            json={"days": -1},
+            headers={'Content-Type': 'application/json'}
+        )
+
+        # Assertions
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data['success'] is True
+        assert 'advanced by 1 day' in data['message']
+
+        # Verify service was called with negative days
+        mock_adjust.assert_called_once_with(
+            '12345678-1234-1234-1234-123456789012',
+            'test-user-id',
+            -1
+        )
+
+    @patch('app.utils.auth.get_current_user')
+    def test_api_adjust_validates_days(self, mock_auth, app):
         """Should validate days parameter."""
-        # This would require full Flask test client setup
-        pass
+        client = app.test_client()
 
-    def test_api_adjust_requires_auth(self, client):
+        # Mock authentication
+        mock_auth.return_value = {'id': 'test-user-id', 'email': 'test@example.com'}
+
+        # Test days > 30
+        response = client.post(
+            '/reminders/api/12345678-1234-1234-1234-123456789012/adjust',
+            json={"days": 31},
+            headers={'Content-Type': 'application/json'}
+        )
+        assert response.status_code == 400
+        assert 'between -7 and +30' in response.get_json()['error']
+
+        # Test days < -7
+        response = client.post(
+            '/reminders/api/12345678-1234-1234-1234-123456789012/adjust',
+            json={"days": -8},
+            headers={'Content-Type': 'application/json'}
+        )
+        assert response.status_code == 400
+        assert 'between -7 and +30' in response.get_json()['error']
+
+        # Test days = 0
+        response = client.post(
+            '/reminders/api/12345678-1234-1234-1234-123456789012/adjust',
+            json={"days": 0},
+            headers={'Content-Type': 'application/json'}
+        )
+        assert response.status_code == 400
+        assert 'Cannot adjust by 0 days' in response.get_json()['error']
+
+        # Test missing days parameter
+        response = client.post(
+            '/reminders/api/12345678-1234-1234-1234-123456789012/adjust',
+            json={},
+            headers={'Content-Type': 'application/json'}
+        )
+        assert response.status_code == 400
+        assert 'Missing' in response.get_json()['error']
+
+        # Test invalid days type
+        response = client.post(
+            '/reminders/api/12345678-1234-1234-1234-123456789012/adjust',
+            json={"days": "not-a-number"},
+            headers={'Content-Type': 'application/json'}
+        )
+        assert response.status_code == 400
+        assert 'Invalid' in response.get_json()['error']
+
+    def test_api_adjust_requires_auth(self, app):
         """Should require authentication."""
-        # This would require full Flask test client setup
-        pass
+        client = app.test_client()
 
-    def test_api_adjust_requires_csrf(self, client, auth):
-        """Should require CSRF token."""
-        # This would require full Flask test client setup
-        pass
+        # Make request without authentication
+        response = client.post(
+            '/reminders/api/12345678-1234-1234-1234-123456789012/adjust',
+            json={"days": 2},
+            headers={'Content-Type': 'application/json'}
+        )
+
+        # Should redirect or return 401/403
+        assert response.status_code in [302, 308, 401, 403]
+
+    @patch('app.utils.auth.get_current_user')
+    @patch('app.routes.reminders.reminder_service.adjust_reminder_by_days')
+    def test_api_adjust_validates_uuid(self, mock_adjust, mock_auth, app):
+        """Should validate reminder ID format."""
+        client = app.test_client()
+
+        # Mock authentication
+        mock_auth.return_value = {'id': 'test-user-id', 'email': 'test@example.com'}
+
+        # Test invalid UUID format
+        response = client.post(
+            '/reminders/api/invalid-uuid/adjust',
+            json={"days": 2},
+            headers={'Content-Type': 'application/json'}
+        )
+
+        assert response.status_code == 400
+        assert 'Invalid reminder ID' in response.get_json()['error']
+
+        # Verify service was not called
+        mock_adjust.assert_not_called()
