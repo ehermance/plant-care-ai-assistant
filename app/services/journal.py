@@ -7,7 +7,7 @@ notes, photos, etc.) using the plant_actions table.
 
 from __future__ import annotations
 from typing import Optional, Dict, Any, List, Tuple
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 from flask import current_app, has_app_context
 from app.services.supabase_client import get_admin_client
@@ -257,7 +257,7 @@ def get_recent_actions(
 
     try:
         from datetime import timedelta
-        cutoff_date = datetime.now() - timedelta(days=days)
+        cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
 
         response = supabase.table("plant_actions") \
             .select("*, plants(id, name, nickname, photo_url)") \

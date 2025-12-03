@@ -6,7 +6,7 @@ and care completeness analysis for personalized AI recommendations.
 """
 
 import pytest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from app.services import ai_insights
 
 
@@ -261,11 +261,11 @@ class TestAnalyzeCareCompleteness:
         activities = [
             {
                 "action_type": "water",
-                "action_at": (datetime.now() - timedelta(days=3)).isoformat()
+                "action_at": (datetime.now(timezone.utc) - timedelta(days=3)).isoformat()
             },
             {
                 "action_type": "fertilize",
-                "action_at": (datetime.now() - timedelta(days=7)).isoformat()
+                "action_at": (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
             },
         ]
         reminders = [
@@ -283,7 +283,7 @@ class TestAnalyzeCareCompleteness:
         activities = [
             {
                 "action_type": "water",
-                "action_at": (datetime.now() - timedelta(days=3)).isoformat()
+                "action_at": (datetime.now(timezone.utc) - timedelta(days=3)).isoformat()
             },
         ]
         reminders = [
@@ -300,7 +300,7 @@ class TestAnalyzeCareCompleteness:
         activities = [
             {
                 "action_type": "water",
-                "action_at": (datetime.now() - timedelta(days=3)).isoformat()
+                "action_at": (datetime.now(timezone.utc) - timedelta(days=3)).isoformat()
             },
         ]
         reminders = [

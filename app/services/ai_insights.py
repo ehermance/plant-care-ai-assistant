@@ -7,7 +7,7 @@ and provide context-aware insights for AI responses.
 
 from __future__ import annotations
 from typing import Dict, List, Optional, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from collections import defaultdict
 
 
@@ -365,7 +365,7 @@ def analyze_care_completeness(
         }
 
     # Count activities by type in last 30 days
-    thirty_days_ago = datetime.now() - timedelta(days=30)
+    thirty_days_ago = datetime.now(timezone.utc) - timedelta(days=30)
     recent_activity_types = set()
 
     for activity in activities:

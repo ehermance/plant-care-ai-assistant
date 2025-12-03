@@ -283,6 +283,27 @@ def build_system_prompt(
     if weather_context:
         context_lines.append(f"Current weather: {weather_context}")
 
+    # FORECAST CONTEXT (Phase 2B - Forecast awareness for rain/temperature predictions)
+    forecast = user_context_data.get("forecast")
+    if forecast:
+        if forecast.get("precipitation_24h_inches") is not None:
+            precip = forecast["precipitation_24h_inches"]
+            if precip > 0.1:
+                context_lines.append(f"Forecast: {precip:.2f} inches rain expected in next 24h")
+            else:
+                context_lines.append(f"Forecast: No significant rain expected (next 24h)")
+
+        temp_extremes = forecast.get("temperature_extremes")
+        if temp_extremes:
+            min_f = temp_extremes.get("temp_min_f")
+            max_f = temp_extremes.get("temp_max_f")
+            freeze_risk = temp_extremes.get("freeze_risk", False)
+
+            if freeze_risk:
+                context_lines.append(f"Temperature forecast: {min_f}°F to {max_f}°F (FREEZE RISK)")
+            elif min_f and max_f:
+                context_lines.append(f"Temperature forecast (48h): {min_f}°F to {max_f}°F")
+
     # WATERING RECOMMENDATION (intelligent stress-based analysis)
     watering_rec = user_context_data.get("watering_recommendation")
     if watering_rec:
@@ -301,9 +322,9 @@ def build_system_prompt(
             if p.get("species"):
                 plant_info += f" ({p['species']})"
 
-            # Add notes summary if available
-            if p.get("notes_summary"):
-                plant_info += f" - {p['notes_summary']}"
+            # Add notes if available
+            if p.get("notes"):
+                plant_info += f" - {p['notes']}"
 
             # Add watering pattern if available
             if p.get("watering_pattern"):
@@ -345,6 +366,25 @@ def build_system_prompt(
             else:
                 context_lines.append(f"  • {days_ago}d ago: {note}")
 
+    # RECENT CARE ACTIVITIES (Phase 2B - detailed actions with dates for "When did I last..." questions)
+    activities = user_context_data.get("activities_detailed", [])
+    if activities:
+        context_lines.append("Recent care activities:")
+        for activity in activities[:10]:  # Limit to 10 most recent
+            action_type = activity.get("action_type", "unknown")
+            days_ago = activity.get("days_ago", 0)
+            amount_ml = activity.get("amount_ml")
+            notes = activity.get("notes")
+
+            # Format: "3d ago: watered (500ml) - soil was very dry"
+            activity_str = f"  {days_ago}d ago: {action_type}"
+            if amount_ml:
+                activity_str += f" ({amount_ml}ml)"
+            if notes:
+                activity_str += f" - {notes[:50]}"  # Truncate notes to 50 chars
+
+            context_lines.append(activity_str)
+
     # HEALTH PATTERNS (for diagnosis context level)
     if context_level == "diagnosis":
         health_trends = user_context_data.get("health_trends")
@@ -378,6 +418,13 @@ def build_system_prompt(
         overdue = reminders.get("overdue", [])
         if overdue:
             context_lines.append(f"Overdue tasks: {len(overdue)}")
+
+    # DEBUG: Log built system prompt (Phase 2B debug)
+    from app.utils.errors import log_info
+    log_info("=== DEBUG: System Prompt Context Lines ===")
+    for i, line in enumerate(context_lines):
+        log_info(f"Line {i}: {line}")
+    log_info("=== END DEBUG ===")
 
     # Build final context section
     if context_lines:
@@ -562,6 +609,14 @@ def generate_advice(
     # Fetch weather first (needed for weather-aware context)
     weather = get_weather_for_city(city) if city else None
 
+    # Fetch forecast data for rain/temperature predictions (Phase 2B)
+    from .weather import (
+        get_precipitation_forecast_24h,
+        get_temperature_extremes_forecast
+    )
+    forecast_precip = get_precipitation_forecast_24h(city) if city else None
+    forecast_temps = get_temperature_extremes_forecast(city, hours=48) if city else None
+
     # Detect question type to determine context level
     context_level = detect_question_type(question, selected_plant_id)
 
@@ -593,6 +648,28 @@ def generate_advice(
             from app.utils.errors import log_info
             log_info(f"Context fetch failed: {str(e)}")
             user_context_data = None
+
+    # DEBUG: Log user context data (Phase 2B debug)
+    if user_context_data:
+        from app.utils.errors import log_info
+        import json
+        log_info("=== DEBUG: User Context Data ===")
+
+        # Log plant details
+        plant_details = user_context_data.get("plant")
+        if plant_details:
+            log_info(f"Plant name: {plant_details.get('name')}")
+            log_info(f"Plant notes_full: {plant_details.get('notes_full')}")
+        else:
+            log_info("No plant details in context")
+
+        # Log activities
+        activities = user_context_data.get("activities_detailed", [])
+        log_info(f"Activities count: {len(activities)}")
+        if activities:
+            log_info(f"Sample activity: {json.dumps(activities[0], default=str)}")
+
+        log_info("=== END DEBUG ===")
 
     # Detect watering questions and generate intelligent recommendations
     if is_watering_question(question) and selected_plant_id and weather:
@@ -644,6 +721,15 @@ def generate_advice(
             from app.utils.errors import log_info
             log_info(f"Watering intelligence failed: {str(e)}")
             pass
+
+    # Add forecast data to context (Phase 2B)
+    if forecast_precip is not None or forecast_temps is not None:
+        if user_context_data is None:
+            user_context_data = {}
+        user_context_data["forecast"] = {
+            "precipitation_24h_inches": forecast_precip,
+            "temperature_extremes": forecast_temps
+        }
 
     # Call AI with enhanced context (context_level passed to build_system_prompt)
     ai_text, provider = _ai_advice(

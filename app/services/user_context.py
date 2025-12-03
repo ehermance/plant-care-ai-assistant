@@ -13,7 +13,7 @@ Enhanced with:
 
 from __future__ import annotations
 from typing import Optional, Dict, Any, List
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from .supabase_client import (
     get_user_plants,
     get_user_profile,
@@ -203,7 +203,7 @@ def _get_recent_activities_summary(user_id: str, days: int = 7) -> List[Dict[str
     Previous implementation: 1 + N queries (one per plant)
     New implementation: 1 query total (~95% performance improvement for 20+ plants)
     """
-    cutoff_date = datetime.now() - timedelta(days=days)
+    cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
 
     # Single optimized query to get all user's activities with plant names
     # This replaces the N+1 pattern of querying each plant individually
@@ -239,7 +239,7 @@ def _get_plant_activities_summary(plant_id: str, user_id: str, days: int = 14) -
 
     Returns detailed list of recent care actions for this plant.
     """
-    cutoff_date = datetime.now() - timedelta(days=days)
+    cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
 
     activities = get_plant_actions(plant_id, user_id, limit=50)
 
@@ -354,7 +354,7 @@ def get_enhanced_user_context(
 
     # Get recent activities WITH notes (last 7-14 days)
     recent_activities_raw = get_user_actions(user_id, limit=100)
-    cutoff_date = datetime.now() - timedelta(days=14)
+    cutoff_date = datetime.now(timezone.utc) - timedelta(days=14)
 
     activities_with_notes = []
     for activity in recent_activities_raw:
@@ -395,12 +395,12 @@ def get_enhanced_user_context(
             "light": plant.get("light")
         }
 
-        # Add notes summary (first 150 chars)
+        # Add notes (first 500 chars for better context)
         notes = plant.get("notes")
         if notes and notes.strip():
-            plant_dict["notes_summary"] = notes[:150]
-            if len(notes) > 150:
-                plant_dict["notes_summary"] += "..."
+            plant_dict["notes"] = notes[:500]
+            if len(notes) > 500:
+                plant_dict["notes"] += "..."
 
         # Calculate watering pattern for this plant
         plant_id = plant.get("id")
@@ -495,7 +495,7 @@ def get_enhanced_plant_context(
 
     # Get activities (last 14 days for standard, 30 days for premium)
     days = 30 if is_premium else 14
-    cutoff_date = datetime.now() - timedelta(days=days)
+    cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
 
     activities_raw = get_plant_actions(plant_id, user_id, limit=100)
     activities = []
