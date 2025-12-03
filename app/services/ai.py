@@ -407,17 +407,25 @@ def build_system_prompt(
             elif vs_avg == "less_frequent_than_others":
                 context_lines.append("This plant is watered less frequently than user's other plants")
 
-    # REMINDERS
+    # REMINDERS (handle both dict from user context and list from plant context)
     reminders = user_context_data.get("reminders", {})
     if reminders:
-        due_today = reminders.get("due_today", [])
-        if due_today:
-            tasks = [r["title"] for r in due_today[:3]]
-            context_lines.append(f"Care due today: {', '.join(tasks)}")
+        # Check if reminders is a dict (from get_enhanced_user_context)
+        # or a list (from get_enhanced_plant_context)
+        if isinstance(reminders, dict):
+            due_today = reminders.get("due_today", [])
+            if due_today:
+                tasks = [r["title"] for r in due_today[:3]]
+                context_lines.append(f"Care due today: {', '.join(tasks)}")
 
-        overdue = reminders.get("overdue", [])
-        if overdue:
-            context_lines.append(f"Overdue tasks: {len(overdue)}")
+            overdue = reminders.get("overdue", [])
+            if overdue:
+                context_lines.append(f"Overdue tasks: {len(overdue)}")
+        elif isinstance(reminders, list):
+            # Plant-specific context returns list of reminders
+            if reminders:
+                tasks = [r.get("title", r.get("reminder_type", "task")) for r in reminders[:3]]
+                context_lines.append(f"Active reminders: {', '.join(tasks)}")
 
     # DEBUG: Log built system prompt (Phase 2B debug)
     from app.utils.errors import log_info
