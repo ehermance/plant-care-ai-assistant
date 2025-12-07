@@ -852,3 +852,74 @@ class TestContentSecurityPolicy:
 
         # CSP should be present (checked in detail above)
         assert "Content-Security-Policy" in response.headers
+
+    def test_permissions_policy_header_present(self, client):
+        """Permissions-Policy header should restrict browser features."""
+        response = client.get("/")
+
+        assert "Permissions-Policy" in response.headers
+        policy = response.headers["Permissions-Policy"]
+
+        # Should disable sensitive features not needed by the app
+        assert "camera=()" in policy
+        assert "microphone=()" in policy
+        assert "geolocation=()" in policy
+        assert "payment=()" in policy
+
+
+class TestUUIDValidation:
+    """Test UUID validation utility."""
+
+    def test_valid_uuid_lowercase(self):
+        """Should accept valid lowercase UUID."""
+        from app.utils.validation import is_valid_uuid
+
+        assert is_valid_uuid("550e8400-e29b-41d4-a716-446655440000") is True
+
+    def test_valid_uuid_uppercase(self):
+        """Should accept valid uppercase UUID."""
+        from app.utils.validation import is_valid_uuid
+
+        assert is_valid_uuid("550E8400-E29B-41D4-A716-446655440000") is True
+
+    def test_valid_uuid_mixed_case(self):
+        """Should accept valid mixed-case UUID."""
+        from app.utils.validation import is_valid_uuid
+
+        assert is_valid_uuid("550e8400-E29B-41d4-A716-446655440000") is True
+
+    def test_invalid_uuid_wrong_format(self):
+        """Should reject incorrectly formatted UUIDs."""
+        from app.utils.validation import is_valid_uuid
+
+        assert is_valid_uuid("invalid-uuid") is False
+        assert is_valid_uuid("550e8400e29b41d4a716446655440000") is False  # No dashes
+        assert is_valid_uuid("550e8400-e29b-41d4-a716") is False  # Too short
+        assert is_valid_uuid("550e8400-e29b-41d4-a716-446655440000-extra") is False  # Too long
+
+    def test_invalid_uuid_special_chars(self):
+        """Should reject UUIDs with SQL injection attempts."""
+        from app.utils.validation import is_valid_uuid
+
+        assert is_valid_uuid("'; DROP TABLE users;--") is False
+        assert is_valid_uuid("550e8400-e29b-41d4-a716-446655440000'") is False
+
+    def test_invalid_uuid_none(self):
+        """Should reject None."""
+        from app.utils.validation import is_valid_uuid
+
+        assert is_valid_uuid(None) is False
+
+    def test_invalid_uuid_empty(self):
+        """Should reject empty string."""
+        from app.utils.validation import is_valid_uuid
+
+        assert is_valid_uuid("") is False
+
+    def test_invalid_uuid_non_string(self):
+        """Should reject non-string types."""
+        from app.utils.validation import is_valid_uuid
+
+        assert is_valid_uuid(123) is False
+        assert is_valid_uuid(["uuid"]) is False
+        assert is_valid_uuid({"id": "uuid"}) is False

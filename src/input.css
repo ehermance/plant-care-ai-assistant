@@ -102,6 +102,15 @@
            focus-visible:ring-rose-500;
   }
 
+  /* Button size variants */
+  .btn-sm {
+    @apply px-4 py-2 text-sm;
+  }
+
+  .btn-lg {
+    @apply px-8 py-4 text-lg;
+  }
+
   /* === FORM INPUTS === */
   .input {
     @apply w-full px-4 py-3

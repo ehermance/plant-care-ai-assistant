@@ -22,7 +22,7 @@ class BaseConfig:
     TESTING = False
 
     # Session configuration
-    PERMANENT_SESSION_LIFETIME = timedelta(days=30)  # Sessions last 30 days
+    PERMANENT_SESSION_LIFETIME = timedelta(days=7)  # Sessions last 7 days (security best practice)
     SESSION_COOKIE_SECURE = True  # Only send cookies over HTTPS (overridden in dev)
     SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to cookies
     SESSION_COOKIE_SAMESITE = "Lax"  # CSRF protection (Lax allows normal links)

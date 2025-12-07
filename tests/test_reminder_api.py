@@ -15,7 +15,7 @@ class TestAdjustReminderByDays:
     @patch('app.services.reminders.get_admin_client')
     @patch('app.services.reminders.invalidate_user_calendar_cache')
     def test_postpone_reminder(self, mock_invalidate, mock_client):
-        """Should postpone reminder by positive days."""
+        """Should postpone reminder by positive days using apply_weather_adjustment RPC."""
         # Setup mock
         mock_supabase = MagicMock()
         mock_client.return_value = mock_supabase
@@ -27,20 +27,21 @@ class TestAdjustReminderByDays:
         # Call function
         success, error = reminders.adjust_reminder_by_days("r123", "u456", 2)
 
-        # Verify
+        # Verify - now uses apply_weather_adjustment with auto-generated reason
         assert success is True
         assert error is None
-        mock_supabase.rpc.assert_called_once_with("snooze_reminder", {
+        mock_supabase.rpc.assert_called_once_with("apply_weather_adjustment", {
             "p_reminder_id": "r123",
             "p_user_id": "u456",
-            "p_days": 2
+            "p_days": 2,
+            "p_reason": "Postponed by 2 day(s)"
         })
         mock_invalidate.assert_called_once_with("u456")
 
     @patch('app.services.reminders.get_admin_client')
     @patch('app.services.reminders.invalidate_user_calendar_cache')
     def test_advance_reminder(self, mock_invalidate, mock_client):
-        """Should advance reminder by negative days."""
+        """Should advance reminder by negative days using apply_weather_adjustment RPC."""
         # Setup mock
         mock_supabase = MagicMock()
         mock_client.return_value = mock_supabase
@@ -52,13 +53,14 @@ class TestAdjustReminderByDays:
         # Call function
         success, error = reminders.adjust_reminder_by_days("r123", "u456", -1)
 
-        # Verify
+        # Verify - now uses apply_weather_adjustment with auto-generated reason
         assert success is True
         assert error is None
-        mock_supabase.rpc.assert_called_once_with("snooze_reminder", {
+        mock_supabase.rpc.assert_called_once_with("apply_weather_adjustment", {
             "p_reminder_id": "r123",
             "p_user_id": "u456",
-            "p_days": -1
+            "p_days": -1,
+            "p_reason": "Advanced by 1 day(s)"
         })
 
     @patch('app.services.reminders.get_admin_client')
@@ -130,12 +132,13 @@ class TestReminderAdjustAPI:
         assert data['success'] is True
         assert 'postponed by 2 day' in data['message']
 
-        # Verify service was called correctly
-        mock_adjust.assert_called_once_with(
-            '12345678-1234-1234-1234-123456789012',
-            'test-user-id',
-            2
-        )
+        # Verify service was called correctly (now includes reason parameter)
+        mock_adjust.assert_called_once()
+        call_args = mock_adjust.call_args[0]
+        assert call_args[0] == '12345678-1234-1234-1234-123456789012'
+        assert call_args[1] == 'test-user-id'
+        assert call_args[2] == 2
+        # 4th argument is reason (from request body or None)
 
         # Verify analytics tracking
         assert mock_analytics.called
@@ -166,12 +169,13 @@ class TestReminderAdjustAPI:
         assert data['success'] is True
         assert 'advanced by 1 day' in data['message']
 
-        # Verify service was called with negative days
-        mock_adjust.assert_called_once_with(
-            '12345678-1234-1234-1234-123456789012',
-            'test-user-id',
-            -1
-        )
+        # Verify service was called with negative days (now includes reason parameter)
+        mock_adjust.assert_called_once()
+        call_args = mock_adjust.call_args[0]
+        assert call_args[0] == '12345678-1234-1234-1234-123456789012'
+        assert call_args[1] == 'test-user-id'
+        assert call_args[2] == -1
+        # 4th argument is reason (from request body or None)
 
     @patch('app.utils.auth.get_current_user')
     def test_api_adjust_validates_days(self, mock_auth, app):

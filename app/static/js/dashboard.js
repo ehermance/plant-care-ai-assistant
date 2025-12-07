@@ -7,7 +7,38 @@
   'use strict';
 
   document.addEventListener('DOMContentLoaded', function() {
-    
+
+    // ========================================================================
+    // ACCESSIBILITY: Screen Reader Announcements
+    // ========================================================================
+
+    // Create a live region for screen reader announcements
+    let srAnnouncer = document.getElementById('sr-announcer');
+    if (!srAnnouncer) {
+      srAnnouncer = document.createElement('div');
+      srAnnouncer.id = 'sr-announcer';
+      srAnnouncer.className = 'sr-only';
+      srAnnouncer.setAttribute('aria-live', 'polite');
+      srAnnouncer.setAttribute('aria-atomic', 'true');
+      srAnnouncer.setAttribute('role', 'status');
+      document.body.appendChild(srAnnouncer);
+    }
+
+    // Announce message to screen readers
+    function announceToScreenReader(message) {
+      if (srAnnouncer) {
+        // Clear first to ensure announcement even if same message
+        srAnnouncer.textContent = '';
+        setTimeout(() => {
+          srAnnouncer.textContent = message;
+        }, 100);
+      }
+    }
+
+    // ========================================================================
+    // GREETING
+    // ========================================================================
+
     function updateGreeting() {
         // Get the current local hour using the client's system clock
         const now = new Date();
@@ -192,6 +223,17 @@
     // WEATHER SUGGESTION HANDLERS
     // ========================================================================
 
+    // Shared function to check if suggestions section is empty and remove it
+    function checkEmptySuggestionsSection() {
+      const suggestionsSection = document.querySelector('[aria-labelledby="weather-title"]');
+      if (suggestionsSection) {
+        const remainingSuggestions = suggestionsSection.querySelectorAll('[data-reminder-id]');
+        if (remainingSuggestions.length === 0) {
+          suggestionsSection.remove();
+        }
+      }
+    }
+
     // Handle weather suggestion accept buttons
     const acceptButtons = document.querySelectorAll('.weather-accept-btn');
     acceptButtons.forEach(button => {
@@ -200,7 +242,13 @@
 
         const reminderId = this.dataset.reminderId;
         const days = parseInt(this.dataset.days || 0);
-        const suggestionCard = this.closest('[data-reminder-id]') || this.closest('.flex');
+        const reason = this.dataset.reason || '';
+        const suggestionCard = this.closest('[data-reminder-id]');
+
+        if (!suggestionCard) {
+          console.error('Could not find suggestion card element');
+          return;
+        }
 
         // Disable button and show loading state
         this.disabled = true;
@@ -208,59 +256,72 @@
         this.innerHTML = '⏳ Applying...';
 
         try {
-          // Call API to adjust reminder
+          // Call API to adjust reminder with reason
           const response = await fetch(`/reminders/api/${reminderId}/adjust`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'X-CSRFToken': csrfToken
             },
-            body: JSON.stringify({ days: days })
+            body: JSON.stringify({
+              days: days,
+              reason: reason
+            })
           });
+
+          // Check HTTP status before parsing JSON
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: `HTTP ${response.status}: ${response.statusText}` }));
+            console.error('Weather adjustment API error:', response.status, errorData);
+            throw new Error(errorData.error || `Server error (${response.status})`);
+          }
 
           const data = await response.json();
 
           if (data.success) {
-            // Fade out and remove suggestion
-            if (suggestionCard) {
+            // Check if user prefers reduced motion
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            // Announce to screen readers and show toast
+            const successMessage = 'Reminder adjusted based on weather';
+            announceToScreenReader(successMessage);
+            if (window.showToast) {
+              window.showToast('✓ ' + successMessage, 'success');
+            }
+
+            if (prefersReducedMotion) {
+              // Instant reload for accessibility
+              window.location.reload();
+            } else {
+              // Quick fade (150ms) then immediate reload
               suggestionCard.style.opacity = '0';
-              suggestionCard.style.transition = 'opacity 0.3s ease';
-
-              setTimeout(() => {
-                suggestionCard.remove();
-
-                // Check if suggestions section is empty
-                const suggestionsSection = document.querySelector('[aria-labelledby="suggestions-title"]');
-                if (suggestionsSection) {
-                  const remainingSuggestions = suggestionsSection.querySelectorAll('.flex.flex-col');
-                  if (remainingSuggestions.length === 0) {
-                    suggestionsSection.remove();
-                  }
-                }
-
-                // Show success toast
-                if (window.showToast) {
-                  window.showToast('✓ Reminder adjusted based on weather', 'success');
-                }
-
-                // Reload to show updated reminder
-                setTimeout(() => window.location.reload(), 500);
-              }, 300);
+              suggestionCard.style.transition = 'opacity 0.15s ease';
+              setTimeout(() => window.location.reload(), 150);
             }
           } else {
             // Show error
+            console.error('Weather adjustment failed:', data.error);
             this.disabled = false;
             this.innerHTML = originalText;
+            const errorMsg = data.error || 'Failed to adjust reminder';
+            announceToScreenReader('Error: ' + errorMsg);
             if (window.showToast) {
-              window.showToast(data.error || 'Failed to adjust reminder', 'error');
+              window.showToast(errorMsg, 'error');
+            } else {
+              alert(errorMsg);
             }
           }
         } catch (error) {
-          // Network error
+          // Network or server error
+          console.error('Weather adjustment error:', error);
           this.disabled = false;
           this.innerHTML = originalText;
+          const errorMsg = error.message || 'Network error. Please try again.';
+          announceToScreenReader('Error: ' + errorMsg);
           if (window.showToast) {
-            window.showToast('Network error. Please try again.', 'error');
+            window.showToast(errorMsg, 'error');
+          } else {
+            alert(errorMsg);
           }
         }
       });
@@ -271,33 +332,79 @@
     dismissButtons.forEach(button => {
       button.addEventListener('click', function(e) {
         e.preventDefault();
+        e.stopPropagation();
 
-        const suggestionCard = this.closest('[data-reminder-id]') || this.closest('.flex');
+        const reminderId = this.dataset.reminderId;
+        const suggestionCard = this.closest('[data-reminder-id]');
 
-        if (suggestionCard) {
-          // Fade out and remove suggestion
+        if (!suggestionCard) {
+          console.error('Could not find suggestion card to dismiss');
+          return;
+        }
+
+        // Store dismissal in session storage
+        const dismissed = JSON.parse(sessionStorage.getItem('dismissedSuggestions') || '[]');
+        if (!dismissed.includes(reminderId)) {
+          dismissed.push(reminderId);
+          sessionStorage.setItem('dismissedSuggestions', JSON.stringify(dismissed));
+        }
+
+        // Get the next focusable element before removing the card
+        const nextCard = suggestionCard.nextElementSibling;
+        const prevCard = suggestionCard.previousElementSibling;
+        const suggestionsSection = document.querySelector('[aria-labelledby="weather-title"]');
+
+        // Check if user prefers reduced motion
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // Announce and show toast
+        const dismissMessage = 'Suggestion dismissed. Proceeding with original schedule.';
+        announceToScreenReader(dismissMessage);
+
+        function handleAfterRemoval() {
+          suggestionCard.remove();
+          checkEmptySuggestionsSection();
+
+          // Move focus to next suggestion, previous suggestion, or section heading
+          if (nextCard && nextCard.querySelector('button')) {
+            nextCard.querySelector('button').focus();
+          } else if (prevCard && prevCard.querySelector('button')) {
+            prevCard.querySelector('button').focus();
+          } else if (suggestionsSection) {
+            // Section is now empty, focus on weather title or next section
+            const weatherTitle = document.getElementById('weather-title');
+            if (weatherTitle) {
+              weatherTitle.focus();
+            }
+          }
+
+          if (window.showToast) {
+            window.showToast(dismissMessage, 'info');
+          }
+        }
+
+        if (prefersReducedMotion) {
+          // Instant removal for accessibility
+          handleAfterRemoval();
+        } else {
+          // Quick fade (150ms) then remove
           suggestionCard.style.opacity = '0';
-          suggestionCard.style.transition = 'opacity 0.3s ease';
-
-          setTimeout(() => {
-            suggestionCard.remove();
-
-            // Check if suggestions section is empty
-            const suggestionsSection = document.querySelector('[aria-labelledby="suggestions-title"]');
-            if (suggestionsSection) {
-              const remainingSuggestions = suggestionsSection.querySelectorAll('.flex.flex-col');
-              if (remainingSuggestions.length === 0) {
-                suggestionsSection.remove();
-              }
-            }
-
-            if (window.showToast) {
-              window.showToast('Suggestion dismissed', 'info');
-            }
-          }, 300);
+          suggestionCard.style.transition = 'opacity 0.15s ease';
+          setTimeout(handleAfterRemoval, 150);
         }
       });
     });
+
+    // Hide dismissed suggestions on page load
+    const dismissedSuggestions = JSON.parse(sessionStorage.getItem('dismissedSuggestions') || '[]');
+    dismissedSuggestions.forEach(reminderId => {
+      const card = document.querySelector(`[data-reminder-id="${reminderId}"]`);
+      if (card && card.closest('[aria-labelledby="weather-title"]')) {
+        card.remove();
+      }
+    });
+    // Check if suggestions section is now empty after removing dismissed cards
+    checkEmptySuggestionsSection();
 
     // ========================================================================
     // "WHY?" EXPLANATION MODAL
@@ -404,22 +511,71 @@
         </div>
       `;
 
+      // Store the element that triggered the modal for focus restoration
+      const triggerElement = document.activeElement;
+
+      // Close modal and restore focus
+      function closeModal() {
+        modal.remove();
+        document.removeEventListener('keydown', keyHandler);
+        // Restore focus to the trigger element
+        if (triggerElement && triggerElement.focus) {
+          triggerElement.focus();
+        }
+      }
+
       // Close on background click
       modal.addEventListener('click', function(e) {
         if (e.target === modal) {
-          modal.remove();
+          closeModal();
         }
       });
 
-      // Close on Escape key
-      document.addEventListener('keydown', function escHandler(e) {
-        if (e.key === 'Escape') {
-          modal.remove();
-          document.removeEventListener('keydown', escHandler);
-        }
+      // Update close buttons to use closeModal function
+      modal.querySelectorAll('button[aria-label="Close modal"], button:last-child').forEach(btn => {
+        btn.onclick = closeModal;
       });
+
+      // Keyboard handler for Escape and focus trap
+      function keyHandler(e) {
+        if (e.key === 'Escape') {
+          closeModal();
+          return;
+        }
+
+        // Focus trap: keep focus within modal
+        if (e.key === 'Tab') {
+          const focusableElements = modal.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          );
+          const firstElement = focusableElements[0];
+          const lastElement = focusableElements[focusableElements.length - 1];
+
+          if (e.shiftKey) {
+            // Shift+Tab: if on first element, go to last
+            if (document.activeElement === firstElement) {
+              e.preventDefault();
+              lastElement.focus();
+            }
+          } else {
+            // Tab: if on last element, go to first
+            if (document.activeElement === lastElement) {
+              e.preventDefault();
+              firstElement.focus();
+            }
+          }
+        }
+      }
+
+      document.addEventListener('keydown', keyHandler);
 
       document.body.appendChild(modal);
+
+      // Focus the close button when modal opens
+      const closeBtn = modal.querySelector('button[aria-label="Close modal"]');
+      if (closeBtn) {
+        closeBtn.focus();
+      }
     };
   });
 })();

@@ -17,6 +17,12 @@ from typing import Any, Dict, Tuple
 
 _SAFE_CHARS_PATTERN = re.compile(r"[^a-zA-Z0-9\s\-\.,'()/&]+")
 
+# UUID validation pattern (RFC 4122 compliant)
+_UUID_PATTERN = re.compile(
+    r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+    re.IGNORECASE
+)
+
 MAX_PLANT_LEN = 80
 MAX_CITY_LEN = 80
 MAX_QUESTION_LEN = 1200
@@ -121,3 +127,24 @@ def validate_inputs(form: Dict[str, Any]) -> Tuple[Dict[str, Any], str | None]:
         "question": question,
         "care_context": care_context,
     }, None
+
+
+def is_valid_uuid(value: str | None) -> bool:
+    """
+    Check if a string is a valid UUID (RFC 4122 format).
+
+    Args:
+        value: String to validate
+
+    Returns:
+        True if valid UUID format, False otherwise
+
+    Example:
+        >>> is_valid_uuid("550e8400-e29b-41d4-a716-446655440000")
+        True
+        >>> is_valid_uuid("invalid")
+        False
+    """
+    if not value or not isinstance(value, str):
+        return False
+    return bool(_UUID_PATTERN.match(value))

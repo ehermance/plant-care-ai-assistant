@@ -13,6 +13,11 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash
 from app.utils.auth import require_auth, get_current_user_id
 from app.services import supabase_client
 from app.services import reminders as reminder_service
+from app.services.weather import (
+    get_weather_for_city,
+    get_precipitation_forecast_24h,
+    get_temperature_extremes_forecast
+)
 
 
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
@@ -48,6 +53,51 @@ def index():
     reminder_stats = reminder_service.get_reminder_stats(user_id)
     due_reminders, weather_suggestions = reminder_service.get_due_reminders_with_adjustments(user_id)
 
+    # Fetch weather context for dashboard alerts (Phase 2C)
+    weather_context = None
+    city = profile.get("city") if profile else None
+    if city:
+        current_weather = get_weather_for_city(city)
+        forecast_precip = get_precipitation_forecast_24h(city)
+        forecast_temps = get_temperature_extremes_forecast(city, hours=48)
+
+        # Build weather alerts based on thresholds
+        weather_alerts = []
+
+        if forecast_precip is not None and forecast_precip >= 0.5:
+            weather_alerts.append({
+                "type": "rain",
+                "icon": "🌧️",
+                "message": f"Heavy rain expected ({forecast_precip:.1f}\" in 24h). Outdoor watering postponed."
+            })
+        elif forecast_precip is not None and forecast_precip >= 0.25:
+            weather_alerts.append({
+                "type": "rain",
+                "icon": "🌦️",
+                "message": f"Rain expected ({forecast_precip:.1f}\" in 24h). Consider postponing outdoor watering."
+            })
+
+        if forecast_temps and forecast_temps.get("freeze_risk"):
+            min_f = forecast_temps.get("temp_min_f", 32)
+            weather_alerts.append({
+                "type": "freeze",
+                "icon": "❄️",
+                "message": f"Freeze warning ({min_f}°F). Protect outdoor plants."
+            })
+
+        if forecast_temps and forecast_temps.get("temp_max_f", 0) >= 95:
+            max_f = forecast_temps["temp_max_f"]
+            weather_alerts.append({
+                "type": "heat",
+                "icon": "🔥",
+                "message": f"Extreme heat ({max_f}°F). Water early morning or evening."
+            })
+
+        weather_context = {
+            "current": current_weather,
+            "alerts": weather_alerts
+        }
+
     return render_template(
         "dashboard/index.html",
         profile=profile,
@@ -60,6 +110,7 @@ def index():
         reminder_stats=reminder_stats,
         due_reminders=due_reminders,
         weather_suggestions=weather_suggestions,
+        weather_context=weather_context,
     )
 
 

@@ -257,13 +257,28 @@ def get_due_reminders_with_adjustments(
         return reminders, []
 
     # Build plants_by_id dict from reminder data
+    # Note: Database views return flattened columns (plant_name, plant_location, etc.)
+    # rather than nested objects (plants.name, plants.location), so we reconstruct them here
+    # Tests may provide nested `plants` objects, so we handle both structures
     plants_by_id = {}
     for reminder in reminders:
-        plant_data = reminder.get("plants")
-        if plant_data:
-            plant_id = plant_data.get("id")
-            if plant_id:
-                plants_by_id[plant_id] = plant_data
+        plant_id = reminder.get("plant_id")
+        if plant_id:
+            # Check for nested plants object first (from tests or direct queries)
+            nested_plant = reminder.get("plants")
+            if nested_plant and isinstance(nested_plant, dict):
+                plants_by_id[plant_id] = nested_plant
+            else:
+                # Reconstruct nested plant object from flattened fields
+                # This is needed for weather adjustment evaluation which expects nested structure
+                plants_by_id[plant_id] = {
+                    "id": plant_id,
+                    "name": reminder.get("plant_name"),
+                    "nickname": reminder.get("plant_nickname"),
+                    "photo_url": reminder.get("plant_photo_url"),
+                    "location": reminder.get("plant_location"),  # Critical for adjustment logic
+                    "species": reminder.get("plant_species")     # Used by plant_intelligence
+                }
 
     # Apply automatic adjustments
     adjusted_reminders = reminder_adjustments.apply_automatic_adjustments(
@@ -314,6 +329,7 @@ def mark_reminder_complete(reminder_id: str, user_id: str) -> Tuple[bool, Option
     Mark a reminder as complete and calculate next due date.
 
     Uses the database function for atomic operation.
+    Logs weather adjustments to journal if applicable (Phase 2C).
 
     Args:
         reminder_id: Reminder's UUID
@@ -327,6 +343,16 @@ def mark_reminder_complete(reminder_id: str, user_id: str) -> Tuple[bool, Option
         return False, "Database not configured"
 
     try:
+        # Fetch reminder data before completion (to capture weather adjustment details)
+        reminder = get_reminder_by_id(reminder_id, user_id)
+        if not reminder:
+            return False, "Reminder not found"
+
+        # Store weather adjustment details before completion
+        had_weather_adjustment = bool(reminder.get("weather_adjusted_due") or reminder.get("weather_adjustment_reason"))
+        weather_reason = reminder.get("weather_adjustment_reason")
+        plant_id = reminder.get("plant_id")
+
         # Call database function with user_id
         response = supabase.rpc("complete_reminder", {
             "p_reminder_id": reminder_id,
@@ -336,6 +362,21 @@ def mark_reminder_complete(reminder_id: str, user_id: str) -> Tuple[bool, Option
         if response.data and len(response.data) > 0:
             result = response.data[0]
             if result.get("success"):
+                # If reminder had weather adjustment, add note to journal entry
+                if had_weather_adjustment and weather_reason and plant_id:
+                    try:
+                        from . import journal
+                        # Add weather adjustment note to the most recent journal entry for this plant
+                        # The complete_reminder database function already created a journal entry
+                        # We'll append the weather adjustment note to it
+                        weather_note = f"\n[Weather-adjusted from original schedule: {weather_reason}]"
+                        journal.append_note_to_recent_action(plant_id, user_id, weather_note)
+                    except Exception as e:
+                        # Don't fail the completion if journal logging fails
+                        import logging
+                        logger = logging.getLogger(__name__)
+                        logger.warning(f"Failed to log weather adjustment to journal: {str(e)}")
+
                 # Invalidate calendar cache for this user
                 invalidate_user_calendar_cache(user_id)
                 return True, None
@@ -395,28 +436,31 @@ def snooze_reminder(
 def adjust_reminder_by_days(
     reminder_id: str,
     user_id: str,
-    days: int
+    days: int,
+    reason: str = None
 ) -> Tuple[bool, Optional[str]]:
     """
-    Adjust a reminder's due date by N days (positive to postpone, negative to advance).
+    Adjust a reminder's due date by N days with optional reason.
 
-    This is used for weather-based reminder adjustments where we may need to
-    postpone (positive days) or advance (negative days) a reminder based on
-    weather conditions.
+    Uses apply_weather_adjustment RPC to properly persist adjustments
+    to weather_adjusted_due and weather_adjustment_reason fields.
+    This ensures weather adjustments are consistently displayed across all pages.
 
     Args:
         reminder_id: Reminder's UUID
         user_id: User's UUID (for authorization)
         days: Number of days to adjust (positive = postpone, negative = advance)
               Valid range: -7 to +30
+        reason: Optional reason for adjustment (e.g., "Heavy rain expected (0.5\" in 24h)")
+                If not provided, a default reason will be generated.
 
     Returns:
         (success, error_message)
 
     Example:
-        >>> adjust_reminder_by_days("abc-123", "user-456", 2)  # Postpone 2 days
+        >>> adjust_reminder_by_days("abc-123", "user-456", 2, "Heavy rain expected")
         (True, None)
-        >>> adjust_reminder_by_days("abc-123", "user-456", -1)  # Advance 1 day
+        >>> adjust_reminder_by_days("abc-123", "user-456", -1, "Early watering recommended")
         (True, None)
     """
     supabase = get_admin_client()
@@ -430,13 +474,19 @@ def adjust_reminder_by_days(
     if days == 0:
         return False, "Cannot adjust by 0 days"
 
+    # Generate default reason if not provided
+    if not reason:
+        action = "Postponed" if days > 0 else "Advanced"
+        reason = f"{action} by {abs(days)} day(s)"
+
     try:
-        # Use the existing snooze_reminder RPC but with potentially negative days
-        # Note: The database function should handle negative days to advance reminders
-        response = supabase.rpc("snooze_reminder", {
+        # Call new apply_weather_adjustment RPC to properly persist weather adjustments
+        # This function sets both weather_adjusted_due and weather_adjustment_reason fields
+        response = supabase.rpc("apply_weather_adjustment", {
             "p_reminder_id": reminder_id,
             "p_user_id": user_id,
-            "p_days": days
+            "p_days": days,
+            "p_reason": reason
         }).execute()
 
         if response.data and len(response.data) > 0:

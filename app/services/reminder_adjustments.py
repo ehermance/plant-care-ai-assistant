@@ -111,6 +111,18 @@ def evaluate_reminder_adjustment(
     if reminder.get("skip_weather_adjustment", False):
         return {"action": ACTION_NONE}
 
+    # Check if reminder already has a weather adjustment applied
+    # Allow re-evaluation only if the reminder is due today (weather may have changed)
+    if reminder.get("weather_adjusted_due"):
+        adjusted_due = reminder.get("weather_adjusted_due")
+        if isinstance(adjusted_due, str):
+            adjusted_due = datetime.fromisoformat(adjusted_due).date()
+
+        # If adjusted date is in the future, skip (reminder already postponed, not due yet)
+        if adjusted_due > date.today():
+            return {"action": ACTION_NONE}
+        # If adjusted date is today or past, continue evaluation (may need another adjustment)
+
     # Only adjust watering and misting reminders for now
     reminder_type = reminder.get("reminder_type", "")
     if reminder_type not in ["watering", "misting"]:
@@ -186,7 +198,7 @@ def evaluate_reminder_adjustment(
             })
 
     # PRIORITY 2: PRECIPITATION - Heavy rain (outdoor plants only)
-    plant_location = plant.get("location", "indoor_potted")
+    plant_location = plant.get("location") or "indoor_potted"
     is_outdoor = "outdoor" in plant_location.lower()
 
     if precip_forecast is not None and precip_forecast > 0 and is_outdoor:
@@ -497,3 +509,86 @@ def get_adjustment_suggestions(
             suggestions.append(suggestion)
 
     return suggestions
+
+
+def batch_adjust_all_users_reminders() -> Dict[str, Any]:
+    """
+    Daily cron job: Adjust reminders for all active users.
+
+    Runs at 6:00 AM daily to update weather adjustments for all users
+    with active watering/misting reminders.
+
+    Returns:
+        Dict with stats:
+        {
+            "total_users": 100,
+            "users_processed": 85,
+            "total_adjusted": 42,
+            "errors": 3
+        }
+    """
+    from .supabase_client import get_admin_client
+    from .reminders import batch_adjust_reminders_for_weather
+    import logging
+
+    logger = logging.getLogger(__name__)
+    logger.info("[Weather Adjustments] Starting daily batch adjustment job")
+
+    supabase = get_admin_client()
+    stats = {
+        "total_users": 0,
+        "users_processed": 0,
+        "total_adjusted": 0,
+        "errors": 0
+    }
+
+    try:
+        # Get all users with active reminders (optimization query)
+        response = supabase.rpc('get_users_with_active_reminders').execute()
+        users = response.data or []
+        stats["total_users"] = len(users)
+
+        logger.info(f"[Weather Adjustments] Processing {len(users)} users with active reminders")
+
+        for user in users:
+            user_id = user.get("user_id")
+            if not user_id:
+                continue
+
+            try:
+                # Get user's profile to fetch city
+                profile_response = supabase.table("user_profiles").select("city").eq("id", user_id).execute()
+                profile = profile_response.data[0] if profile_response.data else None
+                city = profile.get("city") if profile else None
+
+                if not city:
+                    logger.debug(f"[Weather Adjustments] User {user_id} has no city set, skipping")
+                    continue
+
+                # Batch adjust reminders for this user
+                user_stats = batch_adjust_reminders_for_weather(user_id, city)
+                adjusted_count = user_stats.get("adjusted", 0)
+
+                if adjusted_count > 0:
+                    logger.info(f"[Weather Adjustments] User {user_id}: {adjusted_count} reminders adjusted")
+                    stats["total_adjusted"] += adjusted_count
+
+                stats["users_processed"] += 1
+
+            except Exception as e:
+                logger.error(f"[Weather Adjustments] Error processing user {user_id}: {str(e)}")
+                stats["errors"] += 1
+                continue
+
+        logger.info(
+            f"[Weather Adjustments] Completed: "
+            f"{stats['users_processed']}/{stats['total_users']} users processed, "
+            f"{stats['total_adjusted']} reminders adjusted, "
+            f"{stats['errors']} errors"
+        )
+
+    except Exception as e:
+        logger.error(f"[Weather Adjustments] Batch job failed: {str(e)}")
+        stats["errors"] += 1
+
+    return stats

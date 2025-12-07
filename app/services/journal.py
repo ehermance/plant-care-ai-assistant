@@ -453,3 +453,70 @@ def get_action_stats(plant_id: str, user_id: str) -> Dict[str, Any]:
             "last_watered": None,
             "last_fertilized": None,
         }
+
+
+def append_note_to_recent_action(
+    plant_id: str,
+    user_id: str,
+    note_text: str,
+    max_age_minutes: int = 5
+) -> Tuple[bool, Optional[str]]:
+    """
+    Append a note to the most recent journal action for a plant.
+
+    Used to add weather adjustment notes when completing reminders (Phase 2C).
+
+    Args:
+        plant_id: Plant's UUID
+        user_id: User's UUID (for authorization)
+        note_text: Text to append to the existing notes
+        max_age_minutes: Maximum age of action to update (default 5 minutes)
+
+    Returns:
+        (success, error_message)
+    """
+    from datetime import datetime, timedelta, timezone
+    from .supabase_client import get_admin_client
+
+    supabase = get_admin_client()
+    if not supabase:
+        return False, "Database not configured"
+
+    try:
+        # Find most recent action for this plant within the time window
+        cutoff_time = datetime.now(timezone.utc) - timedelta(minutes=max_age_minutes)
+
+        response = supabase.table("plant_actions").select("id, notes").eq(
+            "plant_id", plant_id
+        ).eq(
+            "user_id", user_id
+        ).gte(
+            "action_at", cutoff_time.isoformat()
+        ).order(
+            "action_at", desc=True
+        ).limit(1).execute()
+
+        if not response.data or len(response.data) == 0:
+            # No recent action found - this is not an error, just skip
+            return True, None
+
+        action = response.data[0]
+        action_id = action["id"]
+        existing_notes = action.get("notes") or ""
+
+        # Append new note to existing notes
+        updated_notes = existing_notes + note_text
+
+        # Update the action
+        update_response = supabase.table("plant_actions").update({
+            "notes": updated_notes
+        }).eq("id", action_id).eq("user_id", user_id).execute()
+
+        if update_response.data:
+            return True, None
+        else:
+            return False, "Failed to update action notes"
+
+    except Exception as e:
+        _safe_log_error(f"Error appending note to recent action: {e}")
+        return False, str(e)

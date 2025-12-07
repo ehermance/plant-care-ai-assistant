@@ -7,6 +7,7 @@ Handles displaying, creating, updating, and completing reminders.
 from __future__ import annotations
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from app.utils.auth import require_auth, get_current_user_id
+from app.utils.validation import is_valid_uuid
 from app.services import reminders as reminder_service
 from app.services import analytics
 from app.services.supabase_client import get_user_profile
@@ -447,8 +448,7 @@ def api_complete(reminder_id):
     user_id = get_current_user_id()
 
     # Validate reminder_id format (UUID)
-    import re
-    if not re.match(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', reminder_id, re.IGNORECASE):
+    if not is_valid_uuid(reminder_id):
         return jsonify({"success": False, "error": "Invalid reminder ID"}), 400
 
     success, error = reminder_service.mark_reminder_complete(reminder_id, user_id)
@@ -472,7 +472,8 @@ def api_adjust(reminder_id):
 
     Request body:
         {
-            "days": 2  // positive = postpone, negative = advance
+            "days": 2,  // positive = postpone, negative = advance
+            "reason": "Heavy rain expected (0.5\" in 24h)"  // optional
         }
 
     Security: CSRF token required via X-CSRFToken header
@@ -481,17 +482,17 @@ def api_adjust(reminder_id):
     user_id = get_current_user_id()
 
     # Validate reminder_id format (UUID)
-    import re
-    if not re.match(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', reminder_id, re.IGNORECASE):
+    if not is_valid_uuid(reminder_id):
         return jsonify({"success": False, "error": "Invalid reminder ID"}), 400
 
-    # Get days from request body
+    # Get days and reason from request body
     try:
         data = request.get_json()
         if not data or "days" not in data:
             return jsonify({"success": False, "error": "Missing 'days' parameter"}), 400
 
         days = int(data["days"])
+        reason = data.get("reason")  # Optional parameter
     except (ValueError, TypeError):
         return jsonify({"success": False, "error": "Invalid 'days' value - must be an integer"}), 400
 
@@ -502,8 +503,8 @@ def api_adjust(reminder_id):
     if days == 0:
         return jsonify({"success": False, "error": "Cannot adjust by 0 days"}), 400
 
-    # Adjust reminder
-    success, error = reminder_service.adjust_reminder_by_days(reminder_id, user_id, days)
+    # Adjust reminder with optional reason
+    success, error = reminder_service.adjust_reminder_by_days(reminder_id, user_id, days, reason)
 
     if success:
         # Track analytics event
@@ -522,6 +523,48 @@ def api_adjust(reminder_id):
         # Sanitize error messages for security
         safe_error = error if error else "Failed to adjust reminder"
         return jsonify({"success": False, "error": safe_error}), 400
+
+
+@reminders_bp.route("/<reminder_id>/toggle-weather", methods=["POST"])
+@require_auth
+def toggle_weather_adjustment(reminder_id):
+    """
+    Toggle weather adjustment opt-out for a specific reminder.
+
+    Allows users to enable/disable automatic weather-based adjustments
+    for individual reminders.
+
+    Security: CSRF token required (Flask-WTF CSRFProtect)
+    """
+    user_id = get_current_user_id()
+
+    # Get reminder to check current state
+    reminder = reminder_service.get_reminder_by_id(reminder_id, user_id)
+    if not reminder:
+        flash("Reminder not found", "error")
+        return redirect(url_for("reminders.index"))
+
+    # Toggle skip_weather_adjustment flag
+    current_value = reminder.get("skip_weather_adjustment", False)
+    new_value = not current_value
+
+    # Update reminder with new value
+    success, error = reminder_service.update_reminder(
+        reminder_id,
+        user_id,
+        {"skip_weather_adjustment": new_value}
+    )
+
+    if success:
+        if new_value:
+            flash("Weather adjustments disabled for this reminder", "info")
+        else:
+            flash("Weather adjustments enabled for this reminder", "success")
+    else:
+        flash(f"Failed to update: {error}", "error")
+
+    # Redirect back to referrer or reminder detail page
+    return redirect(request.referrer or url_for("reminders.view", reminder_id=reminder_id))
 
 
 @reminders_bp.route("/calendar")

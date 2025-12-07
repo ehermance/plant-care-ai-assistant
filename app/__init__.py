@@ -170,6 +170,18 @@ def create_app() -> Flask:
         resp.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         resp.headers["X-Frame-Options"] = "DENY"
         resp.headers["X-XSS-Protection"] = "0"  # CSP supersedes legacy XSS filter
+
+        # HSTS: Force HTTPS for 1 year, include subdomains, allow preload list
+        # Only apply in production (when SESSION_COOKIE_SECURE is True)
+        if app.config.get("SESSION_COOKIE_SECURE", False):
+            resp.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
+
+        # Permissions-Policy: Disable sensitive browser features not needed by the app
+        resp.headers["Permissions-Policy"] = (
+            "accelerometer=(), camera=(), geolocation=(), gyroscope=(), "
+            "magnetometer=(), microphone=(), payment=(), usb=()"
+        )
+
         return resp
 
     # Blueprints
@@ -190,6 +202,37 @@ def create_app() -> Flask:
 
     # Add Jinja global for Cloudflare Web Analytics
     app.jinja_env.globals["CF_BEACON_TOKEN"] = os.getenv("CF_BEACON_TOKEN", "")
+
+    # --- Background Scheduler for Weather Adjustments (Phase 2C) ---
+    # Initialize APScheduler for daily weather adjustment job
+    # Runs at 6:00 AM daily to adjust reminders based on weather forecasts
+    if not app.config.get("TESTING", False):  # Skip scheduler in test mode
+        try:
+            from apscheduler.schedulers.background import BackgroundScheduler
+            from app.services.reminder_adjustments import batch_adjust_all_users_reminders
+
+            scheduler = BackgroundScheduler()
+
+            # Schedule daily weather adjustments at 6:00 AM (UTC)
+            scheduler.add_job(
+                func=batch_adjust_all_users_reminders,
+                trigger="cron",
+                hour=6,
+                minute=0,
+                id="daily_weather_adjustments",
+                name="Daily Weather Reminder Adjustments",
+                replace_existing=True
+            )
+
+            scheduler.start()
+            app.logger.info("[Scheduler] Daily weather adjustment job scheduled for 6:00 AM UTC")
+
+            # Shutdown scheduler gracefully on app exit
+            import atexit
+            atexit.register(lambda: scheduler.shutdown())
+
+        except Exception as e:
+            app.logger.warning(f"[Scheduler] Failed to initialize weather adjustment scheduler: {e}")
 
     return app
 

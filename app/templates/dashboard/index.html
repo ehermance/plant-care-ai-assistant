@@ -47,19 +47,111 @@
   </a>
 </div>
 
-<!-- Today's Focus -->
-{% if due_reminders %}
-<section class="card mb-8 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/10 dark:to-cyan-900/10 border-2 border-emerald-200 dark:border-emerald-700" aria-labelledby="focus-title">
+<!-- Weather Insights & Suggestions (Phase 2C - Consolidated) -->
+{% if (weather_context and weather_context.alerts) or weather_suggestions %}
+<section class="card mb-8 bg-gradient-to-br from-blue-50 to-amber-50 dark:from-blue-900/10 dark:to-amber-900/10 border-2 border-blue-200 dark:border-blue-700" aria-labelledby="weather-title">
   <div class="flex items-center gap-3 mb-6">
-    <div class="text-4xl" aria-hidden="true">🎯</div>
+    <div class="text-4xl" aria-hidden="true">🌤️</div>
     <div>
-      <h3 id="focus-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">Today's Focus</h3>
-      <p class="text-sm text-slate-600 dark:text-slate-400">Your top priorities for today</p>
+      <h3 id="weather-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1" tabindex="-1">Weather Insights & Suggestions</h3>
+      <p class="text-sm text-slate-600 dark:text-slate-400">Weather conditions and recommendations for plant care</p>
     </div>
   </div>
 
+  <!-- Weather Alerts -->
+  {% if weather_context and weather_context.alerts %}
+  <div class="space-y-3 mb-6" role="alert" aria-live="polite">
+    {% for alert in weather_context.alerts %}
+    <div class="flex items-start gap-4 p-4 rounded-xl border-l-4 transition-all duration-200
+      {% if alert.type == 'rain' %}bg-cyan-50 dark:bg-cyan-900/20 border-cyan-400 dark:border-cyan-500
+      {% elif alert.type == 'freeze' %}bg-indigo-50 dark:bg-indigo-900/20 border-indigo-400 dark:border-indigo-500
+      {% elif alert.type == 'heat' %}bg-orange-50 dark:bg-orange-900/20 border-orange-400 dark:border-orange-500
+      {% endif %}">
+      <div class="text-3xl flex-shrink-0" aria-hidden="true">{{ alert.icon }}</div>
+      <div class="flex-1 min-w-0">
+        <p class="text-base font-medium text-slate-800 dark:text-slate-200">{{ alert.message }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Actionable Suggestions -->
+  {% if weather_suggestions %}
+  {% if weather_context and weather_context.alerts %}
+  <div class="border-t border-blue-200 dark:border-blue-700 pt-6 mb-3">
+    <h4 id="suggestions-heading" class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">Recommended Actions</h4>
+  </div>
+  {% endif %}
+  <ul class="space-y-3 list-none" role="list" {% if weather_context and weather_context.alerts %}aria-labelledby="suggestions-heading"{% endif %}>
+    {% for suggestion in weather_suggestions %}
+    <li class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-amber-200 dark:border-amber-700 transition-all duration-200 hover:shadow-md focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2" data-reminder-id="{{ suggestion.reminder_id }}" role="listitem">
+      <div class="text-3xl flex-shrink-0" aria-hidden="true">
+        {% if 'rain' in suggestion.message.lower() %}☔
+        {% elif 'freeze' in suggestion.message.lower() or 'frost' in suggestion.message.lower() %}❄️
+        {% elif 'heat' in suggestion.message.lower() %}🌡️
+        {% elif 'dormancy' in suggestion.message.lower() %}🍂
+        {% else %}🌤️{% endif %}
+      </div>
+
+      <div class="flex-1 min-w-0">
+        <h4 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2" id="suggestion-title-{{ suggestion.reminder_id }}">
+          {{ suggestion.plant_name }}
+        </h4>
+        <p class="text-sm text-slate-600 dark:text-slate-400 mb-3" id="suggestion-desc-{{ suggestion.reminder_id }}">
+          {{ suggestion.message }}
+        </p>
+      </div>
+
+      <div class="flex gap-2 flex-shrink-0 w-full sm:w-auto" role="group" aria-label="Actions for {{ suggestion.plant_name }}">
+        <button
+          class="btn btn-sm btn-primary flex-1 sm:flex-initial weather-accept-btn"
+          data-reminder-id="{{ suggestion.reminder_id }}"
+          data-days="{{ suggestion.days }}"
+          data-reason="{{ suggestion.message }}"
+          aria-label="{{ suggestion.action_label }} for {{ suggestion.plant_name }}"
+          aria-describedby="suggestion-desc-{{ suggestion.reminder_id }}"
+        >
+          {{ suggestion.action_label }}
+        </button>
+        <button
+          class="btn btn-sm btn-secondary weather-dismiss-btn"
+          data-reminder-id="{{ suggestion.reminder_id }}"
+          aria-label="Keep original schedule for {{ suggestion.plant_name }}"
+        >
+          Keep Original Schedule
+        </button>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</section>
+{% endif %}
+
+<!-- Today's Care Tasks (Consolidated from Today's Focus + Care Reminders Due Today) -->
+{% if due_reminders %}
+<section class="card mb-8 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/10 dark:to-cyan-900/10 border-2 border-emerald-200 dark:border-emerald-700" aria-labelledby="focus-title">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+    <div class="flex items-center gap-3">
+      <div class="text-4xl" aria-hidden="true">🎯</div>
+      <div>
+        <h3 id="focus-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1 flex items-center gap-3 flex-wrap">
+          <span>Today's Care Tasks</span>
+          {% if reminder_stats.due_today > 0 %}
+          <span class="badge-amber">{{ reminder_stats.due_today }}</span>
+          {% endif %}
+        </h3>
+        <p class="text-sm text-slate-600 dark:text-slate-400">Your plant care priorities for today</p>
+      </div>
+    </div>
+    <a href="{{ url_for('reminders.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+      View all →
+    </a>
+  </div>
+
   <div class="space-y-3" id="todays-focus-list">
-    {% for reminder in due_reminders[:3] %}
+    {% for reminder in due_reminders[:5] %}
     <div class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:shadow-md hover:border-emerald-400 dark:hover:border-emerald-500" data-reminder-id="{{ reminder.id }}">
       <div class="text-3xl flex-shrink-0">
         {% if reminder.reminder_type == 'watering' %}💧
@@ -72,8 +164,10 @@
       </div>
 
       <div class="flex-1 min-w-0">
-        <h4 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
-          {{ reminder.title }}
+        <h4 class="text-lg font-semibold mb-2">
+          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="text-slate-900 dark:text-slate-100 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+            {{ reminder.title }}
+          </a>
         </h4>
         <p class="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2 flex-wrap mb-2">
           <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
@@ -130,68 +224,14 @@
     {% endfor %}
   </div>
 
-  {% if reminder_stats.due_today > 3 %}
+  {% if reminder_stats.due_today > 5 %}
   <div class="text-center text-sm text-slate-600 dark:text-slate-400 mt-4 pt-4 border-t border-emerald-200 dark:border-emerald-700">
     <a href="{{ url_for('reminders.index') }}" class="font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
-      + {{ reminder_stats.due_today - 3 }} more task{% if reminder_stats.due_today > 4 %}s{% endif %} due today →
+      + {{ reminder_stats.due_today - 5 }} more task{% if reminder_stats.due_today > 6 %}s{% endif %} due today →
     </a>
   </div>
   {% endif %}
 </section>
-
-<!-- Weather Suggestions -->
-{% if weather_suggestions %}
-<section class="card mb-8 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 border-2 border-amber-200 dark:border-amber-700" aria-labelledby="suggestions-title">
-  <div class="flex items-center gap-3 mb-6">
-    <div class="text-4xl" aria-hidden="true">🌤️</div>
-    <div>
-      <h3 id="suggestions-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">Weather Suggestions</h3>
-      <p class="text-sm text-slate-600 dark:text-slate-400">Review these weather-based recommendations</p>
-    </div>
-  </div>
-
-  <div class="space-y-3">
-    {% for suggestion in weather_suggestions %}
-    <div class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-amber-200 dark:border-amber-700 transition-all duration-200 hover:shadow-md">
-      <div class="text-3xl flex-shrink-0">
-        {% if 'rain' in suggestion.message.lower() %}☔
-        {% elif 'freeze' in suggestion.message.lower() or 'frost' in suggestion.message.lower() %}❄️
-        {% elif 'heat' in suggestion.message.lower() %}🌡️
-        {% elif 'dormancy' in suggestion.message.lower() %}🍂
-        {% else %}🌤️{% endif %}
-      </div>
-
-      <div class="flex-1 min-w-0">
-        <h4 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
-          {{ suggestion.plant_name }}
-        </h4>
-        <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">
-          {{ suggestion.message }}
-        </p>
-      </div>
-
-      <div class="flex gap-2 flex-shrink-0 w-full sm:w-auto">
-        <button
-          class="btn btn-sm btn-primary flex-1 sm:flex-initial weather-accept-btn"
-          data-reminder-id="{{ suggestion.reminder_id }}"
-          data-days="{{ suggestion.days }}"
-          title="Accept suggestion"
-        >
-          {{ suggestion.action_label }}
-        </button>
-        <button
-          class="btn btn-sm btn-secondary weather-dismiss-btn"
-          data-reminder-id="{{ suggestion.reminder_id }}"
-          title="Dismiss suggestion"
-        >
-          Dismiss
-        </button>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-</section>
-{% endif %}
 
 {% elif plant_count > 0 %}
 <section class="card mb-8 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/10 dark:to-cyan-900/10 border-2 border-emerald-200 dark:border-emerald-700" aria-labelledby="focus-title">
@@ -388,93 +428,6 @@
   <a href="{{ url_for('plants.add') }}" class="btn btn-primary">
     <span aria-hidden="true">🌱</span> Add Your First Plant
   </a>
-</section>
-{% endif %}
-
-<!-- Care Reminders Due Today -->
-{% if due_reminders %}
-<section class="card mb-8" aria-labelledby="reminders-title">
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-    <h3 id="reminders-title" class="section-title !mb-0 flex items-center gap-3 flex-wrap">
-      <span>Care Reminders Due Today</span>
-      {% if reminder_stats.due_today > 0 %}
-      <span class="badge-amber">{{ reminder_stats.due_today }}</span>
-      {% endif %}
-    </h3>
-    <a href="{{ url_for('reminders.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
-      View all →
-    </a>
-  </div>
-
-  <div class="space-y-3" id="dashboard-reminders-list">
-    {% for reminder in due_reminders[:5] %}
-    <div class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:border-emerald-500 dark:hover:border-emerald-400" data-reminder-id="{{ reminder.id }}">
-      <div class="text-2xl flex-shrink-0">
-        {% if reminder.reminder_type == 'watering' %}💧
-        {% elif reminder.reminder_type == 'fertilizing' %}🌿
-        {% elif reminder.reminder_type == 'misting' %}💦
-        {% elif reminder.reminder_type == 'pruning' %}✂️
-        {% elif reminder.reminder_type == 'repotting' %}🪴
-        {% elif reminder.reminder_type == 'inspection' %}🔍
-        {% else %}📝{% endif %}
-      </div>
-
-      <div class="flex-1 min-w-0">
-        <h4 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
-          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-            {{ reminder.title }}
-          </a>
-        </h4>
-        <p class="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2 flex-wrap">
-          <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
-            {{ reminder.plant_name }}{% if reminder.plant_nickname %} "{{ reminder.plant_nickname }}"{% endif %}
-          </a>
-          {% if reminder.weather_adjustment_reason %}
-          <span class="badge-cyan" title="{{ reminder.weather_adjustment_reason }}">
-            <span aria-hidden="true">🌤️</span> Adjusted
-          </span>
-          {% endif %}
-        </p>
-      </div>
-
-      <button
-        class="btn btn-primary flex-shrink-0 w-full sm:w-auto quick-complete-btn"
-        data-reminder-id="{{ reminder.id }}"
-        data-reminder-title="{{ reminder.title }}"
-        title="Mark complete"
-      >
-        <span aria-hidden="true">✓</span> Done
-      </button>
-    </div>
-    {% endfor %}
-  </div>
-
-  {% if reminder_stats.due_today > 5 %}
-  <div class="text-center text-sm text-slate-500 dark:text-slate-400 mt-4">
-    <a href="{{ url_for('reminders.index') }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-      + {{ reminder_stats.due_today - 5 }} more reminder{% if reminder_stats.due_today > 6 %}s{% endif %}
-    </a>
-  </div>
-  {% endif %}
-</section>
-{% elif reminder_stats.active_reminders > 0 %}
-<section class="card mb-8" aria-labelledby="reminders-title">
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-    <h3 id="reminders-title" class="section-title !mb-0">Care Reminders</h3>
-    <a href="{{ url_for('reminders.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
-      View all →
-    </a>
-  </div>
-  <p class="text-slate-600 dark:text-slate-400">
-    <span aria-hidden="true">✅</span> No reminders due today! You have {{ reminder_stats.upcoming_7_days }} upcoming in the next 7 days.
-  </p>
-</section>
-{% else %}
-<section class="card mb-8" aria-labelledby="reminders-title">
-  <h3 id="reminders-title" class="section-title">Care Reminders</h3>
-  <p class="text-slate-600 dark:text-slate-400">
-    No reminders yet. <a href="{{ url_for('reminders.create') }}" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">Create your first reminder</a> to stay on top of plant care!
-  </p>
 </section>
 {% endif %}
 
