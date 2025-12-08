@@ -128,13 +128,10 @@ def evaluate_reminder_adjustment(
     if reminder_type not in ["watering", "misting"]:
         return {"action": ACTION_NONE}
 
-    # Check if reminder is in the future (don't adjust past due reminders)
+    # Parse next_due for later use (adjust ALL active reminders regardless of due date)
     next_due = reminder.get("next_due")
-    if next_due:
-        if isinstance(next_due, str):
-            next_due = datetime.fromisoformat(next_due).date()
-        if next_due < date.today():
-            return {"action": ACTION_NONE}  # Already overdue
+    if next_due and isinstance(next_due, str):
+        next_due = datetime.fromisoformat(next_due).date()
 
     # Get weather data
     if not user_city:

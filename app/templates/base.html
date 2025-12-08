@@ -127,6 +127,16 @@
           </div>
         </div>
 
+        {% if is_authenticated and profile and profile.get("is_admin", True) %}
+        <!-- Admin Links -->
+        <div class="flex justify-end text-right">
+          <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('admin.') %} bg-amber-500/20 text-amber-300{% endif %}"
+              href="{{ url_for('admin.index') }}"
+              title="View your admin dashboard with key product metrics and user behavior insights"
+              {% if request.endpoint and request.endpoint.startswith('admin.') %}aria-current="page"{% endif %}>Admin</a>
+        </div>
+        {% endif %}
+
         <!-- Desktop Navigation -->
         <nav class="hidden md:flex items-center gap-3 overflow-visible" aria-label="Main navigation">
           {% if is_authenticated %}
@@ -184,9 +194,9 @@
         </nav>
       </div>
 
-      <!-- Debug Links -->
       {% set show_debug = (config.UI_DEBUG_LINKS or request.args.get('debug') == 'true') %}
       {% if show_debug %}
+      <!-- Debug Links -->
         <div class="mt-2 pt-2 border-t border-slate-200 dark:border-slate-700">
           <p class="text-xs text-slate-500 dark:text-slate-400">
             <a href="{{ url_for('web.healthz') }}" target="_blank" rel="noopener" class="hover:text-emerald-600 dark:hover:text-emerald-400">Health check</a>

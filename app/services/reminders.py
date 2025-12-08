@@ -280,6 +280,27 @@ def get_due_reminders_with_adjustments(
                     "species": reminder.get("plant_species")     # Used by plant_intelligence
                 }
 
+    # Populate adjustment dict from existing DB fields (set by batch job)
+    # This ensures reminders adjusted by the cron job display their adjustment info
+    for reminder in reminders:
+        if reminder.get("weather_adjusted_due") and reminder.get("weather_adjustment_reason"):
+            adj_date = reminder["weather_adjusted_due"]
+            orig_date = reminder["next_due"]
+            # Parse dates if strings
+            if isinstance(adj_date, str):
+                adj_date = date.fromisoformat(adj_date)
+            if isinstance(orig_date, str):
+                orig_date = date.fromisoformat(orig_date)
+            days_diff = (adj_date - orig_date).days
+
+            reminder["adjustment"] = {
+                "action": "postpone" if days_diff > 0 else "advance",
+                "days": days_diff,
+                "reason": reminder["weather_adjustment_reason"],
+                "adjusted_due_date": reminder["weather_adjusted_due"],
+                "details": {"weather_condition": "batch_adjusted"}
+            }
+
     # Apply automatic adjustments
     adjusted_reminders = reminder_adjustments.apply_automatic_adjustments(
         reminders,

@@ -5,6 +5,7 @@ Handles displaying, creating, updating, and completing reminders.
 """
 
 from __future__ import annotations
+from datetime import date
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from app.utils.auth import require_auth, get_current_user_id
 from app.utils.validation import is_valid_uuid
@@ -180,11 +181,12 @@ def edit(reminder_id):
         custom_interval_days = request.form.get("custom_interval_days")
         notes = request.form.get("notes", "").strip()
         skip_weather = request.form.get("skip_weather_adjustment") == "on"
+        next_due_str = request.form.get("next_due", "").strip()
 
         # Validation
         if not title:
             flash("Reminder title is required.", "error")
-            return render_template("reminders/edit.html", reminder=reminder)
+            return render_template("reminders/edit.html", reminder=reminder, today=date.today().isoformat())
 
         # Convert custom_interval_days
         if frequency == "custom":
@@ -192,32 +194,52 @@ def edit(reminder_id):
                 custom_interval_days = int(custom_interval_days)
                 if custom_interval_days < 1 or custom_interval_days > 365:
                     flash("Custom interval must be between 1 and 365 days.", "error")
-                    return render_template("reminders/edit.html", reminder=reminder)
+                    return render_template("reminders/edit.html", reminder=reminder, today=date.today().isoformat())
             except (ValueError, TypeError):
                 flash("Invalid custom interval days.", "error")
-                return render_template("reminders/edit.html", reminder=reminder)
+                return render_template("reminders/edit.html", reminder=reminder, today=date.today().isoformat())
         else:
             custom_interval_days = None
+
+        # Build update data
+        update_data = {
+            "title": title,
+            "frequency": frequency,
+            "custom_interval_days": custom_interval_days,
+            "notes": notes or None,
+            "skip_weather_adjustment": skip_weather,
+        }
+
+        # Handle due date change
+        if next_due_str:
+            try:
+                next_due_date = date.fromisoformat(next_due_str)
+                if next_due_date < date.today():
+                    flash("Due date cannot be in the past.", "error")
+                    return render_template("reminders/edit.html", reminder=reminder, today=date.today().isoformat())
+                update_data["next_due"] = next_due_str
+                # Clear weather adjustment when user manually changes date
+                update_data["weather_adjusted_due"] = None
+                update_data["weather_adjustment_reason"] = None
+            except ValueError:
+                flash("Invalid date format.", "error")
+                return render_template("reminders/edit.html", reminder=reminder, today=date.today().isoformat())
 
         # Update reminder
         updated, error = reminder_service.update_reminder(
             reminder_id=reminder_id,
             user_id=user_id,
-            title=title,
-            frequency=frequency,
-            custom_interval_days=custom_interval_days,
-            notes=notes or None,
-            skip_weather_adjustment=skip_weather,
+            **update_data,
         )
 
         if error:
             flash(f"Error updating reminder: {error}", "error")
-            return render_template("reminders/edit.html", reminder=reminder)
+            return render_template("reminders/edit.html", reminder=reminder, today=date.today().isoformat())
 
         flash("Reminder updated successfully.", "success")
         return redirect(url_for("reminders.view", reminder_id=reminder_id))
 
-    return render_template("reminders/edit.html", reminder=reminder)
+    return render_template("reminders/edit.html", reminder=reminder, today=date.today().isoformat())
 
 
 @reminders_bp.route("/<reminder_id>/complete", methods=["POST"])

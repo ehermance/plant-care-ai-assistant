@@ -108,6 +108,160 @@ class TestEvaluateReminderAdjustment:
     @patch('app.services.reminder_adjustments.get_seasonal_pattern')
     @patch('app.services.reminder_adjustments.infer_plant_characteristics')
     @patch('app.services.reminder_adjustments.get_light_adjustment_factor')
+    def test_overdue_reminder_still_adjusted_for_rain(
+        self, mock_light, mock_chars, mock_seasonal, mock_temp, mock_precip, mock_weather
+    ):
+        """Overdue reminders should still be adjusted when it's raining (Option B behavior)."""
+        mock_weather.return_value = {"temp_f": 65, "humidity": 85}
+        mock_precip.return_value = 0.8  # Heavy rain
+        mock_temp.return_value = {
+            "temp_min_f": 60,
+            "temp_max_f": 70,
+            "freeze_risk": False
+        }
+        mock_seasonal.return_value = {"season": "spring", "is_dormancy_period": False}
+        mock_chars.return_value = {"water_needs": "moderate"}
+        mock_light.return_value = 1.0
+
+        # Reminder that is 2 days OVERDUE
+        reminder = {
+            "reminder_type": "watering",
+            "next_due": (date.today() - timedelta(days=2)).isoformat(),
+            "skip_weather_adjustment": False
+        }
+
+        plant = {
+            "location": "outdoor_potted",
+            "species": "Tomato"
+        }
+
+        result = reminder_adjustments.evaluate_reminder_adjustment(
+            reminder, plant, "Seattle, WA"
+        )
+
+        # Should be postponed due to rain, NOT skipped because it's overdue
+        assert result["action"] == reminder_adjustments.ACTION_POSTPONE
+        assert result["mode"] == reminder_adjustments.MODE_AUTOMATIC
+        assert "rain" in result["reason"].lower()
+
+    @patch('app.services.reminder_adjustments.get_weather_for_city')
+    @patch('app.services.reminder_adjustments.get_precipitation_forecast_24h')
+    @patch('app.services.reminder_adjustments.get_temperature_extremes_forecast')
+    @patch('app.services.reminder_adjustments.get_seasonal_pattern')
+    @patch('app.services.reminder_adjustments.infer_plant_characteristics')
+    @patch('app.services.reminder_adjustments.get_light_adjustment_factor')
+    def test_today_reminder_adjusted_for_rain(
+        self, mock_light, mock_chars, mock_seasonal, mock_temp, mock_precip, mock_weather
+    ):
+        """Reminders due today should be adjusted when it's raining."""
+        mock_weather.return_value = {"temp_f": 65, "humidity": 85}
+        mock_precip.return_value = 0.8  # Heavy rain
+        mock_temp.return_value = {
+            "temp_min_f": 60,
+            "temp_max_f": 70,
+            "freeze_risk": False
+        }
+        mock_seasonal.return_value = {"season": "spring", "is_dormancy_period": False}
+        mock_chars.return_value = {"water_needs": "moderate"}
+        mock_light.return_value = 1.0
+
+        # Reminder due TODAY
+        reminder = {
+            "reminder_type": "watering",
+            "next_due": date.today().isoformat(),
+            "skip_weather_adjustment": False
+        }
+
+        plant = {
+            "location": "outdoor_bed",
+            "species": "Rose"
+        }
+
+        result = reminder_adjustments.evaluate_reminder_adjustment(
+            reminder, plant, "Seattle, WA"
+        )
+
+        # Should be postponed due to rain
+        assert result["action"] == reminder_adjustments.ACTION_POSTPONE
+        assert "rain" in result["reason"].lower()
+
+    @patch('app.services.reminder_adjustments.get_weather_for_city')
+    @patch('app.services.reminder_adjustments.get_precipitation_forecast_24h')
+    @patch('app.services.reminder_adjustments.get_temperature_extremes_forecast')
+    @patch('app.services.reminder_adjustments.get_seasonal_pattern')
+    @patch('app.services.reminder_adjustments.infer_plant_characteristics')
+    @patch('app.services.reminder_adjustments.get_light_adjustment_factor')
+    def test_already_adjusted_reminder_readjusts_when_adjusted_date_is_today(
+        self, mock_light, mock_chars, mock_seasonal, mock_temp, mock_precip, mock_weather
+    ):
+        """Reminders with weather_adjusted_due of TODAY should be re-evaluated."""
+        mock_weather.return_value = {"temp_f": 65, "humidity": 85}
+        mock_precip.return_value = 0.8  # Heavy rain still happening
+        mock_temp.return_value = {
+            "temp_min_f": 60,
+            "temp_max_f": 70,
+            "freeze_risk": False
+        }
+        mock_seasonal.return_value = {"season": "spring", "is_dormancy_period": False}
+        mock_chars.return_value = {"water_needs": "moderate"}
+        mock_light.return_value = 1.0
+
+        # Reminder was previously adjusted to TODAY - should re-evaluate
+        reminder = {
+            "reminder_type": "watering",
+            "next_due": (date.today() - timedelta(days=1)).isoformat(),  # Originally due yesterday
+            "weather_adjusted_due": date.today().isoformat(),  # Was postponed to today
+            "weather_adjustment_reason": "Previous adjustment",
+            "skip_weather_adjustment": False
+        }
+
+        plant = {
+            "location": "outdoor_potted",
+            "species": "Tomato"
+        }
+
+        result = reminder_adjustments.evaluate_reminder_adjustment(
+            reminder, plant, "Seattle, WA"
+        )
+
+        # Should re-evaluate and postpone again since rain is still happening
+        assert result["action"] == reminder_adjustments.ACTION_POSTPONE
+        assert "rain" in result["reason"].lower()
+
+    @patch('app.services.reminder_adjustments.get_weather_for_city')
+    def test_already_adjusted_reminder_skips_when_adjusted_date_is_future(
+        self, mock_weather
+    ):
+        """Reminders with weather_adjusted_due in FUTURE should NOT be re-evaluated."""
+        mock_weather.return_value = {"temp_f": 65, "humidity": 85}
+
+        # Reminder was previously adjusted to TOMORROW - should skip
+        reminder = {
+            "reminder_type": "watering",
+            "next_due": date.today().isoformat(),
+            "weather_adjusted_due": (date.today() + timedelta(days=1)).isoformat(),  # Adjusted to tomorrow
+            "weather_adjustment_reason": "Previous adjustment",
+            "skip_weather_adjustment": False
+        }
+
+        plant = {
+            "location": "outdoor_potted",
+            "species": "Tomato"
+        }
+
+        result = reminder_adjustments.evaluate_reminder_adjustment(
+            reminder, plant, "Seattle, WA"
+        )
+
+        # Should skip - already adjusted and not due yet
+        assert result["action"] == reminder_adjustments.ACTION_NONE
+
+    @patch('app.services.reminder_adjustments.get_weather_for_city')
+    @patch('app.services.reminder_adjustments.get_precipitation_forecast_24h')
+    @patch('app.services.reminder_adjustments.get_temperature_extremes_forecast')
+    @patch('app.services.reminder_adjustments.get_seasonal_pattern')
+    @patch('app.services.reminder_adjustments.infer_plant_characteristics')
+    @patch('app.services.reminder_adjustments.get_light_adjustment_factor')
     def test_light_rain_suggestion(
         self, mock_light, mock_chars, mock_seasonal, mock_temp, mock_precip, mock_weather
     ):
