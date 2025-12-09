@@ -106,7 +106,6 @@
       <div class="flex gap-2 flex-shrink-0 w-full sm:w-auto" role="group" aria-label="Actions for {{ suggestion.plant_name }}">
         <button
           class="btn btn-sm btn-primary flex-1 sm:flex-initial weather-accept-btn"
-          data-reminder-id="{{ suggestion.reminder_id }}"
           data-days="{{ suggestion.days }}"
           data-reason="{{ suggestion.message }}"
           aria-label="{{ suggestion.action_label }} for {{ suggestion.plant_name }}"
@@ -116,7 +115,6 @@
         </button>
         <button
           class="btn btn-sm btn-secondary weather-dismiss-btn"
-          data-reminder-id="{{ suggestion.reminder_id }}"
           aria-label="Keep original schedule for {{ suggestion.plant_name }}"
         >
           Keep Original Schedule
@@ -197,8 +195,8 @@
               </p>
             </div>
             <button
-              onclick="showAdjustmentDetails({{ reminder.adjustment | tojson }})"
-              class="flex-shrink-0 text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 font-medium transition-colors"
+              class="flex-shrink-0 text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 font-medium transition-colors adjustment-why-btn"
+              data-adjustment='{{ reminder.adjustment | tojson }}'
               title="Show adjustment details"
             >
               Why?

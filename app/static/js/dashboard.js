@@ -240,15 +240,16 @@
       button.addEventListener('click', async function(e) {
         e.preventDefault();
 
-        const reminderId = this.dataset.reminderId;
-        const days = parseInt(this.dataset.days || 0);
-        const reason = this.dataset.reason || '';
+        // Get reminder ID from parent card (not the button itself)
         const suggestionCard = this.closest('[data-reminder-id]');
-
         if (!suggestionCard) {
           console.error('Could not find suggestion card element');
           return;
         }
+
+        const reminderId = suggestionCard.dataset.reminderId;
+        const days = parseInt(this.dataset.days || 0);
+        const reason = this.dataset.reason || '';
 
         // Disable button and show loading state
         this.disabled = true;
@@ -334,13 +335,14 @@
         e.preventDefault();
         e.stopPropagation();
 
-        const reminderId = this.dataset.reminderId;
+        // Get reminder ID from parent card (not the button itself)
         const suggestionCard = this.closest('[data-reminder-id]');
-
         if (!suggestionCard) {
           console.error('Could not find suggestion card to dismiss');
           return;
         }
+
+        const reminderId = suggestionCard.dataset.reminderId;
 
         // Store dismissal in session storage
         const dismissed = JSON.parse(sessionStorage.getItem('dismissedSuggestions') || '[]');
@@ -409,6 +411,20 @@
     // ========================================================================
     // "WHY?" EXPLANATION MODAL
     // ========================================================================
+
+    // Handle "Why?" button clicks (data attribute instead of inline onclick)
+    const whyButtons = document.querySelectorAll('.adjustment-why-btn');
+    whyButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        try {
+          const adjustmentData = JSON.parse(this.dataset.adjustment || '{}');
+          window.showAdjustmentDetails(adjustmentData);
+        } catch (err) {
+          console.error('Failed to parse adjustment data:', err);
+        }
+      });
+    });
 
     // Show adjustment details modal
     window.showAdjustmentDetails = function(adjustment) {

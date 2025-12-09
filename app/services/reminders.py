@@ -769,6 +769,12 @@ def adjust_reminder_for_weather(
             original_due = date.fromisoformat(reminder["next_due"])
             new_due_date = original_due + timedelta(days=2)
 
+            # Ensure new date is always in the future (at least tomorrow)
+            # This handles overdue reminders where original_due + 2 might still be past
+            tomorrow = date.today() + timedelta(days=1)
+            if new_due_date <= date.today():
+                new_due_date = tomorrow
+
             adjustment_reason = f"Delayed due to rain forecast ({conditions})"
             adjustment_made = True
 
