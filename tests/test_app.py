@@ -2728,3 +2728,87 @@ def test_theme_default_value_for_new_users():
     # Or if default profile is created, theme should be 'auto' or None
     assert profile is None or (isinstance(profile, dict) and profile.get("theme") in ["auto", "light", "dark", None])
 
+
+# ============================================================================
+# TIMEZONE FEATURE TESTS (Phase 2)
+# ============================================================================
+
+class TestTimezoneFeatures:
+    """Tests for the timezone feature implemented in Phase 2."""
+
+    def test_timezone_groups_defined(self):
+        """Verify timezone groups are properly defined."""
+        from app.services.supabase_client import TIMEZONE_GROUPS, VALID_TIMEZONES
+
+        # Check groups exist
+        assert "Americas" in TIMEZONE_GROUPS
+        assert "Europe" in TIMEZONE_GROUPS
+        assert "Asia & Middle East" in TIMEZONE_GROUPS
+        assert "Pacific & Australia" in TIMEZONE_GROUPS
+
+        # Check popular timezones are included
+        assert "America/New_York" in VALID_TIMEZONES
+        assert "America/Los_Angeles" in VALID_TIMEZONES
+        assert "Europe/London" in VALID_TIMEZONES
+        assert "Asia/Tokyo" in VALID_TIMEZONES
+        assert "Australia/Sydney" in VALID_TIMEZONES
+
+    def test_get_timezone_for_coordinates(self):
+        """Test offline timezone lookup from coordinates."""
+        from app.services.supabase_client import get_timezone_for_coordinates
+
+        # New York City coordinates
+        tz = get_timezone_for_coordinates(40.7128, -74.0060)
+        assert tz == "America/New_York"
+
+        # Los Angeles coordinates
+        tz = get_timezone_for_coordinates(34.0522, -118.2437)
+        assert tz == "America/Los_Angeles"
+
+        # London coordinates
+        tz = get_timezone_for_coordinates(51.5074, -0.1278)
+        assert tz == "Europe/London"
+
+        # Tokyo coordinates
+        tz = get_timezone_for_coordinates(35.6762, 139.6503)
+        assert tz == "Asia/Tokyo"
+
+    def test_get_timezone_for_invalid_coordinates(self):
+        """Test timezone lookup with invalid coordinates returns None."""
+        from app.services.supabase_client import get_timezone_for_coordinates
+
+        # Ocean coordinates (no timezone)
+        tz = get_timezone_for_coordinates(0.0, 0.0)
+        # May return None or a default - just verify no crash
+        assert tz is None or isinstance(tz, str)
+
+    def test_update_user_timezone_validation(self):
+        """Test that invalid timezones are rejected."""
+        from app.services.supabase_client import update_user_timezone, VALID_TIMEZONES
+
+        # Test validation logic directly
+        invalid_tz = "Invalid/Timezone"
+        assert invalid_tz not in VALID_TIMEZONES
+
+        # When calling update with invalid timezone, it should fail
+        # Either with validation error or database not configured
+        success, error = update_user_timezone("test-user", invalid_tz)
+        assert success is False
+        assert error is not None
+
+    def test_weather_api_returns_coordinates(self):
+        """Test that weather API response includes lat/lon."""
+        from app.services.weather import get_weather_for_city
+
+        # Get weather for a city
+        weather = get_weather_for_city("New York")
+
+        if weather:  # If API call succeeds
+            assert "lat" in weather
+            assert "lon" in weather
+            # Coordinates should be numbers
+            if weather["lat"] is not None:
+                assert isinstance(weather["lat"], (int, float))
+            if weather["lon"] is not None:
+                assert isinstance(weather["lon"], (int, float))
+

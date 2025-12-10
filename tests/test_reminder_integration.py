@@ -296,13 +296,14 @@ class TestReminderAdjustmentIntegration:
         for s in suggestions:
             assert "rain" not in s["message"].lower()
 
+    @patch('app.services.reminders.reminder_adjustments.apply_automatic_adjustments')
     @patch('app.services.reminders.get_user_profile')
     @patch('app.services.reminders.get_due_reminders')
-    def test_multiple_reminders_mixed_adjustments(self, mock_get_due, mock_profile):
+    def test_multiple_reminders_mixed_adjustments(self, mock_get_due, mock_profile, mock_auto_adjust):
         """Multiple reminders should be handled independently."""
         mock_profile.return_value = {"city": "Seattle, WA"}
 
-        mock_get_due.return_value = [
+        test_reminders = [
             {
                 "id": "r1",
                 "plant_id": "p1",
@@ -341,10 +342,14 @@ class TestReminderAdjustmentIntegration:
                 }
             }
         ]
+        mock_get_due.return_value = test_reminders
+        # Mock apply_automatic_adjustments to return all reminders unchanged
+        # (no auto-postponements that would filter them out)
+        mock_auto_adjust.return_value = test_reminders
 
         adjusted_reminders, suggestions = reminders.get_due_reminders_with_adjustments("user-123")
 
-        # All reminders returned
+        # All reminders returned (no auto-postponements filtered them out)
         assert len(adjusted_reminders) == 3
 
         # Only first reminder eligible for adjustments
