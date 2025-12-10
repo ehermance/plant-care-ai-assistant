@@ -85,7 +85,7 @@ tqdm==4.67.1
 typer==0.20.0
 typing-inspection==0.4.1
 typing_extensions==4.15.0
-timezonefinder>=6.0.0
+timezonefinder==8.1.0
 urllib3==2.5.0
 webencodings==0.5.1
 websockets==15.0.1

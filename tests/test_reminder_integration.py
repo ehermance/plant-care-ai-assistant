@@ -296,7 +296,7 @@ class TestReminderAdjustmentIntegration:
         for s in suggestions:
             assert "rain" not in s["message"].lower()
 
-    @patch('app.services.reminders.reminder_adjustments.apply_automatic_adjustments')
+    @patch('app.services.reminder_adjustments.apply_automatic_adjustments')
     @patch('app.services.reminders.get_user_profile')
     @patch('app.services.reminders.get_due_reminders')
     def test_multiple_reminders_mixed_adjustments(self, mock_get_due, mock_profile, mock_auto_adjust):
