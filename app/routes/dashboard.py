@@ -12,6 +12,7 @@ from __future__ import annotations
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from app.utils.auth import require_auth, get_current_user_id
 from app.services import supabase_client
+from app.services.supabase_client import TIMEZONE_GROUPS
 from app.services import reminders as reminder_service
 from app.services.weather import (
     get_weather_for_city,
@@ -136,6 +137,19 @@ def account():
         # Track if any updates were made
         updates_made = []
 
+        # Handle timezone update FIRST (manual override) - before city update
+        # Only update if user explicitly selected a timezone (not the default empty option)
+        timezone_from_form = request.form.get("timezone", "").strip()
+        timezone_explicitly_set = False
+        if timezone_from_form:
+            # User selected a specific timezone - this is a manual override
+            success, error = supabase_client.update_user_timezone(user_id, timezone_from_form)
+            if success:
+                updates_made.append("timezone")
+                timezone_explicitly_set = True
+            else:
+                flash(f"Failed to update timezone: {error}", "error")
+
         # Handle city update
         city = request.form.get("city", "").strip()
         if "city" in request.form:  # Only update if field is present
@@ -143,6 +157,12 @@ def account():
             if success:
                 if city:
                     updates_made.append("location")
+                    # If timezone wasn't explicitly set, note that it was auto-derived
+                    if not timezone_explicitly_set:
+                        # Refresh profile to get the auto-derived timezone
+                        updated_profile = supabase_client.get_user_profile(user_id)
+                        if updated_profile and updated_profile.get("timezone"):
+                            updates_made.append(f"timezone auto-detected")
                 else:
                     updates_made.append("location (cleared)")
             else:
@@ -166,4 +186,5 @@ def account():
     return render_template(
         "dashboard/account.html",
         profile=profile,
+        timezone_groups=TIMEZONE_GROUPS,
     )

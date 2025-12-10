@@ -92,6 +92,9 @@ def get_weather_for_city(city: str | None) -> Optional[Dict]:
         wmain = (data.get("weather") or [{}])[0].get("main", "")
         wdesc = (data.get("weather") or [{}])[0].get("description", "")
 
+        # Extract coordinates for timezone derivation
+        coord = data.get("coord", {})
+
         return {
             "city": data.get("name", city),
             "temp_c": temp_c,
@@ -101,6 +104,8 @@ def get_weather_for_city(city: str | None) -> Optional[Dict]:
             "wind_mps": wind_mps,
             "wind_mph": round(wind_mps * 2.23694, 1) if isinstance(wind_mps, (int, float)) else None,
             "emoji": _emoji_for(wid, wmain, wdesc),
+            "lat": coord.get("lat"),
+            "lon": coord.get("lon"),
         }
     except Exception:
         return None

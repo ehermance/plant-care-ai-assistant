@@ -64,6 +64,12 @@
   </script>
   <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 
+  <!-- Timezone configuration (for client-side timestamp conversion) -->
+  <script>
+    // User timezone from profile (falls back to browser default if empty)
+    window.USER_TIMEZONE = "{{ g.user_timezone or '' }}";
+  </script>
+
   {% block extra_head %}{% endblock %}
 
   <!-- Structured Data (JSON-LD) for SEO -->
@@ -317,6 +323,9 @@
 
   <!-- Toast notification system -->
   <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+
+  <!-- Timezone conversion for timestamps -->
+  <script src="{{ url_for('static', filename='js/timezone.js') }}"></script>
 
   <!-- Mobile bottom navigation -->
   <script src="{{ url_for('static', filename='js/bottom-nav.js') }}"></script>

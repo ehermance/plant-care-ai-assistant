@@ -529,10 +529,11 @@ class TestEvaluateReminderAdjustment:
 class TestApplyAutomaticAdjustments:
     """Test automatic adjustment application."""
 
+    @patch('app.services.supabase_client.get_admin_client')
     @patch('app.services.reminder_adjustments.evaluate_reminder_adjustment')
-    def test_applies_automatic_adjustments(self, mock_evaluate):
-        """Should apply automatic adjustments and skip suggestions."""
-        # Setup mock to return automatic adjustment
+    def test_applies_automatic_adjustments(self, mock_evaluate, mock_db):
+        """Reminders automatically postponed to future dates should be excluded from results."""
+        # Setup mock to return automatic postpone adjustment
         mock_evaluate.return_value = {
             "action": reminder_adjustments.ACTION_POSTPONE,
             "mode": reminder_adjustments.MODE_AUTOMATIC,
@@ -540,12 +541,15 @@ class TestApplyAutomaticAdjustments:
             "reason": "Heavy rain expected",
             "details": {"precipitation_inches": 0.8}
         }
+        mock_db.return_value = None  # DB operations optional
 
+        # Reminder due today - when postponed by 2 days, it's in the future
         reminders = [{
             "id": "r1",
+            "user_id": "u1",
             "plant_id": "p1",
             "reminder_type": "watering",
-            "next_due": "2025-12-03"
+            "next_due": date.today().isoformat()
         }]
 
         plants = {
@@ -556,11 +560,46 @@ class TestApplyAutomaticAdjustments:
             reminders, plants, "Seattle, WA"
         )
 
+        # Reminder should be EXCLUDED because it's been postponed to a future date
+        assert len(result) == 0
+
+    @patch('app.services.supabase_client.get_admin_client')
+    @patch('app.services.reminder_adjustments.evaluate_reminder_adjustment')
+    def test_advance_adjustment_keeps_reminder_if_due_today(self, mock_evaluate, mock_db):
+        """Reminders advanced to today should be included in results."""
+        # Setup mock to return automatic advance adjustment
+        mock_evaluate.return_value = {
+            "action": reminder_adjustments.ACTION_ADVANCE,
+            "mode": reminder_adjustments.MODE_AUTOMATIC,
+            "days": -1,
+            "reason": "Hot weather - water earlier",
+            "details": {}
+        }
+        mock_db.return_value = None
+
+        # Reminder due tomorrow - when advanced by 1 day, it's due today
+        tomorrow = date.today() + timedelta(days=1)
+        reminders = [{
+            "id": "r1",
+            "user_id": "u1",
+            "plant_id": "p1",
+            "reminder_type": "watering",
+            "next_due": tomorrow.isoformat()
+        }]
+
+        plants = {
+            "p1": {"location": "outdoor_bed", "species": "Tomato"}
+        }
+
+        result = reminder_adjustments.apply_automatic_adjustments(
+            reminders, plants, "Seattle, WA"
+        )
+
+        # Reminder should be INCLUDED because it's now due today
         assert len(result) == 1
         assert "adjustment" in result[0]
-        assert result[0]["adjustment"]["action"] == reminder_adjustments.ACTION_POSTPONE
-        assert result[0]["adjustment"]["days"] == 2
-        assert result[0]["adjustment"]["adjusted_due_date"] == "2025-12-05"
+        assert result[0]["adjustment"]["action"] == reminder_adjustments.ACTION_ADVANCE
+        assert result[0]["adjustment"]["adjusted_due_date"] == date.today().isoformat()
 
     @patch('app.services.reminder_adjustments.evaluate_reminder_adjustment')
     def test_skips_suggestion_mode_adjustments(self, mock_evaluate):

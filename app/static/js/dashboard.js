@@ -251,6 +251,19 @@
         const days = parseInt(this.dataset.days || 0);
         const reason = this.dataset.reason || '';
 
+        // Validate reminder ID is present and looks like a UUID
+        if (!reminderId || reminderId === 'undefined' || reminderId === 'null') {
+          console.error('Invalid reminder ID:', reminderId);
+          return;
+        }
+
+        // Basic UUID format check (8-4-4-4-12 hex chars)
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(reminderId)) {
+          console.error('Reminder ID is not a valid UUID:', reminderId);
+          return;
+        }
+
         // Disable button and show loading state
         this.disabled = true;
         const originalText = this.innerHTML;

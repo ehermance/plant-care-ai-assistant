@@ -597,6 +597,124 @@ def sign_out(access_token: str) -> bool:
 
 
 # ============================================================================
+# Timezone Helpers
+# ============================================================================
+
+# Curated timezone list grouped by region (for override dropdown)
+TIMEZONE_GROUPS = {
+    "Americas": [
+        "America/New_York",      # Eastern
+        "America/Chicago",       # Central
+        "America/Denver",        # Mountain
+        "America/Phoenix",       # Arizona (no DST)
+        "America/Los_Angeles",   # Pacific
+        "America/Anchorage",     # Alaska
+        "Pacific/Honolulu",      # Hawaii
+        "America/Toronto",       # Canada Eastern
+        "America/Vancouver",     # Canada Pacific
+        "America/Mexico_City",   # Mexico
+        "America/Sao_Paulo",     # Brazil
+    ],
+    "Europe": [
+        "Europe/London",         # UK/GMT
+        "Europe/Paris",          # Central Europe
+        "Europe/Berlin",         # Germany
+        "Europe/Amsterdam",      # Netherlands
+        "Europe/Rome",           # Italy
+        "Europe/Madrid",         # Spain
+        "Europe/Moscow",         # Russia
+    ],
+    "Asia & Middle East": [
+        "Asia/Dubai",            # UAE/Gulf
+        "Asia/Kolkata",          # India
+        "Asia/Singapore",        # Singapore/Malaysia
+        "Asia/Hong_Kong",        # Hong Kong
+        "Asia/Shanghai",         # China
+        "Asia/Tokyo",            # Japan
+        "Asia/Seoul",            # South Korea
+    ],
+    "Pacific & Australia": [
+        "Australia/Sydney",      # Australia Eastern
+        "Australia/Melbourne",   # Australia Eastern
+        "Australia/Perth",       # Australia Western
+        "Pacific/Auckland",      # New Zealand
+    ],
+}
+
+# Flat list of all valid timezones for validation
+VALID_TIMEZONES = set()
+for zones in TIMEZONE_GROUPS.values():
+    VALID_TIMEZONES.update(zones)
+
+
+# Lazy-loaded TimezoneFinder instance
+_timezone_finder = None
+
+
+def get_timezone_for_coordinates(lat: float, lon: float) -> Optional[str]:
+    """
+    Get IANA timezone identifier from coordinates using timezonefinder (offline).
+
+    This function uses a lazy-loaded TimezoneFinder instance for efficiency.
+    No API calls are made - the lookup is performed locally.
+
+    Args:
+        lat: Latitude coordinate
+        lon: Longitude coordinate
+
+    Returns:
+        IANA timezone string (e.g., "America/New_York"), or None if unable to determine
+    """
+    global _timezone_finder
+
+    try:
+        # Lazy-load TimezoneFinder (it has a large initial load time)
+        if _timezone_finder is None:
+            from timezonefinder import TimezoneFinder
+            _timezone_finder = TimezoneFinder()
+
+        return _timezone_finder.timezone_at(lat=lat, lng=lon)
+    except Exception as e:
+        _safe_log_error(f"Error getting timezone for coordinates ({lat}, {lon}): {e}")
+        return None
+
+
+def update_user_timezone(user_id: str, timezone: str) -> tuple[bool, Optional[str]]:
+    """
+    Manually override user's timezone (or clear to use city-derived/browser default).
+
+    Args:
+        user_id: User's UUID
+        timezone: IANA timezone identifier (e.g., "America/New_York"), or empty to clear
+
+    Returns:
+        tuple[bool, Optional[str]]: (success, error_message)
+    """
+    if not _supabase_client:
+        return False, "Database not configured"
+
+    try:
+        # Validate timezone if provided
+        if timezone:
+            timezone = timezone.strip()
+            if timezone not in VALID_TIMEZONES:
+                return False, f"Invalid timezone. Please select from the dropdown."
+
+        # Update profile
+        response = _supabase_client.table("profiles").update({
+            "timezone": timezone if timezone else None
+        }).eq("id", user_id).execute()
+
+        if response.data:
+            return True, None
+        return False, "Failed to update timezone"
+
+    except Exception as e:
+        _safe_log_error(f"Error updating user timezone: {e}")
+        return False, f"Error updating timezone: {str(e)}"
+
+
+# ============================================================================
 # Profile Helpers
 # ============================================================================
 
@@ -671,6 +789,8 @@ def update_user_city(user_id: str, city: str) -> tuple[bool, Optional[str]]:
     """
     Update user's city/location in their profile.
 
+    Also auto-derives timezone from city coordinates using weather API + timezonefinder.
+
     Security:
     - Input sanitization (XSS prevention)
     - Length validation (max 200 characters)
@@ -704,10 +824,26 @@ def update_user_city(user_id: str, city: str) -> tuple[bool, Optional[str]]:
         else:
             city = None  # Allow clearing the city
 
+        # Build update data
+        update_data = {"city": city}
+
+        # Auto-derive timezone from city coordinates
+        if city:
+            # Get coordinates from weather API
+            from .weather import get_weather_for_city
+            weather = get_weather_for_city(city)
+
+            if weather and weather.get("lat") is not None and weather.get("lon") is not None:
+                timezone = get_timezone_for_coordinates(weather["lat"], weather["lon"])
+                if timezone:
+                    update_data["timezone"] = timezone
+                    _safe_log_info(f"Auto-derived timezone {timezone} for city {city}")
+        else:
+            # City cleared - also clear timezone (falls back to browser default)
+            update_data["timezone"] = None
+
         # Update profile (RLS ensures user can only update their own)
-        response = _supabase_client.table("profiles").update({
-            "city": city
-        }).eq("id", user_id).execute()
+        response = _supabase_client.table("profiles").update(update_data).eq("id", user_id).execute()
 
         if response.data:
             return True, None

@@ -12,7 +12,7 @@ after the project was modularized.
 
 from __future__ import annotations
 import os
-from flask import Flask, Response
+from flask import Flask, Response, g
 from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv  # <-- ensure .env is loaded for local dev
 from .extensions import limiter
@@ -141,6 +141,20 @@ def create_app() -> Flask:
 
     # Register auth context processor (makes current_user, is_authenticated, etc. available in templates)
     app.context_processor(auth.inject_auth_context)
+
+    # Set user timezone in request context (for client-side timestamp conversion)
+    @app.before_request
+    def load_user_timezone():
+        """Load user's timezone preference into request context."""
+        g.user_timezone = None
+        try:
+            user_id = auth.get_current_user_id()
+            if user_id:
+                profile = supabase_client.get_user_profile(user_id)
+                if profile:
+                    g.user_timezone = profile.get("timezone")
+        except Exception:
+            pass  # Don't fail request on timezone lookup errors
 
     # ---- Content Security Policy ----
     # Allow Supabase domains for auth, API calls, and storage

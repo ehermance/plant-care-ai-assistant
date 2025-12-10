@@ -30,6 +30,7 @@ filelock==3.20.0
 Flask==3.0.3
 Flask-Limiter==3.8.0
 Flask-WTF==1.2.1
+flatbuffers==25.9.23
 frozenlist==1.8.0
 fsspec==2025.10.0
 google-ai-generativelanguage==0.6.10
@@ -44,6 +45,7 @@ grpcio-status==1.71.2
 gunicorn==23.0.0
 h11==0.16.0
 h2==4.3.0
+h3==4.3.1
 hf-xet==1.2.0
 hpack==4.1.0
 httpcore==1.0.9
@@ -68,6 +70,7 @@ marshmallow==4.0.1
 mdurl==0.1.2
 multidict==6.7.0
 nltk==3.9.2
+numpy==2.3.5
 openai==2.8.0
 ordered-set==4.1.0
 packaging==25.0
@@ -114,6 +117,7 @@ supabase-auth==2.22.3
 supabase-functions==2.22.3
 tenacity==9.1.2
 tiktoken==0.12.0
+timezonefinder==8.1.0
 tinycss2==1.4.0
 tokenizers==0.22.1
 tomlkit==0.13.3

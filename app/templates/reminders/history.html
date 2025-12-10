@@ -57,7 +57,7 @@
         </div>
         {% if reminder.last_completed_at %}
         <p class="text-sm text-slate-500 dark:text-slate-400 mb-2">
-          Completed: {{ reminder.last_completed_at|replace('T', ' at ')|replace('+00:00', ' UTC')|replace('.000000', '') }}
+          Completed: <time datetime="{{ reminder.last_completed_at }}">{{ reminder.last_completed_at }}</time>
         </p>
         {% endif %}
         {% if reminder.notes %}

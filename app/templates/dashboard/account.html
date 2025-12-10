@@ -162,6 +162,46 @@
       />
     </div>
 
+    <!-- Timezone (derived from location or manual override) -->
+    <div class="mb-6">
+      <label for="timezone" class="label">
+        Timezone
+      </label>
+      <p id="timezone-help" class="help-text mb-2">
+        {% if profile and profile.timezone %}
+        Currently set to: <strong class="text-slate-700 dark:text-slate-300">{{ profile.timezone | replace('_', ' ') }}</strong>
+        {% if profile.city %}<span class="text-slate-400">(auto-detected from {{ profile.city }})</span>{% endif %}
+        {% else %}
+        Currently using: <strong class="text-slate-700 dark:text-slate-300" id="browser-timezone-display">browser default</strong>
+        <span class="text-slate-400">(auto-detected)</span>
+        {% endif %}
+      </p>
+      <select id="timezone" name="timezone" class="input" aria-describedby="timezone-help">
+        <option value="">Use location-derived / browser default</option>
+        {% for region, zones in timezone_groups.items() %}
+        <optgroup label="{{ region }}">
+          {% for tz in zones %}
+          <option value="{{ tz }}" {% if profile and profile.timezone == tz %}selected{% endif %}>
+            {{ tz | replace('_', ' ') }}
+          </option>
+          {% endfor %}
+        </optgroup>
+        {% endfor %}
+      </select>
+      <p class="help-text mt-1">Override if the auto-detected timezone is incorrect</p>
+    </div>
+
+    <script>
+      // Display browser's actual timezone when using default
+      (function() {
+        const browserTzDisplay = document.getElementById('browser-timezone-display');
+        if (browserTzDisplay) {
+          const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          browserTzDisplay.textContent = browserTz.replace(/_/g, ' ');
+        }
+      })();
+    </script>
+
     <!-- Theme Preference -->
     <div class="mb-8">
       <label class="label">

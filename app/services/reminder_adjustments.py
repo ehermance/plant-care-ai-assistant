@@ -341,31 +341,32 @@ def apply_automatic_adjustments(
     Only applies adjustments with mode="automatic". Suggestion-mode adjustments
     are returned separately for user review.
 
+    When automatic adjustments are applied:
+    - Saves the adjustment to the database (weather_adjusted_due, weather_adjustment_reason)
+    - Reminders adjusted to a future date are EXCLUDED from the returned list
+      (they're no longer due today)
+    - Reminders adjusted to today are included with adjustment info
+
     Args:
         reminders: List of reminder dicts
         plants_by_id: Dict mapping plant_id to plant data
         user_city: Optional city for weather data
 
     Returns:
-        List of reminders with automatic adjustments applied:
-        [
-            {
-                ...reminder fields,
-                "adjustment": {
-                    "action": "postpone",
-                    "days": 2,
-                    "reason": "Heavy rain expected",
-                    "adjusted_due_date": "2025-12-05"
-                }
-            }
-        ]
+        List of reminders still due today (after automatic adjustments applied):
+        - Reminders with no adjustment needed
+        - Reminders adjusted to today (with adjustment info)
+        - EXCLUDES reminders adjusted to future dates
 
     Example:
         >>> reminders = [{"id": "r1", "plant_id": "p1", "next_due": "2025-12-03"}]
         >>> plants = {"p1": {"location": "outdoor_bed", "species": "Tomato"}}
         >>> adjusted = apply_automatic_adjustments(reminders, plants, "Seattle, WA")
     """
+    from .supabase_client import get_admin_client
+
     adjusted_reminders = []
+    today = date.today()
 
     for reminder in reminders:
         plant_id = reminder.get("plant_id")
@@ -390,16 +391,37 @@ def apply_automatic_adjustments(
                 days_adjust = adjustment_rec.get("days", 0)
                 adjusted_due = next_due + timedelta(days=days_adjust)
 
-                # Add adjustment info to reminder
-                reminder_copy = reminder.copy()
-                reminder_copy["adjustment"] = {
-                    "action": adjustment_rec["action"],
-                    "days": days_adjust,
-                    "reason": adjustment_rec["reason"],
-                    "adjusted_due_date": adjusted_due.isoformat(),
-                    "details": adjustment_rec.get("details", {})
-                }
-                adjusted_reminders.append(reminder_copy)
+                # Ensure adjusted date is at least tomorrow for postponements
+                if adjustment_rec["action"] == ACTION_POSTPONE and adjusted_due <= today:
+                    adjusted_due = today + timedelta(days=1)
+
+                # Save automatic adjustment to database
+                reminder_id = reminder.get("id")
+                user_id = reminder.get("user_id")
+                if reminder_id and user_id:
+                    try:
+                        supabase = get_admin_client()
+                        if supabase:
+                            supabase.table("reminders").update({
+                                "weather_adjusted_due": adjusted_due.isoformat(),
+                                "weather_adjustment_reason": adjustment_rec["reason"],
+                            }).eq("id", reminder_id).eq("user_id", user_id).execute()
+                    except Exception:
+                        # Don't fail the request if DB update fails
+                        pass
+
+                # Only include reminder if adjusted date is today or earlier
+                if adjusted_due <= today:
+                    reminder_copy = reminder.copy()
+                    reminder_copy["adjustment"] = {
+                        "action": adjustment_rec["action"],
+                        "days": days_adjust,
+                        "reason": adjustment_rec["reason"],
+                        "adjusted_due_date": adjusted_due.isoformat(),
+                        "details": adjustment_rec.get("details", {})
+                    }
+                    adjusted_reminders.append(reminder_copy)
+                # Reminders adjusted to future dates are excluded from Today's Tasks
             else:
                 adjusted_reminders.append(reminder)
         else:

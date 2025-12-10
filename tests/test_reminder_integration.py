@@ -13,6 +13,7 @@ from app.services import reminders
 class TestReminderAdjustmentIntegration:
     """Test end-to-end reminder adjustment flow."""
 
+    @patch('app.services.supabase_client.get_admin_client')
     @patch('app.services.reminders.get_user_profile')
     @patch('app.services.reminders.get_due_reminders')
     @patch('app.services.reminder_adjustments.get_weather_for_city')
@@ -30,19 +31,26 @@ class TestReminderAdjustmentIntegration:
         mock_precip,
         mock_weather,
         mock_get_due,
-        mock_profile
+        mock_profile,
+        mock_db
     ):
-        """Heavy rain should trigger automatic postponement for outdoor plants."""
+        """Heavy rain should trigger automatic postponement for outdoor plants.
+
+        When automatically postponed to a future date, the reminder is EXCLUDED
+        from adjusted_reminders (it's no longer due today).
+        """
         # Setup user profile
         mock_profile.return_value = {"city": "Seattle, WA"}
+        mock_db.return_value = None  # No actual DB writes
 
-        # Setup reminders
+        # Setup reminders - due today, will be postponed to future
         mock_get_due.return_value = [
             {
                 "id": "r1",
+                "user_id": "user-123",
                 "plant_id": "p1",
                 "reminder_type": "watering",
-                "next_due": (date.today() + timedelta(days=1)).isoformat(),
+                "next_due": date.today().isoformat(),
                 "skip_weather_adjustment": False,
                 "plants": {
                     "id": "p1",
@@ -68,12 +76,8 @@ class TestReminderAdjustmentIntegration:
         # Call integration function
         adjusted_reminders, suggestions = reminders.get_due_reminders_with_adjustments("user-123")
 
-        # Verify automatic adjustment was applied
-        assert len(adjusted_reminders) == 1
-        assert "adjustment" in adjusted_reminders[0]
-        assert adjusted_reminders[0]["adjustment"]["action"] == "postpone"
-        assert adjusted_reminders[0]["adjustment"]["days"] == 2
-        assert "heavy rain" in adjusted_reminders[0]["adjustment"]["reason"].lower()
+        # Reminder is automatically postponed to FUTURE, so it's EXCLUDED from Today's Tasks
+        assert len(adjusted_reminders) == 0
 
         # Suggestions should be empty (automatic adjustment, not suggestion)
         assert len(suggestions) == 0
@@ -140,6 +144,7 @@ class TestReminderAdjustmentIntegration:
         assert suggestions[0]["suggestion_type"] == "postpone_watering"
         assert suggestions[0]["action_label"] == "Postpone 1 day"
 
+    @patch('app.services.supabase_client.get_admin_client')
     @patch('app.services.reminders.get_user_profile')
     @patch('app.services.reminders.get_due_reminders')
     @patch('app.services.reminder_adjustments.get_weather_for_city')
@@ -157,17 +162,24 @@ class TestReminderAdjustmentIntegration:
         mock_precip,
         mock_weather,
         mock_get_due,
-        mock_profile
+        mock_profile,
+        mock_db
     ):
-        """Freeze warnings should take priority over other adjustments."""
+        """Freeze warnings should take priority over other adjustments.
+
+        When automatically postponed to a future date, the reminder is EXCLUDED
+        from adjusted_reminders (it's no longer due today).
+        """
         mock_profile.return_value = {"city": "Minneapolis, MN"}
+        mock_db.return_value = None  # No actual DB writes
 
         mock_get_due.return_value = [
             {
                 "id": "r3",
+                "user_id": "user-123",
                 "plant_id": "p3",
                 "reminder_type": "watering",
-                "next_due": (date.today() + timedelta(days=1)).isoformat(),
+                "next_due": date.today().isoformat(),
                 "skip_weather_adjustment": False,
                 "plants": {
                     "id": "p3",
@@ -192,11 +204,9 @@ class TestReminderAdjustmentIntegration:
 
         adjusted_reminders, suggestions = reminders.get_due_reminders_with_adjustments("user-123")
 
-        # Freeze warning (automatic) should win over rain (suggestion)
-        assert len(adjusted_reminders) == 1
-        assert "adjustment" in adjusted_reminders[0]
-        assert "freeze" in adjusted_reminders[0]["adjustment"]["reason"].lower()
-        # Light rain suggestion should not appear (freeze took priority)
+        # Freeze warning postpones to FUTURE, so reminder is EXCLUDED from Today's Tasks
+        assert len(adjusted_reminders) == 0
+        # Light rain suggestion should not appear (freeze took priority and postponed it)
 
     @patch('app.services.reminders.get_user_profile')
     @patch('app.services.reminders.get_due_reminders')
