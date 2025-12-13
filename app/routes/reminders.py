@@ -589,7 +589,7 @@ def toggle_weather_adjustment(reminder_id):
     success, error = reminder_service.update_reminder(
         reminder_id,
         user_id,
-        {"skip_weather_adjustment": new_value}
+        skip_weather_adjustment=new_value
     )
 
     if success:
