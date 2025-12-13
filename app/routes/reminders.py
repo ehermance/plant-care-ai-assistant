@@ -140,10 +140,25 @@ def create():
         flash("Please add a plant before creating reminders.", "warning")
         return redirect(url_for("plants.add"))
 
+    # Check for pre-selected plant from query param
+    preselected_plant_id = request.args.get("plant_id")
+    preselected_plant = None
+
+    if preselected_plant_id:
+        # Validate that the plant belongs to the user
+        preselected_plant = next(
+            (p for p in plants if p["id"] == preselected_plant_id),
+            None
+        )
+        if not preselected_plant:
+            preselected_plant_id = None  # Reset if invalid
+
     return render_template(
         "reminders/create.html",
         plants=plants,
         reminder_types=reminder_service.REMINDER_TYPE_NAMES,
+        preselected_plant_id=preselected_plant_id,
+        preselected_plant=preselected_plant,
     )
 
 

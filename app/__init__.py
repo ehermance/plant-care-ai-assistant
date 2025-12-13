@@ -12,7 +12,7 @@ after the project was modularized.
 
 from __future__ import annotations
 import os
-from flask import Flask, Response, g
+from flask import Flask, Response, g, request
 from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv  # <-- ensure .env is loaded for local dev
 from .extensions import limiter
@@ -147,6 +147,11 @@ def create_app() -> Flask:
     def load_user_timezone():
         """Load user's timezone preference into request context."""
         g.user_timezone = None
+
+        # Skip for static files and certain paths to avoid unnecessary API calls
+        if request.path.startswith('/static/') or request.path.endswith('.ico'):
+            return
+
         try:
             user_id = auth.get_current_user_id()
             if user_id:

@@ -120,6 +120,76 @@
 </div>
 {% endif %}
 
+<!-- Care Reminders Section -->
+<div class="card mb-8">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+    <h2 class="section-title !mb-0">Care Reminders</h2>
+    <a href="{{ url_for('reminders.create', plant_id=plant.id) }}" class="btn btn-primary">
+      <span aria-hidden="true">+</span> Add Reminder
+    </a>
+  </div>
+
+  {% if plant_reminders %}
+    <div class="space-y-3">
+      {% for reminder in plant_reminders %}
+      <div class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:border-emerald-500 dark:hover:border-emerald-400">
+        <div class="text-2xl flex-shrink-0" aria-hidden="true">
+          {% if reminder.reminder_type == 'watering' %}💧
+          {% elif reminder.reminder_type == 'fertilizing' %}🌿
+          {% elif reminder.reminder_type == 'misting' %}💦
+          {% elif reminder.reminder_type == 'pruning' %}✂️
+          {% elif reminder.reminder_type == 'repotting' %}🪴
+          {% elif reminder.reminder_type == 'inspection' %}🔍
+          {% else %}📝{% endif %}
+        </div>
+
+        <div class="flex-1 min-w-0">
+          <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
+            <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              {{ reminder.title }}
+            </a>
+          </h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2 flex-wrap">
+            <span>{{ reminder_type_names.get(reminder.reminder_type, reminder.reminder_type) }}</span>
+            <span aria-hidden="true">•</span>
+            <span>{{ reminder.frequency|replace('_', ' ')|title }}</span>
+            <span aria-hidden="true">•</span>
+            <span>Next: {{ reminder.next_due }}</span>
+            {% if reminder.weather_adjustment_reason %}
+            <span class="badge badge-cyan" title="{{ reminder.weather_adjustment_reason }}">
+              <span aria-hidden="true">🌤️</span> Adjusted
+            </span>
+            {% endif %}
+          </p>
+        </div>
+
+        <div class="flex-shrink-0 w-full sm:w-auto">
+          <a href="{{ url_for('reminders.edit', reminder_id=reminder.id) }}" class="btn btn-secondary w-full sm:w-auto">
+            Edit
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- Empty State -->
+    <div class="flex flex-col items-center justify-center text-center py-8">
+      <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-100 to-emerald-100 dark:from-cyan-900/30 dark:to-emerald-900/30 flex items-center justify-center">
+        <span class="text-4xl opacity-60" aria-hidden="true">⏰</span>
+      </div>
+      <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+        No reminders yet
+      </h3>
+      <p class="text-slate-600 dark:text-slate-400 mb-4 max-w-sm">
+        Create care reminders to stay on top of watering, fertilizing, and other tasks for {{ plant.name }}.
+      </p>
+      <a href="{{ url_for('reminders.create', plant_id=plant.id) }}" class="btn btn-primary">
+        <span aria-hidden="true">+</span> Create First Reminder
+      </a>
+    </div>
+  {% endif %}
+</div>
+
 <!-- Recent Care History -->
 <div class="card mb-8">
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">

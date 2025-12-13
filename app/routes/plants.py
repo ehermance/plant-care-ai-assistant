@@ -125,6 +125,12 @@ def view(plant_id):
     recent_actions = journal_service.get_plant_actions(plant_id, user_id, limit=5)
     stats = journal_service.get_action_stats(plant_id, user_id)
 
+    # Get active reminders for this plant
+    from app.services import reminders as reminder_service
+    plant_reminders = reminder_service.get_user_reminders(
+        user_id, plant_id=plant_id, active_only=True
+    )
+
     return render_template(
         "plants/view.html",
         plant=plant,
@@ -132,6 +138,8 @@ def view(plant_id):
         stats=stats,
         action_type_names=journal_service.ACTION_TYPE_NAMES,
         action_type_emojis=journal_service.ACTION_TYPE_EMOJIS,
+        plant_reminders=plant_reminders,
+        reminder_type_names=reminder_service.REMINDER_TYPE_NAMES,
     )
 
 

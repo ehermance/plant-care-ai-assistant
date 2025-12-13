@@ -24,15 +24,32 @@
       <label for="plant_id" class="label label-required">
         Plant
       </label>
-      <select id="plant_id" name="plant_id" class="input" required aria-describedby="plant-help">
+      <select
+        id="plant_id"
+        name="plant_id"
+        class="input{% if preselected_plant_id %} bg-slate-100 dark:bg-slate-700 cursor-not-allowed{% endif %}"
+        required
+        aria-describedby="plant-help"
+        {% if preselected_plant_id %}disabled{% endif %}
+      >
         <option value="">Select a plant...</option>
         {% for plant in plants %}
-        <option value="{{ plant.id }}">
+        <option value="{{ plant.id }}" {% if plant.id == preselected_plant_id %}selected{% endif %}>
           {{ plant.name }}{% if plant.nickname %} "{{ plant.nickname }}"{% endif %}
         </option>
         {% endfor %}
       </select>
-      <p id="plant-help" class="help-text">Which plant is this reminder for?</p>
+      {% if preselected_plant_id %}
+      <!-- Hidden field to submit value when select is disabled -->
+      <input type="hidden" name="plant_id" value="{{ preselected_plant_id }}" />
+      {% endif %}
+      <p id="plant-help" class="help-text">
+        {% if preselected_plant %}
+          Creating reminder for <strong>{{ preselected_plant.name }}</strong>
+        {% else %}
+          Which plant is this reminder for?
+        {% endif %}
+      </p>
     </div>
 
     <!-- Reminder Type -->
@@ -193,6 +210,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     titleInput.dataset.previousValue = this.value;
   });
+
+  // Auto-fill title on page load if plant is pre-selected
+  if (plantSelect.value && plantSelect.value !== '') {
+    updateTitle();
+  }
 });
 </script>
 

@@ -566,3 +566,124 @@ class TestPlantCascadingDeletes:
         assert response.status_code == 200
         assert b'removed from your collection' in response.data
         mock_delete.assert_called_once_with('plant-123', 'test-user-id')
+
+
+class TestPlantViewReminders:
+    """Test Care Reminders section on plant view page."""
+
+    @patch('app.utils.auth.get_current_user')
+    @patch('app.routes.plants.supabase_client.get_plant_by_id')
+    @patch('app.services.journal.get_plant_actions')
+    @patch('app.services.journal.get_action_stats')
+    @patch('app.services.reminders.get_user_reminders')
+    def test_plant_view_shows_reminders_section(
+        self, mock_reminders, mock_stats, mock_actions, mock_get_plant, mock_auth, app, sample_plant
+    ):
+        """Plant view page should include care reminders section."""
+        client = app.test_client()
+        mock_auth.return_value = {'id': 'test-user-id', 'email': 'test@example.com'}
+        mock_get_plant.return_value = sample_plant
+        mock_actions.return_value = []
+        mock_stats.return_value = {'total_actions': 0}
+        mock_reminders.return_value = []
+
+        response = client.get('/plants/plant-123')
+
+        assert response.status_code == 200
+        assert b'Care Reminders' in response.data
+        assert b'Add Reminder' in response.data
+
+    @patch('app.utils.auth.get_current_user')
+    @patch('app.routes.plants.supabase_client.get_plant_by_id')
+    @patch('app.services.journal.get_plant_actions')
+    @patch('app.services.journal.get_action_stats')
+    @patch('app.services.reminders.get_user_reminders')
+    def test_plant_view_shows_plant_reminders(
+        self, mock_reminders, mock_stats, mock_actions, mock_get_plant, mock_auth, app, sample_plant, sample_reminder
+    ):
+        """Plant view should display reminders for that plant."""
+        client = app.test_client()
+        mock_auth.return_value = {'id': 'test-user-id', 'email': 'test@example.com'}
+        mock_get_plant.return_value = sample_plant
+        mock_actions.return_value = []
+        mock_stats.return_value = {'total_actions': 0}
+        mock_reminders.return_value = [sample_reminder]
+
+        response = client.get('/plants/plant-123')
+
+        assert response.status_code == 200
+        assert sample_reminder['title'].encode() in response.data
+
+    @patch('app.utils.auth.get_current_user')
+    @patch('app.routes.plants.supabase_client.get_plant_by_id')
+    @patch('app.services.journal.get_plant_actions')
+    @patch('app.services.journal.get_action_stats')
+    @patch('app.services.reminders.get_user_reminders')
+    def test_plant_view_empty_reminders_state(
+        self, mock_reminders, mock_stats, mock_actions, mock_get_plant, mock_auth, app, sample_plant
+    ):
+        """Plant view should show empty state when no reminders exist."""
+        client = app.test_client()
+        mock_auth.return_value = {'id': 'test-user-id', 'email': 'test@example.com'}
+        mock_get_plant.return_value = sample_plant
+        mock_actions.return_value = []
+        mock_stats.return_value = {'total_actions': 0}
+        mock_reminders.return_value = []
+
+        response = client.get('/plants/plant-123')
+
+        assert response.status_code == 200
+        assert b'No reminders yet' in response.data
+        assert b'Create First Reminder' in response.data
+
+
+class TestReminderCreatePreselection:
+    """Test reminder create page with plant pre-selection."""
+
+    @patch('app.utils.auth.get_current_user')
+    @patch('app.services.supabase_client.get_user_plants')
+    def test_create_reminder_preselects_plant(self, mock_plants, mock_auth, app, sample_plant):
+        """Creating reminder with plant_id query param should pre-select plant."""
+        client = app.test_client()
+        mock_auth.return_value = {'id': 'test-user-id', 'email': 'test@example.com'}
+        mock_plants.return_value = [sample_plant]
+
+        response = client.get(f'/reminders/create?plant_id={sample_plant["id"]}')
+
+        assert response.status_code == 200
+        assert b'selected' in response.data
+        # Check plant name appears in "Creating reminder for..." text
+        assert b'Creating reminder for' in response.data
+        assert sample_plant['name'].encode() in response.data
+
+    @patch('app.utils.auth.get_current_user')
+    @patch('app.services.supabase_client.get_user_plants')
+    def test_create_reminder_invalid_plant_id_ignored(self, mock_plants, mock_auth, app, sample_plant):
+        """Invalid plant_id should be ignored, not cause error."""
+        client = app.test_client()
+        mock_auth.return_value = {'id': 'test-user-id', 'email': 'test@example.com'}
+        mock_plants.return_value = [sample_plant]
+
+        response = client.get('/reminders/create?plant_id=invalid-uuid')
+
+        assert response.status_code == 200
+        assert b'Select a plant...' in response.data
+        # Should NOT show "Creating reminder for"
+        assert b'Creating reminder for' not in response.data
+
+    @patch('app.utils.auth.get_current_user')
+    @patch('app.services.supabase_client.get_user_plants')
+    def test_create_reminder_plant_dropdown_disabled_when_preselected(
+        self, mock_plants, mock_auth, app, sample_plant
+    ):
+        """Plant dropdown should be disabled when pre-selected."""
+        client = app.test_client()
+        mock_auth.return_value = {'id': 'test-user-id', 'email': 'test@example.com'}
+        mock_plants.return_value = [sample_plant]
+
+        response = client.get(f'/reminders/create?plant_id={sample_plant["id"]}')
+
+        assert response.status_code == 200
+        assert b'disabled' in response.data
+        # Hidden input should be present for form submission
+        assert f'type="hidden" name="plant_id" value="{sample_plant["id"]}"'.encode() in response.data
