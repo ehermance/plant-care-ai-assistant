@@ -74,6 +74,11 @@ def evaluate_reminder_adjustment(
 
     Returns adjustment recommendation with reasoning, or None if no adjustment needed.
 
+    Adjustment types by plant location:
+    - OUTDOOR plants: All adjustments (weather, seasonal, light)
+    - INDOOR plants: Seasonal dormancy and light adjustments only
+      (no freeze, rain, extreme heat, or outdoor temperature adjustments)
+
     Args:
         reminder: Reminder dict with type, next_due, skip_weather_adjustment, etc.
         plant: Plant dict with location, species, notes, etc.
@@ -128,6 +133,11 @@ def evaluate_reminder_adjustment(
     if reminder_type not in ["watering", "misting"]:
         return {"action": ACTION_NONE}
 
+    # Determine if plant is outdoor (affects which adjustments apply)
+    # Indoor plants get seasonal/light adjustments but not weather-specific ones
+    plant_location = plant.get("location") or "indoor_potted"
+    is_outdoor = "outdoor" in plant_location.lower()
+
     # Parse next_due for later use (adjust ALL active reminders regardless of due date)
     next_due = reminder.get("next_due")
     if next_due and isinstance(next_due, str):
@@ -157,115 +167,118 @@ def evaluate_reminder_adjustment(
     # Collect all potential adjustments with priorities
     adjustments = []
 
-    # PRIORITY 1: SAFETY - Freeze warnings
-    if temp_extremes and temp_extremes.get("freeze_risk"):
-        temp_min = temp_extremes.get("temp_min_f", 32)
+    # ========== OUTDOOR-ONLY ADJUSTMENTS ==========
+    # These weather-specific adjustments only apply to outdoor plants
+    if is_outdoor:
+        # PRIORITY 1: SAFETY - Freeze warnings
+        if temp_extremes and temp_extremes.get("freeze_risk"):
+            temp_min = temp_extremes.get("temp_min_f", 32)
 
-        # Postpone watering before freeze
-        if reminder_type == "watering":
-            adjustments.append({
-                "action": ACTION_POSTPONE,
-                "mode": MODE_AUTOMATIC,
-                "days": 2,
-                "reason": f"Freeze warning: Low of {temp_min:.0f}°F expected. Avoid watering before freeze.",
-                "priority": PRIORITY_SAFETY,
-                "details": {
-                    "weather_condition": "freeze_warning",
-                    "temp_min_f": temp_min,
-                    "freeze_risk": True
-                }
-            })
+            # Postpone watering before freeze
+            if reminder_type == "watering":
+                adjustments.append({
+                    "action": ACTION_POSTPONE,
+                    "mode": MODE_AUTOMATIC,
+                    "days": 2,
+                    "reason": f"Freeze warning: Low of {temp_min:.0f}°F expected. Avoid watering before freeze.",
+                    "priority": PRIORITY_SAFETY,
+                    "details": {
+                        "weather_condition": "freeze_warning",
+                        "temp_min_f": temp_min,
+                        "freeze_risk": True
+                    }
+                })
 
-    # PRIORITY 1: SAFETY - Extreme heat (tender plants)
-    if weather and weather.get("temp_f", 0) > _get_config("WEATHER_ADJUSTMENT_EXTREME_HEAT_THRESHOLD", 95):
-        # Check if plant is tender
-        if plant_chars.get("cold_tolerance") == "tender":
-            temp_f = weather.get("temp_f")
-            adjustments.append({
-                "action": ACTION_ADVANCE,
-                "mode": MODE_SUGGESTION,  # Suggest, don't auto-adjust
-                "days": -1,
-                "reason": f"Extreme heat ({temp_f:.0f}°F). Tender plants may need extra water.",
-                "priority": PRIORITY_SAFETY,
-                "details": {
-                    "weather_condition": "extreme_heat",
-                    "temp_f": temp_f,
-                    "plant_tolerance": "tender"
-                }
-            })
+        # PRIORITY 1: SAFETY - Extreme heat (tender plants)
+        if weather and weather.get("temp_f", 0) > _get_config("WEATHER_ADJUSTMENT_EXTREME_HEAT_THRESHOLD", 95):
+            # Check if plant is tender
+            if plant_chars.get("cold_tolerance") == "tender":
+                temp_f = weather.get("temp_f")
+                adjustments.append({
+                    "action": ACTION_ADVANCE,
+                    "mode": MODE_SUGGESTION,  # Suggest, don't auto-adjust
+                    "days": -1,
+                    "reason": f"Extreme heat ({temp_f:.0f}°F). Tender plants may need extra water.",
+                    "priority": PRIORITY_SAFETY,
+                    "details": {
+                        "weather_condition": "extreme_heat",
+                        "temp_f": temp_f,
+                        "plant_tolerance": "tender"
+                    }
+                })
 
-    # PRIORITY 2: PRECIPITATION - Heavy rain (outdoor plants only)
-    plant_location = plant.get("location") or "indoor_potted"
-    is_outdoor = "outdoor" in plant_location.lower()
+        # PRIORITY 2: PRECIPITATION - Heavy rain
+        if precip_forecast is not None and precip_forecast > 0:
+            heavy_rain_threshold = _get_config("WEATHER_ADJUSTMENT_RAIN_THRESHOLD_HEAVY", 0.5)
+            light_rain_threshold = _get_config("WEATHER_ADJUSTMENT_RAIN_THRESHOLD_LIGHT", 0.25)
 
-    if precip_forecast is not None and precip_forecast > 0 and is_outdoor:
-        heavy_rain_threshold = _get_config("WEATHER_ADJUSTMENT_RAIN_THRESHOLD_HEAVY", 0.5)
-        light_rain_threshold = _get_config("WEATHER_ADJUSTMENT_RAIN_THRESHOLD_LIGHT", 0.25)
+            if precip_forecast >= heavy_rain_threshold:
+                # Heavy rain - automatic postpone
+                adjustments.append({
+                    "action": ACTION_POSTPONE,
+                    "mode": MODE_AUTOMATIC,
+                    "days": 2,
+                    "reason": f"Heavy rain expected ({precip_forecast:.1f} inches). Soil will be saturated.",
+                    "priority": PRIORITY_PRECIPITATION,
+                    "details": {
+                        "weather_condition": "heavy_rain",
+                        "precipitation_inches": precip_forecast
+                    }
+                })
+            elif precip_forecast >= light_rain_threshold:
+                # Light rain - suggestion
+                adjustments.append({
+                    "action": ACTION_POSTPONE,
+                    "mode": MODE_SUGGESTION,
+                    "days": 1,
+                    "reason": f"Light rain expected ({precip_forecast:.1f} inches). May be able to skip watering.",
+                    "priority": PRIORITY_PRECIPITATION,
+                    "details": {
+                        "weather_condition": "light_rain",
+                        "precipitation_inches": precip_forecast
+                    }
+                })
 
-        if precip_forecast >= heavy_rain_threshold:
-            # Heavy rain - automatic postpone
-            adjustments.append({
-                "action": ACTION_POSTPONE,
-                "mode": MODE_AUTOMATIC,
-                "days": 2,
-                "reason": f"Heavy rain expected ({precip_forecast:.1f} inches). Soil will be saturated.",
-                "priority": PRIORITY_PRECIPITATION,
-                "details": {
-                    "weather_condition": "heavy_rain",
-                    "precipitation_inches": precip_forecast
-                }
-            })
-        elif precip_forecast >= light_rain_threshold:
-            # Light rain - suggestion
-            adjustments.append({
-                "action": ACTION_POSTPONE,
-                "mode": MODE_SUGGESTION,
-                "days": 1,
-                "reason": f"Light rain expected ({precip_forecast:.1f} inches). May be able to skip watering.",
-                "priority": PRIORITY_PRECIPITATION,
-                "details": {
-                    "weather_condition": "light_rain",
-                    "precipitation_inches": precip_forecast
-                }
-            })
+        # PRIORITY 3: PLANT STRESS - Water needs vs outdoor weather
+        if plant_chars and weather:
+            water_needs = plant_chars.get("water_needs", "moderate")
+            humidity = weather.get("humidity", 50)
+            temp_f = weather.get("temp_f", 70)
 
-    # PRIORITY 3: PLANT STRESS - Water needs vs weather
-    if plant_chars and weather:
-        water_needs = plant_chars.get("water_needs", "moderate")
-        humidity = weather.get("humidity", 50)
-        temp_f = weather.get("temp_f", 70)
+            # High water need plant + hot dry weather = suggest advance
+            if water_needs == "high" and temp_f > 85 and humidity < 40:
+                adjustments.append({
+                    "action": ACTION_ADVANCE,
+                    "mode": MODE_SUGGESTION,
+                    "days": -1,
+                    "reason": f"Hot, dry weather ({temp_f:.0f}°F, {humidity}% humidity). High-water plant may need earlier watering.",
+                    "priority": PRIORITY_PLANT_STRESS,
+                    "details": {
+                        "weather_condition": "hot_dry",
+                        "temp_f": temp_f,
+                        "humidity": humidity,
+                        "water_needs": "high"
+                    }
+                })
 
-        # High water need plant + hot dry weather = suggest advance
-        if water_needs == "high" and temp_f > 85 and humidity < 40:
-            adjustments.append({
-                "action": ACTION_ADVANCE,
-                "mode": MODE_SUGGESTION,
-                "days": -1,
-                "reason": f"Hot, dry weather ({temp_f:.0f}°F, {humidity}% humidity). High-water plant may need earlier watering.",
-                "priority": PRIORITY_PLANT_STRESS,
-                "details": {
-                    "weather_condition": "hot_dry",
-                    "temp_f": temp_f,
-                    "humidity": humidity,
-                    "water_needs": "high"
-                }
-            })
+            # Low water need plant + cool humid weather = suggest postpone
+            if water_needs == "low" and temp_f < 65 and humidity > 60:
+                adjustments.append({
+                    "action": ACTION_POSTPONE,
+                    "mode": MODE_SUGGESTION,
+                    "days": 1,
+                    "reason": f"Cool, humid weather ({temp_f:.0f}°F, {humidity}% humidity). Low-water plant can wait.",
+                    "priority": PRIORITY_PLANT_STRESS,
+                    "details": {
+                        "weather_condition": "cool_humid",
+                        "temp_f": temp_f,
+                        "humidity": humidity,
+                        "water_needs": "low"
+                    }
+                })
 
-        # Low water need plant + cool humid weather = suggest postpone
-        if water_needs == "low" and temp_f < 65 and humidity > 60:
-            adjustments.append({
-                "action": ACTION_POSTPONE,
-                "mode": MODE_SUGGESTION,
-                "days": 1,
-                "reason": f"Cool, humid weather ({temp_f:.0f}°F, {humidity}% humidity). Low-water plant can wait.",
-                "priority": PRIORITY_PLANT_STRESS,
-                "details": {
-                    "weather_condition": "cool_humid",
-                    "temp_f": temp_f,
-                    "humidity": humidity,
-                    "water_needs": "low"
-                }
-            })
+    # ========== ALL PLANTS (indoor + outdoor) ==========
+    # These adjustments apply to all plants regardless of location
 
     # PRIORITY 4: SEASONAL - Dormancy period
     if seasonal and seasonal.get("is_dormancy_period") and plant_chars:

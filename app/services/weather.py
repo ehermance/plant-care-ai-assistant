@@ -28,10 +28,26 @@ from flask import current_app, has_app_context
 _US_STATE_LIKE = re.compile(r"^\s*([^,]+),\s*([A-Za-z]{2})\s*$")
 _US_ZIP = re.compile(r"^\s*(\d{5})(?:-\d{4})?\s*$")
 
+# Hawaiian island names mapped to their main towns (for OpenWeather API compatibility)
+_HAWAIIAN_ISLANDS = {
+    "maui": "Kahului",
+    "big island": "Hilo",
+    "hawaii island": "Hilo",
+    "kauai": "Lihue",
+    "molokai": "Kaunakakai",
+    "lanai": "Lanai City",
+    "oahu": "Honolulu",
+}
+
 def _normalize_city_query(city: str) -> str:
     m = _US_STATE_LIKE.match(city)
     if m:
-        return f"{m.group(1).strip()}, {m.group(2).upper()}, US"
+        city_part = m.group(1).strip()
+        state = m.group(2).upper()
+        # Map Hawaiian island names to their main towns
+        if state == "HI" and city_part.lower() in _HAWAIIAN_ISLANDS:
+            return f"{_HAWAIIAN_ISLANDS[city_part.lower()]}, HI, US"
+        return f"{city_part}, {state}, US"
     return city.strip()
 
 def _get_api_key() -> str | None:

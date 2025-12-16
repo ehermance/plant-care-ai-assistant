@@ -28,10 +28,10 @@
     <div class="text-sm text-slate-600 dark:text-slate-400">Plants</div>
   </a>
 
-  <a href="{{ url_for('reminders.index') }}" class="{% if reminder_stats.due_today > 0 %}stat-card-alert{% else %}stat-card{% endif %}">
+  <a href="{{ url_for('reminders.index') }}" class="{% if due_reminders %}stat-card-alert{% else %}stat-card{% endif %}">
     <div class="text-4xl mb-3" aria-hidden="true">💧</div>
-    <div class="text-3xl font-bold {% if reminder_stats.due_today > 0 %}text-amber-700 dark:text-amber-300{% else %}text-slate-900 dark:text-slate-100{% endif %} mb-1">{{ reminder_stats.due_today or 0 }}</div>
-    <div class="text-sm {% if reminder_stats.due_today > 0 %}text-amber-700 dark:text-amber-300{% else %}text-slate-600 dark:text-slate-400{% endif %}">Due Today</div>
+    <div class="text-3xl font-bold {% if due_reminders %}text-amber-700 dark:text-amber-300{% else %}text-slate-900 dark:text-slate-100{% endif %} mb-1">{{ due_reminders|length }}</div>
+    <div class="text-sm {% if due_reminders %}text-amber-700 dark:text-amber-300{% else %}text-slate-600 dark:text-slate-400{% endif %}">Due Today</div>
   </a>
 
   <a href="{{ url_for('reminders.calendar') }}" class="stat-card">
@@ -136,8 +136,8 @@
       <div>
         <h3 id="focus-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1 flex items-center gap-3 flex-wrap">
           <span>Today's Care Tasks</span>
-          {% if reminder_stats.due_today > 0 %}
-          <span class="badge-amber">{{ reminder_stats.due_today }}</span>
+          {% if due_reminders %}
+          <span class="badge-amber">{{ due_reminders|length }}</span>
           {% endif %}
         </h3>
         <p class="text-sm text-slate-600 dark:text-slate-400">Your plant care priorities for today</p>
@@ -222,10 +222,10 @@
     {% endfor %}
   </div>
 
-  {% if reminder_stats.due_today > 5 %}
+  {% if due_reminders|length > 5 %}
   <div class="text-center text-sm text-slate-600 dark:text-slate-400 mt-4 pt-4 border-t border-emerald-200 dark:border-emerald-700">
     <a href="{{ url_for('reminders.index') }}" class="font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
-      + {{ reminder_stats.due_today - 5 }} more task{% if reminder_stats.due_today > 6 %}s{% endif %} due today →
+      + {{ due_reminders|length - 5 }} more task{% if due_reminders|length > 6 %}s{% endif %} due today →
     </a>
   </div>
   {% endif %}

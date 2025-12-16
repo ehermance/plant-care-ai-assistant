@@ -5,6 +5,9 @@ Manual test for weather adjustments for a single user.
 This test requires interactive input (email, city) and is skipped by pytest.
 Run from project root with: python -m tests.test_single_user
 Or: python tests/test_single_user.py
+
+Options:
+  --reset  Clear all existing weather adjustments before re-evaluating
 """
 import sys
 from pathlib import Path
@@ -20,11 +23,24 @@ import pytest
 pytestmark = pytest.mark.skip(reason="Requires manual user input for email and city")
 
 
+def clear_weather_adjustments(supabase, user_id):
+    """Clear all weather adjustments for a user's reminders."""
+    result = supabase.table("reminders").update({
+        "weather_adjusted_due": None,
+        "weather_adjustment_reason": None
+    }).eq("user_id", user_id).eq("is_active", True).execute()
+
+    return len(result.data) if result.data else 0
+
+
 def run_manual_test():
     """Run the manual weather adjustment test."""
     from app import create_app
     from app.services import supabase_client
     from app.services.reminders import batch_adjust_reminders_for_weather
+
+    # Check for --reset flag
+    reset_mode = "--reset" in sys.argv
 
     app = create_app()
 
@@ -50,6 +66,12 @@ def run_manual_test():
             if not city:
                 print("❌ No city provided. Set your city at /dashboard/account")
             else:
+                # Clear existing adjustments if --reset flag
+                if reset_mode:
+                    print(f"\n🗑️  Clearing existing weather adjustments...")
+                    cleared = clear_weather_adjustments(supabase, user_id)
+                    print(f"   Cleared {cleared} reminder(s)")
+
                 print(f"\n🔄 Running weather adjustment for {city}...\n")
 
                 # Run adjustment
