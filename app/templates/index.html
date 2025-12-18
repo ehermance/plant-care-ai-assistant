@@ -164,7 +164,7 @@
   </div>
 
   <!-- Answer Card -->
-  <div class="answer-card card" aria-labelledby="answer-title" role="region" aria-live="polite" aria-atomic="true" tabindex="-1">
+  <div id="answer-box" class="answer-card card" aria-labelledby="answer-title" role="region" aria-live="polite" aria-atomic="true" tabindex="-1">
     {% if answer %}
       <div class="mb-4">
         <h2 id="answer-title" class="section-title !mb-2">Answer</h2>
@@ -459,6 +459,30 @@
 
 {% block extra_scripts %}
 <script>
+  // Scroll to answer box when page loads with an answer
+  (function() {
+    const answerBox = document.getElementById('answer-box');
+    const hasAnswer = answerBox && answerBox.querySelector('.prewrap');
+    if (hasAnswer) {
+      // Small delay to ensure page layout is complete
+      setTimeout(function() {
+        // Get the sticky header height to offset the scroll position
+        const header = document.querySelector('header.sticky');
+        const headerHeight = header ? header.offsetHeight : 0;
+        const padding = 16; // Extra padding for visual breathing room
+
+        // Calculate scroll position: element top minus header and padding
+        const elementTop = answerBox.getBoundingClientRect().top + window.scrollY;
+        const scrollTarget = elementTop - headerHeight - padding;
+
+        window.scrollTo({
+          top: scrollTarget,
+          behavior: 'smooth'
+        });
+      }, 100);
+    }
+  })();
+
   // Preset chip click handlers (unauthenticated users only)
   document.querySelectorAll('.preset-chip').forEach(function(chip) {
     chip.addEventListener('click', function(e) {
