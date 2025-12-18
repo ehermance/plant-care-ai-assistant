@@ -219,7 +219,7 @@
             <p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-1">{{ action.notes }}</p>
           {% endif %}
           <p class="text-xs text-slate-500 dark:text-slate-400">
-            {{ action.action_at[:10] if action.action_at else 'Unknown date' }}
+            {{ action.action_at|relative_date }}
           </p>
         </div>
         {% if action.photo_url_thumb or action.photo_url %}

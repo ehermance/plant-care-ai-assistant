@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}{{ guide.name }} Care Guide - How to Grow & Water | PlantCareAI{% endblock %}
+
+{% block description %}{{ guide.meta_description }}{% endblock %}
+
+{% block og_title %}{{ guide.name }} Care Guide | PlantCareAI{% endblock %}
+{% block og_description %}{{ guide.meta_description }}{% endblock %}
+
+{% block twitter_title %}{{ guide.name }} Care Guide{% endblock %}
+{% block twitter_description %}{{ guide.meta_description }}{% endblock %}
+
+{% block extra_head %}
+<!-- Article Structured Data for SEO -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{{ guide.name }} Care Guide",
+  "description": "{{ guide.meta_description }}",
+  "author": {
+    "@type": "Organization",
+    "name": "PlantCareAI"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "PlantCareAI"
+  }
+}
+</script>
+<!-- HowTo Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "How to Care for {{ guide.name }}",
+  "description": "{{ guide.summary }}",
+  "step": [
+    {
+      "@type": "HowToStep",
+      "name": "Watering",
+      "text": "{{ guide.watering }}"
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Light Requirements",
+      "text": "{{ guide.light_details }}"
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Humidity & Temperature",
+      "text": "{{ guide.humidity }}"
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav class="mb-6" aria-label="Breadcrumb">
+  <ol class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+    <li>
+      <a href="{{ url_for('guides.index') }}" class="hover:text-emerald-600 dark:hover:text-emerald-400">
+        Plant Care Guides
+      </a>
+    </li>
+    <li aria-hidden="true">/</li>
+    <li class="text-slate-900 dark:text-slate-100 font-medium">{{ guide.name }}</li>
+  </ol>
+</nav>
+
+<!-- Header -->
+<header class="mb-8">
+  <div class="flex items-start gap-4 mb-4">
+    <div class="text-6xl" aria-hidden="true">{{ guide.emoji }}</div>
+    <div>
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100">
+        {{ guide.name }} Care Guide
+      </h1>
+      <p class="text-lg text-slate-500 dark:text-slate-400 italic">{{ guide.scientific_name }}</p>
+    </div>
+  </div>
+  <p class="text-xl text-slate-600 dark:text-slate-400 max-w-3xl">
+    {{ guide.summary }}
+  </p>
+</header>
+
+<!-- Quick Stats -->
+<section class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+  <div class="card text-center">
+    <div class="text-3xl mb-2" aria-hidden="true">☀️</div>
+    <div class="text-sm text-slate-500 dark:text-slate-400 mb-1">Light</div>
+    <div class="font-semibold text-slate-900 dark:text-slate-100">{{ guide.light }}</div>
+  </div>
+  <div class="card text-center">
+    <div class="text-3xl mb-2" aria-hidden="true">💧</div>
+    <div class="text-sm text-slate-500 dark:text-slate-400 mb-1">Water</div>
+    <div class="font-semibold text-slate-900 dark:text-slate-100">{{ guide.water }}</div>
+  </div>
+  <div class="card text-center">
+    <div class="text-3xl mb-2" aria-hidden="true">💨</div>
+    <div class="text-sm text-slate-500 dark:text-slate-400 mb-1">Humidity</div>
+    <div class="font-semibold text-slate-900 dark:text-slate-100">{{ guide.humidity_level }}</div>
+  </div>
+  <div class="card text-center">
+    <div class="text-3xl mb-2" aria-hidden="true">🌡️</div>
+    <div class="text-sm text-slate-500 dark:text-slate-400 mb-1">Difficulty</div>
+    <div class="font-semibold text-slate-900 dark:text-slate-100">{{ guide.difficulty }}</div>
+  </div>
+</section>
+
+<!-- Care Details -->
+<div class="grid lg:grid-cols-3 gap-8">
+  <div class="lg:col-span-2 space-y-8">
+    <!-- Watering -->
+    <section class="card">
+      <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+        <span aria-hidden="true">💧</span> Watering
+      </h2>
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+        {{ guide.watering }}
+      </p>
+    </section>
+
+    <!-- Light -->
+    <section class="card">
+      <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+        <span aria-hidden="true">☀️</span> Light Requirements
+      </h2>
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+        {{ guide.light_details }}
+      </p>
+    </section>
+
+    <!-- Humidity & Temperature -->
+    <section class="card">
+      <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+        <span aria-hidden="true">🌡️</span> Humidity & Temperature
+      </h2>
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+        {{ guide.humidity }}
+      </p>
+    </section>
+
+    <!-- Fertilizing -->
+    <section class="card">
+      <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+        <span aria-hidden="true">🧪</span> Fertilizing
+      </h2>
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+        {{ guide.fertilizing }}
+      </p>
+    </section>
+
+    <!-- Common Problems -->
+    <section class="card">
+      <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+        <span aria-hidden="true">⚠️</span> Common Problems
+      </h2>
+      <ul class="space-y-3">
+        {% for problem in guide.common_problems %}
+        <li class="flex items-start gap-3">
+          <span class="text-amber-500 mt-1" aria-hidden="true">•</span>
+          <span class="text-slate-600 dark:text-slate-400">{{ problem }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="space-y-6">
+    <!-- Ask AI CTA -->
+    <div class="card bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/20 dark:to-cyan-900/20 border-2 border-emerald-200 dark:border-emerald-700">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">
+        Have a specific question?
+      </h3>
+      <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+        Our AI plant doctor can give you personalized advice based on your location and situation.
+      </p>
+      <a href="{{ url_for('web.assistant') }}?plant={{ guide.name | urlencode }}"
+         class="btn btn-primary w-full text-center">
+        Ask about {{ guide.name }}
+      </a>
+    </div>
+
+    <!-- Quick Tips -->
+    <div class="card">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">
+        Quick Tips
+      </h3>
+      <ul class="space-y-3 text-sm">
+        {% for tip in guide.quick_tips %}
+        <li class="flex items-start gap-2">
+          <span class="text-emerald-500" aria-hidden="true">✓</span>
+          <span class="text-slate-600 dark:text-slate-400">{{ tip }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Related Guides -->
+    <div class="card">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">
+        More Guides
+      </h3>
+      <a href="{{ url_for('guides.index') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline text-sm">
+        View all plant care guides →
+      </a>
+    </div>
+  </aside>
+</div>
+
+<!-- Bottom CTA -->
+<section class="mt-12 py-8 text-center bg-white dark:bg-slate-800 -mx-4 px-4 rounded-2xl">
+  <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+    Track your {{ guide.name }} with PlantCareAI
+  </h2>
+  <p class="text-slate-600 dark:text-slate-400 mb-6 max-w-xl mx-auto">
+    Get weather-aware watering reminders and personalized care tips. Free for up to 20 plants.
+  </p>
+  <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">
+    Create Free Account
+  </a>
+</section>
+{% endblock %}

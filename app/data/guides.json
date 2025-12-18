@@ -1,0 +1,292 @@
+[
+  {
+    "slug": "monstera-deliciosa",
+    "name": "Monstera Deliciosa",
+    "scientific_name": "Monstera deliciosa",
+    "emoji": "🌿",
+    "summary": "The Swiss Cheese Plant is beloved for its dramatic, fenestrated leaves. Native to Central American rainforests, it's an easy-care tropical that thrives indoors.",
+    "meta_description": "Complete Monstera Deliciosa care guide. Learn watering, light requirements, humidity needs, and how to encourage fenestration in your Swiss Cheese Plant.",
+    "light": "Bright indirect",
+    "water": "Weekly",
+    "humidity_level": "Medium-High",
+    "difficulty": "Easy",
+    "watering": "Water your Monstera when the top 2 inches of soil feel dry. In spring and summer, this is typically once a week. Reduce to every 10-14 days in winter when growth slows. Monsteras prefer consistent moisture but will suffer from overwatering, so ensure your pot has drainage holes.",
+    "light_details": "Monsteras thrive in bright, indirect light. They can tolerate medium light but will grow slower and produce smaller leaves. Avoid direct sunlight, which can scorch the leaves. East or north-facing windows are ideal. More light = more fenestrations (holes) in mature leaves.",
+    "humidity": "As tropical plants, Monsteras prefer humidity levels of 60% or higher. They'll adapt to average home humidity (40-50%) but will thrive with a humidifier nearby or regular misting. Brown leaf edges often indicate low humidity. Keep temperatures between 65-85°F and avoid cold drafts.",
+    "fertilizing": "Feed monthly during the growing season (spring through fall) with a balanced liquid fertilizer diluted to half strength. Skip fertilizing in winter when growth naturally slows. Over-fertilizing can cause salt buildup and brown leaf tips.",
+    "common_problems": [
+      "Yellow leaves: Usually overwatering. Let soil dry more between waterings.",
+      "Brown leaf tips: Low humidity or inconsistent watering.",
+      "No fenestrations: Young plants and low light both cause solid leaves. Be patient and provide bright indirect light.",
+      "Leggy growth: Not enough light. Move closer to a window.",
+      "Brown spots: Could be sunburn (direct light) or bacterial infection (overwatering)."
+    ],
+    "quick_tips": [
+      "Provide a moss pole for vertical growth",
+      "Clean leaves monthly to remove dust",
+      "Rotate plant quarterly for even growth",
+      "Propagate easily from stem cuttings"
+    ]
+  },
+  {
+    "slug": "pothos",
+    "name": "Pothos",
+    "scientific_name": "Epipremnum aureum",
+    "emoji": "💚",
+    "summary": "Often called Devil's Ivy, Pothos is one of the most forgiving houseplants. Its trailing vines and heart-shaped leaves make it perfect for beginners and experienced plant parents alike.",
+    "meta_description": "Complete Pothos care guide. Learn how to water, propagate, and care for Devil's Ivy. Tips for golden, marble queen, and neon pothos varieties.",
+    "light": "Low to bright indirect",
+    "water": "Weekly",
+    "humidity_level": "Low-Medium",
+    "difficulty": "Very Easy",
+    "watering": "Water when the top inch of soil is dry. Pothos is drought-tolerant and would rather be slightly underwatered than overwatered. Drooping leaves that perk up after watering is normal – it's the plant's way of telling you it's thirsty.",
+    "light_details": "Pothos is incredibly adaptable. It survives in low light but grows faster and maintains variegation in bright indirect light. Direct sun will scorch leaves. Variegated varieties (Marble Queen, N'Joy) need more light to maintain their patterns – low light causes them to revert to solid green.",
+    "humidity": "Pothos tolerates average home humidity well, making it ideal for offices and bathrooms. While it appreciates higher humidity, it's not required. Keep temperatures between 60-85°F. Avoid cold drafts and temperatures below 50°F.",
+    "fertilizing": "Feed monthly during spring and summer with a balanced liquid fertilizer. Pothos isn't a heavy feeder, so dilute to half strength. No fertilizer needed in fall and winter.",
+    "common_problems": [
+      "Yellow leaves: Usually overwatering. Check that soil is drying between waterings.",
+      "Brown tips: Underwatering, low humidity, or salt buildup from tap water.",
+      "Loss of variegation: Not enough light. Move to brighter location.",
+      "Leggy vines with few leaves: Needs more light or hasn't been pruned recently.",
+      "Root rot: Caused by overwatering or poor drainage. Repot in fresh soil if caught early."
+    ],
+    "quick_tips": [
+      "Prune regularly to encourage bushier growth",
+      "Root cuttings easily in water",
+      "Excellent air purifier",
+      "Safe alternative: Peperomia if you have pets"
+    ]
+  },
+  {
+    "slug": "snake-plant",
+    "name": "Snake Plant",
+    "scientific_name": "Dracaena trifasciata",
+    "emoji": "🌵",
+    "summary": "Also known as Mother-in-Law's Tongue, Snake Plants are nearly indestructible. Their architectural, upright leaves add structure to any space while requiring minimal care.",
+    "meta_description": "Complete Snake Plant care guide. Learn watering frequency, light needs, and propagation tips for Sansevieria. Perfect for beginners and low-light spaces.",
+    "light": "Low to bright indirect",
+    "water": "Every 2-3 weeks",
+    "humidity_level": "Low",
+    "difficulty": "Very Easy",
+    "watering": "Snake plants are succulents and store water in their thick leaves. Water only when the soil is completely dry – typically every 2-3 weeks in summer, monthly in winter. Overwatering is the most common killer. When in doubt, wait another week.",
+    "light_details": "Snake plants tolerate a wide range of light conditions, from low light to bright indirect. They'll grow faster with more light but survive in corners and bathrooms. Avoid intense direct sun which can bleach the leaves. Variegated varieties maintain their patterns better in brighter light.",
+    "humidity": "Snake plants thrive in dry conditions and don't need extra humidity. They're perfect for air-conditioned offices and dry climates. Keep temperatures between 55-85°F. They're more cold-tolerant than most tropicals but avoid frost.",
+    "fertilizing": "Snake plants are light feeders. Fertilize 2-3 times during the growing season with a diluted balanced fertilizer. Over-fertilizing does more harm than good. Skip feeding entirely in fall and winter.",
+    "common_problems": [
+      "Mushy leaves: Overwatering or root rot. Let dry completely and reduce watering.",
+      "Wrinkled leaves: Underwatering – surprisingly possible even for snake plants.",
+      "Brown tips: Could be overwatering, fluoride in tap water, or cold damage.",
+      "Falling over: Root rot, top-heavy growth, or pot too small.",
+      "Slow growth: Normal for snake plants. More light speeds it up slightly."
+    ],
+    "quick_tips": [
+      "Excellent bedroom plant – releases oxygen at night",
+      "Propagate by leaf cuttings or division",
+      "Tolerates neglect better than most plants",
+      "NASA-studied air purifier"
+    ]
+  },
+  {
+    "slug": "fiddle-leaf-fig",
+    "name": "Fiddle Leaf Fig",
+    "scientific_name": "Ficus lyrata",
+    "emoji": "🎻",
+    "summary": "The Fiddle Leaf Fig is a statement plant with large, violin-shaped leaves. While more demanding than some houseplants, its dramatic foliage rewards attentive care.",
+    "meta_description": "Fiddle Leaf Fig care guide with expert tips. Learn watering schedules, light requirements, and how to prevent common problems like brown spots and leaf drop.",
+    "light": "Bright indirect",
+    "water": "Weekly",
+    "humidity_level": "Medium",
+    "difficulty": "Moderate",
+    "watering": "Water when the top 2 inches of soil are dry. Fiddle Leaf Figs prefer consistent moisture but hate soggy soil. Water thoroughly until it drains from the bottom, then empty the saucer. Inconsistent watering is a top cause of problems.",
+    "light_details": "Fiddle Leaf Figs need bright, indirect light – ideally 6+ hours daily. South or west-facing windows are perfect (filter intense afternoon sun). Low light causes leggy growth and leaf drop. Once placed, avoid moving them frequently – they dislike change.",
+    "humidity": "Aim for 30-65% humidity. Average home humidity is usually fine, but dry winter air can cause brown edges. Mist occasionally or use a humidifier if you see browning. Keep temperatures between 60-80°F and away from drafts and vents.",
+    "fertilizing": "Feed monthly from spring through summer with a liquid fertilizer formulated for fiddle leaf figs or a balanced 3-1-2 ratio. Reduce to every other month in fall, stop in winter. Don't fertilize stressed plants.",
+    "common_problems": [
+      "Brown spots: Bacterial infection (dark with yellow halo) or root rot (spreading from edges).",
+      "Dropping leaves: Usually environmental stress – drafts, inconsistent watering, or recent move.",
+      "Red spots on new leaves: Normal – just new growth maturing.",
+      "Leggy or leaning: Not enough light. Rotate and consider moving closer to window.",
+      "Stunted growth: Check roots – may need repotting or have root rot."
+    ],
+    "quick_tips": [
+      "Wipe leaves monthly to remove dust",
+      "Stake or support young plants",
+      "Don't move frequently – they hate change",
+      "Prune to encourage branching"
+    ]
+  },
+  {
+    "slug": "peace-lily",
+    "name": "Peace Lily",
+    "scientific_name": "Spathiphyllum",
+    "emoji": "☮️",
+    "summary": "Peace Lilies are elegant flowering plants that thrive in low light. Their graceful white blooms and air-purifying qualities make them popular for homes and offices.",
+    "meta_description": "Peace Lily care guide with tips for blooming, watering, and troubleshooting. Learn how to care for Spathiphyllum in low light conditions.",
+    "light": "Low to medium indirect",
+    "water": "Weekly",
+    "humidity_level": "Medium-High",
+    "difficulty": "Easy",
+    "watering": "Peace Lilies like consistent moisture but not soggy soil. Water when the top inch is dry. They'll dramatically droop when thirsty – a helpful reminder – but try not to let them wilt regularly as it stresses the plant. Use filtered water if possible; they're sensitive to chlorine.",
+    "light_details": "Peace Lilies are famous for tolerating low light, making them perfect for offices and north-facing windows. However, they bloom more readily with brighter (still indirect) light. Direct sun scorches their leaves. If your Peace Lily isn't flowering, try moving it to a brighter spot.",
+    "humidity": "As tropical plants, Peace Lilies love humidity above 50%. They tolerate average humidity but appreciate misting or a pebble tray. Brown leaf tips often indicate dry air. Keep temperatures between 65-85°F and avoid cold drafts.",
+    "fertilizing": "Feed monthly during spring and summer with a balanced liquid fertilizer at half strength. Peace Lilies are light feeders and sensitive to over-fertilizing, which causes brown leaf tips. No feeding needed in winter.",
+    "common_problems": [
+      "Brown tips: Usually low humidity or fluoride/chlorine in tap water.",
+      "Yellow leaves: Overwatering, underwatering, or old age (bottom leaves naturally yellow).",
+      "No flowers: Needs more light. Peace Lilies also bloom more when slightly root-bound.",
+      "Drooping: Thirsty! Water immediately and it should recover within hours.",
+      "Brown spots: Could be sunburn or cold damage."
+    ],
+    "quick_tips": [
+      "Let tap water sit 24 hours before using",
+      "Remove spent blooms to encourage more",
+      "Excellent bathroom plant",
+      "Mildly toxic to pets if ingested"
+    ]
+  },
+  {
+    "slug": "spider-plant",
+    "name": "Spider Plant",
+    "scientific_name": "Chlorophytum comosum",
+    "emoji": "🕷️",
+    "summary": "Spider Plants are classic houseplants known for producing adorable baby plantlets that dangle like spiders on a web. They're incredibly resilient and perfect for beginners.",
+    "meta_description": "Spider Plant care guide. Learn watering, light requirements, and how to propagate spider plant babies. Tips for variegated and solid green varieties.",
+    "light": "Bright indirect",
+    "water": "Weekly",
+    "humidity_level": "Low-Medium",
+    "difficulty": "Very Easy",
+    "watering": "Water when the top inch of soil is dry. Spider plants have thick, tuberous roots that store water, making them somewhat drought-tolerant. Overwatering causes root rot, while underwatering causes brown tips. Consistent moderate watering is best.",
+    "light_details": "Spider plants prefer bright, indirect light but adapt to various conditions. Variegated varieties need more light to maintain their stripes. In low light, they survive but grow slowly and produce fewer babies. Avoid direct sun, which scorches the leaves.",
+    "humidity": "Spider plants tolerate average home humidity well. They're not fussy about humidity but appreciate occasional misting. Keep temperatures between 55-80°F. They can handle brief cold spells better than most tropicals.",
+    "fertilizing": "Feed monthly during spring and summer with a half-strength balanced fertilizer. Spider plants aren't heavy feeders. Over-fertilizing causes brown tips and salt buildup. Flush the soil occasionally with plain water.",
+    "common_problems": [
+      "Brown tips: Fluoride in tap water, dry air, or over-fertilizing. Use filtered water.",
+      "Pale leaves: Too much direct sun – move to indirect light.",
+      "No babies: Needs maturity and slightly root-bound conditions to produce offsets.",
+      "Limp leaves: Usually underwatering. Water thoroughly.",
+      "Root rot: From overwatering. Ensure pot has drainage."
+    ],
+    "quick_tips": [
+      "Propagate babies by rooting in water or soil",
+      "Great hanging basket plant",
+      "NASA-approved air purifier",
+      "Safe for pets"
+    ]
+  },
+  {
+    "slug": "zz-plant",
+    "name": "ZZ Plant",
+    "scientific_name": "Zamioculcas zamiifolia",
+    "emoji": "✨",
+    "summary": "The ZZ Plant is virtually indestructible with waxy, dark green leaves that stay glossy even in neglect. Perfect for forgetful waterers and low-light spaces.",
+    "meta_description": "ZZ Plant care guide. Learn how to water, propagate, and care for Zamioculcas zamiifolia. Tips for this low-light, drought-tolerant houseplant.",
+    "light": "Low to bright indirect",
+    "water": "Every 2-3 weeks",
+    "humidity_level": "Low",
+    "difficulty": "Very Easy",
+    "watering": "ZZ Plants store water in their thick rhizomes and stems, making them extremely drought-tolerant. Water only when soil is completely dry – every 2-3 weeks in summer, monthly in winter. Overwatering causes yellowing and root rot. When in doubt, don't water.",
+    "light_details": "ZZ Plants thrive in any light condition from low to bright indirect. They survive in windowless offices but grow faster with more light. Avoid direct sun, which can scorch leaves. Raven ZZ (black variety) maintains its color better in brighter light.",
+    "humidity": "ZZ Plants thrive in dry conditions and need no extra humidity. Perfect for air-conditioned spaces and dry climates. Keep temperatures between 60-85°F. They're more cold-tolerant than they look but avoid frost.",
+    "fertilizing": "Feed 2-3 times total during the growing season with diluted balanced fertilizer. ZZ Plants are very light feeders and grow slowly regardless of fertilizing. Over-fertilizing does more harm than good.",
+    "common_problems": [
+      "Yellow leaves: Almost always overwatering. Let soil dry completely.",
+      "Leaning stems: Can be normal for older stems, or overwatering.",
+      "No growth: Normal – ZZ Plants grow slowly. More light helps slightly.",
+      "Brown leaf tips: Rare, but usually means extreme underwatering.",
+      "Mushy stems: Root rot from overwatering. May need to propagate healthy parts."
+    ],
+    "quick_tips": [
+      "Wipe leaves to maintain shine",
+      "Propagate by leaf or stem cuttings (patience required)",
+      "Excellent office plant",
+      "Wash hands after handling – sap can irritate skin"
+    ]
+  },
+  {
+    "slug": "philodendron",
+    "name": "Philodendron",
+    "scientific_name": "Philodendron spp.",
+    "emoji": "💖",
+    "summary": "Philodendrons are a diverse group of tropical plants ranging from vining heartleaf types to dramatic self-heading varieties. All are relatively easy to care for and grow quickly.",
+    "meta_description": "Philodendron care guide for heartleaf, brasil, birkin and other varieties. Learn watering, light needs, and propagation tips for these easy tropical plants.",
+    "light": "Medium to bright indirect",
+    "water": "Weekly",
+    "humidity_level": "Medium",
+    "difficulty": "Easy",
+    "watering": "Water when the top inch of soil is dry. Philodendrons like consistent moisture but are forgiving of occasional missed waterings. Vining types (heartleaf, brasil) are more drought-tolerant than self-heading types (hope, birkin). Avoid soggy soil.",
+    "light_details": "Most philodendrons prefer medium to bright indirect light. They tolerate lower light but grow leggy and lose variegation. Variegated types (brasil, birkin) need brighter light to maintain patterns. Direct sun burns leaves.",
+    "humidity": "Philodendrons appreciate humidity above 50% but adapt to average home conditions. Higher humidity promotes larger leaves and faster growth. Brown leaf edges indicate dry air. Keep temperatures between 65-85°F.",
+    "fertilizing": "Feed monthly during spring and summer with balanced liquid fertilizer. Reduce to every 6-8 weeks in fall, stop in winter. Philodendrons are moderate feeders and respond well to regular fertilizing.",
+    "common_problems": [
+      "Yellow leaves: Usually overwatering, but can be underwatering or old age.",
+      "Leggy growth: Not enough light. Move closer to window.",
+      "Small leaves: Needs more light or fertilizer.",
+      "Loss of variegation: Too little light. Move to brighter spot.",
+      "Brown tips/edges: Low humidity or inconsistent watering."
+    ],
+    "quick_tips": [
+      "Vining types trail beautifully from shelves",
+      "Propagate easily from stem cuttings",
+      "Prune to encourage bushier growth",
+      "Toxic to pets – keep out of reach"
+    ]
+  },
+  {
+    "slug": "rubber-plant",
+    "name": "Rubber Plant",
+    "scientific_name": "Ficus elastica",
+    "emoji": "🌳",
+    "summary": "Rubber Plants are bold statement plants with thick, glossy leaves in deep green or dramatic burgundy. They're easier than their fiddle leaf fig cousins while being equally impressive.",
+    "meta_description": "Rubber Plant care guide for Ficus elastica. Learn watering, light requirements, and care tips for burgundy, ruby, and tineke varieties.",
+    "light": "Bright indirect",
+    "water": "Every 1-2 weeks",
+    "humidity_level": "Medium",
+    "difficulty": "Easy",
+    "watering": "Water when the top 2 inches of soil are dry. Rubber plants prefer to dry out between waterings but don't like to stay dry for long. They'll droop dramatically when thirsty. Reduce watering in winter when growth slows.",
+    "light_details": "Rubber plants thrive in bright indirect light. Darker varieties (burgundy) tolerate lower light; variegated types (tineke, ruby) need more light to maintain colors. Some direct morning sun is fine, but intense afternoon sun can scorch leaves.",
+    "humidity": "Average home humidity (40-50%) is fine for rubber plants. They appreciate slightly higher humidity but aren't fussy. Brown leaf edges may indicate dry air. Keep temperatures between 60-80°F and away from cold drafts.",
+    "fertilizing": "Feed monthly during spring and summer with balanced liquid fertilizer. Rubber plants are moderate feeders. Reduce feeding in fall, stop in winter. Over-fertilizing causes salt buildup and brown edges.",
+    "common_problems": [
+      "Dropping leaves: Usually environmental stress – overwatering, cold drafts, or sudden change.",
+      "Yellow leaves: Overwatering or natural aging of lower leaves.",
+      "Leggy growth: Not enough light. Prune and move to brighter spot.",
+      "Sticky leaves: Scale insects. Wipe leaves and treat with neem oil.",
+      "Loss of variegation: Too little light for variegated types."
+    ],
+    "quick_tips": [
+      "Wipe leaves monthly to remove dust",
+      "Prune to control height and encourage branching",
+      "Rotate regularly for even growth",
+      "Sap can irritate skin – wash hands after pruning"
+    ]
+  },
+  {
+    "slug": "aloe-vera",
+    "name": "Aloe Vera",
+    "scientific_name": "Aloe barbadensis miller",
+    "emoji": "🧴",
+    "summary": "Aloe Vera is a succulent famous for its soothing gel used for burns and skincare. It's low-maintenance, drought-tolerant, and produces offsets (pups) you can share.",
+    "meta_description": "Aloe Vera care guide. Learn watering, light requirements, and how to harvest gel. Tips for keeping your aloe healthy and propagating pups.",
+    "light": "Bright indirect to direct",
+    "water": "Every 2-3 weeks",
+    "humidity_level": "Low",
+    "difficulty": "Easy",
+    "watering": "As a succulent, Aloe Vera stores water in its thick leaves and needs infrequent watering. Water deeply when soil is completely dry – typically every 2-3 weeks in summer, monthly in winter. Overwatering causes mushy leaves and root rot.",
+    "light_details": "Aloe Vera loves bright light and can handle some direct sun, especially morning light. South or west-facing windows are ideal. Low light causes leggy, pale growth. If moving to more sun, acclimate gradually to prevent sunburn.",
+    "humidity": "Aloe thrives in dry conditions and needs no extra humidity. It's perfect for arid climates and air-conditioned spaces. Keep temperatures between 55-85°F. Avoid frost – it's not cold-hardy.",
+    "fertilizing": "Aloe is a light feeder. Fertilize 2-3 times during the growing season with diluted succulent fertilizer. Over-fertilizing is worse than under-fertilizing. Many aloe thrive for years without any fertilizer.",
+    "common_problems": [
+      "Mushy leaves: Overwatering or root rot. Let dry completely and reduce watering.",
+      "Brown tips: Usually sunburn or underwatering.",
+      "Flat, thin leaves: Not enough light or water.",
+      "Leggy growth: Insufficient light. Move to brighter location.",
+      "Red/brown coloring: Sun stress – can be normal but move to indirect light if concerned."
+    ],
+    "quick_tips": [
+      "Harvest gel by cutting outer leaves at base",
+      "Propagate pups when they're 3-4 inches tall",
+      "Use terracotta pots for better drainage",
+      "Let cut ends callous before using gel"
+    ]
+  }
+]

@@ -26,6 +26,8 @@ from .routes.plants import plants_bp
 from .routes.reminders import reminders_bp
 from .routes.journal import journal_bp
 from .routes.admin import admin_bp
+from .routes.marketing import marketing_bp
+from .routes.guides import guides_bp
 from .services import supabase_client
 from .utils import auth
 
@@ -214,10 +216,50 @@ def create_app() -> Flask:
     app.register_blueprint(reminders_bp)
     app.register_blueprint(journal_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(marketing_bp)
+    app.register_blueprint(guides_bp)
 
     # Add Jinja global for templates that need current date/time
-    from datetime import datetime
+    from datetime import datetime, date
     app.jinja_env.globals["now"] = lambda: datetime.now()
+
+    # Add Jinja filter for relative dates ("today", "yesterday", "3 days ago")
+    def relative_date(value):
+        """Convert a date/datetime to relative format like 'today', 'yesterday', '3 days ago'."""
+        if not value:
+            return "Unknown"
+
+        # Parse string to date if needed
+        if isinstance(value, str):
+            try:
+                # Handle ISO format (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)
+                value = datetime.fromisoformat(value.replace("Z", "+00:00")).date()
+            except (ValueError, AttributeError):
+                return value[:10] if len(value) >= 10 else value
+        elif isinstance(value, datetime):
+            value = value.date()
+
+        today = date.today()
+        delta = (today - value).days
+
+        if delta == 0:
+            return "Today"
+        elif delta == 1:
+            return "Yesterday"
+        elif delta < 7:
+            return f"{delta} days ago"
+        elif delta < 14:
+            return "1 week ago"
+        elif delta < 30:
+            weeks = delta // 7
+            return f"{weeks} weeks ago"
+        elif delta < 60:
+            return "1 month ago"
+        else:
+            # Fall back to formatted date for older entries
+            return value.strftime("%b %d, %Y")
+
+    app.jinja_env.filters["relative_date"] = relative_date
 
     # Add Jinja global for Cloudflare Web Analytics
     app.jinja_env.globals["CF_BEACON_TOKEN"] = os.getenv("CF_BEACON_TOKEN", "")

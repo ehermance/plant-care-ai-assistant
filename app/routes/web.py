@@ -178,13 +178,19 @@ def assistant():
     # Handle GET request - render form
     if request.method == "GET":
         today_str = datetime.now().strftime("%Y-%m-%d")
+        # Build form_values from query params and defaults
+        form_values = {}
+        if request.args.get("plant"):
+            form_values["plant"] = request.args.get("plant")
+        if request.args.get("city") or default_city:
+            form_values["city"] = request.args.get("city") or default_city
         return render_template(
             "index.html",
             answer=None,
             weather=None,
             forecast=None,
             hourly=None,
-            form_values={"city": default_city} if default_city else None,
+            form_values=form_values if form_values else None,
             history=_get_history(),
             has_history=len(_get_history()) > 0,
             source=None,

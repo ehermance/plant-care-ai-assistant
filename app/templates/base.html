@@ -187,6 +187,10 @@
                href="{{ url_for('web.assistant') }}"
                title="Get AI-powered plant care advice"
                {% if request.endpoint == 'web.assistant' %}aria-current="page"{% endif %}>Assistant</a>
+            <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('guides.') %} bg-amber-500/20 text-amber-300{% endif %}"
+               href="{{ url_for('guides.index') }}"
+               title="Browse plant care guides"
+               {% if request.endpoint and request.endpoint.startswith('guides.') %}aria-current="page"{% endif %}>Guides</a>
             <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('pricing.') %} bg-amber-500/20 text-amber-300{% endif %}"
                href="{{ url_for('pricing.index') }}"
                title="View features and pricing plans"
@@ -264,16 +268,16 @@
           <span>Account</span>
         </a>
       {% else %}
-        {# Unauthenticated users: Assistant, Features, Sign Up #}
+        {# Unauthenticated users: Assistant, Guides, Sign Up #}
         <a href="{{ url_for('web.assistant') }}"
            class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint == 'web.assistant' %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}">
           <span class="text-3xl" aria-hidden="true">💡</span>
           <span>Assistant</span>
         </a>
-        <a href="{{ url_for('pricing.index') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('pricing.') %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}">
-          <span class="text-2xl" aria-hidden="true">✨</span>
-          <span>Features</span>
+        <a href="{{ url_for('guides.index') }}"
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('guides.') %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}">
+          <span class="text-2xl" aria-hidden="true">📚</span>
+          <span>Guides</span>
         </a>
         <a href="{{ url_for('auth.signup') }}"
            class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('auth.signup') %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}">
@@ -300,6 +304,10 @@
 
         <!-- Footer Links -->
         <nav class="flex items-center gap-4" aria-label="Footer navigation">
+          <a href="{{ url_for('guides.index') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Plant Guides</a>
+          <span aria-hidden="true">•</span>
+          <a href="{{ url_for('pricing.index') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Features</a>
+          <span aria-hidden="true">•</span>
           <a href="{{ url_for('legal.terms') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Terms</a>
           <span aria-hidden="true">•</span>
           <a href="{{ url_for('legal.privacy') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Privacy</a>

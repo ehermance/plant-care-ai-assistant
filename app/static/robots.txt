@@ -1,0 +1,18 @@
+# robots.txt for PlantCareAI.app
+# https://www.robotstxt.org/
+
+User-agent: *
+Allow: /
+
+# Block authenticated/private areas
+Disallow: /dashboard/
+Disallow: /auth/callback
+Disallow: /admin/
+Disallow: /api/
+
+# Block query parameters that create duplicate content
+Disallow: /*?debug=
+Disallow: /*?utm_
+
+# Sitemap location
+Sitemap: https://plantcareai.app/sitemap.xml

@@ -93,7 +93,7 @@
             {% endif %}
 
             <p class="text-xs text-slate-500 dark:text-slate-400">
-              {{ action.action_at[:10] if action.action_at else 'Unknown date' }} at {{ action.action_at[11:16] if action.action_at and action.action_at|length > 16 else '' }}
+              {{ action.action_at|relative_date }}
             </p>
           </div>
 
