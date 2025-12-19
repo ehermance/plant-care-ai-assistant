@@ -483,6 +483,19 @@
     }
   })();
 
+  // Helper function to scroll to form with header offset
+  function scrollToForm() {
+    const formCard = document.querySelector('#ask-form').closest('.card');
+    if (formCard) {
+      const header = document.querySelector('header.sticky');
+      const headerHeight = header ? header.offsetHeight : 0;
+      const padding = 16;
+      const elementTop = formCard.getBoundingClientRect().top + window.scrollY;
+      const scrollTarget = elementTop - headerHeight - padding;
+      window.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+    }
+  }
+
   // Preset chip click handlers (unauthenticated users only)
   document.querySelectorAll('.preset-chip').forEach(function(chip) {
     chip.addEventListener('click', function(e) {
@@ -498,27 +511,24 @@
       const questionField = document.getElementById('question');
       const contextField = document.getElementById('care_context');
 
-      // Only fill fields if they're empty (respect existing user input)
-      if (plant && !plantField.value.trim()) {
+      // Always replace all fields with preset values
+      if (plant) {
         plantField.value = plant;
       }
 
-      if (question && !questionField.value.trim()) {
+      if (question) {
         questionField.value = question;
       }
 
-      // Context dropdown can always be set (less "personal" than typed input)
       if (context) {
         contextField.value = context;
       }
 
+      // Scroll to form so user can see what was filled
+      scrollToForm();
+
       // Focus the question field (most likely next action)
       questionField.focus();
-
-      // If question was just filled, select it so user can review/edit
-      if (questionField.value === question) {
-        questionField.select();
-      }
     });
   });
 
@@ -558,6 +568,9 @@
         b.classList.remove('ring-2', 'ring-emerald-500', 'dark:ring-emerald-400');
       });
       this.classList.add('ring-2', 'ring-emerald-500', 'dark:ring-emerald-400');
+
+      // Scroll to form so user can see what was filled
+      scrollToForm();
 
       // Focus the question field (most likely next action)
       questionField.focus();
