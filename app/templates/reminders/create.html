@@ -29,6 +29,7 @@
         name="plant_id"
         class="input{% if preselected_plant_id %} bg-slate-100 dark:bg-slate-700 cursor-not-allowed{% endif %}"
         required
+        aria-required="true"
         aria-describedby="plant-help"
         {% if preselected_plant_id %}disabled{% endif %}
       >
@@ -57,7 +58,7 @@
       <label for="reminder_type" class="label label-required">
         Reminder Type
       </label>
-      <select id="reminder_type" name="reminder_type" class="input" required aria-describedby="type-help">
+      <select id="reminder_type" name="reminder_type" class="input" required aria-required="true" aria-describedby="type-help">
         {% for value, label in reminder_types.items() %}
         <option value="{{ value }}" {% if value == 'watering' %}selected{% endif %}>
           {{ label }}
@@ -80,6 +81,7 @@
         maxlength="255"
         placeholder="e.g., Water Monstera"
         required
+        aria-required="true"
         aria-describedby="title-help"
         autocomplete="off"
       />
@@ -91,7 +93,7 @@
       <label for="frequency" class="label label-required">
         Frequency
       </label>
-      <select id="frequency" name="frequency" class="input" required onchange="toggleCustomInterval(this)" aria-describedby="frequency-help">
+      <select id="frequency" name="frequency" class="input" required aria-required="true" onchange="toggleCustomInterval(this)" aria-describedby="frequency-help">
         <option value="daily">Daily</option>
         <option value="every_2_days">Every 2 Days</option>
         <option value="every_3_days">Every 3 Days</option>

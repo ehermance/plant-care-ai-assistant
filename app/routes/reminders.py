@@ -16,6 +16,32 @@ from app.services.supabase_client import get_user_profile
 reminders_bp = Blueprint("reminders", __name__, url_prefix="/reminders")
 
 
+def _validate_custom_interval(frequency: str, custom_interval_days) -> tuple:
+    """
+    Validate and parse custom interval days for reminders.
+
+    Args:
+        frequency: The frequency type (e.g., "custom", "weekly")
+        custom_interval_days: The raw custom interval value from form
+
+    Returns:
+        Tuple of (parsed_value, error_message).
+        If frequency is not "custom", returns (None, None).
+        If valid, returns (int_value, None).
+        If invalid, returns (None, error_message).
+    """
+    if frequency != "custom":
+        return None, None
+
+    try:
+        interval = int(custom_interval_days)
+        if interval < 1 or interval > 365:
+            return None, "Custom interval must be between 1 and 365 days."
+        return interval, None
+    except (ValueError, TypeError):
+        return None, "Invalid custom interval days."
+
+
 @reminders_bp.route("/")
 @require_auth
 def index():
@@ -88,18 +114,11 @@ def create():
             flash("Reminder title is required.", "error")
             return redirect(url_for("reminders.create"))
 
-        # Convert custom_interval_days to int
-        if frequency == "custom":
-            try:
-                custom_interval_days = int(custom_interval_days)
-                if custom_interval_days < 1 or custom_interval_days > 365:
-                    flash("Custom interval must be between 1 and 365 days.", "error")
-                    return redirect(url_for("reminders.create"))
-            except (ValueError, TypeError):
-                flash("Invalid custom interval days.", "error")
-                return redirect(url_for("reminders.create"))
-        else:
-            custom_interval_days = None
+        # Validate custom interval
+        custom_interval_days, interval_error = _validate_custom_interval(frequency, custom_interval_days)
+        if interval_error:
+            flash(interval_error, "error")
+            return redirect(url_for("reminders.create"))
 
         # Create reminder
         reminder, error = reminder_service.create_reminder(
@@ -203,18 +222,11 @@ def edit(reminder_id):
             flash("Reminder title is required.", "error")
             return render_template("reminders/edit.html", reminder=reminder, today=date.today().isoformat())
 
-        # Convert custom_interval_days
-        if frequency == "custom":
-            try:
-                custom_interval_days = int(custom_interval_days)
-                if custom_interval_days < 1 or custom_interval_days > 365:
-                    flash("Custom interval must be between 1 and 365 days.", "error")
-                    return render_template("reminders/edit.html", reminder=reminder, today=date.today().isoformat())
-            except (ValueError, TypeError):
-                flash("Invalid custom interval days.", "error")
-                return render_template("reminders/edit.html", reminder=reminder, today=date.today().isoformat())
-        else:
-            custom_interval_days = None
+        # Validate custom interval
+        custom_interval_days, interval_error = _validate_custom_interval(frequency, custom_interval_days)
+        if interval_error:
+            flash(interval_error, "error")
+            return render_template("reminders/edit.html", reminder=reminder, today=date.today().isoformat())
 
         # Build update data
         update_data = {

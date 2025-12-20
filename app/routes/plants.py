@@ -9,7 +9,7 @@ Handles:
 """
 
 from __future__ import annotations
-from flask import Blueprint, render_template, flash, redirect, url_for, request, current_app
+from flask import Blueprint, render_template, flash, redirect, url_for, request, current_app, jsonify
 from werkzeug.utils import secure_filename
 from app.utils.auth import require_auth, get_current_user_id
 from app.utils.photo_handler import handle_photo_upload, delete_all_photo_versions
@@ -306,7 +306,6 @@ def onboarding():
 
         # Validation
         if not name:
-            from flask import jsonify
             return jsonify({"success": False, "message": "Plant name is required."}), 400
 
         # Handle photo upload
@@ -318,7 +317,6 @@ def onboarding():
             is_valid, error, file_bytes = validate_upload_file(file)
 
             if error:
-                from flask import jsonify
                 return jsonify({"success": False, "message": error}), 400
 
             if is_valid and file_bytes:
@@ -329,7 +327,6 @@ def onboarding():
                 )
 
                 if upload_error:
-                    from flask import jsonify
                     return jsonify({"success": False, "message": f"Photo upload failed: {upload_error}"}), 400
                 elif photo_urls:
                     photo_url = photo_urls['display']
@@ -356,14 +353,12 @@ def onboarding():
             )
 
             # Return JSON response for AJAX call
-            from flask import jsonify
             return jsonify({
                 "success": True,
                 "plant_id": plant["id"],
                 "message": f"{name} added successfully!"
             })
         else:
-            from flask import jsonify
             return jsonify({
                 "success": False,
                 "message": "Failed to create plant. Please try again."

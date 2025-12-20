@@ -133,7 +133,7 @@
           </div>
         </div>
 
-        {% if is_authenticated and profile and profile.get("is_admin", True) %}
+        {% if is_authenticated and profile and profile.get("is_admin", False) %}
         <!-- Admin Links -->
         <div class="flex justify-end text-right">
           <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('admin.') %} bg-amber-500/20 text-amber-300{% endif %}"

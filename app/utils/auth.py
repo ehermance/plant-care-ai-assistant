@@ -103,6 +103,23 @@ def is_authenticated() -> bool:
     return get_current_user() is not None
 
 
+def is_admin(user_id: Optional[str]) -> bool:
+    """
+    Check if a user has admin privileges.
+
+    Args:
+        user_id: User UUID to check
+
+    Returns:
+        True if user is an admin, False otherwise
+    """
+    if not user_id:
+        return False
+
+    profile = supabase_client.get_user_profile(user_id)
+    return bool(profile and profile.get("is_admin", False))
+
+
 # ============================================================================
 # Decorators
 # ============================================================================
