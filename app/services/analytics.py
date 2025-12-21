@@ -341,3 +341,289 @@ def get_all_metrics() -> Dict[str, Any]:
         metrics["d30_retention"] = retention
 
     return metrics
+
+
+def get_total_counts() -> Dict[str, Any]:
+    """
+    Get total counts for users, plants, reminders, and journal entries.
+
+    Returns:
+        Dictionary with counts and any errors
+    """
+    counts = {
+        "users": 0,
+        "plants": 0,
+        "reminders": 0,
+        "journal_entries": 0,
+        "errors": [],
+    }
+
+    try:
+        supabase = get_admin_client()
+
+        # Count users
+        result = supabase.table("profiles").select("id", count="exact").execute()
+        counts["users"] = result.count or 0
+
+        # Count plants
+        result = supabase.table("plants").select("id", count="exact").execute()
+        counts["plants"] = result.count or 0
+
+        # Count reminders
+        result = supabase.table("reminders").select("id", count="exact").execute()
+        counts["reminders"] = result.count or 0
+
+        # Count journal entries (plant_actions)
+        result = supabase.table("plant_actions").select("id", count="exact").execute()
+        counts["journal_entries"] = result.count or 0
+
+    except Exception as e:
+        logger.error(f"Error getting total counts: {str(e)}", exc_info=True)
+        counts["errors"].append(f"Failed to get counts: {str(e)}")
+
+    return counts
+
+
+def get_signups_by_week(weeks: int = 12) -> Tuple[Optional[list], Optional[str]]:
+    """
+    Get signup counts grouped by week.
+
+    Args:
+        weeks: Number of weeks to look back (default: 12)
+
+    Returns:
+        Tuple of (list of {week_start, count}, error_message)
+    """
+    try:
+        supabase = get_admin_client()
+        end_date = date.today()
+        start_date = end_date - timedelta(weeks=weeks)
+
+        # Query profiles created in the date range
+        result = (
+            supabase.table("profiles")
+            .select("created_at")
+            .gte("created_at", start_date.isoformat())
+            .lte("created_at", end_date.isoformat())
+            .execute()
+        )
+
+        if not result.data:
+            return [], None
+
+        # Group by week
+        from collections import defaultdict
+        weekly_counts = defaultdict(int)
+
+        for profile in result.data:
+            created = datetime.fromisoformat(profile["created_at"].replace("Z", "+00:00"))
+            # Get the Monday of that week
+            week_start = created.date() - timedelta(days=created.weekday())
+            weekly_counts[week_start.isoformat()] += 1
+
+        # Convert to sorted list
+        weeks_list = [
+            {"week_start": week, "count": count}
+            for week, count in sorted(weekly_counts.items())
+        ]
+
+        return weeks_list, None
+
+    except Exception as e:
+        logger.error(f"Error getting signups by week: {str(e)}", exc_info=True)
+        return None, f"Failed to get signup data: {str(e)}"
+
+
+def get_event_counts_by_type(
+    start_date: Optional[date] = None, end_date: Optional[date] = None
+) -> Tuple[Optional[Dict[str, int]], Optional[str]]:
+    """
+    Get counts of analytics events grouped by type.
+
+    Args:
+        start_date: Start date (default: 30 days ago)
+        end_date: End date (default: today)
+
+    Returns:
+        Tuple of ({event_type: count}, error_message)
+    """
+    if start_date is None:
+        start_date = date.today() - timedelta(days=30)
+    if end_date is None:
+        end_date = date.today()
+
+    try:
+        supabase = get_admin_client()
+
+        result = (
+            supabase.table("analytics_events")
+            .select("event_type")
+            .gte("created_at", start_date.isoformat())
+            .lte("created_at", (end_date + timedelta(days=1)).isoformat())
+            .execute()
+        )
+
+        if not result.data:
+            return {}, None
+
+        # Count by type
+        from collections import Counter
+        type_counts = Counter(event["event_type"] for event in result.data)
+
+        return dict(type_counts), None
+
+    except Exception as e:
+        logger.error(f"Error getting event counts: {str(e)}", exc_info=True)
+        return None, f"Failed to get event data: {str(e)}"
+
+
+def get_recent_events(limit: int = 20) -> Tuple[Optional[list], Optional[str]]:
+    """
+    Get recent analytics events for activity feed.
+
+    Args:
+        limit: Maximum number of events to return
+
+    Returns:
+        Tuple of (list of events, error_message)
+    """
+    try:
+        supabase = get_admin_client()
+
+        result = (
+            supabase.table("analytics_events")
+            .select("id, user_id, event_type, event_data, created_at")
+            .order("created_at", desc=True)
+            .limit(limit)
+            .execute()
+        )
+
+        return result.data or [], None
+
+    except Exception as e:
+        logger.error(f"Error getting recent events: {str(e)}", exc_info=True)
+        return None, f"Failed to get recent events: {str(e)}"
+
+
+def get_users_list(
+    limit: int = 50,
+    offset: int = 0,
+    search: Optional[str] = None
+) -> Tuple[Optional[list], int, Optional[str]]:
+    """
+    Get paginated list of users with basic stats.
+
+    Args:
+        limit: Number of users per page
+        offset: Pagination offset
+        search: Optional email search term
+
+    Returns:
+        Tuple of (list of users, total_count, error_message)
+    """
+    try:
+        supabase = get_admin_client()
+
+        # Build query
+        query = supabase.table("profiles").select(
+            "id, email, created_at, city, is_admin",
+            count="exact"
+        )
+
+        if search:
+            query = query.ilike("email", f"%{search}%")
+
+        query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
+
+        result = query.execute()
+
+        users = result.data or []
+        total = result.count or 0
+
+        # Get plant counts for each user
+        user_ids = [u["id"] for u in users]
+        if user_ids:
+            plants_result = (
+                supabase.table("plants")
+                .select("user_id")
+                .in_("user_id", user_ids)
+                .execute()
+            )
+
+            from collections import Counter
+            plant_counts = Counter(p["user_id"] for p in (plants_result.data or []))
+
+            for user in users:
+                user["plant_count"] = plant_counts.get(user["id"], 0)
+
+        return users, total, None
+
+    except Exception as e:
+        logger.error(f"Error getting users list: {str(e)}", exc_info=True)
+        return None, 0, f"Failed to get users: {str(e)}"
+
+
+def get_user_detail(user_id: str) -> Tuple[Optional[Dict[str, Any]], Optional[str]]:
+    """
+    Get detailed info for a specific user.
+
+    Args:
+        user_id: UUID of the user
+
+    Returns:
+        Tuple of (user_detail_dict, error_message)
+    """
+    try:
+        supabase = get_admin_client()
+
+        # Get profile
+        profile_result = (
+            supabase.table("profiles")
+            .select("*")
+            .eq("id", user_id)
+            .single()
+            .execute()
+        )
+
+        if not profile_result.data:
+            return None, "User not found"
+
+        user = profile_result.data
+
+        # Get plant count
+        plants_result = (
+            supabase.table("plants")
+            .select("id, name, created_at")
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .limit(10)
+            .execute()
+        )
+        user["plants"] = plants_result.data or []
+        user["plant_count"] = len(plants_result.data or [])
+
+        # Get reminder count
+        reminders_result = (
+            supabase.table("reminders")
+            .select("id", count="exact")
+            .eq("user_id", user_id)
+            .execute()
+        )
+        user["reminder_count"] = reminders_result.count or 0
+
+        # Get recent events
+        events_result = (
+            supabase.table("analytics_events")
+            .select("event_type, created_at")
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .limit(10)
+            .execute()
+        )
+        user["recent_events"] = events_result.data or []
+
+        return user, None
+
+    except Exception as e:
+        logger.error(f"Error getting user detail: {str(e)}", exc_info=True)
+        return None, f"Failed to get user: {str(e)}"

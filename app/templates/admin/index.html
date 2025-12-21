@@ -7,11 +7,45 @@
 <!-- Page Header -->
 <div class="mb-8">
   <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-    Analytics Dashboard
+    Admin Dashboard
   </h1>
   <p class="text-lg text-slate-600 dark:text-slate-400">
     Key product metrics and user behavior insights
   </p>
+</div>
+
+<!-- Quick Navigation Cards -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+  <a href="{{ url_for('admin.overview') }}" class="card hover:shadow-lg transition-shadow text-center py-4">
+    <span class="text-2xl mb-2 block">📋</span>
+    <span class="text-sm font-medium text-slate-900 dark:text-slate-100">Overview</span>
+    <span class="text-xs text-slate-500 dark:text-slate-400 block mt-1">{{ counts.users }} users</span>
+  </a>
+  <a href="{{ url_for('admin.users') }}" class="card hover:shadow-lg transition-shadow text-center py-4">
+    <span class="text-2xl mb-2 block">👥</span>
+    <span class="text-sm font-medium text-slate-900 dark:text-slate-100">Users</span>
+    <span class="text-xs text-slate-500 dark:text-slate-400 block mt-1">Manage users</span>
+  </a>
+  <a href="{{ url_for('admin.usage') }}" class="card hover:shadow-lg transition-shadow text-center py-4">
+    <span class="text-2xl mb-2 block">📊</span>
+    <span class="text-sm font-medium text-slate-900 dark:text-slate-100">Usage</span>
+    <span class="text-xs text-slate-500 dark:text-slate-400 block mt-1">Feature stats</span>
+  </a>
+  <a href="{{ url_for('admin.growth') }}" class="card hover:shadow-lg transition-shadow text-center py-4">
+    <span class="text-2xl mb-2 block">📈</span>
+    <span class="text-sm font-medium text-slate-900 dark:text-slate-100">Growth</span>
+    <span class="text-xs text-slate-500 dark:text-slate-400 block mt-1">Signup trends</span>
+  </a>
+  <a href="{{ url_for('admin.weather') }}" class="card hover:shadow-lg transition-shadow text-center py-4">
+    <span class="text-2xl mb-2 block">🌤️</span>
+    <span class="text-sm font-medium text-slate-900 dark:text-slate-100">Weather</span>
+    <span class="text-xs text-slate-500 dark:text-slate-400 block mt-1">API cache</span>
+  </a>
+  <div class="card bg-emerald-50 dark:bg-emerald-900/20 text-center py-4 border-2 border-emerald-200 dark:border-emerald-800">
+    <span class="text-2xl mb-2 block">🎯</span>
+    <span class="text-sm font-medium text-emerald-700 dark:text-emerald-300">Metrics</span>
+    <span class="text-xs text-emerald-600 dark:text-emerald-400 block mt-1">Current page</span>
+  </div>
 </div>
 
 <!-- Error Messages -->

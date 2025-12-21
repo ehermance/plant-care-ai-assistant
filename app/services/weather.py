@@ -47,6 +47,61 @@ def clear_weather_cache():
     _weather_cache.clear()
 
 
+def get_cache_stats() -> Dict[str, any]:
+    """
+    Get statistics about the weather cache.
+
+    Returns dictionary with:
+    - total_entries: Total cached items across all functions
+    - by_function: Dict of function name to entry count
+    - cached_cities: List of unique cities currently cached
+    - cache_ttl: Current TTL setting in seconds
+    - max_per_function: Max entries per function
+    - oldest_entry_age: Age of oldest entry in seconds (or None)
+    - newest_entry_age: Age of newest entry in seconds (or None)
+    """
+    current_time = time.time()
+    stats = {
+        "total_entries": 0,
+        "by_function": {},
+        "cached_cities": set(),
+        "cache_ttl": OPENWEATHER_CACHE_TTL,
+        "max_per_function": OPENWEATHER_CACHE_MAX_CITIES,
+        "oldest_entry_age": None,
+        "newest_entry_age": None,
+        "free_tier_rpm": OPENWEATHER_FREE_TIER_RPM,
+    }
+
+    oldest_time = None
+    newest_time = None
+
+    for func_name, cache in _weather_cache.items():
+        stats["by_function"][func_name] = len(cache)
+        stats["total_entries"] += len(cache)
+
+        for cache_key, (cached_time, _) in cache.items():
+            # Track oldest/newest
+            if oldest_time is None or cached_time < oldest_time:
+                oldest_time = cached_time
+            if newest_time is None or cached_time > newest_time:
+                newest_time = cached_time
+
+            # Extract city from cache key if possible
+            args = cache_key[0]
+            if args and isinstance(args[0], str):
+                stats["cached_cities"].add(args[0])
+
+    if oldest_time:
+        stats["oldest_entry_age"] = round(current_time - oldest_time)
+    if newest_time:
+        stats["newest_entry_age"] = round(current_time - newest_time)
+
+    # Convert set to sorted list for JSON serialization
+    stats["cached_cities"] = sorted(stats["cached_cities"])
+
+    return stats
+
+
 def ttl_cache(seconds: int = OPENWEATHER_CACHE_TTL, maxsize: int = OPENWEATHER_CACHE_MAX_CITIES):
     """
     Simple TTL cache decorator for weather API calls.
