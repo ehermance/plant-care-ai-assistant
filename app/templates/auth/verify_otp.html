@@ -101,42 +101,5 @@
   </section>
 </div>
 
-<script>
-  // Auto-focus on code input
-  document.getElementById('code').focus();
-
-  // Remove non-digits as user types
-  document.getElementById('code').addEventListener('input', function(e) {
-    this.value = this.value.replace(/\D/g, '');
-  });
-
-  // Prevent double submission with loading state
-  const form = document.querySelector('form');
-  const submitBtn = document.getElementById('verify-btn');
-  const verifyIcon = document.getElementById('verify-icon');
-  const verifyText = document.getElementById('verify-text');
-  const verifyLoading = document.getElementById('verify-loading');
-  let isSubmitting = false;
-
-  form.addEventListener('submit', function(e) {
-    // Prevent double submission
-    if (isSubmitting) {
-      e.preventDefault();
-      return false;
-    }
-
-    // Mark as submitting
-    isSubmitting = true;
-
-    // Show loading state
-    submitBtn.disabled = true;
-    submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
-    verifyIcon.classList.add('hidden');
-    verifyText.classList.add('hidden');
-    verifyLoading.classList.remove('hidden');
-
-    // Allow form to submit normally
-    return true;
-  });
-</script>
+<script src="{{ url_for('static', filename='js/verify-otp.js') }}"></script>
 {% endblock %}

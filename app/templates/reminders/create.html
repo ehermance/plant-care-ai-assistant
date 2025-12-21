@@ -93,7 +93,7 @@
       <label for="frequency" class="label label-required">
         Frequency
       </label>
-      <select id="frequency" name="frequency" class="input" required aria-required="true" onchange="toggleCustomInterval(this)" aria-describedby="frequency-help">
+      <select id="frequency" name="frequency" class="input" required aria-required="true" aria-describedby="frequency-help">
         <option value="daily">Daily</option>
         <option value="every_2_days">Every 2 Days</option>
         <option value="every_3_days">Every 3 Days</option>
@@ -169,55 +169,6 @@
   </form>
 </div>
 
-<script>
-// Toggle custom interval field
-function toggleCustomInterval(select) {
-  const customGroup = document.getElementById('custom-interval-group');
-  const customInput = document.getElementById('custom_interval_days');
-
-  if (select.value === 'custom') {
-    customGroup.classList.remove('hidden');
-    customInput.required = true;
-  } else {
-    customGroup.classList.add('hidden');
-    customInput.required = false;
-  }
-}
-
-// Auto-fill title based on plant and reminder type
-document.addEventListener('DOMContentLoaded', function() {
-  const plantSelect = document.getElementById('plant_id');
-  const typeSelect = document.getElementById('reminder_type');
-  const titleInput = document.getElementById('title');
-
-  function updateTitle() {
-    if (!titleInput.value || titleInput.dataset.autoFilled) {
-      const plantText = plantSelect.options[plantSelect.selectedIndex]?.text || '';
-      const typeText = typeSelect.options[typeSelect.selectedIndex]?.text || '';
-
-      if (plantText && plantText !== 'Select a plant...' && typeText) {
-        titleInput.value = `${typeText} - ${plantText}`;
-        titleInput.dataset.autoFilled = 'true';
-      }
-    }
-  }
-
-  plantSelect.addEventListener('change', updateTitle);
-  typeSelect.addEventListener('change', updateTitle);
-
-  // Clear auto-filled flag when user manually edits
-  titleInput.addEventListener('input', function() {
-    if (this.value !== titleInput.dataset.previousValue) {
-      delete titleInput.dataset.autoFilled;
-    }
-    titleInput.dataset.previousValue = this.value;
-  });
-
-  // Auto-fill title on page load if plant is pre-selected
-  if (plantSelect.value && plantSelect.value !== '') {
-    updateTitle();
-  }
-});
-</script>
+<script src="{{ url_for('static', filename='js/reminders.js') }}"></script>
 
 {% endblock %}

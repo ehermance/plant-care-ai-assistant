@@ -107,6 +107,28 @@
       // Update states on scroll
       scrollContainer.addEventListener('scroll', updateScrollState);
 
+      // Keyboard navigation for carousel (WCAG 2.1 compliance)
+      scrollContainer.addEventListener('keydown', function(e) {
+        switch (e.key) {
+          case 'ArrowLeft':
+            e.preventDefault();
+            scrollContainer.scrollBy({ left: -scrollDistance, behavior: 'smooth' });
+            break;
+          case 'ArrowRight':
+            e.preventDefault();
+            scrollContainer.scrollBy({ left: scrollDistance, behavior: 'smooth' });
+            break;
+          case 'Home':
+            e.preventDefault();
+            scrollContainer.scrollTo({ left: 0, behavior: 'smooth' });
+            break;
+          case 'End':
+            e.preventDefault();
+            scrollContainer.scrollTo({ left: scrollContainer.scrollWidth, behavior: 'smooth' });
+            break;
+        }
+      });
+
       // Initial state
       updateScrollState();
 
@@ -439,6 +461,23 @@
       });
     });
 
+    // Helper function to format dates relatively (e.g., "today", "2 days ago")
+    function formatRelativeDate(isoDate) {
+      if (!isoDate) return '';
+      const date = new Date(isoDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const diffDays = Math.floor((today - dateOnly) / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) return 'today';
+      if (diffDays === 1) return 'yesterday';
+      if (diffDays > 1 && diffDays < 7) return `${diffDays} days ago`;
+      if (diffDays >= 7 && diffDays < 14) return 'last week';
+      // Fall back to formatted date
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
     // Show adjustment details modal
     window.showAdjustmentDetails = function(adjustment) {
       const modal = document.createElement('div');
@@ -448,6 +487,7 @@
       modal.setAttribute('aria-modal', 'true');
 
       const details = adjustment.details || {};
+      const adjustedAt = adjustment.adjusted_at ? formatRelativeDate(adjustment.adjusted_at) : '';
 
       // Build details HTML
       let detailsHTML = '<dl class="space-y-3 mt-4">';
@@ -525,6 +565,7 @@
             <p class="text-sm font-medium text-slate-700 dark:text-slate-300">
               ${adjustment.reason}
             </p>
+            ${adjustedAt ? `<p class="text-xs text-slate-500 dark:text-slate-500 mt-1">Adjusted ${adjustedAt}</p>` : ''}
           </div>
 
           ${detailsHTML}

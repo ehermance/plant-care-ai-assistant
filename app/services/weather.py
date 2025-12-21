@@ -17,12 +17,87 @@ Notes:
 
 from __future__ import annotations
 import os
+import time
+from functools import lru_cache, wraps
 from typing import Optional, Dict, List
 import re
 import requests
 from datetime import datetime, timezone, timedelta
 from collections import defaultdict, Counter
 from flask import current_app, has_app_context
+
+
+# ============================================================================
+# OPENWEATHER API RATE LIMITS & CACHING
+# ============================================================================
+# Free tier limit: 60 requests per minute (rpm)
+# Caching strategy: 10-minute TTL per city keeps us well under the limit
+# See: https://openweathermap.org/price
+
+OPENWEATHER_FREE_TIER_RPM = 60      # Free tier: 60 requests per minute
+OPENWEATHER_CACHE_TTL = 600         # 10 minutes - weather doesn't change fast
+OPENWEATHER_CACHE_MAX_CITIES = 64   # Max cached cities per function
+
+# Cache storage: {func_name: {cache_key: (timestamp, value)}}
+_weather_cache: Dict[str, Dict[tuple, tuple]] = {}
+
+
+def clear_weather_cache():
+    """Clear all weather API caches. Useful for testing."""
+    _weather_cache.clear()
+
+
+def ttl_cache(seconds: int = OPENWEATHER_CACHE_TTL, maxsize: int = OPENWEATHER_CACHE_MAX_CITIES):
+    """
+    Simple TTL cache decorator for weather API calls.
+
+    Caching is essential to stay under the OpenWeather free tier limit
+    of {OPENWEATHER_FREE_TIER_RPM} requests per minute.
+
+    Args:
+        seconds: Cache TTL in seconds (default {OPENWEATHER_CACHE_TTL})
+        maxsize: Maximum cache entries (default {OPENWEATHER_CACHE_MAX_CITIES})
+    """
+    def decorator(func):
+        cache_name = func.__name__
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # Create cache key from args and kwargs
+            cache_key = (args, tuple(sorted(kwargs.items())))
+
+            # Initialize cache for this function if needed
+            if cache_name not in _weather_cache:
+                _weather_cache[cache_name] = {}
+
+            cache = _weather_cache[cache_name]
+            current_time = time.time()
+
+            # Check if we have a valid cached value
+            if cache_key in cache:
+                cached_time, cached_value = cache[cache_key]
+                if current_time - cached_time < seconds:
+                    return cached_value
+
+            # Call the actual function
+            result = func(*args, **kwargs)
+
+            # Store in cache (evict oldest if at max size)
+            if len(cache) >= maxsize:
+                # Remove oldest entry
+                oldest_key = min(cache.keys(), key=lambda k: cache[k][0])
+                del cache[oldest_key]
+
+            cache[cache_key] = (current_time, result)
+            return result
+
+        def cache_clear():
+            if cache_name in _weather_cache:
+                _weather_cache[cache_name].clear()
+
+        wrapper.cache_clear = cache_clear
+        return wrapper
+    return decorator
 
 
 _US_STATE_LIKE = re.compile(r"^\s*([^,]+),\s*([A-Za-z]{2})\s*$")
@@ -71,6 +146,7 @@ def _emoji_for(weather_id: int, main: str, descr: str) -> str:
     if "clear" in d: return "☀️"
     return "🌤️"
 
+@ttl_cache()  # Uses OPENWEATHER_CACHE_TTL and OPENWEATHER_CACHE_MAX_CITIES
 def get_weather_for_city(city: str | None) -> Optional[Dict]:
     if not city:
         return None
@@ -126,6 +202,7 @@ def get_weather_for_city(city: str | None) -> Optional[Dict]:
     except Exception:
         return None
 
+@ttl_cache()  # Cache coords lookups
 def _coords_for(city: str, key: str):
     """Auto-doc: see function name for purpose."""
     base = "https://api.openweathermap.org/data/2.5/weather"
@@ -149,6 +226,7 @@ def _coords_for(city: str, key: str):
     except Exception:
         return None
 
+@ttl_cache()
 def get_forecast_for_city(city: str | None) -> Optional[List[Dict]]:
     if not city:
         return None
@@ -217,6 +295,7 @@ def _fmt_hour_label(dt_local: datetime) -> str:
     label = dt_local.strftime("%I%p")  # e.g., "01PM"
     return label.lstrip("0") if label[0] == "0" else label
 
+@ttl_cache()
 def get_hourly_for_city(city: str | None) -> Optional[List[Dict]]:
     """
     Return hourly entries:
@@ -337,6 +416,7 @@ def get_precipitation_last_48h(city: str | None) -> Optional[float]:
     return None
 
 
+@ttl_cache()
 def get_precipitation_forecast_24h(city: str | None) -> Optional[float]:
     """
     Get expected precipitation in next 24 hours from forecast.
@@ -388,6 +468,7 @@ def get_precipitation_forecast_24h(city: str | None) -> Optional[float]:
         return None
 
 
+@ttl_cache()
 def get_temperature_extremes_forecast(city: str | None, hours: int = 48) -> Optional[Dict]:
     """
     Get min/max temperatures in forecast period.

@@ -103,7 +103,7 @@
           {% endif %}
 
           <!-- Delete Button -->
-          <form method="POST" action="{{ url_for('journal.delete_entry', action_id=action.id) }}" class="flex-shrink-0" onsubmit="return confirm('Are you sure you want to delete this entry?');">
+          <form method="POST" action="{{ url_for('journal.delete_entry', action_id=action.id) }}" class="flex-shrink-0" data-confirm="Are you sure you want to delete this entry?">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <button type="submit" class="text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors p-2" title="Delete entry">
               <span aria-hidden="true">🗑️</span>

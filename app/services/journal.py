@@ -193,6 +193,53 @@ def get_plant_actions(
         return []
 
 
+def get_plant_actions_batch(
+    plant_ids: List[str],
+    user_id: str,
+    limit_per_plant: int = 50,
+) -> Dict[str, List[Dict[str, Any]]]:
+    """
+    Get actions for multiple plants in a single query (avoids N+1 queries).
+
+    Args:
+        plant_ids: List of plant UUIDs
+        user_id: User's UUID (for authorization)
+        limit_per_plant: Maximum actions per plant (applied after fetch)
+
+    Returns:
+        Dict mapping plant_id -> list of actions
+    """
+    if not plant_ids:
+        return {}
+
+    supabase = get_admin_client()
+    if not supabase:
+        return {}
+
+    try:
+        # Fetch all actions for the given plants in one query
+        response = supabase.table("plant_actions") \
+            .select("*") \
+            .in_("plant_id", plant_ids) \
+            .eq("user_id", user_id) \
+            .order("action_at", desc=True) \
+            .execute()
+
+        # Group by plant_id and limit per plant
+        result: Dict[str, List[Dict[str, Any]]] = {pid: [] for pid in plant_ids}
+        if response.data:
+            for action in response.data:
+                pid = action.get("plant_id")
+                if pid in result and len(result[pid]) < limit_per_plant:
+                    result[pid].append(action)
+
+        return result
+
+    except Exception as e:
+        _safe_log_error(f"Error fetching batch plant actions: {e}")
+        return {}
+
+
 def get_last_watered_date(
     plant_id: str,
     user_id: str,

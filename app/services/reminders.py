@@ -298,6 +298,7 @@ def get_due_reminders_with_adjustments(
                 "days": days_diff,
                 "reason": reminder["weather_adjustment_reason"],
                 "adjusted_due_date": reminder["weather_adjusted_due"],
+                "adjusted_at": reminder.get("updated_at"),
                 "details": {"weather_condition": "batch_adjusted"}
             }
 

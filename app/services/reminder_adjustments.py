@@ -431,6 +431,7 @@ def apply_automatic_adjustments(
                         "days": days_adjust,
                         "reason": adjustment_rec["reason"],
                         "adjusted_due_date": adjusted_due.isoformat(),
+                        "adjusted_at": datetime.now().isoformat(),
                         "details": adjustment_rec.get("details", {})
                     }
                     adjusted_reminders.append(reminder_copy)

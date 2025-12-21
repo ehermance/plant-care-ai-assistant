@@ -6,8 +6,9 @@
 
 class ThemeManager {
   constructor() {
-    // Priority: server-side theme (from database) > localStorage > default 'auto'
-    const serverTheme = window.__INITIAL_THEME__;
+    // Priority: server-side theme (from meta tag) > localStorage > default 'auto'
+    const themeMeta = document.querySelector('meta[name="x-initial-theme"]');
+    const serverTheme = themeMeta ? themeMeta.content : null;
     const localTheme = localStorage.getItem('theme');
 
     // Use server theme if available, otherwise use localStorage, otherwise default to 'auto'

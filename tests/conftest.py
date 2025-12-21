@@ -16,6 +16,15 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 
+@pytest.fixture(autouse=True)
+def clear_weather_cache_before_test():
+    """Clear weather cache before each test to prevent cross-test pollution."""
+    from app.services.weather import clear_weather_cache
+    clear_weather_cache()
+    yield
+    clear_weather_cache()
+
+
 @pytest.fixture
 def app():
     """Create and configure a Flask app instance for testing."""

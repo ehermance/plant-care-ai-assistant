@@ -55,20 +55,14 @@
   <!-- Tailwind CSS (Horti-Futuristic Design System) -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}" />
 
-  <!-- Theme Manager (load early to prevent flash) -->
-  <script>
-    // Pass server-side theme preference to JavaScript (if user is authenticated)
-    {% if is_authenticated and profile and profile.theme_preference %}
-      window.__INITIAL_THEME__ = '{{ profile.theme_preference }}';
-    {% endif %}
-  </script>
-  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+  <!-- Theme & timezone configuration for JavaScript (CSP-compliant) -->
+  {% if is_authenticated and profile and profile.theme_preference %}
+  <meta name="x-initial-theme" content="{{ profile.theme_preference }}">
+  {% endif %}
+  <meta name="x-user-timezone" content="{{ g.user_timezone or '' }}">
 
-  <!-- Timezone configuration (for client-side timestamp conversion) -->
-  <script>
-    // User timezone from profile (falls back to browser default if empty)
-    window.USER_TIMEZONE = "{{ g.user_timezone or '' }}";
-  </script>
+  <!-- Theme Manager (load early to prevent flash) -->
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 
   {% block extra_head %}{% endblock %}
 
@@ -228,9 +222,9 @@
                  role="alert"
                  aria-live="polite">
               <span class="flex-1">{{ message }}</span>
-              <button class="flex-shrink-0 text-2xl leading-none hover:opacity-70 transition-opacity"
+              <button class="flash-dismiss-btn flex-shrink-0 text-2xl leading-none hover:opacity-70 transition-opacity"
                       aria-label="Dismiss notification"
-                      onclick="this.parentElement.remove()">
+                      type="button">
                 &times;
               </button>
             </div>
@@ -339,10 +333,5 @@
   <script src="{{ url_for('static', filename='js/bottom-nav.js') }}"></script>
 
   <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
-
-  <!-- Copyright year script -->
-  <script>
-    document.getElementById('copyright-year').textContent = new Date().getFullYear();
-  </script>
 </body>
 </html>

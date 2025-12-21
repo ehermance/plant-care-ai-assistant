@@ -393,4 +393,30 @@
       }, 300);
     }
   }
+
+  // --- Flash Message Dismissal (Event Delegation for base.html alerts) ---
+  document.addEventListener('click', function(e) {
+    const dismissBtn = e.target.closest('.flash-dismiss-btn');
+    if (dismissBtn) {
+      const alertEl = dismissBtn.closest('[role="alert"]');
+      if (alertEl) {
+        dismissFlash(alertEl);
+      }
+    }
+  });
+
+  // --- Form Confirmation Handler (CSP-compliant alternative to onclick confirm) ---
+  document.addEventListener('submit', function(e) {
+    const form = e.target;
+    const confirmMessage = form.dataset.confirm;
+    if (confirmMessage && !confirm(confirmMessage)) {
+      e.preventDefault();
+    }
+  });
+
+  // --- Copyright Year ---
+  const copyrightYear = document.getElementById('copyright-year');
+  if (copyrightYear) {
+    copyrightYear.textContent = new Date().getFullYear();
+  }
 })();

@@ -20,8 +20,34 @@ from .supabase_client import (
     get_plant_by_id
 )
 from .reminders import get_due_reminders, get_upcoming_reminders
-from .journal import get_plant_actions, get_user_actions
+from .journal import get_plant_actions, get_plant_actions_batch, get_user_actions
 from . import ai_insights
+
+
+# ============================================================================
+# TIMESTAMP PARSING HELPERS
+# ============================================================================
+
+def _parse_date(value) -> Optional[datetime]:
+    """Parse a date value, handling both date objects and ISO strings."""
+    if value is None:
+        return None
+    if hasattr(value, 'date'):  # datetime object
+        return value.date()
+    if isinstance(value, str):
+        return datetime.fromisoformat(value).date()
+    return value  # Already a date
+
+
+def _parse_datetime(value) -> Optional[datetime]:
+    """Parse a datetime value, handling ISO strings with Z timezone."""
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value
+    if isinstance(value, str):
+        return datetime.fromisoformat(value.replace('Z', '+00:00'))
+    return None
 
 
 def get_user_context(user_id: str) -> Dict[str, Any]:
@@ -53,15 +79,9 @@ def get_user_context(user_id: str) -> Dict[str, Any]:
     due_today_filtered = []
 
     for reminder in due_today:
-        effective_due = reminder.get("effective_due_date")
-        if effective_due:
-            if isinstance(effective_due, str):
-                effective_due = datetime.fromisoformat(effective_due).date()
-
-            if effective_due < today:
-                overdue.append(_format_reminder_context(reminder))
-            else:
-                due_today_filtered.append(_format_reminder_context(reminder))
+        effective_due = _parse_date(reminder.get("effective_due_date"))
+        if effective_due and effective_due < today:
+            overdue.append(_format_reminder_context(reminder))
         else:
             due_today_filtered.append(_format_reminder_context(reminder))
 
@@ -71,10 +91,8 @@ def get_user_context(user_id: str) -> Dict[str, Any]:
         formatted = _format_reminder_context(reminder)
 
         # Calculate days until
-        effective_due = reminder.get("effective_due_date")
+        effective_due = _parse_date(reminder.get("effective_due_date"))
         if effective_due:
-            if isinstance(effective_due, str):
-                effective_due = datetime.fromisoformat(effective_due).date()
             days_until = (effective_due - today).days
             formatted["days_until"] = days_until
 
@@ -212,12 +230,8 @@ def _get_recent_activities_summary(user_id: str, days: int = 7) -> List[Dict[str
     # Filter to time window and format
     all_activities = []
     for activity in all_activities_raw:
-        action_at = activity.get("action_at")
+        action_at = _parse_datetime(activity.get("action_at"))
         if action_at:
-            # Parse timestamp
-            if isinstance(action_at, str):
-                action_at = datetime.fromisoformat(action_at.replace('Z', '+00:00'))
-
             # Only include if within time window
             if action_at >= cutoff_date:
                 days_ago = (datetime.now(action_at.tzinfo) - action_at).days
@@ -245,18 +259,12 @@ def _get_plant_activities_summary(plant_id: str, user_id: str, days: int = 14) -
 
     recent = []
     for activity in activities:
-        action_at = activity.get("action_at")
-        if action_at:
-            # Parse timestamp
-            if isinstance(action_at, str):
-                action_at = datetime.fromisoformat(action_at.replace('Z', '+00:00'))
-
-            # Only include if within time window
-            if action_at >= cutoff_date:
-                days_ago = (datetime.now(action_at.tzinfo) - action_at).days
-                recent.append({
-                    "action_type": activity.get("action_type"),
-                    "days_ago": days_ago,
+        action_at = _parse_datetime(activity.get("action_at"))
+        if action_at and action_at >= cutoff_date:
+            days_ago = (datetime.now(action_at.tzinfo) - action_at).days
+            recent.append({
+                "action_type": activity.get("action_type"),
+                "days_ago": days_ago,
                     "amount_ml": activity.get("amount_ml"),
                     "notes": activity.get("notes")
                 })
@@ -328,11 +336,8 @@ def get_enhanced_user_context(
     due_today_filtered = []
 
     for reminder in due_today:
-        effective_due = reminder.get("effective_due_date")
+        effective_due = _parse_date(reminder.get("effective_due_date"))
         if effective_due:
-            if isinstance(effective_due, str):
-                effective_due = datetime.fromisoformat(effective_due).date()
-
             if effective_due < today:
                 overdue.append(_format_reminder_context(reminder))
             else:
@@ -344,12 +349,9 @@ def get_enhanced_user_context(
     upcoming_formatted = []
     for reminder in upcoming[:10]:
         formatted = _format_reminder_context(reminder)
-        effective_due = reminder.get("effective_due_date")
+        effective_due = _parse_date(reminder.get("effective_due_date"))
         if effective_due:
-            if isinstance(effective_due, str):
-                effective_due = datetime.fromisoformat(effective_due).date()
-            days_until = (effective_due - today).days
-            formatted["days_until"] = days_until
+            formatted["days_until"] = (effective_due - today).days
         upcoming_formatted.append(formatted)
 
     # Get recent activities WITH notes (last 7-14 days)
@@ -358,25 +360,21 @@ def get_enhanced_user_context(
 
     activities_with_notes = []
     for activity in recent_activities_raw:
-        action_at = activity.get("action_at")
-        if action_at:
-            if isinstance(action_at, str):
-                action_at = datetime.fromisoformat(action_at.replace('Z', '+00:00'))
+        action_at = _parse_datetime(activity.get("action_at"))
+        if action_at and action_at >= cutoff_date:
+            days_ago = (datetime.now(action_at.tzinfo) - action_at).days
+            note_text = activity.get("notes")
 
-            if action_at >= cutoff_date:
-                days_ago = (datetime.now(action_at.tzinfo) - action_at).days
-                note_text = activity.get("notes")
+            # Extract keywords if notes present
+            keywords = ai_insights.extract_health_keywords(note_text) if note_text else []
 
-                # Extract keywords if notes present
-                keywords = ai_insights.extract_health_keywords(note_text) if note_text else []
-
-                activities_with_notes.append({
-                    "plant_name": activity.get("plant_name", "Unknown"),
-                    "action_type": activity.get("action_type"),
-                    "days_ago": days_ago,
-                    "notes": note_text[:100] if note_text else None,  # Truncate to 100 chars
-                    "keywords": keywords
-                })
+            activities_with_notes.append({
+                "plant_name": activity.get("plant_name", "Unknown"),
+                "action_type": activity.get("action_type"),
+                "days_ago": days_ago,
+                "notes": note_text[:100] if note_text else None,  # Truncate to 100 chars
+                "keywords": keywords
+            })
 
     # Sort and get most recent observations
     recent_observations = ai_insights.summarize_recent_observations(
@@ -501,20 +499,16 @@ def get_enhanced_plant_context(
     activities = []
 
     for activity in activities_raw:
-        action_at = activity.get("action_at")
-        if action_at:
-            if isinstance(action_at, str):
-                action_at = datetime.fromisoformat(action_at.replace('Z', '+00:00'))
-
-            if action_at >= cutoff_date:
-                days_ago = (datetime.now(action_at.tzinfo) - action_at).days
-                activities.append({
-                    "action_type": activity.get("action_type"),
-                    "action_at": activity.get("action_at"),
-                    "days_ago": days_ago,
-                    "amount_ml": activity.get("amount_ml"),
-                    "notes": activity.get("notes")
-                })
+        action_at = _parse_datetime(activity.get("action_at"))
+        if action_at and action_at >= cutoff_date:
+            days_ago = (datetime.now(action_at.tzinfo) - action_at).days
+            activities.append({
+                "action_type": activity.get("action_type"),
+                "action_at": activity.get("action_at"),
+                "days_ago": days_ago,
+                "amount_ml": activity.get("amount_ml"),
+                "notes": activity.get("notes")
+            })
 
     # Get reminders for this plant
     all_reminders = get_due_reminders(user_id) + get_upcoming_reminders(user_id, days=14)
@@ -591,14 +585,16 @@ def get_enhanced_plant_context(
         all_user_plants = get_user_plants(user_id, fields="id")
         if len(all_user_plants) > 1:
             # Calculate average watering interval across all plants
+            # Use batch fetch to avoid N+1 queries
+            other_plant_ids = [p.get("id") for p in all_user_plants if p.get("id") != plant_id]
+            all_activities = get_plant_actions_batch(other_plant_ids, user_id, limit_per_plant=50)
+
             all_intervals = []
-            for other_plant in all_user_plants:
-                other_id = other_plant.get("id")
-                if other_id != plant_id:
-                    other_activities = get_plant_actions(other_id, user_id, limit=50)
-                    other_pattern = ai_insights.calculate_watering_pattern(other_activities)
-                    if other_pattern.get("avg_interval_days"):
-                        all_intervals.append(other_pattern["avg_interval_days"])
+            for other_id in other_plant_ids:
+                other_activities = all_activities.get(other_id, [])
+                other_pattern = ai_insights.calculate_watering_pattern(other_activities)
+                if other_pattern.get("avg_interval_days"):
+                    all_intervals.append(other_pattern["avg_interval_days"])
 
             if all_intervals:
                 avg_user_interval = sum(all_intervals) / len(all_intervals)

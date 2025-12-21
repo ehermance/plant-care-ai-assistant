@@ -44,7 +44,7 @@
       <label for="frequency" class="label label-required">
         Frequency
       </label>
-      <select id="frequency" name="frequency" class="input" required onchange="toggleCustomInterval(this)" aria-describedby="frequency-help">
+      <select id="frequency" name="frequency" class="input" required aria-describedby="frequency-help">
         <option value="daily" {% if reminder.frequency == 'daily' %}selected{% endif %}>Daily</option>
         <option value="every_2_days" {% if reminder.frequency == 'every_2_days' %}selected{% endif %}>Every 2 Days</option>
         <option value="every_3_days" {% if reminder.frequency == 'every_3_days' %}selected{% endif %}>Every 3 Days</option>
@@ -145,25 +145,6 @@
   </form>
 </div>
 
-<script>
-// Toggle custom interval field
-function toggleCustomInterval(select) {
-  const customGroup = document.getElementById('custom-interval-group');
-  const customInput = document.getElementById('custom_interval_days');
-
-  if (select.value === 'custom') {
-    customGroup.classList.remove('hidden');
-    customInput.required = true;
-  } else {
-    customGroup.classList.add('hidden');
-    customInput.required = false;
-  }
-}
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-  toggleCustomInterval(document.getElementById('frequency'));
-});
-</script>
+<script src="{{ url_for('static', filename='js/reminders.js') }}"></script>
 
 {% endblock %}

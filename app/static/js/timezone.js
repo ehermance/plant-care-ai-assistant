@@ -2,7 +2,7 @@
  * Timezone conversion for timestamps
  *
  * Converts all <time datetime="..."> elements to the user's timezone.
- * Uses the USER_TIMEZONE global variable set from the server, or falls back
+ * Reads timezone from meta tag (CSP-compliant), or falls back
  * to the browser's default timezone.
  *
  * Usage:
@@ -20,9 +20,11 @@
    * Prefers server-side profile timezone, falls back to browser default.
    */
   function getUserTimezone() {
-    // Check if server provided a timezone from user profile
-    if (typeof window.USER_TIMEZONE === 'string' && window.USER_TIMEZONE.trim()) {
-      return window.USER_TIMEZONE.trim();
+    // Check if server provided a timezone from meta tag (CSP-compliant)
+    const tzMeta = document.querySelector('meta[name="x-user-timezone"]');
+    const serverTimezone = tzMeta ? tzMeta.content.trim() : '';
+    if (serverTimezone) {
+      return serverTimezone;
     }
     // Fall back to browser's default timezone
     return Intl.DateTimeFormat().resolvedOptions().timeZone;

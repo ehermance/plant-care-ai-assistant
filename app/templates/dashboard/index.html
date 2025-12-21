@@ -192,6 +192,9 @@
                 {% elif reminder.adjustment.days < 0 %}
                   ({{ reminder.adjustment.days }} day{% if reminder.adjustment.days < -1 %}s{% endif %})
                 {% endif %}
+                {% if reminder.adjustment.adjusted_at %}
+                <span class="text-slate-500 dark:text-slate-500">&middot; {{ reminder.adjustment.adjusted_at | relative_date }}</span>
+                {% endif %}
               </p>
             </div>
             <button

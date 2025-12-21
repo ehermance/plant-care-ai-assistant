@@ -191,16 +191,7 @@
       <p class="help-text mt-1">Override if the auto-detected timezone is incorrect</p>
     </div>
 
-    <script>
-      // Display browser's actual timezone when using default
-      (function() {
-        const browserTzDisplay = document.getElementById('browser-timezone-display');
-        if (browserTzDisplay) {
-          const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-          browserTzDisplay.textContent = browserTz.replace(/_/g, ' ');
-        }
-      })();
-    </script>
+    <script src="{{ url_for('static', filename='js/account.js') }}"></script>
 
     <!-- Theme Preference -->
     <div class="mb-8">

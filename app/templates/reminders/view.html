@@ -98,7 +98,12 @@
             <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Weather Adjusted Due Date</dt>
             <dd class="mt-1">
               <span class="text-base font-semibold text-slate-900 dark:text-slate-100">{{ reminder.weather_adjusted_due }}</span>
-              <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">{{ reminder.weather_adjustment_reason }}</p>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">
+                {{ reminder.weather_adjustment_reason }}
+                {% if reminder.updated_at %}
+                <span class="text-slate-500 dark:text-slate-500">&middot; Adjusted {{ reminder.updated_at | relative_date }}</span>
+                {% endif %}
+              </p>
               <form method="POST" action="{{ url_for('reminders.clear_weather', reminder_id=reminder.id) }}" class="mt-3">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <button type="submit" class="btn btn-sm btn-secondary">
@@ -228,7 +233,7 @@
         {% endif %}
 
         <!-- Deactivate -->
-        <form method="POST" action="{{ url_for('reminders.toggle_status', reminder_id=reminder.id) }}" onsubmit="return confirm('Deactivate this reminder? You can reactivate it later from the history page.');">
+        <form method="POST" action="{{ url_for('reminders.toggle_status', reminder_id=reminder.id) }}" data-confirm="Deactivate this reminder? You can reactivate it later from the history page.">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <button type="submit" class="btn btn-danger w-full">
             Deactivate Reminder
