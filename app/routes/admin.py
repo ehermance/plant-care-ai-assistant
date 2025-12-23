@@ -11,11 +11,21 @@ Provides dashboard for:
 """
 
 from __future__ import annotations
+import uuid
 from flask import Blueprint, render_template, request
 from app.utils.auth import require_admin
 from app.services import analytics
 from app.services.weather import get_cache_stats
 from datetime import date, timedelta
+
+
+def is_valid_uuid(value: str) -> bool:
+    """Check if a string is a valid UUID."""
+    try:
+        uuid.UUID(value)
+        return True
+    except (ValueError, AttributeError):
+        return False
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -92,6 +102,9 @@ def users():
 @require_admin
 def user_detail(user_id: str):
     """Detailed view for a specific user."""
+    if not is_valid_uuid(user_id):
+        return render_template("admin/user_detail.html", user=None, error="Invalid user ID format")
+
     user, error = analytics.get_user_detail(user_id)
 
     if error:
