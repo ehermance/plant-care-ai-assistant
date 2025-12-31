@@ -177,6 +177,29 @@ def account():
             else:
                 flash(f"Failed to update theme: {error}", "error")
 
+        # Handle marketing email preference update
+        current_marketing_opt_in = profile.get("marketing_opt_in", False) if profile else False
+        new_marketing_opt_in = request.form.get("marketing_opt_in") == "on"
+
+        if new_marketing_opt_in != current_marketing_opt_in:
+            success, error = supabase_client.update_marketing_preference(
+                user_id, marketing_opt_in=new_marketing_opt_in
+            )
+            if success:
+                # Sync with Resend Audience
+                from app.services.marketing_emails import sync_to_resend_audience
+
+                email = profile.get("email") if profile else None
+                if email:
+                    sync_to_resend_audience(email, subscribed=new_marketing_opt_in)
+
+                if new_marketing_opt_in:
+                    updates_made.append("email preferences (subscribed)")
+                else:
+                    updates_made.append("email preferences (unsubscribed)")
+            else:
+                flash(f"Failed to update email preferences: {error}", "error")
+
         # Show success message if any updates were made
         if updates_made:
             flash(f"Preferences updated: {', '.join(updates_made)}", "success")

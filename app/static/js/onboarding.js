@@ -36,6 +36,15 @@
 
   function nextStep() {
     if (currentStep < totalSteps) {
+      // If moving from step 1 to step 2, copy marketing opt-in preference
+      if (currentStep === 1) {
+        const marketingCheckbox = document.getElementById('onboarding_marketing_opt_in');
+        const marketingHidden = document.getElementById('marketing_opt_in_hidden');
+        if (marketingCheckbox && marketingHidden) {
+          marketingHidden.value = marketingCheckbox.checked ? 'on' : '';
+        }
+      }
+
       currentStep++;
       showStep(currentStep);
     }

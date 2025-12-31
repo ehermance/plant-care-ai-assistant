@@ -429,7 +429,12 @@ class TestAuthorization:
         """All admin routes should require authentication."""
         admin_routes = [
             "/admin",
-            "/admin/metrics",
+            "/admin/overview",
+            "/admin/users",
+            "/admin/usage",
+            "/admin/growth",
+            "/admin/weather",
+            "/admin/marketing",
         ]
 
         for route in admin_routes:

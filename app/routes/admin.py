@@ -172,3 +172,18 @@ def weather():
         "admin/weather.html",
         cache_stats=cache_stats,
     )
+
+
+@admin_bp.route("/marketing")
+@require_admin
+def marketing():
+    """Marketing email metrics and subscriber overview."""
+    stats, stats_error = analytics.get_marketing_stats()
+    activity, activity_error = analytics.get_marketing_activity(limit=20)
+
+    return render_template(
+        "admin/marketing.html",
+        stats=stats,
+        activity=activity or [],
+        error=stats_error or activity_error,
+    )

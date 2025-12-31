@@ -627,3 +627,164 @@ def get_user_detail(user_id: str) -> Tuple[Optional[Dict[str, Any]], Optional[st
     except Exception as e:
         logger.error(f"Error getting user detail: {str(e)}", exc_info=True)
         return None, f"Failed to get user: {str(e)}"
+
+
+def get_marketing_stats() -> Tuple[Dict[str, Any], Optional[str]]:
+    """
+    Get marketing subscription statistics.
+
+    Returns:
+        Tuple of (stats dict, error message)
+
+    Stats include:
+    - total_subscribers: count of marketing_opt_in = True
+    - total_users: total profile count
+    - opt_in_rate: percentage
+    - unsubscribed_count: count with marketing_unsubscribed_at set
+    - welcome_emails: counts by email type
+    """
+    try:
+        supabase = get_admin_client()
+
+        # Get total users and subscribers
+        total_result = (
+            supabase.table("profiles")
+            .select("id", count="exact")
+            .execute()
+        )
+        total_users = total_result.count or 0
+
+        subscribers_result = (
+            supabase.table("profiles")
+            .select("id", count="exact")
+            .eq("marketing_opt_in", True)
+            .execute()
+        )
+        total_subscribers = subscribers_result.count or 0
+
+        # Get unsubscribed count
+        unsubscribed_result = (
+            supabase.table("profiles")
+            .select("id", count="exact")
+            .not_.is_("marketing_unsubscribed_at", "null")
+            .execute()
+        )
+        unsubscribed_count = unsubscribed_result.count or 0
+
+        # Calculate opt-in rate
+        opt_in_rate = (
+            round((total_subscribers / total_users) * 100, 1)
+            if total_users > 0
+            else 0
+        )
+
+        # Get welcome email counts
+        welcome_emails = {"day0": 0, "day3": 0, "day7": 0}
+        try:
+            for email_type in ["welcome_day0", "welcome_day3", "welcome_day7"]:
+                email_result = (
+                    supabase.table("welcome_emails_sent")
+                    .select("id", count="exact")
+                    .eq("email_type", email_type)
+                    .execute()
+                )
+                key = email_type.replace("welcome_", "")
+                welcome_emails[key] = email_result.count or 0
+        except Exception:
+            # Table might not exist yet
+            pass
+
+        stats = {
+            "total_subscribers": total_subscribers,
+            "total_users": total_users,
+            "opt_in_rate": opt_in_rate,
+            "unsubscribed_count": unsubscribed_count,
+            "welcome_emails": welcome_emails,
+        }
+
+        return stats, None
+
+    except Exception as e:
+        logger.error(f"Error getting marketing stats: {str(e)}", exc_info=True)
+        return {}, f"Failed to get marketing stats: {str(e)}"
+
+
+def get_marketing_activity(limit: int = 20) -> Tuple[list, Optional[str]]:
+    """
+    Get recent marketing-related activity.
+
+    Returns list of recent opt-ins, opt-outs, and welcome emails sent.
+    """
+    try:
+        supabase = get_admin_client()
+        activity = []
+
+        # Get recent subscribers (those with marketing_opt_in = True, ordered by created_at)
+        # We'll approximate this by getting profiles created recently with marketing_opt_in
+        subscribers_result = (
+            supabase.table("profiles")
+            .select("id, email, created_at, marketing_opt_in")
+            .eq("marketing_opt_in", True)
+            .order("created_at", desc=True)
+            .limit(limit)
+            .execute()
+        )
+
+        if subscribers_result.data:
+            for profile in subscribers_result.data:
+                activity.append({
+                    "type": "subscribed",
+                    "email": profile.get("email", "unknown"),
+                    "timestamp": profile.get("created_at"),
+                })
+
+        # Get recent unsubscribes
+        unsubscribes_result = (
+            supabase.table("profiles")
+            .select("id, email, marketing_unsubscribed_at")
+            .not_.is_("marketing_unsubscribed_at", "null")
+            .order("marketing_unsubscribed_at", desc=True)
+            .limit(limit)
+            .execute()
+        )
+
+        if unsubscribes_result.data:
+            for profile in unsubscribes_result.data:
+                activity.append({
+                    "type": "unsubscribed",
+                    "email": profile.get("email", "unknown"),
+                    "timestamp": profile.get("marketing_unsubscribed_at"),
+                })
+
+        # Get recent welcome emails sent
+        try:
+            emails_result = (
+                supabase.table("welcome_emails_sent")
+                .select("user_id, email_type, sent_at")
+                .order("sent_at", desc=True)
+                .limit(limit)
+                .execute()
+            )
+
+            if emails_result.data:
+                for email in emails_result.data:
+                    activity.append({
+                        "type": f"welcome_{email.get('email_type', 'unknown')}",
+                        "email": email.get("user_id", "unknown")[:8] + "...",
+                        "timestamp": email.get("sent_at"),
+                    })
+        except Exception:
+            # Table might not exist yet
+            pass
+
+        # Sort by timestamp
+        activity.sort(
+            key=lambda x: x.get("timestamp") or "",
+            reverse=True
+        )
+
+        return activity[:limit], None
+
+    except Exception as e:
+        logger.error(f"Error getting marketing activity: {str(e)}", exc_info=True)
+        return [], f"Failed to get marketing activity: {str(e)}"

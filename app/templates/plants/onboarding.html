@@ -60,7 +60,39 @@
         </div>
       </div>
 
-      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <!-- Marketing Opt-in Reminder (for users who didn't opt in at signup) -->
+      {% if not marketing_opt_in %}
+      <div class="mt-8 p-4 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl border-2 border-amber-200 dark:border-amber-700">
+        <div class="flex items-start gap-3">
+          <span class="text-2xl flex-shrink-0" aria-hidden="true">📬</span>
+          <div class="flex-1">
+            <p class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
+              Don't let your plants down!
+            </p>
+            <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">
+              Get timely reminders for seasonal care, expert tips, and new features that help your plants thrive.
+            </p>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                name="onboarding_marketing_opt_in"
+                id="onboarding_marketing_opt_in"
+                class="h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-emerald-600 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+                aria-describedby="onboarding-marketing-help"
+              />
+              <span class="text-sm font-medium text-slate-700 dark:text-slate-300">
+                Yes, send me plant care tips & updates
+              </span>
+            </label>
+            <p id="onboarding-marketing-help" class="text-xs text-slate-500 dark:text-slate-400 mt-1 ml-7">
+              Free monthly tips, no spam. Unsubscribe anytime.
+            </p>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="flex flex-col sm:flex-row gap-3 justify-center {% if not marketing_opt_in %}mt-6{% endif %}">
         <button type="button" data-action="next-step" class="btn btn-primary">
           Get Started <span aria-hidden="true">→</span>
         </button>
@@ -86,6 +118,7 @@
       <form id="onboarding-form" method="POST" action="{{ url_for('plants.onboarding') }}" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <input type="hidden" name="step" value="2" id="form-step"/>
+        <input type="hidden" name="marketing_opt_in" id="marketing_opt_in_hidden" value=""/>
 
         <!-- Plant Name (Required) -->
         <div class="mb-6">

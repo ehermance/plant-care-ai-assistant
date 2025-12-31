@@ -265,6 +265,40 @@
       </div>
     </div>
 
+    <!-- Email Preferences -->
+    <div class="mb-8">
+      <label class="label">
+        Email Preferences
+      </label>
+      <p id="email-pref-help" class="help-text mb-3">
+        Control what emails you receive from PlantCareAI.
+      </p>
+
+      <div class="space-y-3">
+        <label class="flex items-start gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+          <input
+            type="checkbox"
+            name="marketing_opt_in"
+            class="mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-emerald-600 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+            {% if profile and profile.marketing_opt_in %}checked{% endif %}
+            aria-describedby="email-pref-help marketing-desc"
+          />
+          <div class="flex-1">
+            <strong class="text-slate-900 dark:text-slate-100">Plant care tips & updates</strong>
+            <p id="marketing-desc" class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              Seasonal advice, new features, and expert plant care tips delivered to your inbox.
+            </p>
+          </div>
+        </label>
+      </div>
+
+      {% if profile and profile.marketing_unsubscribed_at %}
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-3">
+        You unsubscribed on {{ profile.marketing_unsubscribed_at[:10] }}. Check the box above to resubscribe.
+      </p>
+      {% endif %}
+    </div>
+
     <!-- Submit Button -->
     <div class="mb-6">
       <button type="submit" class="btn btn-primary">

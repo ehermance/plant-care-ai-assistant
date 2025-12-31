@@ -1,13 +1,14 @@
 """
-Marketing landing pages for SEO.
+Marketing landing pages and email management.
 
-Public pages designed for organic search traffic:
-- AI Plant Doctor: Markets the /ask feature
-- Sitemap: Dynamic XML sitemap for search engines
+Provides:
+- SEO landing pages (AI Plant Doctor)
+- Sitemap and robots.txt
+- Email unsubscribe functionality
 """
 
 from __future__ import annotations
-from flask import Blueprint, render_template, Response, url_for, request, current_app
+from flask import Blueprint, render_template, Response, url_for, request, current_app, flash, redirect
 import os
 import json
 
@@ -99,3 +100,66 @@ def robots():
     with open(robots_path, "r") as f:
         content = f.read()
     return Response(content, mimetype="text/plain")
+
+
+@marketing_bp.route("/unsubscribe/<token>")
+def unsubscribe(token: str):
+    """
+    One-click unsubscribe from marketing emails.
+
+    Token is a signed user_id that expires after 30 days.
+    Shows a confirmation page after unsubscribing.
+    """
+    from app.services.marketing_emails import verify_unsubscribe_token, sync_to_resend_audience
+    from app.services import supabase_client
+
+    # Verify token
+    user_id = verify_unsubscribe_token(token)
+
+    if not user_id:
+        return render_template(
+            "marketing/unsubscribe.html",
+            success=False,
+            error="This unsubscribe link has expired or is invalid. Please visit your account settings to manage email preferences.",
+        )
+
+    # Get user profile
+    profile = supabase_client.get_user_profile(user_id)
+
+    if not profile:
+        return render_template(
+            "marketing/unsubscribe.html",
+            success=False,
+            error="We couldn't find your account. Please visit your account settings to manage email preferences.",
+        )
+
+    # Check if already unsubscribed
+    if not profile.get("marketing_opt_in", False):
+        return render_template(
+            "marketing/unsubscribe.html",
+            success=True,
+            already_unsubscribed=True,
+        )
+
+    # Unsubscribe the user
+    success, error = supabase_client.update_marketing_preference(
+        user_id, marketing_opt_in=False
+    )
+
+    if success:
+        # Remove from Resend Audience
+        email = profile.get("email")
+        if email:
+            sync_to_resend_audience(email, subscribed=False)
+
+        return render_template(
+            "marketing/unsubscribe.html",
+            success=True,
+            already_unsubscribed=False,
+        )
+    else:
+        return render_template(
+            "marketing/unsubscribe.html",
+            success=False,
+            error="Something went wrong. Please try again or visit your account settings.",
+        )

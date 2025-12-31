@@ -292,7 +292,13 @@ def onboarding():
             flash("You've already added plants! Welcome back.", "info")
             return redirect(url_for("dashboard.index"))
 
-        return render_template("plants/onboarding.html")
+        # Get user profile to check marketing opt-in status
+        profile = supabase_client.get_user_profile(user_id)
+        marketing_opt_in = profile.get("marketing_opt_in", False) if profile else False
+
+        return render_template(
+            "plants/onboarding.html", marketing_opt_in=marketing_opt_in
+        )
 
     # POST request - handle step submission
     step = request.form.get("step", "2")
@@ -351,6 +357,11 @@ def onboarding():
                 analytics.EVENT_FIRST_PLANT_ADDED,
                 {"plant_id": plant["id"], "plant_name": name}
             )
+
+            # Handle marketing opt-in from onboarding (if user opted in during Step 1)
+            marketing_opt_in = request.form.get("marketing_opt_in") == "on"
+            if marketing_opt_in:
+                supabase_client.update_marketing_preference(user_id, marketing_opt_in=True)
 
             # Return JSON response for AJAX call
             return jsonify({

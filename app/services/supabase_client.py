@@ -740,7 +740,9 @@ def get_user_profile(user_id: str) -> Optional[Dict[str, Any]]:
         return None
 
 
-def create_user_profile(user_id: str, email: str) -> Optional[Dict[str, Any]]:
+def create_user_profile(
+    user_id: str, email: str, marketing_opt_in: bool = False
+) -> Optional[Dict[str, Any]]:
     """
     Create a new user profile with 14-day trial.
     Note: This should be handled by the database trigger, but included as fallback.
@@ -750,6 +752,7 @@ def create_user_profile(user_id: str, email: str) -> Optional[Dict[str, Any]]:
     Args:
         user_id: Supabase user UUID
         email: User's email address
+        marketing_opt_in: Whether user opted in to marketing emails
 
     Returns:
         Created profile dict or None
@@ -769,7 +772,8 @@ def create_user_profile(user_id: str, email: str) -> Optional[Dict[str, Any]]:
             "email": email,
             "plan": "free",
             "trial_ends_at": trial_ends_at,
-            "onboarding_completed": False
+            "onboarding_completed": False,
+            "marketing_opt_in": marketing_opt_in
         }).execute()
 
         return response.data[0] if response.data else None
@@ -852,6 +856,55 @@ def update_user_city(user_id: str, city: str) -> tuple[bool, Optional[str]]:
     except Exception as e:
         _safe_log_error(f"Error updating user city: {e}")
         return False, f"Error updating city: {str(e)}"
+
+
+def update_marketing_preference(
+    user_id: str, marketing_opt_in: bool
+) -> tuple[bool, Optional[str]]:
+    """
+    Update user's marketing email preference.
+
+    Args:
+        user_id: User's UUID
+        marketing_opt_in: Whether user wants to receive marketing emails
+
+    Returns:
+        tuple[bool, Optional[str]]: (success, error_message)
+    """
+    if not _supabase_client:
+        return False, "Database not configured"
+
+    try:
+        update_data = {"marketing_opt_in": marketing_opt_in}
+
+        # If opting out, record the timestamp
+        if not marketing_opt_in:
+            from datetime import datetime, timezone
+
+            update_data["marketing_unsubscribed_at"] = datetime.now(
+                timezone.utc
+            ).isoformat()
+        else:
+            # If opting back in, clear the unsubscribed timestamp
+            update_data["marketing_unsubscribed_at"] = None
+
+        response = (
+            _supabase_client.table("profiles")
+            .update(update_data)
+            .eq("id", user_id)
+            .execute()
+        )
+
+        if response.data:
+            _safe_log_info(
+                f"Updated marketing preference for user {user_id}: {marketing_opt_in}"
+            )
+            return True, None
+        return False, "Failed to update marketing preference"
+
+    except Exception as e:
+        _safe_log_error(f"Error updating marketing preference: {e}")
+        return False, f"Error updating marketing preference: {str(e)}"
 
 
 def update_user_theme(user_id: str, theme: str) -> tuple[bool, Optional[str]]:

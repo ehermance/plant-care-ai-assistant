@@ -271,6 +271,7 @@ def create_app() -> Flask:
         try:
             from apscheduler.schedulers.background import BackgroundScheduler
             from app.services.reminder_adjustments import batch_adjust_all_users_reminders
+            from app.services.marketing_emails import process_welcome_email_queue
 
             scheduler = BackgroundScheduler()
 
@@ -285,8 +286,19 @@ def create_app() -> Flask:
                 replace_existing=True
             )
 
+            # Schedule welcome email processing every hour
+            scheduler.add_job(
+                func=process_welcome_email_queue,
+                trigger="interval",
+                hours=1,
+                id="welcome_email_job",
+                name="Process Welcome Email Queue",
+                replace_existing=True
+            )
+
             scheduler.start()
             app.logger.info("[Scheduler] Daily weather adjustment job scheduled for 6:00 AM UTC")
+            app.logger.info("[Scheduler] Welcome email job scheduled to run hourly")
 
             # Shutdown scheduler gracefully on app exit
             import atexit

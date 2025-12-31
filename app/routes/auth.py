@@ -114,9 +114,10 @@ def signup():
     result = supabase_client.send_otp_code(email)
 
     if result["success"]:
-        # Store email in session for OTP verification page
+        # Store email and marketing preference in session for OTP verification
         from flask import session
         session["pending_email"] = email
+        session["pending_marketing_opt_in"] = request.form.get("marketing_opt_in") == "on"
 
         # Redirect to OTP verification page
         return redirect(url_for("auth.verify_otp"))
@@ -200,8 +201,12 @@ def verify_otp():
     # Set session with both tokens
     set_session(user, access_token, refresh_token)
 
-    # Clear pending email from session
+    # Get marketing preference before clearing session
+    marketing_opt_in = session.get("pending_marketing_opt_in", False)
+
+    # Clear pending data from session
     session.pop("pending_email", None)
+    session.pop("pending_marketing_opt_in", None)
 
     # Get or create user profile
     user_id = user.get("id")
@@ -212,7 +217,10 @@ def verify_otp():
     if not profile:
         # Profile doesn't exist (trigger should have created it, but fallback)
         current_app.logger.warning(f"Profile not found for user {user_id}, creating...")
-        supabase_client.create_user_profile(user_id, email)
+        supabase_client.create_user_profile(user_id, email, marketing_opt_in=marketing_opt_in)
+    elif marketing_opt_in and not profile.get("marketing_opt_in"):
+        # User opted in during signup but profile exists without opt-in
+        supabase_client.update_marketing_preference(user_id, marketing_opt_in=True)
 
     # Check if onboarding completed
     if not supabase_client.is_onboarding_completed(user_id):
