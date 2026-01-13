@@ -490,7 +490,7 @@ def send_welcome_email(
                 "Content-Type": "application/json",
             },
             json={
-                "from": "PlantCareAI <hello@plantcareai.app>",
+                "from": "PlantCareAI <hello@send.plantcareai.app>",
                 "to": [email],
                 "subject": email_content["subject"],
                 "html": email_content["html"],

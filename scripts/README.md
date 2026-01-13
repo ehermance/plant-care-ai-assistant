@@ -75,8 +75,6 @@ If tests fail:
 4. **Review recent changes**: Git log to see what changed
 5. **Manual browser test**: Open the site in a browser to see actual errors
 
-See [DEPLOYMENT_CHECKLIST.md](../.claude/context/DEPLOYMENT_CHECKLIST.md) for detailed troubleshooting.
-
 ---
 
 ## Future Scripts
