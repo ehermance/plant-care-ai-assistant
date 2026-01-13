@@ -9,6 +9,7 @@ This directory contains logo and branding assets for PlantCareAI.
 This is the official brand name used in all visual assets, product UI, and marketing materials. The ".app" extension is only used in specific contexts:
 
 **Use "PlantCareAI":**
+
 - All logos and visual branding
 - Website headers and navigation
 - Page titles and browser tabs
@@ -17,8 +18,9 @@ This is the official brand name used in all visual assets, product UI, and marke
 - Spoken/verbal references
 
 **Use "PlantCareAI.app":**
+
 - Domain/URL references (https://plantcareai.app)
-- Email addresses (hello@send.plantcareai.app)
+- Email addresses (updates@updates.plantcareai.app and hello@updates.plantcareai.app)
 - Technical documentation referencing the domain
 - Open Graph metadata (social sharing tags)
 
@@ -27,6 +29,7 @@ This is the official brand name used in all visual assets, product UI, and marke
 ## Files
 
 ### Header Banner
+
 - **header-banner.png** (1356x327px)
   - Main site header banner with "PlantCareAI" logo
   - Rounded corners (16px radius) matching site design
@@ -34,6 +37,7 @@ This is the official brand name used in all visual assets, product UI, and marke
   - Use in: Website header, documentation
 
 ### Email Banner
+
 - **email-banner.png** (600x180px)
   - Optimized for email templates and marketing emails
   - Shows "PlantCareAI" branding with emerald leaf logo
@@ -45,6 +49,7 @@ This is the official brand name used in all visual assets, product UI, and marke
   - Use in: Transactional emails, newsletters, notifications, landing pages
 
 ### OG Preview
+
 - **og-preview.png** (1200x630px)
   - Social media preview image
   - Features "PlantCareAI" brand banner on gradient background
@@ -70,10 +75,15 @@ When creating email templates in Supabase, use the public URL:
 
 ### Resend API Templates
 
-For Resend API (hello@send.plantcareai.app):
+For Resend API (hello@updates.plantcareai.app):
 
 ```html
-<table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto;">
+<table
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  style="max-width: 600px; margin: 0 auto;"
+>
   <tr>
     <td style="padding: 20px 0;">
       <img
@@ -127,12 +137,12 @@ If you need to regenerate these images:
 
 ## Image Specifications
 
-| File | Dimensions | Size | Format | Use Case |
-|------|-----------|------|--------|----------|
-| header-banner.png | 1356x327 | ~85KB | PNG | Website header |
-| email-banner.png | 600x180 | ~49KB | PNG | Email templates, landing pages |
-| email-banner@2x.png | 1200x360 | ~163KB | PNG | Retina display emails |
-| og-preview.png | 1200x630 | ~85KB | PNG | Social sharing |
+| File                | Dimensions | Size   | Format | Use Case                       |
+| ------------------- | ---------- | ------ | ------ | ------------------------------ |
+| header-banner.png   | 1356x327   | ~85KB  | PNG    | Website header                 |
+| email-banner.png    | 600x180    | ~49KB  | PNG    | Email templates, landing pages |
+| email-banner@2x.png | 1200x360   | ~163KB | PNG    | Retina display emails          |
+| og-preview.png      | 1200x630   | ~85KB  | PNG    | Social sharing                 |
 
 ## Brand Colors
 

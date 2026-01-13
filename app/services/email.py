@@ -156,7 +156,7 @@ PlantCareAI - Free plant care tracking and AI-powered gardening tips
                 "Content-Type": "application/json"
             },
             json={
-                "from": "PlantCareAI <hello@send.plantcareai.app>",
+                "from": "PlantCareAI <updates@updates.plantcareai.app>",
                 "to": [email],
                 "subject": f"Your PlantCareAI verification code: {code}",
                 "html": html_content,

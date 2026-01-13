@@ -331,7 +331,7 @@ def send_emails():
                     "Content-Type": "application/json",
                 },
                 json={
-                    "from": "PlantCareAI <hello@plantcareai.app>",
+                    "from": "Ellen from PlantCareAI <hello@updates.plantcareai.app>",
                     "to": [TEST_EMAIL],
                     "subject": f"[TEST] {email['subject']}",
                     "html": email["html"],
