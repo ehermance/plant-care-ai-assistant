@@ -18,7 +18,7 @@ This is the official brand name used in all visual assets, product UI, and marke
 
 **Use "PlantCareAI.app":**
 - Domain/URL references (https://plantcareai.app)
-- Email addresses (noreply@plantcareai.app)
+- Email addresses (hello@send.plantcareai.app)
 - Technical documentation referencing the domain
 - Open Graph metadata (social sharing tags)
 
@@ -70,7 +70,7 @@ When creating email templates in Supabase, use the public URL:
 
 ### Resend API Templates
 
-For Resend API (noreply@plantcareai.app):
+For Resend API (hello@send.plantcareai.app):
 
 ```html
 <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto;">
