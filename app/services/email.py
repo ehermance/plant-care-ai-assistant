@@ -57,94 +57,82 @@ def send_otp_email(email: str, code: str) -> Dict[str, Any]:
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your PlantCareAI Verification Code</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PlantCareAI Verification Code</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
-        <tr>
-            <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <!-- Header -->
-                    <tr>
-                        <td style="background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%); padding: 40px 40px 30px; text-align: center;">
-                            <div style="font-size: 48px; margin-bottom: 16px;">🌱</div>
-                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">PlantCareAI</h1>
-                        </td>
-                    </tr>
-
-                    <!-- Content -->
-                    <tr>
-                        <td style="padding: 40px;">
-                            <h2 style="margin: 0 0 16px; color: #111827; font-size: 20px; font-weight: 600;">Your Verification Code</h2>
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 1.5;">
-                                Enter this code to sign in to your PlantCareAI account:
-                            </p>
-
-                            <!-- OTP Code Box -->
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
-                                <tr>
-                                    <td align="center" style="background-color: #f9fafb; border: 2px solid #10b981; border-radius: 8px; padding: 24px;">
-                                        <div style="font-size: 36px; font-weight: 700; letter-spacing: 8px; color: #111827; font-family: 'Courier New', monospace;">
-                                            {code}
-                                        </div>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <!-- Warning Box -->
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
-                                <tr>
-                                    <td style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; border-radius: 4px;">
-                                        <p style="margin: 0; color: #92400e; font-size: 14px; font-weight: 600;">
-                                            ⚠️ Code expires in 15 minutes
-                                        </p>
-                                        <p style="margin: 8px 0 0; color: #92400e; font-size: 13px;">
-                                            For your security, this code will expire soon. If it expires, you can request a new one.
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <p style="margin: 0 0 16px; color: #4b5563; font-size: 14px; line-height: 1.5;">
-                                If you didn't request this code, you can safely ignore this email. Someone may have entered your email address by mistake.
-                            </p>
-                        </td>
-                    </tr>
-
-                    <!-- Footer -->
-                    <tr>
-                        <td style="background-color: #f9fafb; padding: 24px 40px; border-top: 1px solid #e5e7eb;">
-                            <p style="margin: 0 0 8px; color: #6b7280; font-size: 12px; text-align: center;">
-                                This is an automated message from PlantCareAI
-                            </p>
-                            <p style="margin: 0; color: #9ca3af; font-size: 11px; text-align: center;">
-                                Free plant care tracking and AI-powered gardening tips
-                            </p>
-                        </td>
-                    </tr>
-                </table>
+<body style="margin:0; padding:0; background-color:#ffffff; font-family:Arial, sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+      <td align="center" style="padding:24px;">
+        <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="width:100%; max-width:600px;">
+          <tr>
+            <td style="padding:0 0 16px; font-size:18px; font-weight:bold; color:#111827;">
+              PlantCareAI
             </td>
-        </tr>
-    </table>
+          </tr>
+
+          <tr>
+            <td style="padding:0 0 12px; font-size:16px; font-weight:bold; color:#111827;">
+              Your verification code
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:0 0 16px; font-size:14px; color:#374151; line-height:1.5;">
+              Enter this code to sign in:
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:16px; border:1px solid #e5e7eb; border-radius:6px; text-align:center;">
+              <div style="font-size:32px; font-weight:bold; letter-spacing:4px; color:#111827;">
+                {code}
+              </div>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:16px 0 0; font-size:13px; color:#6b7280; line-height:1.5;">
+              This code expires in 15 minutes. Don’t share it with anyone.
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:16px 0 0; font-size:13px; color:#6b7280; line-height:1.5;">
+              If you didn’t request this, you can safely ignore this email.
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:24px 0 0; font-size:12px; color:#9ca3af; line-height:1.5;">
+              Automated message from PlantCareAI.
+              Need help? support@plantcareai.app
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
 """
 
     # Plain text version (for email clients that don't support HTML)
-    text_content = f"""PlantCareAI Verification Code
+    text_content = f"""PlantCareAI
+    
+Your verification code
 
-Your verification code is: {code}
+Enter this code to sign in:
+{code}
 
-This code expires in 15 minutes.
+This code expires in 15 minutes. Don’t share it with anyone.
 
-Enter this code to sign in to your PlantCareAI account.
-
-If you didn't request this code, you can safely ignore this email.
+If you didn’t request this, you can safely ignore this email.
 
 ---
-PlantCareAI - Free plant care tracking and AI-powered gardening tips
+Automated message from PlantCareAI.
+Need help? support@plantcareai.app
 """
 
     # Send email via Resend API
