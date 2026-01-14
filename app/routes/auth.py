@@ -198,15 +198,11 @@ def verify_otp():
     access_token = session_data["access_token"]
     refresh_token = session_data["refresh_token"]
 
-    # Set session with both tokens
-    set_session(user, access_token, refresh_token)
-
-    # Get marketing preference before clearing session
+    # Get marketing preference BEFORE set_session (which clears the session)
     marketing_opt_in = session.get("pending_marketing_opt_in", False)
 
-    # Clear pending data from session
-    session.pop("pending_email", None)
-    session.pop("pending_marketing_opt_in", None)
+    # Set session with both tokens (this clears the session)
+    set_session(user, access_token, refresh_token)
 
     # Get or create user profile
     user_id = user.get("id")
