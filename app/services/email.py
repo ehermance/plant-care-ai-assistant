@@ -98,7 +98,7 @@ def send_otp_email(email: str, code: str) -> Dict[str, Any]:
                                 <tr>
                                     <td style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; border-radius: 4px;">
                                         <p style="margin: 0; color: #92400e; font-size: 14px; font-weight: 600;">
-                                            ⚠️ Code expires in 5 minutes
+                                            ⚠️ Code expires in 15 minutes
                                         </p>
                                         <p style="margin: 8px 0 0; color: #92400e; font-size: 13px;">
                                             For your security, this code will expire soon. If it expires, you can request a new one.
@@ -137,7 +137,7 @@ def send_otp_email(email: str, code: str) -> Dict[str, Any]:
 
 Your verification code is: {code}
 
-This code expires in 5 minutes.
+This code expires in 15 minutes.
 
 Enter this code to sign in to your PlantCareAI account.
 
