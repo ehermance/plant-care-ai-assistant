@@ -13,7 +13,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, List, Optional
 import os
 import requests
-from flask import current_app, has_app_context, url_for
+from flask import current_app, has_app_context
 from itsdangerous import URLSafeSerializer
 
 
@@ -55,11 +55,16 @@ def get_unsubscribe_url(user_id: str) -> str:
         secret_key = current_app.secret_key or os.getenv("SECRET_KEY", "dev-secret")
         s = URLSafeSerializer(secret_key, salt="unsubscribe")
         token = s.dumps(user_id)
-        return url_for("marketing.unsubscribe", token=token, _external=True)
+
+        # Build URL manually to work outside request context (scheduler jobs)
+        # url_for with _external=True requires SERVER_NAME or active request
+        base_url = os.getenv("APP_URL", "https://plantcareai.app")
+        return f"{base_url}/marketing/unsubscribe/{token}"
     except Exception as e:
         _safe_log_error(f"Error generating unsubscribe URL: {e}")
         # Fallback to account settings page
-        return url_for("dashboard.account", _external=True)
+        base_url = os.getenv("APP_URL", "https://plantcareai.app")
+        return f"{base_url}/dashboard/account"
 
 
 def verify_unsubscribe_token(token: str) -> Optional[str]:
@@ -438,11 +443,11 @@ def send_welcome_email(
     Returns:
         Dict with 'success' bool and 'message' or 'error'
     """
-    from app.services import supabase_client
+    from app.services.supabase_client import get_admin_client
 
-    # Check if already sent
+    # Check if already sent (use admin client to bypass RLS)
     try:
-        client = supabase_client._supabase_client
+        client = get_admin_client()
         if not client:
             return {"success": False, "error": "database_not_configured"}
 
@@ -538,13 +543,14 @@ def get_pending_welcome_emails() -> List[Dict[str, Any]]:
 
     Returns list of dicts with user_id, email, and email_type needed.
     """
-    from app.services import supabase_client
+    from app.services.supabase_client import get_admin_client
 
     pending = []
     now = datetime.now(timezone.utc)
 
     try:
-        client = supabase_client._supabase_client
+        # Use admin client to bypass RLS (profiles table has RLS enabled)
+        client = get_admin_client()
         if not client:
             return pending
 
