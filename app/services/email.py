@@ -146,7 +146,7 @@ Need help? support@plantcareai.app
             json={
                 "from": "PlantCareAI <verify@updates.plantcareai.app>",
                 "to": [email],
-                "subject": f"Your PlantCareAI verification code: {code}",
+                "subject": "Your PlantCareAI verification code is ready",
                 "html": html_content,
                 "text": text_content,
             },

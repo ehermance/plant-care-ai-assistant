@@ -275,9 +275,19 @@ def create_app() -> Flask:
 
             scheduler = BackgroundScheduler()
 
+            # Wrapper functions to ensure Flask app context is available
+            # APScheduler runs jobs in background threads without app context
+            def run_weather_adjustments():
+                with app.app_context():
+                    batch_adjust_all_users_reminders()
+
+            def run_welcome_email_job():
+                with app.app_context():
+                    process_welcome_email_queue()
+
             # Schedule daily weather adjustments at 6:00 AM (UTC)
             scheduler.add_job(
-                func=batch_adjust_all_users_reminders,
+                func=run_weather_adjustments,
                 trigger="cron",
                 hour=6,
                 minute=0,
@@ -288,7 +298,7 @@ def create_app() -> Flask:
 
             # Schedule welcome email processing every hour
             scheduler.add_job(
-                func=process_welcome_email_queue,
+                func=run_welcome_email_job,
                 trigger="interval",
                 hours=1,
                 id="welcome_email_job",

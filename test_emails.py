@@ -101,7 +101,7 @@ def get_welcome_day0_email(unsubscribe_url: str) -> dict:
 
                             <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
                                 Happy growing! 🌿<br>
-                                <em>The PlantCareAI Team</em>
+                                Ellen
                             </p>
                         </td>
                     </tr>
@@ -180,7 +180,7 @@ def get_welcome_day3_email(unsubscribe_url: str) -> dict:
 
                             <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
                                 Keep growing! 🌿<br>
-                                <em>The PlantCareAI Team</em>
+                                Ellen
                             </p>
                         </td>
                     </tr>
@@ -268,7 +268,7 @@ def get_welcome_day7_email(unsubscribe_url: str) -> dict:
 
                             <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
                                 Happy planting! 🌿<br>
-                                <em>The PlantCareAI Team</em>
+                                Ellen
                             </p>
                         </td>
                     </tr>

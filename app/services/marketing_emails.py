@@ -164,7 +164,7 @@ def _get_welcome_day0_email(unsubscribe_url: str) -> Dict[str, str]:
 
                             <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
                                 Happy growing! 🌿<br>
-                                <em>The PlantCareAI Team</em>
+                                Ellen
                             </p>
                         </td>
                     </tr>
@@ -196,7 +196,7 @@ Get notified when it's time to water, fertilize, or rotate your plants.
 Got questions? Our plant care AI knows all about watering, light, and troubleshooting.
 
 Happy growing! 🌿
-The PlantCareAI Team
+Ellen
 
 ---
 To unsubscribe from marketing emails, visit your account settings.
@@ -269,7 +269,7 @@ def _get_welcome_day3_email(unsubscribe_url: str) -> Dict[str, str]:
 
                             <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
                                 Keep growing! 🌿<br>
-                                <em>The PlantCareAI Team</em>
+                                Ellen
                             </p>
                         </td>
                     </tr>
@@ -299,7 +299,7 @@ Give your plants a quarter turn every time you water. This helps them grow evenl
 💡 Pro tip: Use our AI assistant for personalized advice about your specific plants!
 
 Keep growing! 🌿
-The PlantCareAI Team
+Ellen
 
 ---
 To unsubscribe from marketing emails, visit your account settings.
@@ -381,7 +381,7 @@ def _get_welcome_day7_email(unsubscribe_url: str) -> Dict[str, str]:
 
                             <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
                                 Happy planting! 🌿<br>
-                                <em>The PlantCareAI Team</em>
+                                Ellen
                             </p>
                         </td>
                     </tr>
@@ -411,7 +411,7 @@ Track your plant's progress with photos and notes. Perfect for spotting patterns
 Have questions or feedback? Just reply to this email — we'd love to hear from you!
 
 Happy planting! 🌿
-The PlantCareAI Team
+Ellen
 
 ---
 To unsubscribe from marketing emails, visit your account settings.
@@ -492,9 +492,15 @@ def send_welcome_email(
             json={
                 "from": "Ellen from PlantCareAI <hello@updates.plantcareai.app>",
                 "to": [email],
+                "reply_to": "support@plantcareai.app",
                 "subject": email_content["subject"],
                 "html": email_content["html"],
                 "text": email_content["text"],
+                # RFC 2369 List-Unsubscribe header for Gmail compliance
+                "headers": {
+                    "List-Unsubscribe": f"<{unsubscribe_url}>",
+                    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+                },
             },
             timeout=10,
         )
