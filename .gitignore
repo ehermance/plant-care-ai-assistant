@@ -66,4 +66,6 @@ docs/
 migrations/
 supabase_migrations/
 email_previews/
+newsletters/
 tests/
+scripts/

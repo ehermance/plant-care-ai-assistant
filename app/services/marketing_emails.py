@@ -12,7 +12,6 @@ from __future__ import annotations
 from datetime import datetime, timezone, timedelta
 from html import escape as html_escape
 from typing import Dict, Any, List, Optional
-import json
 import os
 import requests
 from flask import current_app, has_app_context
@@ -146,6 +145,10 @@ def _send_via_resend(
                     "List-Unsubscribe": f"<{unsubscribe_url}>",
                     "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
                 },
+                "tracking": {
+                    "click": False,
+                    "open": False,
+                },
             },
             timeout=10,
         )
@@ -188,17 +191,17 @@ def _get_welcome_day0_email(unsubscribe_url: str) -> Dict[str, str]:
     """Generate Day 0 welcome email (immediate)."""
     html_content = f"""
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to PlantCareAI!</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <!-- Header -->
                     <tr>
                         <td style="background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%); padding: 40px 40px 30px; text-align: center;">
@@ -217,7 +220,7 @@ def _get_welcome_day0_email(unsubscribe_url: str) -> Dict[str, str]:
 
                             <h3 style="margin: 24px 0 16px; color: #111827; font-size: 18px; font-weight: 600;">Quick Start Guide</h3>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #ecfdf5; border-radius: 8px; margin-bottom: 12px;">
                                         <p style="margin: 0; color: #065f46; font-size: 14px;">
@@ -297,17 +300,17 @@ def _get_welcome_day3_email(unsubscribe_url: str) -> Dict[str, str]:
     """Generate Day 3 welcome email (plant care tips)."""
     html_content = f"""
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plant Care Tips from PlantCareAI</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <!-- Header -->
                     <tr>
                         <td style="background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%); padding: 40px 40px 30px; text-align: center;">
@@ -338,7 +341,7 @@ def _get_welcome_day3_email(unsubscribe_url: str) -> Dict[str, str]:
                                 Give your plants a quarter turn every time you water. This helps them grow evenly instead of leaning toward the light. Your future self will thank you!
                             </p>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0;">
                                 <tr>
                                     <td style="background-color: #ecfdf5; border-radius: 8px; padding: 20px; text-align: center;">
                                         <p style="margin: 0 0 8px; color: #065f46; font-size: 14px; font-weight: 600;">
@@ -400,17 +403,17 @@ def _get_welcome_day7_email(unsubscribe_url: str) -> Dict[str, str]:
     """Generate Day 7 welcome email (weather feature deep dive)."""
     html_content = f"""
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Plants Check the Weather Now</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <!-- Header -->
                     <tr>
                         <td style="background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%); padding: 40px 40px 30px; text-align: center;">
@@ -426,7 +429,7 @@ def _get_welcome_day7_email(unsubscribe_url: str) -> Dict[str, str]:
                                 Here's something most people don't realize about PlantCareAI: <strong>it adjusts your reminders based on weather.</strong>
                             </p>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
                                 <tr>
                                     <td style="padding: 20px; background-color: #dbeafe; border-radius: 8px;">
                                         <h3 style="margin: 0 0 8px; color: #1e40af; font-size: 16px; font-weight: 600;">☔ Rain expected tomorrow?</h3>
@@ -437,7 +440,7 @@ def _get_welcome_day7_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
                                 <tr>
                                     <td style="padding: 20px; background-color: #fef3c7; border-radius: 8px;">
                                         <h3 style="margin: 0 0 8px; color: #92400e; font-size: 16px; font-weight: 600;">🥶 Frost warning?</h3>
@@ -448,7 +451,7 @@ def _get_welcome_day7_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
                                     <td style="padding: 20px; background-color: #fee2e2; border-radius: 8px;">
                                         <h3 style="margin: 0 0 8px; color: #991b1b; font-size: 16px; font-weight: 600;">🔥 Heatwave coming?</h3>
@@ -463,7 +466,7 @@ def _get_welcome_day7_email(unsubscribe_url: str) -> Dict[str, str]:
                                 This happens automatically — you don't have to do anything. Just make sure your location is set in settings.
                             </p>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
                                     <td style="background-color: #ecfdf5; border-radius: 8px; padding: 20px; text-align: center;">
                                         <p style="margin: 0 0 8px; color: #065f46; font-size: 14px; font-weight: 600;">
@@ -533,17 +536,17 @@ def _get_welcome_day10_email(unsubscribe_url: str) -> Dict[str, str]:
     """Generate Day 10 welcome email (journaling deep dive)."""
     html_content = f"""
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Best Way to Improve at Plant Care</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <!-- Header -->
                     <tr>
                         <td style="background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%); padding: 40px 40px 30px; text-align: center;">
@@ -567,7 +570,7 @@ def _get_welcome_day10_email(unsubscribe_url: str) -> Dict[str, str]:
                                 After a few months of logging, you'll know:
                             </p>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #f3f4f6; border-radius: 8px;">
                                         <p style="margin: 0 0 12px; color: #374151; font-size: 14px; line-height: 1.6;">
@@ -588,7 +591,7 @@ def _get_welcome_day10_email(unsubscribe_url: str) -> Dict[str, str]:
 
                             <h3 style="margin: 0 0 16px; color: #111827; font-size: 18px; font-weight: 600;">PlantCareAI's journal makes this easy:</h3>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #ecfdf5; border-radius: 8px;">
                                         <p style="margin: 0 0 8px; color: #065f46; font-size: 14px;">
@@ -607,7 +610,7 @@ def _get_welcome_day10_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
                                     <td style="background-color: #fef3c7; border-radius: 8px; padding: 20px; text-align: center;">
                                         <p style="margin: 0; color: #92400e; font-size: 14px;">
@@ -672,17 +675,17 @@ def _get_reengagement_14day_email(unsubscribe_url: str) -> Dict[str, str]:
     """Generate re-engagement email for users inactive 14+ days."""
     html_content = f"""
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Plants Miss You</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <!-- Header -->
                     <tr>
                         <td style="background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%); padding: 40px 40px 30px; text-align: center;">
@@ -704,7 +707,7 @@ def _get_reengagement_14day_email(unsubscribe_url: str) -> Dict[str, str]:
 
                             <h3 style="margin: 0 0 16px; color: #111827; font-size: 18px; font-weight: 600;">Here's what you can do in 30 seconds:</h3>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #ecfdf5; border-radius: 8px;">
                                         <p style="margin: 0 0 12px; color: #065f46; font-size: 14px; line-height: 1.6;">
@@ -720,7 +723,7 @@ def _get_reengagement_14day_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
                                     <td style="background-color: #fef3c7; border-radius: 8px; padding: 20px; text-align: center;">
                                         <p style="margin: 0; color: #92400e; font-size: 14px;">
@@ -778,17 +781,17 @@ def _get_seasonal_spring_email(unsubscribe_url: str) -> Dict[str, str]:
     """Generate spring seasonal email (March)."""
     html_content = f"""
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spring Plant Care Checklist</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <tr>
                         <td style="background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%); padding: 40px 40px 30px; text-align: center;">
                             <div style="font-size: 48px; margin-bottom: 16px;">🌸</div>
@@ -803,7 +806,7 @@ def _get_seasonal_spring_email(unsubscribe_url: str) -> Dict[str, str]:
 
                             <h3 style="margin: 0 0 16px; color: #111827; font-size: 18px; font-weight: 600;">Your Spring To-Do List:</h3>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #ecfdf5; border-radius: 8px;">
                                         <p style="margin: 0 0 8px; color: #065f46; font-size: 14px;"><strong>🌱 Start fertilizing again</strong></p>
@@ -812,7 +815,7 @@ def _get_seasonal_spring_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #fef3c7; border-radius: 8px;">
                                         <p style="margin: 0 0 8px; color: #92400e; font-size: 14px;"><strong>🪴 Check if anyone needs repotting</strong></p>
@@ -821,7 +824,7 @@ def _get_seasonal_spring_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #dbeafe; border-radius: 8px;">
                                         <p style="margin: 0 0 8px; color: #1e40af; font-size: 14px;"><strong>✂️ Propagate your favorites</strong></p>
@@ -878,17 +881,17 @@ def _get_seasonal_summer_email(unsubscribe_url: str) -> Dict[str, str]:
     """Generate summer seasonal email (June)."""
     html_content = f"""
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Summer Plant Care Tips</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <tr>
                         <td style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); padding: 40px 40px 30px; text-align: center;">
                             <div style="font-size: 48px; margin-bottom: 16px;">☀️</div>
@@ -903,7 +906,7 @@ def _get_seasonal_summer_email(unsubscribe_url: str) -> Dict[str, str]:
 
                             <h3 style="margin: 0 0 16px; color: #111827; font-size: 18px; font-weight: 600;">Beat the Heat:</h3>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #dbeafe; border-radius: 8px;">
                                         <p style="margin: 0 0 8px; color: #1e40af; font-size: 14px;"><strong>💧 Water more often</strong></p>
@@ -912,7 +915,7 @@ def _get_seasonal_summer_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #fef3c7; border-radius: 8px;">
                                         <p style="margin: 0 0 8px; color: #92400e; font-size: 14px;"><strong>🌤️ Watch for sunburn</strong></p>
@@ -921,7 +924,7 @@ def _get_seasonal_summer_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #ecfdf5; border-radius: 8px;">
                                         <p style="margin: 0 0 8px; color: #065f46; font-size: 14px;"><strong>🌬️ Boost humidity</strong></p>
@@ -978,17 +981,17 @@ def _get_seasonal_fall_email(unsubscribe_url: str) -> Dict[str, str]:
     """Generate fall seasonal email (September)."""
     html_content = f"""
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Preparing Your Plants for Fall</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <tr>
                         <td style="background: linear-gradient(135deg, #f59e0b 0%, #dc2626 100%); padding: 40px 40px 30px; text-align: center;">
                             <div style="font-size: 48px; margin-bottom: 16px;">🍂</div>
@@ -1003,7 +1006,7 @@ def _get_seasonal_fall_email(unsubscribe_url: str) -> Dict[str, str]:
 
                             <h3 style="margin: 0 0 16px; color: #111827; font-size: 18px; font-weight: 600;">Fall Prep Checklist:</h3>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #fef3c7; border-radius: 8px;">
                                         <p style="margin: 0 0 8px; color: #92400e; font-size: 14px;"><strong>🏠 Bring outdoor plants inside</strong></p>
@@ -1012,7 +1015,7 @@ def _get_seasonal_fall_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #dbeafe; border-radius: 8px;">
                                         <p style="margin: 0 0 8px; color: #1e40af; font-size: 14px;"><strong>💧 Reduce watering</strong></p>
@@ -1021,7 +1024,7 @@ def _get_seasonal_fall_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #ecfdf5; border-radius: 8px;">
                                         <p style="margin: 0 0 8px; color: #065f46; font-size: 14px;"><strong>☀️ Maximize light</strong></p>
@@ -1078,17 +1081,17 @@ def _get_seasonal_winter_email(unsubscribe_url: str) -> Dict[str, str]:
     """Generate winter seasonal email (November)."""
     html_content = f"""
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Winter Dormancy Tips</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <tr>
                         <td style="background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%); padding: 40px 40px 30px; text-align: center;">
                             <div style="font-size: 48px; margin-bottom: 16px;">❄️</div>
@@ -1103,7 +1106,7 @@ def _get_seasonal_winter_email(unsubscribe_url: str) -> Dict[str, str]:
 
                             <h3 style="margin: 0 0 16px; color: #111827; font-size: 18px; font-weight: 600;">Winter Care Basics:</h3>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #dbeafe; border-radius: 8px;">
                                         <p style="margin: 0 0 8px; color: #1e40af; font-size: 14px;"><strong>💧 Water less often</strong></p>
@@ -1112,7 +1115,7 @@ def _get_seasonal_winter_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 16px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #fef3c7; border-radius: 8px;">
                                         <p style="margin: 0 0 8px; color: #92400e; font-size: 14px;"><strong>🚫 Stop fertilizing</strong></p>
@@ -1121,7 +1124,7 @@ def _get_seasonal_winter_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #ecfdf5; border-radius: 8px;">
                                         <p style="margin: 0 0 8px; color: #065f46; font-size: 14px;"><strong>🌡️ Watch for drafts</strong></p>
@@ -1178,17 +1181,17 @@ def _get_milestone_first_plant_email(unsubscribe_url: str) -> Dict[str, str]:
     """Generate milestone email for first plant added."""
     html_content = f"""
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your First Plant Is In!</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <tr>
                         <td style="background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%); padding: 40px 40px 30px; text-align: center;">
                             <div style="font-size: 48px; margin-bottom: 16px;">🌱</div>
@@ -1205,7 +1208,7 @@ def _get_milestone_first_plant_email(unsubscribe_url: str) -> Dict[str, str]:
                                 Here's what happens next:
                             </p>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #ecfdf5; border-radius: 8px;">
                                         <p style="margin: 0 0 12px; color: #065f46; font-size: 14px; line-height: 1.6;">
@@ -1221,7 +1224,7 @@ def _get_milestone_first_plant_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
                                     <td style="background-color: #fef3c7; border-radius: 8px; padding: 20px; text-align: center;">
                                         <p style="margin: 0; color: #92400e; font-size: 14px;">
@@ -1277,17 +1280,17 @@ def _get_milestone_anniversary_30_email(unsubscribe_url: str, plant_name: str) -
     safe_plant_name = html_escape(plant_name)
     html_content = f"""
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>One Month Together!</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <tr>
                         <td style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); padding: 40px 40px 30px; text-align: center;">
                             <div style="font-size: 48px; margin-bottom: 16px;">🎂</div>
@@ -1304,7 +1307,7 @@ def _get_milestone_anniversary_30_email(unsubscribe_url: str, plant_name: str) -
                                 That's 30 days of learning what makes your plant happy. You've probably figured out its favorite spot, how thirsty it gets, and maybe even started to notice new growth.
                             </p>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
                                     <td style="padding: 20px; background-color: #ecfdf5; border-radius: 8px; text-align: center;">
                                         <p style="margin: 0 0 8px; color: #065f46; font-size: 14px; font-weight: 600;">
@@ -1359,17 +1362,17 @@ def _get_milestone_streak_5_email(unsubscribe_url: str, streak_count: int) -> Di
     """Generate milestone email for watering streak."""
     html_content = f"""
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>You're on a Streak!</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <tr>
                         <td style="background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%); padding: 40px 40px 30px; text-align: center;">
                             <div style="font-size: 48px; margin-bottom: 16px;">💧</div>
@@ -1382,7 +1385,7 @@ def _get_milestone_streak_5_email(unsubscribe_url: str, streak_count: int) -> Di
                                 You've logged plant care for <strong>{streak_count} days in a row!</strong> Your plants are lucky to have you.
                             </p>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
                                     <td style="padding: 24px; background-color: #dbeafe; border-radius: 8px; text-align: center;">
                                         <p style="margin: 0; color: #1e40af; font-size: 36px; font-weight: bold;">
@@ -1440,17 +1443,17 @@ def _get_milestone_collection_5_email(unsubscribe_url: str, plant_count: int) ->
     """Generate milestone email for growing collection."""
     html_content = f"""
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Collection Is Growing!</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <tr>
                         <td style="background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%); padding: 40px 40px 30px; text-align: center;">
                             <div style="font-size: 48px; margin-bottom: 16px;">🌿</div>
@@ -1463,7 +1466,7 @@ def _get_milestone_collection_5_email(unsubscribe_url: str, plant_count: int) ->
                                 You now have <strong>{plant_count} plants</strong> in your collection! 🎉
                             </p>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
                                     <td style="padding: 24px; background-color: #ecfdf5; border-radius: 8px; text-align: center;">
                                         <p style="margin: 0; color: #065f46; font-size: 48px; font-weight: bold;">
@@ -1480,7 +1483,7 @@ def _get_milestone_collection_5_email(unsubscribe_url: str, plant_count: int) ->
                                 As your collection grows, here are some tips to stay organized:
                             </p>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
                                     <td style="padding: 16px; background-color: #f3f4f6; border-radius: 8px;">
                                         <p style="margin: 0 0 8px; color: #374151; font-size: 14px;">
