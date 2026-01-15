@@ -10,7 +10,9 @@ Provides:
 
 from __future__ import annotations
 from datetime import datetime, timezone, timedelta
+from html import escape as html_escape
 from typing import Dict, Any, List, Optional
+import json
 import os
 import requests
 from flask import current_app, has_app_context
@@ -99,6 +101,69 @@ def verify_unsubscribe_token(token: str) -> Optional[str]:
     except Exception as e:
         _safe_log_error(f"Invalid unsubscribe token: {e}")
         return None
+
+
+def _send_via_resend(
+    to_email: str,
+    subject: str,
+    html_content: str,
+    text_content: str,
+    unsubscribe_url: str
+) -> Dict[str, Any]:
+    """
+    Send an email via Resend API with standard marketing email headers.
+
+    Args:
+        to_email: Recipient email address
+        subject: Email subject line
+        html_content: HTML email body
+        text_content: Plain text email body
+        unsubscribe_url: Unsubscribe URL for headers
+
+    Returns:
+        Dict with 'success' bool and 'message' or 'error'
+    """
+    api_key = os.getenv("RESEND_API_KEY")
+    if not api_key:
+        _safe_log_error("RESEND_API_KEY not configured")
+        return {"success": False, "error": "email_not_configured"}
+
+    try:
+        response = requests.post(
+            "https://api.resend.com/emails",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "from": "Ellen from PlantCareAI <hello@updates.plantcareai.app>",
+                "to": [to_email],
+                "reply_to": "support@plantcareai.app",
+                "subject": subject,
+                "html": html_content,
+                "text": text_content,
+                "headers": {
+                    "List-Unsubscribe": f"<{unsubscribe_url}>",
+                    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+                },
+            },
+            timeout=10,
+        )
+
+        if response.status_code == 200:
+            return {"success": True, "message": "sent"}
+        else:
+            error_data = response.json() if response.text else {}
+            error_message = error_data.get("message", "Unknown error")
+            _safe_log_error(f"Resend API error: {response.status_code} - {error_message}")
+            return {"success": False, "error": "email_send_failed"}
+
+    except requests.exceptions.Timeout:
+        _safe_log_error("Resend API timeout")
+        return {"success": False, "error": "timeout"}
+    except Exception as e:
+        _safe_log_error(f"Error sending email via Resend: {e}")
+        return {"success": False, "error": str(e)}
 
 
 def _get_email_footer(unsubscribe_url: str) -> str:
@@ -1208,6 +1273,8 @@ To unsubscribe from marketing emails, visit your account settings.
 
 def _get_milestone_anniversary_30_email(unsubscribe_url: str, plant_name: str) -> Dict[str, str]:
     """Generate milestone email for 30-day plant anniversary."""
+    # Escape plant_name to prevent XSS in HTML email
+    safe_plant_name = html_escape(plant_name)
     html_content = f"""
 <!DOCTYPE html>
 <html>
@@ -1230,7 +1297,7 @@ def _get_milestone_anniversary_30_email(unsubscribe_url: str, plant_name: str) -
                     <tr>
                         <td style="padding: 40px;">
                             <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 1.6;">
-                                Your <strong>{plant_name}</strong> has been with you for 1 month now! 🎉
+                                Your <strong>{safe_plant_name}</strong> has been with you for 1 month now! <span aria-label="party">🎉</span>
                             </p>
 
                             <p style="margin: 0 0 24px; color: #4b5563; font-size: 14px; line-height: 1.6;">
@@ -1282,7 +1349,7 @@ To unsubscribe from marketing emails, visit your account settings.
 """
 
     return {
-        "subject": f"🎂 {plant_name} has been with you for 1 month!",
+        "subject": f"🎂 {safe_plant_name} has been with you for 1 month!",
         "html": html_content,
         "text": text_content
     }
@@ -1508,12 +1575,6 @@ def send_welcome_email(
         _safe_log_error(f"Error checking welcome email history: {e}")
         # Continue anyway - we'll try to insert and let the unique constraint catch duplicates
 
-    # Get API key
-    api_key = os.getenv("RESEND_API_KEY")
-    if not api_key:
-        _safe_log_error("RESEND_API_KEY not configured")
-        return {"success": False, "error": "email_not_configured"}
-
     # Generate unsubscribe URL
     unsubscribe_url = get_unsubscribe_url(user_id)
 
@@ -1539,55 +1600,29 @@ def send_welcome_email(
     else:
         return {"success": False, "error": f"unknown_email_type: {email_type}"}
 
-    # Send email via Resend API
-    try:
-        response = requests.post(
-            "https://api.resend.com/emails",
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "from": "Ellen from PlantCareAI <hello@updates.plantcareai.app>",
-                "to": [email],
-                "reply_to": "support@plantcareai.app",
-                "subject": email_content["subject"],
-                "html": email_content["html"],
-                "text": email_content["text"],
-                # RFC 2369 List-Unsubscribe header for Gmail compliance
-                "headers": {
-                    "List-Unsubscribe": f"<{unsubscribe_url}>",
-                    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-                },
-            },
-            timeout=10,
-        )
+    # Send email via Resend API using shared helper
+    result = _send_via_resend(
+        to_email=email,
+        subject=email_content["subject"],
+        html_content=email_content["html"],
+        text_content=email_content["text"],
+        unsubscribe_url=unsubscribe_url
+    )
 
-        if response.status_code == 200:
-            # Record that we sent the email
-            try:
-                client.table("welcome_emails_sent").insert(
-                    {"user_id": user_id, "email_type": email_type}
-                ).execute()
-            except Exception as e:
-                # If insert fails due to duplicate, that's fine
-                if "duplicate key" not in str(e) and "23505" not in str(e):
-                    _safe_log_error(f"Error recording welcome email: {e}")
+    if result.get("success"):
+        # Record that we sent the email
+        try:
+            client.table("welcome_emails_sent").insert(
+                {"user_id": user_id, "email_type": email_type}
+            ).execute()
+        except Exception as e:
+            # If insert fails due to duplicate, that's fine
+            if "duplicate key" not in str(e) and "23505" not in str(e):
+                _safe_log_error(f"Error recording welcome email: {e}")
 
-            _safe_log_info(f"Welcome email {email_type} sent to {email}")
-            return {"success": True, "message": "sent"}
-        else:
-            error_data = response.json() if response.text else {}
-            error_message = error_data.get("message", "Unknown error")
-            _safe_log_error(f"Resend API error: {response.status_code} - {error_message}")
-            return {"success": False, "error": "email_send_failed"}
+        _safe_log_info(f"Welcome email {email_type} sent to {email}")
 
-    except requests.exceptions.Timeout:
-        _safe_log_error("Resend API timeout for welcome email")
-        return {"success": False, "error": "timeout"}
-    except Exception as e:
-        _safe_log_error(f"Error sending welcome email: {e}")
-        return {"success": False, "error": str(e)}
+    return result
 
 
 def get_pending_welcome_emails() -> List[Dict[str, Any]]:
@@ -2009,17 +2044,13 @@ def trigger_milestone_event(
         True if event was recorded, False otherwise
     """
     from app.services.supabase_client import get_admin_client
-    import json
 
     try:
         client = get_admin_client()
         if not client:
             return False
 
-        # Use a JSON string for event_data in the unique constraint
-        event_data_json = json.dumps(event_data, sort_keys=True) if event_data else "{}"
-
-        # Try to insert (will fail silently if duplicate)
+        # Try to insert (will fail silently if duplicate due to unique constraint)
         client.table("email_events").insert({
             "user_id": user_id,
             "event_type": event_type,
@@ -2055,13 +2086,6 @@ def send_milestone_email(
         Dict with 'success' bool and 'message' or 'error'
     """
     from app.services.supabase_client import get_admin_client
-    import json
-
-    # Get API key
-    api_key = os.getenv("RESEND_API_KEY")
-    if not api_key:
-        _safe_log_error("RESEND_API_KEY not configured")
-        return {"success": False, "error": "email_not_configured"}
 
     # Generate unsubscribe URL
     unsubscribe_url = get_unsubscribe_url(user_id)
@@ -2081,57 +2105,31 @@ def send_milestone_email(
     else:
         return {"success": False, "error": f"unknown_event_type: {event_type}"}
 
-    # Send email via Resend API
-    try:
-        response = requests.post(
-            "https://api.resend.com/emails",
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "from": "Ellen from PlantCareAI <hello@updates.plantcareai.app>",
-                "to": [email],
-                "reply_to": "support@plantcareai.app",
-                "subject": email_content["subject"],
-                "html": email_content["html"],
-                "text": email_content["text"],
-                "headers": {
-                    "List-Unsubscribe": f"<{unsubscribe_url}>",
-                    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-                },
-            },
-            timeout=10,
-        )
+    # Send email via Resend API using shared helper
+    result = _send_via_resend(
+        to_email=email,
+        subject=email_content["subject"],
+        html_content=email_content["html"],
+        text_content=email_content["text"],
+        unsubscribe_url=unsubscribe_url
+    )
 
-        if response.status_code == 200:
-            # Mark the event as sent
-            try:
-                client = get_admin_client()
-                if client:
-                    event_data_json = json.dumps(event_data, sort_keys=True) if event_data else "{}"
-                    client.table("email_events").update({
-                        "email_sent_at": datetime.now(timezone.utc).isoformat()
-                    }).eq("user_id", user_id).eq(
-                        "event_type", event_type
-                    ).is_("email_sent_at", "null").execute()
-            except Exception as e:
-                _safe_log_error(f"Error marking milestone event as sent: {e}")
+    if result.get("success"):
+        # Mark the event as sent
+        try:
+            client = get_admin_client()
+            if client:
+                client.table("email_events").update({
+                    "email_sent_at": datetime.now(timezone.utc).isoformat()
+                }).eq("user_id", user_id).eq(
+                    "event_type", event_type
+                ).is_("email_sent_at", "null").execute()
+        except Exception as e:
+            _safe_log_error(f"Error marking milestone event as sent: {e}")
 
-            _safe_log_info(f"Milestone email {event_type} sent to {email}")
-            return {"success": True, "message": "sent"}
-        else:
-            error_data = response.json() if response.text else {}
-            error_message = error_data.get("message", "Unknown error")
-            _safe_log_error(f"Resend API error: {response.status_code} - {error_message}")
-            return {"success": False, "error": "email_send_failed"}
+        _safe_log_info(f"Milestone email {event_type} sent to {email}")
 
-    except requests.exceptions.Timeout:
-        _safe_log_error("Resend API timeout for milestone email")
-        return {"success": False, "error": "timeout"}
-    except Exception as e:
-        _safe_log_error(f"Error sending milestone email: {e}")
-        return {"success": False, "error": str(e)}
+    return result
 
 
 def get_pending_milestone_emails() -> List[Dict[str, Any]]:
