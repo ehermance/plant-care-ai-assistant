@@ -59,7 +59,7 @@ def get_unsubscribe_url(user_id: str) -> str:
         # Build URL manually to work outside request context (scheduler jobs)
         # url_for with _external=True requires SERVER_NAME or active request
         base_url = os.getenv("APP_URL", "https://plantcareai.app")
-        return f"{base_url}/marketing/unsubscribe/{token}"
+        return f"{base_url}/unsubscribe/{token}"
     except Exception as e:
         _safe_log_error(f"Error generating unsubscribe URL: {e}")
         # Fallback to account settings page
