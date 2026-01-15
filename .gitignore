@@ -65,3 +65,5 @@ node_modules/
 docs/
 migrations/
 supabase_migrations/
+email_previews/
+tests/

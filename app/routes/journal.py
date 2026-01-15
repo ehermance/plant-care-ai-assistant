@@ -135,6 +135,10 @@ def add_entry(plant_id):
             }
         )
 
+        # Check for watering streak milestone
+        from app.services.marketing_emails import check_watering_streak
+        check_watering_streak(user_id)
+
         action_name = journal_service.ACTION_TYPE_NAMES.get(action_type, action_type)
         flash(f"✓ {action_name} logged for {plant['name']}!", "success")
         return redirect(url_for("journal.view_plant_journal", plant_id=plant_id))
@@ -245,6 +249,10 @@ def api_quick_log():
 
         if error:
             return jsonify({"success": False, "error": error}), 400
+
+        # Check for watering streak milestone
+        from app.services.marketing_emails import check_watering_streak
+        check_watering_streak(user_id)
 
         return jsonify({
             "success": True,

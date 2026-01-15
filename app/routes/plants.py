@@ -101,6 +101,30 @@ def add():
                 analytics.EVENT_PLANT_ADDED,
                 {"plant_id": plant["id"], "plant_name": name}
             )
+
+            # Check for milestone emails
+            from app.services.marketing_emails import (
+                trigger_milestone_event,
+                MILESTONE_FIRST_PLANT,
+                MILESTONE_COLLECTION_5
+            )
+
+            # Get updated plant count
+            updated_plants = supabase_client.get_user_plants(user_id)
+            plant_count = len(updated_plants) if updated_plants else 1
+
+            # First plant milestone
+            if plant_count == 1:
+                trigger_milestone_event(user_id, MILESTONE_FIRST_PLANT)
+
+            # Collection milestones (5, 10, 25, 50, etc.)
+            if plant_count in [5, 10, 25, 50, 100]:
+                trigger_milestone_event(
+                    user_id,
+                    MILESTONE_COLLECTION_5,
+                    {"plant_count": plant_count}
+                )
+
             flash(f"🌱 {name} added successfully!", "success")
             return redirect(url_for("plants.view", plant_id=plant["id"]))
         else:
@@ -357,6 +381,13 @@ def onboarding():
                 analytics.EVENT_FIRST_PLANT_ADDED,
                 {"plant_id": plant["id"], "plant_name": name}
             )
+
+            # Trigger first plant milestone email
+            from app.services.marketing_emails import (
+                trigger_milestone_event,
+                MILESTONE_FIRST_PLANT
+            )
+            trigger_milestone_event(user_id, MILESTONE_FIRST_PLANT)
 
             # Handle marketing opt-in from onboarding (if user opted in during Step 1)
             marketing_opt_in = request.form.get("marketing_opt_in") == "on"
