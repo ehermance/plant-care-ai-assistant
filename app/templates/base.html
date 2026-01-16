@@ -285,50 +285,53 @@
   <!-- Footer -->
   <footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 mt-auto mb-16 md:mb-0" role="contentinfo">
     <div class="container mx-auto px-4 py-6">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-600 dark:text-slate-400">
-        <!-- Copyright -->
-        <p class="text-center md:text-left">
-          PlantCareAI.app
-          <span aria-label="Copyright">&copy;</span>
-          <span id="copyright-year"></span>
-          by <a href="https://www.ehermance.com" target="_blank" rel="noopener noreferrer" class="text-emerald-600 dark:text-emerald-400 hover:underline">EDH Dev</a>
-          <span class="hidden sm:inline mx-2">—</span>
-          <span class="hidden sm:inline">Built with care</span>
-        </p>
+      <div class="flex flex-col gap-4 text-sm text-slate-600 dark:text-slate-400">
+        <!-- Row 1: Navigation -->
+        <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6">
+          <!-- Footer Links -->
+          <nav class="flex items-center gap-4" aria-label="Footer navigation">
+            <a href="{{ url_for('guides.index') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Plant Guides</a>
+            <span aria-hidden="true">•</span>
+            <a href="{{ url_for('pricing.index') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Features</a>
+            <span aria-hidden="true">•</span>
+            <a href="{{ url_for('legal.terms') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Terms</a>
+            <span aria-hidden="true">•</span>
+            <a href="{{ url_for('legal.privacy') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Privacy</a>
+          </nav>
 
-        <!-- Footer Links -->
-        <nav class="flex items-center gap-4" aria-label="Footer navigation">
-          <a href="{{ url_for('guides.index') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Plant Guides</a>
-          <span aria-hidden="true">•</span>
-          <a href="{{ url_for('pricing.index') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Features</a>
-          <span aria-hidden="true">•</span>
-          <a href="{{ url_for('legal.terms') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Terms</a>
-          <span aria-hidden="true">•</span>
-          <a href="{{ url_for('legal.privacy') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Privacy</a>
-        </nav>
-
-        <!-- Social Links -->
-        <div class="flex items-center gap-3">
-          <span class="text-slate-500 dark:text-slate-400">Follow along:</span>
-          <a href="https://www.instagram.com/plantcareai/"
-             target="_blank"
-             rel="noopener noreferrer"
-             class="text-emerald-600 dark:text-emerald-400 hover:underline"
-             aria-label="PlantCareAI on Instagram">
-            Instagram
-          </a>
-          <span aria-hidden="true">•</span>
-          <a href="https://www.linkedin.com/company/plantcareai/"
-             target="_blank"
-             rel="noopener noreferrer"
-             class="text-emerald-600 dark:text-emerald-400 hover:underline"
-             aria-label="PlantCareAI on LinkedIn">
-            LinkedIn
-          </a>
+          <!-- Social Links (muted to indicate secondary navigation) -->
+          <div class="flex items-center gap-3">
+            <a href="https://www.instagram.com/plantcareai/"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+               aria-label="PlantCareAI on Instagram">
+              Instagram
+            </a>
+            <span aria-hidden="true" class="text-slate-400 dark:text-slate-500">•</span>
+            <a href="https://www.linkedin.com/company/plantcareai/"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+               aria-label="PlantCareAI on LinkedIn">
+              LinkedIn
+            </a>
+          </div>
         </div>
 
-        <!-- Support Link -->
-        <div>
+        <!-- Row 2: Branding -->
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+          <!-- Copyright -->
+          <p class="text-center md:text-left">
+            PlantCareAI.app
+            <span aria-label="Copyright">&copy;</span>
+            <span id="copyright-year"></span>
+            by <a href="https://www.ehermance.com" target="_blank" rel="noopener noreferrer" class="text-emerald-600 dark:text-emerald-400 hover:underline">EDH Dev</a>
+            <span class="hidden sm:inline mx-2">—</span>
+            <span class="hidden sm:inline">Built with care</span>
+          </p>
+
+          <!-- Support Link -->
           <a href="https://buymeacoffee.com/edhdev"
              target="_blank"
              rel="noopener noreferrer"
