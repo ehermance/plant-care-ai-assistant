@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "AI-powered plant care assistant with weather-aware reminders",
   "scripts": {
-    "build:css": "npx tailwindcss -i ./src/input.css -o ./app/static/css/output.css --minify",
-    "watch:css": "npx tailwindcss -i ./src/input.css -o ./app/static/css/output.css --watch",
+    "build:css": "npx tailwindcss -i ./app/static/src/input.css -o ./app/static/css/output.css --minify",
+    "watch:css": "npx tailwindcss -i ./app/static/src/input.css -o ./app/static/css/output.css --watch",
     "dev": "npm run watch:css"
   },
   "keywords": [
