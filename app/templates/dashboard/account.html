@@ -299,6 +299,78 @@
       {% endif %}
     </div>
 
+    <!-- Plant Care Preferences (AI Personalization) -->
+    <div class="mb-8 p-4 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/10 dark:to-cyan-900/10 rounded-xl border border-emerald-200 dark:border-emerald-800">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-xl" aria-hidden="true">🌿</span>
+        <label class="label mb-0">
+          Plant Care Preferences
+        </label>
+      </div>
+      <p id="plant-prefs-help" class="help-text mb-4">
+        These preferences help personalize AI advice to your experience level and goals.
+        {% if profile and profile.preferences_completed_at %}
+        <span class="text-emerald-600 dark:text-emerald-400 font-medium">Configured</span>
+        {% else %}
+        <span class="text-amber-600 dark:text-amber-400 font-medium">Not yet configured</span>
+        {% endif %}
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Experience Level -->
+        <div>
+          <label for="experience_level" class="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1">
+            Experience Level
+          </label>
+          <select id="experience_level" name="experience_level" class="input">
+            <option value="">Not specified</option>
+            <option value="beginner" {% if profile and profile.experience_level == 'beginner' %}selected{% endif %}>Beginner - new to plant care</option>
+            <option value="intermediate" {% if profile and profile.experience_level == 'intermediate' %}selected{% endif %}>Intermediate - some experience</option>
+            <option value="expert" {% if profile and profile.experience_level == 'expert' %}selected{% endif %}>Expert - advanced knowledge</option>
+          </select>
+        </div>
+
+        <!-- Primary Goal -->
+        <div>
+          <label for="primary_goal" class="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1">
+            Primary Goal
+          </label>
+          <select id="primary_goal" name="primary_goal" class="input">
+            <option value="">Not specified</option>
+            <option value="keep_alive" {% if profile and profile.primary_goal == 'keep_alive' %}selected{% endif %}>Keep plants alive - focus on basics</option>
+            <option value="grow_collection" {% if profile and profile.primary_goal == 'grow_collection' %}selected{% endif %}>Grow collection - expand my plants</option>
+            <option value="specific_focus" {% if profile and profile.primary_goal == 'specific_focus' %}selected{% endif %}>Specific focus - certain plant types</option>
+          </select>
+        </div>
+
+        <!-- Time Commitment -->
+        <div>
+          <label for="time_commitment" class="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1">
+            Time Commitment
+          </label>
+          <select id="time_commitment" name="time_commitment" class="input">
+            <option value="">Not specified</option>
+            <option value="minimal" {% if profile and profile.time_commitment == 'minimal' %}selected{% endif %}>Minimal - low-maintenance plants</option>
+            <option value="moderate" {% if profile and profile.time_commitment == 'moderate' %}selected{% endif %}>Moderate - regular care routine</option>
+            <option value="dedicated" {% if profile and profile.time_commitment == 'dedicated' %}selected{% endif %}>Dedicated - love spending time</option>
+          </select>
+        </div>
+
+        <!-- Environment -->
+        <div>
+          <label for="environment_preference" class="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1">
+            Growing Environment
+          </label>
+          <select id="environment_preference" name="environment_preference" class="input">
+            <option value="">Not specified</option>
+            <option value="indoor" {% if profile and profile.environment_preference == 'indoor' %}selected{% endif %}>Indoor - houseplants</option>
+            <option value="outdoor" {% if profile and profile.environment_preference == 'outdoor' %}selected{% endif %}>Outdoor - garden or patio</option>
+            <option value="both" {% if profile and profile.environment_preference == 'both' %}selected{% endif %}>Both - indoor and outdoor</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
     <!-- Submit Button -->
     <div class="mb-6">
       <button type="submit" class="btn btn-primary">

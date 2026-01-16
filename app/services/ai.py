@@ -258,8 +258,9 @@ def build_system_prompt(
     Build AI system prompt with enhanced context and weather awareness.
 
     Args:
-        user_context_data: Enhanced context from get_enhanced_user_context() or
-                          get_enhanced_plant_context()
+        user_context_data: Enhanced context from get_enhanced_user_context(),
+                          get_enhanced_plant_context(), or
+                          get_enhanced_context_for_empty_user()
         context_level: "plant" (Tier 2 default) or "diagnosis" (Tier 3 premium)
 
     Returns:
@@ -275,8 +276,65 @@ def build_system_prompt(
     if not user_context_data:
         return base
 
+    # Check for user preferences context and adapt tone
+    user_prefs = user_context_data.get("user_preferences", {})
+    if user_prefs:
+        experience = user_prefs.get("experience_level")
+        if experience == "beginner":
+            base = (
+                "You are a helpful, patient plant-care expert. "
+                "This user is new to plant care, so explain concepts clearly and avoid jargon. "
+                "Provide safe, practical steps with reasoning. "
+                "Be encouraging and reassuring. If uncertain, say so."
+            )
+        elif experience == "expert":
+            base = (
+                "You are a knowledgeable plant-care expert. "
+                "This user is experienced, so you can use technical terminology and discuss nuances. "
+                "Provide precise, detailed advice. Skip basic explanations. "
+                "If uncertain, say so."
+            )
+
     # Build enhanced context summary for prompt
     context_lines = []
+
+    # USER PREFERENCES (for personalization even without plant data)
+    if user_prefs:
+        if user_prefs.get("goal_description"):
+            context_lines.append(f"User goal: {user_prefs['goal_description']}")
+        if user_prefs.get("time_description"):
+            context_lines.append(f"Time commitment: {user_prefs['time_description']}")
+        if user_prefs.get("environment_description"):
+            context_lines.append(f"Environment: {user_prefs['environment_description']}")
+
+    # SEASONAL CONTEXT (proactive tips based on date/season)
+    seasonal = user_context_data.get("seasonal")
+    if seasonal:
+        context_lines.append(f"Current timing: {seasonal.get('context_summary', '')}")
+        if seasonal.get("timely_focus"):
+            context_lines.append(f"Seasonal focus: {seasonal['timely_focus']}")
+        # Add top seasonal tips
+        seasonal_tips = seasonal.get("seasonal_tips", [])
+        if seasonal_tips:
+            context_lines.append("Seasonal tips to consider:")
+            for tip in seasonal_tips[:2]:  # Limit to 2 tips
+                context_lines.append(f"  - {tip}")
+
+    # WEATHER TIPS (proactive weather-based advice)
+    weather_data = user_context_data.get("weather")
+    if weather_data and weather_data.get("tips"):
+        weather_tips = weather_data["tips"]
+        if weather_tips:
+            context_lines.append("Weather-aware tips:")
+            for tip in weather_tips[:2]:  # Limit to 2 tips
+                context_lines.append(f"  - {tip}")
+
+    # PERSONALIZED GUIDANCE (for users without plant data)
+    guidance = user_context_data.get("personalized_guidance", [])
+    if guidance:
+        context_lines.append("Personalized guidance for this user:")
+        for g in guidance[:2]:  # Limit to 2
+            context_lines.append(f"  - {g}")
 
     # WEATHER CONTEXT (Phase 2 - Weather-aware AI)
     weather_context = user_context_data.get("weather_context")
@@ -650,6 +708,21 @@ def generate_advice(
                     user_id,
                     weather=weather
                 )
+
+                # Check if user has plants - if not, use enriched "cold start" context
+                # This provides value to new users even without plant data
+                stats = user_context_data.get("stats", {})
+                if stats.get("total_plants", 0) == 0:
+                    # Get latitude from weather if available (for hemisphere detection)
+                    latitude = weather.get("lat", 40.0) if weather else 40.0
+
+                    # Build enriched context for users without plants
+                    user_context_data = user_context.get_enhanced_context_for_empty_user(
+                        user_id,
+                        weather=weather,
+                        forecast=None,  # TODO: Pass forecast data
+                        latitude=latitude
+                    )
         except Exception as e:
             # If context fetch fails, continue without it (graceful degradation)
             # Log error for debugging

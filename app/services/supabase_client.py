@@ -946,6 +946,118 @@ def update_user_theme(user_id: str, theme: str) -> tuple[bool, Optional[str]]:
         return False, f"Error updating theme: {str(e)}"
 
 
+def update_user_preferences(
+    user_id: str,
+    experience_level: Optional[str] = None,
+    primary_goal: Optional[str] = None,
+    time_commitment: Optional[str] = None,
+    environment_preference: Optional[str] = None
+) -> tuple[bool, Optional[str]]:
+    """
+    Update user's plant care preferences for AI personalization.
+
+    Args:
+        user_id: User's UUID
+        experience_level: 'beginner', 'intermediate', or 'expert'
+        primary_goal: 'keep_alive', 'grow_collection', or 'specific_focus'
+        time_commitment: 'minimal', 'moderate', or 'dedicated'
+        environment_preference: 'indoor', 'outdoor', or 'both'
+
+    Returns:
+        tuple[bool, Optional[str]]: (success, error_message)
+    """
+    if not _supabase_client:
+        return False, "Database not configured"
+
+    try:
+        # Validate values
+        valid_experience = {'beginner', 'intermediate', 'expert'}
+        valid_goals = {'keep_alive', 'grow_collection', 'specific_focus'}
+        valid_time = {'minimal', 'moderate', 'dedicated'}
+        valid_environment = {'indoor', 'outdoor', 'both'}
+
+        if experience_level and experience_level not in valid_experience:
+            return False, f"Invalid experience level. Must be one of: {', '.join(valid_experience)}"
+        if primary_goal and primary_goal not in valid_goals:
+            return False, f"Invalid primary goal. Must be one of: {', '.join(valid_goals)}"
+        if time_commitment and time_commitment not in valid_time:
+            return False, f"Invalid time commitment. Must be one of: {', '.join(valid_time)}"
+        if environment_preference and environment_preference not in valid_environment:
+            return False, f"Invalid environment preference. Must be one of: {', '.join(valid_environment)}"
+
+        # Build update data
+        update_data = {}
+        if experience_level is not None:
+            update_data["experience_level"] = experience_level
+        if primary_goal is not None:
+            update_data["primary_goal"] = primary_goal
+        if time_commitment is not None:
+            update_data["time_commitment"] = time_commitment
+        if environment_preference is not None:
+            update_data["environment_preference"] = environment_preference
+
+        # Mark preferences as completed with timestamp
+        if update_data:
+            update_data["preferences_completed_at"] = datetime.utcnow().isoformat()
+
+        response = (
+            _supabase_client.table("profiles")
+            .update(update_data)
+            .eq("id", user_id)
+            .execute()
+        )
+
+        if response.data:
+            _safe_log_info(f"Updated preferences for user {user_id}")
+            return True, None
+        return False, "Failed to update preferences"
+
+    except Exception as e:
+        _safe_log_error(f"Error updating user preferences: {e}")
+        return False, f"Error updating preferences: {str(e)}"
+
+
+def has_preferences_configured(user_id: str) -> bool:
+    """
+    Check if user has completed the preferences questionnaire.
+
+    Args:
+        user_id: Supabase user UUID
+
+    Returns:
+        True if preferences have been configured, False otherwise
+    """
+    profile = get_user_profile(user_id)
+    if not profile:
+        return False
+
+    return profile.get("preferences_completed_at") is not None
+
+
+def get_user_preferences(user_id: str) -> Optional[Dict[str, Any]]:
+    """
+    Get user's plant care preferences for AI context building.
+
+    Args:
+        user_id: Supabase user UUID
+
+    Returns:
+        Dict with preference fields or None if not found/configured
+    """
+    profile = get_user_profile(user_id)
+    if not profile:
+        return None
+
+    # Return preference fields (may be None if not yet configured)
+    return {
+        "experience_level": profile.get("experience_level"),
+        "primary_goal": profile.get("primary_goal"),
+        "time_commitment": profile.get("time_commitment"),
+        "environment_preference": profile.get("environment_preference"),
+        "preferences_completed_at": profile.get("preferences_completed_at"),
+    }
+
+
 def is_premium(user_id: str) -> bool:
     """
     Check if user has premium plan.
@@ -1206,7 +1318,12 @@ def create_plant(user_id: str, plant_data: dict) -> dict | None:
 
     Args:
         user_id: User UUID
-        plant_data: Dictionary with plant fields (name, species, nickname, location, light, notes, photo_url)
+        plant_data: Dictionary with plant fields:
+            - name, species, nickname, location, light, notes, photo_url (basic info)
+            - initial_health_state: 'thriving', 'okay', 'struggling' (optional assessment)
+            - ownership_duration: 'just_got', 'few_weeks', 'few_months', 'year_plus' (optional)
+            - current_watering_schedule: freeform text (optional)
+            - initial_concerns: freeform text (optional)
 
     Returns:
         Created plant dictionary, or None if error
@@ -1215,6 +1332,20 @@ def create_plant(user_id: str, plant_data: dict) -> dict | None:
         return None
 
     try:
+        # Validate initial assessment fields if provided
+        valid_health_states = {'thriving', 'okay', 'struggling'}
+        valid_ownership = {'just_got', 'few_weeks', 'few_months', 'year_plus'}
+
+        initial_health = plant_data.get("initial_health_state", "").strip() or None
+        if initial_health and initial_health not in valid_health_states:
+            _safe_log_error(f"Invalid initial_health_state: {initial_health}")
+            initial_health = None
+
+        ownership = plant_data.get("ownership_duration", "").strip() or None
+        if ownership and ownership not in valid_ownership:
+            _safe_log_error(f"Invalid ownership_duration: {ownership}")
+            ownership = None
+
         # Prepare plant data with user_id
         data = {
             "user_id": user_id,
@@ -1225,6 +1356,11 @@ def create_plant(user_id: str, plant_data: dict) -> dict | None:
             "light": plant_data.get("light", "").strip() or None,
             "notes": plant_data.get("notes", "").strip() or None,
             "photo_url": plant_data.get("photo_url") or None,
+            # Initial assessment fields (captured when creating a plant)
+            "initial_health_state": initial_health,
+            "ownership_duration": ownership,
+            "current_watering_schedule": plant_data.get("current_watering_schedule", "").strip() or None,
+            "initial_concerns": plant_data.get("initial_concerns", "").strip() or None,
         }
 
         response = _supabase_client.table("plants").insert(data).execute()

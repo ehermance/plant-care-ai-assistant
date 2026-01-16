@@ -121,6 +121,86 @@
       ></textarea>
     </div>
 
+    <!-- Initial Assessment (Collapsible) -->
+    <details class="mb-6 group">
+      <summary class="flex items-center justify-between cursor-pointer p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <div class="flex items-center gap-2">
+          <span class="text-lg" aria-hidden="true">📊</span>
+          <span class="font-semibold text-slate-900 dark:text-slate-100">Initial Assessment</span>
+          <span class="text-sm text-slate-500 dark:text-slate-400">(Optional)</span>
+        </div>
+        <span class="text-slate-400 dark:text-slate-500 group-open:rotate-180 transition-transform" aria-hidden="true">▼</span>
+      </summary>
+
+      <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-800/30 rounded-lg border border-slate-200 dark:border-slate-700 space-y-6">
+        <p class="text-sm text-slate-600 dark:text-slate-400">
+          This baseline helps track your plant's progress over time and gives the AI context for better advice.
+        </p>
+
+        <!-- Health State & Ownership Duration -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <!-- Current Health State -->
+          <div>
+            <label for="initial_health_state" class="label">
+              Current Health
+            </label>
+            <select id="initial_health_state" name="initial_health_state" class="input">
+              <option value="">Select health state</option>
+              <option value="thriving">Thriving - looks great!</option>
+              <option value="okay">Okay - doing alright</option>
+              <option value="struggling">Struggling - needs help</option>
+            </select>
+          </div>
+
+          <!-- Ownership Duration -->
+          <div>
+            <label for="ownership_duration" class="label">
+              How long have you had it?
+            </label>
+            <select id="ownership_duration" name="ownership_duration" class="input">
+              <option value="">Select duration</option>
+              <option value="just_got">Just got it</option>
+              <option value="few_weeks">A few weeks</option>
+              <option value="few_months">A few months</option>
+              <option value="year_plus">A year or more</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Current Watering Schedule -->
+        <div>
+          <label for="current_watering_schedule" class="label">
+            Current Watering Schedule
+          </label>
+          <input
+            type="text"
+            id="current_watering_schedule"
+            name="current_watering_schedule"
+            class="input"
+            placeholder="e.g., once a week, every 3 days, when soil is dry"
+            maxlength="100"
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- Initial Concerns -->
+        <div>
+          <label for="initial_concerns" class="label">
+            Any Current Concerns?
+          </label>
+          <textarea
+            id="initial_concerns"
+            name="initial_concerns"
+            class="input"
+            rows="3"
+            placeholder="e.g., yellow leaves, slow growth, pest issues..."
+            maxlength="500"
+            autocomplete="off"
+          ></textarea>
+        </div>
+      </div>
+    </details>
+
     <!-- Photo Upload -->
     <div class="mb-8">
       <label for="photo" class="label">

@@ -200,6 +200,26 @@ def account():
             else:
                 flash(f"Failed to update email preferences: {error}", "error")
 
+        # Handle plant care preferences update (AI personalization)
+        experience_level = request.form.get("experience_level", "").strip()
+        primary_goal = request.form.get("primary_goal", "").strip()
+        time_commitment = request.form.get("time_commitment", "").strip()
+        environment_preference = request.form.get("environment_preference", "").strip()
+
+        # Check if any preference was provided
+        if experience_level or primary_goal or time_commitment or environment_preference:
+            success, error = supabase_client.update_user_preferences(
+                user_id,
+                experience_level=experience_level or None,
+                primary_goal=primary_goal or None,
+                time_commitment=time_commitment or None,
+                environment_preference=environment_preference or None
+            )
+            if success:
+                updates_made.append("plant care preferences")
+            else:
+                flash(f"Failed to update plant care preferences: {error}", "error")
+
         # Show success message if any updates were made
         if updates_made:
             flash(f"Preferences updated: {', '.join(updates_made)}", "success")

@@ -68,6 +68,12 @@ def add():
         light = request.form.get("light", "").strip()
         notes = request.form.get("notes", "").strip()
 
+        # Get initial assessment fields (optional)
+        initial_health_state = request.form.get("initial_health_state", "").strip()
+        ownership_duration = request.form.get("ownership_duration", "").strip()
+        current_watering_schedule = request.form.get("current_watering_schedule", "").strip()
+        initial_concerns = request.form.get("initial_concerns", "").strip()
+
         # Validation
         if not name:
             flash("Plant name is required.", "error")
@@ -90,7 +96,12 @@ def add():
             "light": light,
             "notes": notes,
             "photo_url": photo_url,
-            "photo_url_thumb": photo_url_thumb if photo_url else None
+            "photo_url_thumb": photo_url_thumb if photo_url else None,
+            # Initial assessment fields (for AI context and progress tracking)
+            "initial_health_state": initial_health_state or None,
+            "ownership_duration": ownership_duration or None,
+            "current_watering_schedule": current_watering_schedule or None,
+            "initial_concerns": initial_concerns or None
         }
 
         plant = supabase_client.create_plant(user_id, plant_data)
@@ -325,14 +336,30 @@ def onboarding():
         )
 
     # POST request - handle step submission
-    step = request.form.get("step", "2")
+    step = request.form.get("step", "3")
 
-    if step == "2":
-        # Step 2: Create plant
+    if step == "3":
+        # Step 3: Create plant (and save user preferences)
         name = request.form.get("name", "").strip()
         nickname = request.form.get("nickname", "").strip()
         location = request.form.get("location", "indoor_potted").strip()
         light = request.form.get("light", "").strip()
+
+        # Get user preferences from hidden fields (captured in step 2)
+        experience_level = request.form.get("experience_level", "").strip()
+        primary_goal = request.form.get("primary_goal", "").strip()
+        time_commitment = request.form.get("time_commitment", "").strip()
+        environment_preference = request.form.get("environment_preference", "").strip()
+
+        # Save user preferences if any were provided
+        if experience_level or primary_goal or time_commitment or environment_preference:
+            supabase_client.update_user_preferences(
+                user_id,
+                experience_level=experience_level or None,
+                primary_goal=primary_goal or None,
+                time_commitment=time_commitment or None,
+                environment_preference=environment_preference or None
+            )
 
         # Validation
         if not name:
@@ -406,8 +433,8 @@ def onboarding():
                 "message": "Failed to create plant. Please try again."
             }), 500
 
-    elif step == "3":
-        # Step 3: Create reminder and complete onboarding
+    elif step == "4":
+        # Step 4: Create reminder and complete onboarding
         watering_frequency = request.form.get("watering_frequency", "").strip()
         skip_reminder = request.form.get("skip_reminder") == "on"
 

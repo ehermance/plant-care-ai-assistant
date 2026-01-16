@@ -17,11 +17,13 @@ from datetime import datetime, timedelta, timezone
 from .supabase_client import (
     get_user_plants,
     get_user_profile,
-    get_plant_by_id
+    get_plant_by_id,
+    get_user_preferences
 )
 from .reminders import get_due_reminders, get_upcoming_reminders
 from .journal import get_plant_actions, get_plant_actions_batch, get_user_actions
 from . import ai_insights
+from . import seasonal_context
 
 
 # ============================================================================
@@ -620,3 +622,156 @@ def get_enhanced_plant_context(
         }
 
     return result
+
+
+# ============================================================================
+# USER PREFERENCES CONTEXT (For AI Personalization)
+# ============================================================================
+
+def get_user_preferences_context(user_id: str) -> Dict[str, Any]:
+    """
+    Get user's plant care preferences for AI context building.
+
+    Translates preference values into human-readable context for prompts.
+
+    Args:
+        user_id: User UUID
+
+    Returns:
+        Dict with formatted preference context or empty dict if not configured
+    """
+    prefs = get_user_preferences(user_id)
+    if not prefs or not prefs.get("preferences_completed_at"):
+        return {}
+
+    context = {}
+
+    # Experience level context
+    experience = prefs.get("experience_level")
+    if experience:
+        experience_context = {
+            "beginner": "new to plant care and learning the basics",
+            "intermediate": "has some experience with plants and understands fundamentals",
+            "expert": "experienced plant enthusiast with advanced knowledge"
+        }
+        context["experience_description"] = experience_context.get(experience, experience)
+        context["experience_level"] = experience
+
+    # Primary goal context
+    goal = prefs.get("primary_goal")
+    if goal:
+        goal_context = {
+            "keep_alive": "focused on keeping plants healthy and not killing them",
+            "grow_collection": "interested in expanding their plant collection",
+            "specific_focus": "focused on specific plant types or goals"
+        }
+        context["goal_description"] = goal_context.get(goal, goal)
+        context["primary_goal"] = goal
+
+    # Time commitment context
+    time = prefs.get("time_commitment")
+    if time:
+        time_context = {
+            "minimal": "has limited time for plant care, prefers low-maintenance plants",
+            "moderate": "can dedicate regular time to plant care",
+            "dedicated": "enjoys spending significant time on plant care"
+        }
+        context["time_description"] = time_context.get(time, time)
+        context["time_commitment"] = time
+
+    # Environment preference context
+    environment = prefs.get("environment_preference")
+    if environment:
+        env_context = {
+            "indoor": "primarily grows indoor plants",
+            "outdoor": "primarily grows outdoor plants",
+            "both": "grows both indoor and outdoor plants"
+        }
+        context["environment_description"] = env_context.get(environment, environment)
+        context["environment_preference"] = environment
+
+    return context
+
+
+def get_enhanced_context_for_empty_user(
+    user_id: str,
+    weather: Optional[Dict[str, Any]] = None,
+    forecast: Optional[List[Dict[str, Any]]] = None,
+    latitude: float = 40.0
+) -> Dict[str, Any]:
+    """
+    Build enriched context for users without plants or plant data.
+
+    This solves the "cold start" problem by providing value through:
+    - User preferences (if configured)
+    - Seasonal/timing context
+    - Weather-based proactive tips
+    - General guidance based on user goals
+
+    Args:
+        user_id: User UUID
+        weather: Optional current weather data
+        forecast: Optional weather forecast data
+        latitude: User's latitude for hemisphere detection (default: Northern)
+
+    Returns:
+        Dict with preferences, seasonal context, weather tips, and guidance
+    """
+    # Get user preferences
+    preferences = get_user_preferences_context(user_id)
+
+    # Get seasonal context
+    season_ctx = seasonal_context.get_seasonal_context(
+        latitude=latitude,
+        weather=weather,
+        forecast=forecast
+    )
+
+    # Get timely focus recommendation
+    month_ctx = seasonal_context.get_month_context()
+    timely_focus = seasonal_context.get_timely_focus(
+        season_ctx["season"],
+        month_ctx["month_number"]
+    )
+
+    # Build guidance based on user goals
+    guidance = []
+    if preferences.get("primary_goal") == "keep_alive":
+        guidance.append("Focus on mastering watering basics - overwatering is the most common mistake")
+        guidance.append("Start with forgiving plants like pothos, snake plants, or spider plants")
+    elif preferences.get("primary_goal") == "grow_collection":
+        guidance.append("Consider plant swaps or propagation to expand affordably")
+        guidance.append("Research light and humidity needs before adding new plants")
+    elif preferences.get("primary_goal") == "specific_focus":
+        guidance.append("Share your specific plant interests for tailored advice")
+
+    if preferences.get("time_commitment") == "minimal":
+        guidance.append("Low-maintenance plants like ZZ plant, snake plant, and pothos are great choices")
+    elif preferences.get("time_commitment") == "dedicated":
+        guidance.append("Consider more demanding plants like fiddle leaf figs or calatheas")
+
+    # Weather-specific tips if available
+    weather_tips = []
+    if weather:
+        weather_tips = seasonal_context.get_weather_proactive_advice(weather, forecast)
+
+    return {
+        "user_preferences": preferences,
+        "has_preferences": bool(preferences),
+        "seasonal": {
+            "season": season_ctx["season"],
+            "timing": season_ctx["timing"],
+            "context_summary": season_ctx["context_summary"],
+            "seasonal_tips": season_ctx["seasonal_tips"],
+            "timely_focus": timely_focus
+        },
+        "weather": {
+            "current": weather,
+            "tips": weather_tips
+        } if weather else None,
+        "personalized_guidance": guidance,
+        "stats": {
+            "total_plants": 0,
+            "active_reminders": 0
+        }
+    }
