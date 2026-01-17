@@ -220,14 +220,39 @@ def account():
             else:
                 flash(f"Failed to update plant care preferences: {error}", "error")
 
+        # Handle hemisphere preference update
+        hemisphere = request.form.get("hemisphere", "").strip()
+        # Only update if the field was present in the form
+        if "hemisphere" in request.form:
+            # Empty string means auto-detect
+            success, error = supabase_client.update_hemisphere_preference(
+                user_id, hemisphere if hemisphere else None
+            )
+            if success:
+                if hemisphere:
+                    updates_made.append(f"hemisphere ({hemisphere})")
+                else:
+                    updates_made.append("hemisphere (auto-detect)")
+            else:
+                flash(f"Failed to update hemisphere: {error}", "error")
+
         # Show success message if any updates were made
         if updates_made:
             flash(f"Preferences updated: {', '.join(updates_made)}", "success")
             # Refresh profile to show updated data
             profile = supabase_client.get_user_profile(user_id)
 
+    # Compute auto-detected hemisphere from city latitude (similar to timezone)
+    detected_hemisphere = None
+    if profile and profile.get("city") and not profile.get("hemisphere"):
+        from app.services.weather import get_city_latitude
+        lat = get_city_latitude(profile.get("city"))
+        if lat is not None:
+            detected_hemisphere = "Southern" if lat < 0 else "Northern"
+
     return render_template(
         "dashboard/account.html",
         profile=profile,
         timezone_groups=TIMEZONE_GROUPS,
+        detected_hemisphere=detected_hemisphere,
     )

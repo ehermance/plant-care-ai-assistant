@@ -617,13 +617,16 @@ def _ai_advice(
         if cond:
             parts.append(f"conditions: {cond}")
 
-        wind_mps = weather.get("wind_mps")
-        if wind_mps is not None:
-            parts.append(f"wind_mps: {wind_mps}")
+        # Only include wind data for outdoor plants (not relevant for indoor plants)
+        is_outdoor = care_context in ("outdoor_potted", "outdoor_bed")
+        if is_outdoor:
+            wind_mps = weather.get("wind_mps")
+            if wind_mps is not None:
+                parts.append(f"wind_mps: {wind_mps}")
 
-        wind_mph = weather.get("wind_mph")
-        if wind_mph is not None:
-            parts.append(f"wind_mph: {wind_mph}")
+            wind_mph = weather.get("wind_mph")
+            if wind_mph is not None:
+                parts.append(f"wind_mph: {wind_mph}")
 
         w_summary = ", ".join(parts) if parts else None
 
@@ -633,6 +636,14 @@ def _ai_advice(
         "outdoor_bed": "plant grown in an outdoor garden bed",
     }
     context_str = context_map.get(care_context, "potted house plant (indoors)")
+
+    # Add indoor-specific weather guidance to context
+    if care_context == "indoor_potted":
+        context_str += (
+            " - Note: Indoor plants are shielded from direct outdoor weather effects. "
+            "Outdoor conditions only matter for: (1) light levels through windows on cloudy days, "
+            "(2) dry indoor air during heating season, (3) cold drafts if placed near windows/doors in winter."
+        )
 
     # Build system message with enhanced user context and context level
     sys_msg = build_system_prompt(user_context_data, context_level=context_level)

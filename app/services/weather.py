@@ -281,6 +281,31 @@ def _coords_for(city: str, key: str):
     except Exception:
         return None
 
+
+def get_city_latitude(city: str | None) -> Optional[float]:
+    """
+    Get latitude for a city.
+
+    Args:
+        city: City name or US ZIP code
+
+    Returns:
+        Latitude as float, or None if city not found
+    """
+    if not city:
+        return None
+    key = _get_api_key()
+    if not key:
+        return None
+
+    coords = _coords_for(city, key)
+    if not coords:
+        return None
+
+    lat, _, _, _ = coords
+    return lat
+
+
 @ttl_cache()
 def get_forecast_for_city(city: str | None) -> Optional[List[Dict]]:
     if not city:
@@ -591,17 +616,22 @@ def get_temperature_extremes_forecast(city: str | None, hours: int = 48) -> Opti
         return None
 
 
-def get_seasonal_pattern(city: str | None) -> Optional[Dict]:
+def get_seasonal_pattern(
+    city: str | None, latitude: float | None = None
+) -> Optional[Dict]:
     """
     Determine current season based on actual weather patterns + calendar fallback.
 
     Hybrid approach:
     1. Analyzes last 7 days of weather patterns (if available)
-    2. Falls back to U.S. calendar-based seasons
+    2. Falls back to calendar-based seasons (hemisphere-aware)
     3. Detects dormancy periods and frost risk
 
     Args:
         city: City name or US ZIP code
+        latitude: Optional latitude for hemisphere detection.
+                  If not provided, will be auto-detected from city.
+                  Positive = Northern Hemisphere, Negative = Southern Hemisphere.
 
     Returns:
         {
@@ -620,19 +650,38 @@ def get_seasonal_pattern(city: str | None) -> Optional[Dict]:
     current = get_weather_for_city(city)
     extremes = get_temperature_extremes_forecast(city, hours=48)
 
+    # Auto-detect latitude if not provided (for hemisphere detection)
+    if latitude is None:
+        latitude = get_city_latitude(city)
+
+    # Detect hemisphere (negative latitude = Southern Hemisphere)
+    is_southern = latitude is not None and latitude < 0
+
     # Calendar-based fallback
     now = datetime.now()
     month = now.month
 
-    # Meteorological seasons (more aligned with weather patterns)
-    if month in [12, 1, 2]:
-        calendar_season = "winter"
-    elif month in [3, 4, 5]:
-        calendar_season = "spring"
-    elif month in [6, 7, 8]:
-        calendar_season = "summer"
-    else:  # 9, 10, 11
-        calendar_season = "fall"
+    # Meteorological seasons (flip for Southern Hemisphere)
+    if is_southern:
+        # Southern Hemisphere: seasons are flipped
+        if month in [12, 1, 2]:
+            calendar_season = "summer"
+        elif month in [3, 4, 5]:
+            calendar_season = "fall"
+        elif month in [6, 7, 8]:
+            calendar_season = "winter"
+        else:  # 9, 10, 11
+            calendar_season = "spring"
+    else:
+        # Northern Hemisphere (or unknown)
+        if month in [12, 1, 2]:
+            calendar_season = "winter"
+        elif month in [3, 4, 5]:
+            calendar_season = "spring"
+        elif month in [6, 7, 8]:
+            calendar_season = "summer"
+        else:  # 9, 10, 11
+            calendar_season = "fall"
 
     if not current or not extremes:
         # Calendar fallback only

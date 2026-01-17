@@ -1058,6 +1058,86 @@ def get_user_preferences(user_id: str) -> Optional[Dict[str, Any]]:
     }
 
 
+def get_user_hemisphere(user_id: str) -> str:
+    """
+    Get user's hemisphere (from preference or auto-detect from city).
+
+    Priority:
+    1. Explicit hemisphere preference in profile
+    2. Auto-detect from city latitude
+    3. Default to 'northern' if unknown
+
+    Args:
+        user_id: User's UUID
+
+    Returns:
+        'northern' or 'southern'
+    """
+    from app.services.weather import get_city_latitude
+
+    try:
+        profile = get_user_profile(user_id)
+        if not profile:
+            return 'northern'
+
+        # Check explicit hemisphere preference
+        if profile.get('hemisphere'):
+            return profile['hemisphere']
+
+        # Try to infer from city coordinates
+        city = profile.get('city')
+        if city:
+            lat = get_city_latitude(city)
+            if lat is not None:
+                return 'southern' if lat < 0 else 'northern'
+    except Exception as e:
+        _safe_log_error(f"Error getting user hemisphere: {e}")
+
+    return 'northern'
+
+
+def update_hemisphere_preference(
+    user_id: str, hemisphere: Optional[str]
+) -> tuple[bool, Optional[str]]:
+    """
+    Update user's hemisphere preference.
+
+    Args:
+        user_id: User's UUID
+        hemisphere: 'northern', 'southern', or None/empty (auto-detect)
+
+    Returns:
+        tuple[bool, Optional[str]]: (success, error_message)
+    """
+    if not _supabase_client:
+        return False, "Database not configured"
+
+    # Normalize empty string to None
+    if hemisphere == "":
+        hemisphere = None
+
+    # Validate hemisphere value
+    if hemisphere and hemisphere not in ('northern', 'southern'):
+        return False, "Invalid hemisphere value. Must be 'northern', 'southern', or empty for auto-detect."
+
+    try:
+        response = (
+            _supabase_client.table("profiles")
+            .update({"hemisphere": hemisphere})
+            .eq("id", user_id)
+            .execute()
+        )
+
+        if response.data:
+            _safe_log_info(f"Updated hemisphere preference for user {user_id}")
+            return True, None
+        return False, "Failed to update hemisphere preference"
+
+    except Exception as e:
+        _safe_log_error(f"Error updating hemisphere preference: {e}")
+        return False, f"Error updating hemisphere: {str(e)}"
+
+
 def is_premium(user_id: str) -> bool:
     """
     Check if user has premium plan.

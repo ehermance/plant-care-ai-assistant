@@ -191,6 +191,39 @@
       <p class="help-text mt-1">Override if the auto-detected timezone is incorrect</p>
     </div>
 
+    <!-- Hemisphere Selection -->
+    <div class="mb-6">
+      <label for="hemisphere" class="label">
+        Hemisphere
+      </label>
+      <p id="hemisphere-help" class="help-text mb-2">
+        {% if profile and profile.hemisphere %}
+        Currently set to: <strong class="text-slate-700 dark:text-slate-300">{{ profile.hemisphere | capitalize }} Hemisphere</strong>
+        <span class="text-slate-400">(manually set)</span>
+        {% elif detected_hemisphere %}
+        Currently set to: <strong class="text-slate-700 dark:text-slate-300">{{ detected_hemisphere }} Hemisphere</strong>
+        {% if profile and profile.city %}<span class="text-slate-400">(auto-detected from {{ profile.city }})</span>{% endif %}
+        {% else %}
+        Currently using: <strong class="text-slate-700 dark:text-slate-300">Northern Hemisphere</strong>
+        <span class="text-slate-400">(default)</span>
+        {% endif %}
+        <br>
+        <span class="text-slate-500 dark:text-slate-400">Your hemisphere affects seasonal plant care advice and emails.</span>
+      </p>
+      <select id="hemisphere" name="hemisphere" class="input" aria-describedby="hemisphere-help">
+        <option value="" {% if not profile or not profile.hemisphere %}selected{% endif %}>
+          Auto (detect from location)
+        </option>
+        <option value="northern" {% if profile and profile.hemisphere == 'northern' %}selected{% endif %}>
+          Northern Hemisphere
+        </option>
+        <option value="southern" {% if profile and profile.hemisphere == 'southern' %}selected{% endif %}>
+          Southern Hemisphere
+        </option>
+      </select>
+      <p class="help-text mt-1">Override if auto-detection is incorrect or you prefer to set it manually</p>
+    </div>
+
     <script src="{{ url_for('static', filename='js/account.js') }}"></script>
 
     <!-- Theme Preference -->

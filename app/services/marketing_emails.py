@@ -1808,15 +1808,60 @@ def get_pending_reengagement_emails() -> List[Dict[str, Any]]:
     return pending
 
 
-def get_current_season() -> Optional[tuple[str, str]]:
+def get_user_hemisphere(user_id: str) -> str:
     """
-    Get the current season email type and season_year key if in a sending window.
+    Determine user's hemisphere from profile or weather data.
 
-    Sending windows (Northern Hemisphere):
-    - Spring: March 1-15
-    - Summer: June 1-15
-    - Fall: September 1-15
-    - Winter: November 1-15
+    Priority:
+    1. Explicit hemisphere preference in profile
+    2. Auto-detect from city latitude
+    3. Default to 'northern' if unknown
+
+    Args:
+        user_id: User's UUID
+
+    Returns:
+        'northern' or 'southern'
+    """
+    from app.services.supabase_client import get_user_profile
+    from app.services.weather import get_city_latitude
+
+    try:
+        profile = get_user_profile(user_id)
+        if not profile:
+            return 'northern'
+
+        # Check explicit hemisphere preference
+        if profile.get('hemisphere'):
+            return profile['hemisphere']
+
+        # Try to infer from city coordinates
+        city = profile.get('city')
+        if city:
+            lat = get_city_latitude(city)
+            if lat is not None:
+                return 'southern' if lat < 0 else 'northern'
+    except Exception as e:
+        _safe_log_error(f"Error getting user hemisphere: {e}")
+
+    return 'northern'
+
+
+def get_current_season_for_hemisphere(
+    hemisphere: str = 'northern'
+) -> Optional[tuple[str, str]]:
+    """
+    Get current season email type and season_year key if in a sending window.
+
+    Sending windows are the 1st-15th of:
+    - March, June, September, November
+
+    The season returned depends on hemisphere:
+    - Northern: March=Spring, June=Summer, Sept=Fall, Nov=Winter
+    - Southern: March=Fall, June=Winter, Sept=Spring, Nov=Summer
+
+    Args:
+        hemisphere: 'northern' or 'southern'
 
     Returns:
         Tuple of (email_type, season_year) if in window, None otherwise
@@ -1831,23 +1876,56 @@ def get_current_season() -> Optional[tuple[str, str]]:
     if day > 15:
         return None
 
-    if month == 3:
-        return (SEASONAL_SPRING, f"spring_{year}")
-    elif month == 6:
-        return (SEASONAL_SUMMER, f"summer_{year}")
-    elif month == 9:
-        return (SEASONAL_FALL, f"fall_{year}")
-    elif month == 11:
-        return (SEASONAL_WINTER, f"winter_{year}")
+    # Northern hemisphere mapping
+    northern_seasons = {
+        3: (SEASONAL_SPRING, f"spring_{year}"),
+        6: (SEASONAL_SUMMER, f"summer_{year}"),
+        9: (SEASONAL_FALL, f"fall_{year}"),
+        11: (SEASONAL_WINTER, f"winter_{year}"),
+    }
 
-    return None
+    # Southern hemisphere - seasons are flipped
+    southern_seasons = {
+        3: (SEASONAL_FALL, f"fall_{year}"),      # March = Fall in Southern
+        6: (SEASONAL_WINTER, f"winter_{year}"),  # June = Winter in Southern
+        9: (SEASONAL_SPRING, f"spring_{year}"),  # Sept = Spring in Southern
+        11: (SEASONAL_SUMMER, f"summer_{year}"), # Nov = Summer in Southern
+    }
+
+    seasons = southern_seasons if hemisphere == 'southern' else northern_seasons
+    return seasons.get(month)
+
+
+def get_current_season() -> Optional[tuple[str, str]]:
+    """
+    Get the current season email type and season_year key if in a sending window.
+
+    DEPRECATED: Use get_current_season_for_hemisphere() for hemisphere-aware logic.
+
+    Sending windows (Northern Hemisphere):
+    - Spring: March 1-15
+    - Summer: June 1-15
+    - Fall: September 1-15
+    - Winter: November 1-15
+
+    Returns:
+        Tuple of (email_type, season_year) if in window, None otherwise
+        Example: (SEASONAL_SPRING, "spring_2026")
+    """
+    return get_current_season_for_hemisphere('northern')
 
 
 def get_pending_seasonal_emails() -> List[Dict[str, Any]]:
     """
-    Get users who are due for seasonal emails.
+    Get users who are due for seasonal emails (hemisphere-aware).
 
-    Only sends during the appropriate seasonal window and only once per season.
+    Only sends during the appropriate seasonal window (1st-15th of March,
+    June, September, or November) and only once per season.
+
+    Each user receives the seasonal email appropriate for their hemisphere:
+    - Northern hemisphere: March=Spring, June=Summer, Sept=Fall, Nov=Winter
+    - Southern hemisphere: March=Fall, June=Winter, Sept=Spring, Nov=Summer
+
     Uses seasonal_emails_sent table to track what's been sent.
 
     Returns list of dicts with user_id, email, email_type, and season_year.
@@ -1856,12 +1934,14 @@ def get_pending_seasonal_emails() -> List[Dict[str, Any]]:
 
     pending = []
 
-    # Check if we're in a sending window
-    season_info = get_current_season()
-    if not season_info:
-        return pending
+    # First check if we're in a sending window at all
+    # Both hemispheres send in the same months, just different season names
+    now = datetime.now(timezone.utc)
+    month = now.month
+    day = now.day
 
-    email_type, season_year = season_info
+    if day > 15 or month not in (3, 6, 9, 11):
+        return pending
 
     try:
         client = get_admin_client()
@@ -1870,32 +1950,47 @@ def get_pending_seasonal_emails() -> List[Dict[str, Any]]:
 
         # Get all users with marketing_opt_in = True
         profiles_result = client.table("profiles").select(
-            "id, email, marketing_opt_in"
+            "id, email, marketing_opt_in, hemisphere, city"
         ).eq("marketing_opt_in", True).execute()
 
         if not profiles_result.data:
             return pending
 
-        # Get seasonal emails already sent for this season
+        # Get ALL seasonal emails sent (we'll filter per-user)
         try:
             sent_result = client.table("seasonal_emails_sent").select(
-                "user_id"
-            ).eq("season_year", season_year).execute()
+                "user_id, season_year"
+            ).execute()
 
+            # Build set of (user_id, season_year) tuples
             already_sent = set()
             if sent_result.data:
                 for row in sent_result.data:
-                    already_sent.add(row["user_id"])
+                    already_sent.add((row["user_id"], row["season_year"]))
         except Exception:
             # Table might not exist yet
             already_sent = set()
 
-        # Check each user
+        # Check each user - determine their hemisphere and appropriate season
         for profile in profiles_result.data:
             user_id = profile["id"]
             email = profile.get("email")
 
-            if not email or user_id in already_sent:
+            if not email:
+                continue
+
+            # Get user's hemisphere
+            hemisphere = get_user_hemisphere(user_id)
+
+            # Get the correct season for this user's hemisphere
+            season_info = get_current_season_for_hemisphere(hemisphere)
+            if not season_info:
+                continue
+
+            email_type, season_year = season_info
+
+            # Check if this user already received this season's email
+            if (user_id, season_year) in already_sent:
                 continue
 
             pending.append({
