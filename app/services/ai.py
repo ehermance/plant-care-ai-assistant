@@ -71,7 +71,7 @@ def _get_litellm_router():
                 "litellm_params": {
                     "model": "gpt-4o-mini",
                     "api_key": openai_key,
-                    "temperature": 0.3,
+                    "temperature": 0.5,  # Balanced for natural variation
                     "max_tokens": 1500,  # Increased from 350 to match Gemini
                 }
             })
@@ -83,7 +83,7 @@ def _get_litellm_router():
                 "litellm_params": {
                     "model": "gemini/gemini-flash-latest",
                     "api_key": gemini_key,
-                    "temperature": 0.3,
+                    "temperature": 0.5,  # Balanced for natural variation
                     "max_tokens": 1500,  # Increased from 350 to avoid truncation
                 }
             })
@@ -250,6 +250,52 @@ def is_watering_question(question: str) -> bool:
     return any(keyword in q_lower for keyword in watering_keywords)
 
 
+def _get_response_guidance(question: str) -> str:
+    """
+    Determine response length and format guidance based on question type.
+
+    Provides adaptive instructions to keep responses natural and appropriately sized
+    for the UI Answer card (~800 characters max for desktop fit).
+
+    Args:
+        question: User's question text
+
+    Returns:
+        Format and length guidance string for the AI
+    """
+    q_lower = question.lower()
+
+    # Simple yes/no or "should I" questions - direct answers
+    if any(kw in q_lower for kw in ["should i", "can i", "is it", "when should"]):
+        return (
+            "Answer directly first, then briefly explain why. "
+            "Keep under 400 characters."
+        )
+
+    # Diagnostic questions (yellowing, drooping, etc.) - focused troubleshooting
+    if any(kw in q_lower for kw in [
+        "why is", "what's wrong", "yellow", "brown", "drooping",
+        "wilting", "dying", "spots", "curling"
+    ]):
+        return (
+            "Identify the most likely cause first, then suggest 2-3 solutions. "
+            "Keep under 700 characters."
+        )
+
+    # How-to questions - clear steps
+    if any(kw in q_lower for kw in ["how do i", "how to", "how often", "how much"]):
+        return (
+            "Provide clear, practical steps. Use a numbered list only if sequence matters. "
+            "Keep under 600 characters."
+        )
+
+    # General care questions - conversational tips
+    return (
+        "Be helpful and conversational. Use 2-4 key points if listing tips. "
+        "Keep under 800 characters."
+    )
+
+
 def build_system_prompt(
     user_context_data: Optional[Dict[str, Any]] = None,
     context_level: str = "plant"
@@ -267,10 +313,10 @@ def build_system_prompt(
         System prompt string with rich context and weather insights
     """
     base = (
-        "You are a helpful plant-care expert with calm persona. "
-        "Provide safe, concise, accurate, and practical steps. "
-        "Reference the user's specific observations and care history when relevant. "
-        "If uncertain, say so."
+        "You are a friendly, knowledgeable plant care advisor—like a neighbor who's great with plants. "
+        "Give practical, actionable advice in a warm, conversational tone. "
+        "Be concise but thorough. Reference the user's specific situation when relevant. "
+        "If you're uncertain, say so honestly."
     )
 
     if not user_context_data:
@@ -282,17 +328,16 @@ def build_system_prompt(
         experience = user_prefs.get("experience_level")
         if experience == "beginner":
             base = (
-                "You are a helpful, patient plant-care expert. "
-                "This user is new to plant care, so explain concepts clearly and avoid jargon. "
-                "Provide safe, practical steps with reasoning. "
-                "Be encouraging and reassuring. If uncertain, say so."
+                "You are a patient, encouraging plant mentor helping someone new to plant care. "
+                "Explain concepts simply without jargon. Give clear, step-by-step guidance. "
+                "Reassure them that mistakes are part of learning. "
+                "Keep advice practical and achievable."
             )
         elif experience == "expert":
             base = (
-                "You are a knowledgeable plant-care expert. "
-                "This user is experienced, so you can use technical terminology and discuss nuances. "
-                "Provide precise, detailed advice. Skip basic explanations. "
-                "If uncertain, say so."
+                "You are a fellow plant enthusiast having a knowledgeable conversation. "
+                "Use technical terminology when useful. Discuss nuances and trade-offs. "
+                "Skip basics and get to the specifics. Share insights they might not know."
             )
 
     # Build enhanced context summary for prompt
@@ -570,12 +615,15 @@ def _ai_advice(
     # Build system message with enhanced user context and context level
     sys_msg = build_system_prompt(user_context_data, context_level=context_level)
 
+    # Get adaptive response guidance based on question type
+    response_guidance = _get_response_guidance(question)
+
     user_msg = (
         f"Plant: {(plant or '').strip() or 'unspecified'}\n"
         f"Care context: {context_str}\n"
         f"Question: {question.strip()}\n"
         f"Weather: {w_summary or 'n/a'}\n\n"
-        "Respond with one short, introductory sentence, 3–6 short bullet points, and a final encouraging sentence."
+        f"{response_guidance}"
     )
 
     try:
