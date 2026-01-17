@@ -457,7 +457,29 @@ def build_system_prompt(
             care_level = care_history["care_level"]
             context_lines.append(f"Care level: {care_level}")
 
+        # INITIAL ASSESSMENT (baseline from when plant was added)
+        # This provides context especially for new plants without journal history
+        initial = plant_details.get("initial_assessment")
+        if initial:
+            context_lines.append("Initial assessment (baseline when added):")
+            if initial.get("health_state"):
+                context_lines.append(f"  • Starting health: {initial['health_state']}")
+            if initial.get("ownership_duration"):
+                duration_map = {
+                    "just_got": "just acquired",
+                    "few_weeks": "owned a few weeks",
+                    "few_months": "owned a few months",
+                    "year_plus": "owned over a year"
+                }
+                duration = duration_map.get(initial["ownership_duration"], initial["ownership_duration"])
+                context_lines.append(f"  • When added: {duration}")
+            if initial.get("watering_schedule"):
+                context_lines.append(f"  • Original watering: {initial['watering_schedule']}")
+            if initial.get("concerns"):
+                context_lines.append(f"  • Initial concerns: {initial['concerns'][:100]}")
+
     # RECENT OBSERVATIONS with health keywords
+    # Note: These are more current indicators than initial assessment
     recent_obs = user_context_data.get("recent_observations", [])
     if recent_obs:
         context_lines.append("Recent observations:")

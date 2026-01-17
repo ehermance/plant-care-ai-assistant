@@ -195,6 +195,17 @@ def _format_plant_context(plant: Dict[str, Any], detailed: bool = False) -> Dict
         base["light"] = plant.get("light")
         base["notes"] = plant.get("notes")
         base["created_at"] = plant.get("created_at")
+
+        # Include initial assessment for baseline context (especially useful
+        # for new plants without journal history)
+        if plant.get("initial_health_state"):
+            base["initial_health"] = plant["initial_health_state"]
+        if plant.get("ownership_duration"):
+            base["ownership_duration"] = plant["ownership_duration"]
+        if plant.get("current_watering_schedule"):
+            base["watering_schedule"] = plant["current_watering_schedule"]
+        if plant.get("initial_concerns"):
+            base["initial_concerns"] = plant["initial_concerns"]
     else:
         # Just light level for general context
         if plant.get("light"):
@@ -551,6 +562,21 @@ def get_enhanced_plant_context(
             "on_schedule": care_analysis.get("on_schedule")
         }
     }
+
+    # Add initial assessment (baseline data from when plant was added)
+    # This is especially useful for new plants without journal history
+    initial_assessment = {}
+    if plant.get("initial_health_state"):
+        initial_assessment["health_state"] = plant["initial_health_state"]
+    if plant.get("ownership_duration"):
+        initial_assessment["ownership_duration"] = plant["ownership_duration"]
+    if plant.get("current_watering_schedule"):
+        initial_assessment["watering_schedule"] = plant["current_watering_schedule"]
+    if plant.get("initial_concerns"):
+        initial_assessment["concerns"] = plant["initial_concerns"]
+
+    if initial_assessment:
+        plant_context["initial_assessment"] = initial_assessment
 
     # Extract weather context
     weather_context = None
