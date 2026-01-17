@@ -14,6 +14,7 @@ from werkzeug.utils import secure_filename
 from app.utils.auth import require_auth, get_current_user_id
 from app.utils.photo_handler import handle_photo_upload, delete_all_photo_versions
 from app.utils.file_upload import validate_upload_file
+from app.utils.validation import is_valid_uuid
 from app.services import supabase_client
 from app.services import analytics
 from app.extensions import limiter
@@ -148,6 +149,11 @@ def add():
 @require_auth
 def view(plant_id):
     """View a single plant's details with journal entries."""
+    # Validate UUID format before database query
+    if not is_valid_uuid(plant_id):
+        flash("Invalid plant ID.", "error")
+        return redirect(url_for("plants.index"))
+
     user_id = get_current_user_id()
 
     plant = supabase_client.get_plant_by_id(plant_id, user_id)
@@ -183,6 +189,11 @@ def view(plant_id):
 @limiter.limit(lambda: current_app.config['UPLOAD_RATE_LIMIT'])
 def edit(plant_id):
     """Edit plant information."""
+    # Validate UUID format before database query
+    if not is_valid_uuid(plant_id):
+        flash("Invalid plant ID.", "error")
+        return redirect(url_for("plants.index"))
+
     user_id = get_current_user_id()
 
     plant = supabase_client.get_plant_by_id(plant_id, user_id)
@@ -288,6 +299,11 @@ def edit(plant_id):
 @require_auth
 def delete(plant_id):
     """Delete a plant from the user's collection."""
+    # Validate UUID format before database query
+    if not is_valid_uuid(plant_id):
+        flash("Invalid plant ID.", "error")
+        return redirect(url_for("plants.index"))
+
     user_id = get_current_user_id()
 
     plant = supabase_client.get_plant_by_id(plant_id, user_id)

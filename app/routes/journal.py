@@ -9,6 +9,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from app.utils.auth import require_auth, get_current_user_id
 from app.utils.photo_handler import handle_photo_upload, delete_all_photo_versions
 from app.utils.errors import sanitize_error, log_info
+from app.utils.validation import is_valid_uuid
 from app.services import journal as journal_service
 from app.services import analytics
 from app.services.supabase_client import get_plant_by_id, upload_plant_photo_versions, delete_plant_photo
@@ -22,6 +23,11 @@ journal_bp = Blueprint("journal", __name__, url_prefix="/journal")
 @require_auth
 def view_plant_journal(plant_id):
     """View all journal entries for a specific plant."""
+    # Validate UUID format before database query
+    if not is_valid_uuid(plant_id):
+        flash("Invalid plant ID.", "error")
+        return redirect(url_for("plants.index"))
+
     user_id = get_current_user_id()
 
     # Get plant details
@@ -49,6 +55,11 @@ def view_plant_journal(plant_id):
 @limiter.limit(lambda: current_app.config['UPLOAD_RATE_LIMIT'])
 def add_entry(plant_id):
     """Add a new journal entry for a plant."""
+    # Validate UUID format before database query
+    if not is_valid_uuid(plant_id):
+        flash("Invalid plant ID.", "error")
+        return redirect(url_for("plants.index"))
+
     user_id = get_current_user_id()
 
     # Get plant details
@@ -176,6 +187,11 @@ def recent_activity():
 @require_auth
 def delete_entry(action_id):
     """Delete a journal entry."""
+    # Validate UUID format before database query
+    if not is_valid_uuid(action_id):
+        flash("Invalid entry ID.", "error")
+        return redirect(url_for("dashboard.index"))
+
     user_id = get_current_user_id()
 
     # Get action to find plant_id and photo_url
@@ -232,6 +248,10 @@ def api_quick_log():
 
         if not plant_id or not action_type:
             return jsonify({"success": False, "error": "Missing required fields"}), 400
+
+        # Validate UUID format before database query
+        if not is_valid_uuid(plant_id):
+            return jsonify({"success": False, "error": "Invalid plant ID format"}), 400
 
         # Verify plant ownership
         plant = get_plant_by_id(plant_id, user_id)

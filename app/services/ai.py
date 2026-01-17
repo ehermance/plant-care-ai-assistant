@@ -485,13 +485,6 @@ def build_system_prompt(
                 tasks = [r.get("title", r.get("reminder_type", "task")) for r in reminders[:3]]
                 context_lines.append(f"Active reminders: {', '.join(tasks)}")
 
-    # DEBUG: Log built system prompt (Phase 2B debug)
-    from app.utils.errors import log_info
-    log_info("=== DEBUG: System Prompt Context Lines ===")
-    for i, line in enumerate(context_lines):
-        log_info(f"Line {i}: {line}")
-    log_info("=== END DEBUG ===")
-
     # Build final context section
     if context_lines:
         context_section = "\n\nUser Context:\n" + "\n".join(f"- {line}" for line in context_lines)
@@ -729,28 +722,6 @@ def generate_advice(
             from app.utils.errors import log_info
             log_info(f"Context fetch failed: {str(e)}")
             user_context_data = None
-
-    # DEBUG: Log user context data (Phase 2B debug)
-    if user_context_data:
-        from app.utils.errors import log_info
-        import json
-        log_info("=== DEBUG: User Context Data ===")
-
-        # Log plant details
-        plant_details = user_context_data.get("plant")
-        if plant_details:
-            log_info(f"Plant name: {plant_details.get('name')}")
-            log_info(f"Plant notes_full: {plant_details.get('notes_full')}")
-        else:
-            log_info("No plant details in context")
-
-        # Log activities
-        activities = user_context_data.get("activities_detailed", [])
-        log_info(f"Activities count: {len(activities)}")
-        if activities:
-            log_info(f"Sample activity: {json.dumps(activities[0], default=str)}")
-
-        log_info("=== END DEBUG ===")
 
     # Detect watering questions and generate intelligent recommendations
     if is_watering_question(question) and selected_plant_id and weather:

@@ -185,6 +185,11 @@ def create():
 @require_auth
 def view(reminder_id):
     """View a single reminder."""
+    # Validate UUID format before database query
+    if not is_valid_uuid(reminder_id):
+        flash("Invalid reminder ID.", "error")
+        return redirect(url_for("reminders.index"))
+
     user_id = get_current_user_id()
 
     reminder = reminder_service.get_reminder_by_id(reminder_id, user_id)
@@ -200,6 +205,11 @@ def view(reminder_id):
 @require_auth
 def edit(reminder_id):
     """Edit a reminder."""
+    # Validate UUID format before database query
+    if not is_valid_uuid(reminder_id):
+        flash("Invalid reminder ID.", "error")
+        return redirect(url_for("reminders.index"))
+
     user_id = get_current_user_id()
 
     reminder = reminder_service.get_reminder_by_id(reminder_id, user_id)
@@ -273,6 +283,11 @@ def edit(reminder_id):
 @require_auth
 def complete(reminder_id):
     """Mark a reminder as complete."""
+    # Validate UUID format before database query
+    if not is_valid_uuid(reminder_id):
+        flash("Invalid reminder ID.", "error")
+        return redirect(url_for("reminders.index"))
+
     user_id = get_current_user_id()
 
     success, error = reminder_service.mark_reminder_complete(reminder_id, user_id)
@@ -324,6 +339,11 @@ def bulk_complete():
 @require_auth
 def snooze(reminder_id):
     """Snooze a reminder by N days."""
+    # Validate UUID format before database query
+    if not is_valid_uuid(reminder_id):
+        flash("Invalid reminder ID.", "error")
+        return redirect(url_for("reminders.index"))
+
     user_id = get_current_user_id()
 
     # Get snooze days from form (default 1)
@@ -353,6 +373,11 @@ def snooze(reminder_id):
 @require_auth
 def delete(reminder_id):
     """Delete (deactivate) a reminder."""
+    # Validate UUID format before database query
+    if not is_valid_uuid(reminder_id):
+        flash("Invalid reminder ID.", "error")
+        return redirect(url_for("reminders.index"))
+
     user_id = get_current_user_id()
 
     success, error = reminder_service.delete_reminder(reminder_id, user_id)
