@@ -329,6 +329,9 @@
 
 <!-- Action Buttons -->
 <div class="flex flex-wrap gap-3">
+  <a href="{{ url_for('web.assistant', plant=plant.name) }}" class="btn btn-primary">
+    <span aria-hidden="true">🤖</span> Ask AI about this plant
+  </a>
   <a href="{{ url_for('plants.edit', plant_id=plant.id) }}" class="btn btn-secondary">
     <span aria-hidden="true">✏️</span> Edit Plant
   </a>
