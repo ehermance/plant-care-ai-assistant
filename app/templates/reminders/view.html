@@ -268,7 +268,7 @@
 
 <!-- Back Button -->
 <div class="flex flex-wrap gap-3">
-  <a href="{{ url_for('web.assistant', plant=reminder.plants.name) }}" class="btn btn-primary">
+  <a href="{{ url_for('web.assistant', plant_id=reminder.plant_id) }}" class="btn btn-primary">
     <span aria-hidden="true">🤖</span> Ask AI about {{ reminder.plants.name }}
   </a>
   <a href="{{ url_for('reminders.index') }}" class="btn btn-secondary">

@@ -180,8 +180,20 @@ def assistant():
         today_str = datetime.now().strftime("%Y-%m-%d")
         # Build form_values from query params and defaults
         form_values = {}
-        if request.args.get("plant"):
+        selected_plant_id = None
+
+        # Handle plant_id query param (from plant/reminder view links)
+        if request.args.get("plant_id") and user_id:
+            plant_id = request.args.get("plant_id")
+            # Find the plant in user's plants list
+            matching_plant = next((p for p in user_plants if p.get("id") == plant_id), None)
+            if matching_plant:
+                form_values["plant"] = matching_plant.get("name", "")
+                form_values["care_context"] = matching_plant.get("location", "indoor_potted")
+                selected_plant_id = plant_id
+        elif request.args.get("plant"):
             form_values["plant"] = request.args.get("plant")
+
         if request.args.get("city") or default_city:
             form_values["city"] = request.args.get("city") or default_city
         return render_template(
@@ -197,6 +209,7 @@ def assistant():
             ai_error=None,
             today_str=today_str,
             user_plants=user_plants,
+            selected_plant_id=selected_plant_id,
         )
 
     # Handle POST request - process form submission

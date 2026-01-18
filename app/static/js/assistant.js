@@ -127,6 +127,28 @@
     });
   });
 
+  // Highlight pre-selected plant on page load (from URL plant_id param)
+  (function() {
+    const selectedPlantIdField = document.getElementById('selected_plant_id');
+    if (selectedPlantIdField && selectedPlantIdField.value) {
+      const preSelectedId = selectedPlantIdField.value;
+      const matchingBtn = document.querySelector('.plant-select-btn[data-plant-id="' + preSelectedId + '"]');
+      if (matchingBtn) {
+        // Add highlight ring
+        matchingBtn.classList.add('ring-2', 'ring-emerald-500', 'dark:ring-emerald-400');
+        // Scroll the carousel to show the selected plant
+        const scrollContainer = document.getElementById('plants-scroll-container');
+        if (scrollContainer) {
+          // Calculate scroll position to center the selected plant
+          const containerRect = scrollContainer.getBoundingClientRect();
+          const btnRect = matchingBtn.getBoundingClientRect();
+          const scrollOffset = btnRect.left - containerRect.left - (containerRect.width / 2) + (btnRect.width / 2);
+          scrollContainer.scrollLeft += scrollOffset;
+        }
+      }
+    }
+  })();
+
   // Plant carousel scroll functionality with gradient indicators
   (function() {
     const scrollContainer = document.getElementById('plants-scroll-container');
