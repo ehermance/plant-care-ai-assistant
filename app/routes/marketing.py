@@ -8,7 +8,8 @@ Provides:
 """
 
 from __future__ import annotations
-from flask import Blueprint, render_template, Response, url_for, request, current_app, flash, redirect
+from flask import Blueprint, render_template, Response, current_app
+from xml.sax.saxutils import escape
 import os
 import json
 
@@ -49,8 +50,8 @@ def sitemap():
 
     Lists all public pages with priority and change frequency.
     """
-    # Base URL from request
-    base_url = request.url_root.rstrip("/")
+    # Use configured base URL (not request.url_root to prevent Host header injection)
+    base_url = os.getenv("APP_URL", "https://plantcareai.app")
 
     # Static public pages with priorities
     pages = [
@@ -64,6 +65,17 @@ def sitemap():
         {"loc": "/terms", "priority": "0.3", "changefreq": "yearly"},
         {"loc": "/privacy", "priority": "0.3", "changefreq": "yearly"},
     ]
+
+    # SEO landing pages (problem-first content pages)
+    seo_landing_pages = [
+        "/why-are-my-plant-leaves-drooping",
+        "/am-i-overwatering-my-plant",
+        "/how-often-should-i-water-my-plant",
+        "/why-are-my-plant-leaves-turning-yellow",
+        "/should-i-water-my-plant-today",
+    ]
+    for slug in seo_landing_pages:
+        pages.append({"loc": slug, "priority": "0.8", "changefreq": "monthly"})
 
     # Add individual guide pages
     for slug in _load_guide_slugs():
@@ -79,9 +91,9 @@ def sitemap():
 
     for page in pages:
         xml_content += "  <url>\n"
-        xml_content += f"    <loc>{base_url}{page['loc']}</loc>\n"
-        xml_content += f"    <changefreq>{page['changefreq']}</changefreq>\n"
-        xml_content += f"    <priority>{page['priority']}</priority>\n"
+        xml_content += f"    <loc>{escape(base_url + page['loc'])}</loc>\n"
+        xml_content += f"    <changefreq>{escape(page['changefreq'])}</changefreq>\n"
+        xml_content += f"    <priority>{escape(page['priority'])}</priority>\n"
         xml_content += "  </url>\n"
 
     xml_content += "</urlset>"
@@ -97,8 +109,12 @@ def robots():
     Search engines expect this at /robots.txt, not /static/robots.txt.
     """
     robots_path = os.path.join(current_app.static_folder, "robots.txt")
-    with open(robots_path, "r") as f:
-        content = f.read()
+    try:
+        with open(robots_path, "r") as f:
+            content = f.read()
+    except FileNotFoundError:
+        # Provide sensible default if file is missing
+        content = "User-agent: *\nAllow: /"
     return Response(content, mimetype="text/plain")
 
 

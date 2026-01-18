@@ -74,6 +74,38 @@
   {% endif %}
 </section>
 
+<!-- Common Plant Problems Section -->
+<section class="py-8 border-t border-slate-200 dark:border-slate-700">
+  <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6 text-center">
+    Common Plant Problems
+  </h2>
+  <p class="text-slate-600 dark:text-slate-400 text-center mb-8 max-w-2xl mx-auto">
+    Troubleshooting guides for the most common plant care issues.
+  </p>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+    <a href="{{ url_for('seo.drooping') }}" class="card hover:shadow-lg transition-shadow p-4">
+      <span class="text-2xl mb-2 block" aria-hidden="true">🥀</span>
+      <span class="font-medium text-slate-900 dark:text-slate-100">Why Are My Leaves Drooping?</span>
+    </a>
+    <a href="{{ url_for('seo.yellow_leaves') }}" class="card hover:shadow-lg transition-shadow p-4">
+      <span class="text-2xl mb-2 block" aria-hidden="true">🍂</span>
+      <span class="font-medium text-slate-900 dark:text-slate-100">Why Are Leaves Turning Yellow?</span>
+    </a>
+    <a href="{{ url_for('seo.overwatering') }}" class="card hover:shadow-lg transition-shadow p-4">
+      <span class="text-2xl mb-2 block" aria-hidden="true">💧</span>
+      <span class="font-medium text-slate-900 dark:text-slate-100">Am I Overwatering?</span>
+    </a>
+    <a href="{{ url_for('seo.watering_frequency') }}" class="card hover:shadow-lg transition-shadow p-4">
+      <span class="text-2xl mb-2 block" aria-hidden="true">🚿</span>
+      <span class="font-medium text-slate-900 dark:text-slate-100">How Often Should I Water?</span>
+    </a>
+    <a href="{{ url_for('seo.water_today') }}" class="card hover:shadow-lg transition-shadow p-4">
+      <span class="text-2xl mb-2 block" aria-hidden="true">🤔</span>
+      <span class="font-medium text-slate-900 dark:text-slate-100">Should I Water Today?</span>
+    </a>
+  </div>
+</section>
+
 <!-- CTA Section -->
 <section class="py-12 text-center bg-white dark:bg-slate-800 -mx-4 px-4 rounded-2xl mt-8">
   <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
