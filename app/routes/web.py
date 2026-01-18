@@ -196,6 +196,11 @@ def assistant():
 
         if request.args.get("city") or default_city:
             form_values["city"] = request.args.get("city") or default_city
+
+        # Handle question query param (from SEO landing pages)
+        if request.args.get("question"):
+            form_values["question"] = request.args.get("question")
+
         return render_template(
             "index.html",
             answer=None,

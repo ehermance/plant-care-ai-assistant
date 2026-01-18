@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} | PlantCareAI{% endblock %}
+
+{% block description %}{{ page.meta_description }}{% endblock %}
+
+{% block og_title %}{{ page.title }} | PlantCareAI{% endblock %}
+{% block og_description %}{{ page.meta_description }}{% endblock %}
+
+{% block twitter_title %}{{ page.title }}{% endblock %}
+{% block twitter_description %}{{ page.meta_description }}{% endblock %}
+
+{% block extra_head %}
+<!-- Article Structured Data for SEO -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{{ page.title }}",
+  "description": "{{ page.meta_description }}",
+  "author": {
+    "@type": "Organization",
+    "name": "PlantCareAI"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "PlantCareAI"
+  }
+}
+</script>
+<!-- FAQPage Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {% for cause in page.causes %}
+    {
+      "@type": "Question",
+      "name": "{{ cause.title }}",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "{{ cause.description }}"
+      }
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<header class="mb-8 text-center max-w-3xl mx-auto">
+  <div class="text-6xl mb-4" aria-hidden="true">{{ page.emoji }}</div>
+  <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+    {{ page.title }}
+  </h1>
+  <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+    {{ page.intro }}
+  </p>
+</header>
+
+<!-- Main Content -->
+<div class="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+  <!-- Causes Section -->
+  <div class="lg:col-span-2">
+    <section class="card mb-8">
+      <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">
+        Common Causes
+      </h2>
+      <div class="space-y-6">
+        {% for cause in page.causes %}
+        <div class="flex items-start gap-4">
+          <div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold text-sm">
+            {{ loop.index }}
+          </div>
+          <div>
+            <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
+              {{ cause.title }}
+            </h3>
+            <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+              {{ cause.description }}
+            </p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Bottom Line -->
+    <section class="card bg-slate-50 dark:bg-slate-800/50 border-l-4 border-emerald-500">
+      <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">
+        The Bottom Line
+      </h2>
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+        {{ page.bottom_line }}
+      </p>
+    </section>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="space-y-6">
+    <!-- Primary CTA -->
+    <div class="card bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/20 dark:to-cyan-900/20 border-2 border-emerald-200 dark:border-emerald-700">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">
+        Need personalized help?
+      </h3>
+      <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+        PlantCareAI can diagnose your specific situation using your plant type, location, and local weather.
+      </p>
+      <a href="{{ url_for('web.assistant') }}?question={{ page.cta_question | urlencode }}"
+         class="btn btn-primary w-full text-center">
+        {{ page.cta_text }} &rarr;
+      </a>
+    </div>
+
+    <!-- Related Articles -->
+    {% if related_pages %}
+    <div class="card">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">
+        Related Articles
+      </h3>
+      <ul class="space-y-3">
+        {% for related in related_pages %}
+        <li>
+          <a href="{{ url_for('seo.' ~ related.route_name) }}"
+             class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:underline text-sm">
+            {{ related.title }}
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <!-- Quick Tip -->
+    <div class="card">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-3">
+        Quick Tip
+      </h3>
+      <p class="text-sm text-slate-600 dark:text-slate-400">
+        When diagnosing plant problems, always check the soil moisture first. About 80% of common plant issues are related to watering—either too much or too little.
+      </p>
+    </div>
+  </aside>
+</div>
+
+<!-- Bottom CTA Section -->
+<section class="mt-12 py-10 text-center bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/10 dark:to-cyan-900/10 -mx-4 px-4 rounded-2xl max-w-4xl mx-auto">
+  <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-3">
+    Get Personalized Plant Care Advice
+  </h2>
+  <p class="text-slate-600 dark:text-slate-400 mb-6 max-w-xl mx-auto">
+    PlantCareAI uses your location and local weather to give you advice tailored to your exact situation. No signup required to try.
+  </p>
+  <a href="{{ url_for('web.assistant') }}" class="btn btn-primary btn-lg">
+    Try the AI Plant Doctor
+  </a>
+</section>
+
+<!-- Breadcrumb at bottom for easy navigation -->
+<nav class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700" aria-label="Related content">
+  <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">More plant care resources:</p>
+  <div class="flex flex-wrap gap-3">
+    <a href="{{ url_for('guides.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
+      Plant Care Guides
+    </a>
+    <span class="text-slate-300 dark:text-slate-600">|</span>
+    <a href="{{ url_for('web.assistant') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
+      AI Plant Assistant
+    </a>
+    <span class="text-slate-300 dark:text-slate-600">|</span>
+    <a href="{{ url_for('pricing.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
+      Features & Pricing
+    </a>
+  </div>
+</nav>
+{% endblock %}

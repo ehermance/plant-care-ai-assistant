@@ -28,6 +28,7 @@ from .routes.journal import journal_bp
 from .routes.admin import admin_bp
 from .routes.marketing import marketing_bp
 from .routes.guides import guides_bp
+from .routes.seo import seo_bp
 from .services import supabase_client
 from .utils import auth
 
@@ -218,6 +219,7 @@ def create_app() -> Flask:
     app.register_blueprint(admin_bp)
     app.register_blueprint(marketing_bp)
     app.register_blueprint(guides_bp)
+    app.register_blueprint(seo_bp)
 
     # Add Jinja global for templates that need current date/time
     from datetime import datetime, date
