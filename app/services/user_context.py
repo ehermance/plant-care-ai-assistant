@@ -192,9 +192,12 @@ def _format_plant_context(plant: Dict[str, Any], detailed: bool = False) -> Dict
 
     if detailed:
         # Include more fields for plant-specific queries
-        base["light"] = plant.get("light")
-        base["notes"] = plant.get("notes")
-        base["created_at"] = plant.get("created_at")
+        if plant.get("light"):
+            base["light"] = plant.get("light")
+        if plant.get("notes"):
+            base["notes"] = plant.get("notes")
+        if plant.get("created_at"):
+            base["created_at"] = plant.get("created_at")
 
         # Include initial assessment for baseline context (especially useful
         # for new plants without journal history)

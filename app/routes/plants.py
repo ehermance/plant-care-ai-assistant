@@ -99,10 +99,10 @@ def add():
             "photo_url": photo_url,
             "photo_url_thumb": photo_url_thumb if photo_url else None,
             # Initial assessment fields (for AI context and progress tracking)
-            "initial_health_state": initial_health_state or None,
-            "ownership_duration": ownership_duration or None,
-            "current_watering_schedule": current_watering_schedule or None,
-            "initial_concerns": initial_concerns or None
+            "initial_health_state": initial_health_state,
+            "ownership_duration": ownership_duration,
+            "current_watering_schedule": current_watering_schedule,
+            "initial_concerns": initial_concerns
         }
 
         plant = supabase_client.create_plant(user_id, plant_data)
@@ -371,10 +371,10 @@ def onboarding():
         if experience_level or primary_goal or time_commitment or environment_preference:
             supabase_client.update_user_preferences(
                 user_id,
-                experience_level=experience_level or None,
-                primary_goal=primary_goal or None,
-                time_commitment=time_commitment or None,
-                environment_preference=environment_preference or None
+                experience_level=experience_level,
+                primary_goal=primary_goal,
+                time_commitment=time_commitment,
+                environment_preference=environment_preference
             )
 
         # Validation

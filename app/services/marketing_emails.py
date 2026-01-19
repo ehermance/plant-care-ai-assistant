@@ -2372,7 +2372,7 @@ def check_plant_anniversaries() -> None:
 
         # Get plants created around 30 days ago
         result = client.table("plants").select(
-            "id, user_id, nickname, common_name, created_at"
+            "id, user_id, name, nickname, species, created_at"
         ).gte(
             "created_at", thirty_one_days_ago.isoformat()
         ).lte(
@@ -2383,7 +2383,7 @@ def check_plant_anniversaries() -> None:
             return
 
         for plant in result.data:
-            plant_name = plant.get("nickname") or plant.get("common_name") or "Your plant"
+            plant_name = plant.get("nickname") or plant.get("name") or plant.get("species") or "Your plant"
             trigger_milestone_event(
                 plant["user_id"],
                 MILESTONE_ANNIVERSARY_30,

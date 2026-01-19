@@ -210,10 +210,10 @@ def account():
         if experience_level or primary_goal or time_commitment or environment_preference:
             success, error = supabase_client.update_user_preferences(
                 user_id,
-                experience_level=experience_level or None,
-                primary_goal=primary_goal or None,
-                time_commitment=time_commitment or None,
-                environment_preference=environment_preference or None
+                experience_level=experience_level,
+                primary_goal=primary_goal,
+                time_commitment=time_commitment,
+                environment_preference=environment_preference
             )
             if success:
                 updates_made.append("plant care preferences")
