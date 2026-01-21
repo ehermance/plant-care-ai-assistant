@@ -2128,15 +2128,18 @@ def process_welcome_email_queue() -> Dict[str, Any]:
 def trigger_milestone_event(
     user_id: str,
     event_type: str,
-    event_data: Optional[Dict[str, Any]] = None
+    event_data: Optional[Dict[str, Any]] = None,
+    event_key: str = "once"
 ) -> bool:
     """
     Record a milestone event for later email processing.
+    Uses upsert to guarantee idempotency.
 
     Args:
         user_id: User's UUID
         event_type: One of MILESTONE_FIRST_PLANT, MILESTONE_ANNIVERSARY_30, etc.
         event_data: Optional data like plant_name, streak_count, plant_count
+        event_key: A stable idempotency key for each milestone event
 
     Returns:
         True if event was recorded, False otherwise
@@ -2148,20 +2151,21 @@ def trigger_milestone_event(
         if not client:
             return False
 
-        # Try to insert (will fail silently if duplicate due to unique constraint)
-        client.table("email_events").insert({
-            "user_id": user_id,
-            "event_type": event_type,
-            "event_data": event_data
-        }).execute()
-
-        _safe_log_info(f"Milestone event {event_type} recorded for user {user_id}")
+        client.table("email_events").upsert(
+            {
+                "user_id": user_id,
+                "event_type": event_type,
+                "event_data": event_data,
+                "event_key": event_key,
+            },
+            on_conflict="user_id,event_type,event_key",
+        ).execute()
+        
+        _safe_log_info(f"Milestone event {event_type} recorded for user {user_id} (key={event_key})")
         return True
 
     except Exception as e:
-        # Duplicate key errors are expected and fine
-        if "duplicate key" not in str(e) and "23505" not in str(e):
-            _safe_log_error(f"Error recording milestone event: {e}")
+        _safe_log_error(f"Error recording milestone event: {e}")
         return False
 
 
@@ -2345,7 +2349,8 @@ def check_watering_streak(user_id: str) -> None:
             trigger_milestone_event(
                 user_id,
                 MILESTONE_STREAK_5,
-                {"streak_count": streak}
+                {"streak_count": streak},
+                event_key=f"days:{streak}"
             )
 
     except Exception as e:
@@ -2387,7 +2392,8 @@ def check_plant_anniversaries() -> None:
             trigger_milestone_event(
                 plant["user_id"],
                 MILESTONE_ANNIVERSARY_30,
-                {"plant_name": plant_name, "plant_id": plant["id"]}
+                {"plant_name": plant_name, "plant_id": plant["id"]},
+                event_key=f"plant:{plant['id']}:30d"
             )
 
     except Exception as e:

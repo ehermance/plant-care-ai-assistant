@@ -127,14 +127,16 @@ def add():
 
             # First plant milestone
             if plant_count == 1:
-                trigger_milestone_event(user_id, MILESTONE_FIRST_PLANT)
+                trigger_milestone_event(user_id, MILESTONE_FIRST_PLANT, event_key="once")
+
 
             # Collection milestones (5, 10, 25, 50, etc.)
             if plant_count in [5, 10, 25, 50, 100]:
                 trigger_milestone_event(
                     user_id,
                     MILESTONE_COLLECTION_5,
-                    {"plant_count": plant_count}
+                    {"plant_count": plant_count},
+                    event_key=f"count:{plant_count}"
                 )
 
             flash(f"🌱 {name} added successfully!", "success")
@@ -430,7 +432,7 @@ def onboarding():
                 trigger_milestone_event,
                 MILESTONE_FIRST_PLANT
             )
-            trigger_milestone_event(user_id, MILESTONE_FIRST_PLANT)
+            trigger_milestone_event(user_id, MILESTONE_FIRST_PLANT, event_key="once")
 
             # Handle marketing opt-in from onboarding (if user opted in during Step 1)
             marketing_opt_in = request.form.get("marketing_opt_in") == "on"
