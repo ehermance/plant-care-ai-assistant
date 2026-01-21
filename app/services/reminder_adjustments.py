@@ -590,7 +590,7 @@ def batch_adjust_all_users_reminders() -> Dict[str, Any]:
 
             try:
                 # Get user's profile to fetch city
-                profile_response = supabase.table("user_profiles").select("city").eq("id", user_id).execute()
+                profile_response = supabase.table("profiles").select("city").eq("id", user_id).execute()
                 profile = profile_response.data[0] if profile_response.data else None
                 city = profile.get("city") if profile else None
 
