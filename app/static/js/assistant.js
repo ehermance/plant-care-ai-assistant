@@ -269,7 +269,7 @@
       text += contextParts.join(' | ') + '\n';
     }
 
-    text += '\nA: ' + answer + '\n\n— via PlantCareAI.app';
+    text += '\nA: ' + answer + '\n\n— PlantCareAI';
 
     return text;
   }
@@ -339,10 +339,11 @@
       // Check if Web Share API is available
       if (navigator.share) {
         try {
+          // Embed URL in text - some apps ignore the url parameter and only share text
+          var shareText = text + '\n\nhttps://plantcareai.app/ask';
           await navigator.share({
             title: 'Plant Care Advice from PlantCareAI',
-            text: text,
-            url: 'https://plantcareai.app/ask'
+            text: shareText
           });
         } catch (err) {
           // User cancelled or share failed - fall back to copy
