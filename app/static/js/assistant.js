@@ -228,3 +228,226 @@
     });
   })();
 })();
+
+// --- Copy/Share Answer Functionality ---
+(function() {
+  'use strict';
+
+  const copyBtn = document.getElementById('copy-answer-btn');
+  const shareBtn = document.getElementById('share-answer-btn');
+
+  if (!copyBtn && !shareBtn) return;
+
+  // Map care_context values to readable labels
+  const contextLabels = {
+    'indoor_potted': 'Indoor, potted',
+    'outdoor_potted': 'Outdoor, potted',
+    'outdoor_bed': 'Outdoor, in-ground',
+    'greenhouse': 'Greenhouse',
+    'office': 'Office'
+  };
+
+  /**
+   * Build formatted text for copying/sharing
+   */
+  function buildShareText(btn) {
+    const question = btn.dataset.question || '';
+    const plant = btn.dataset.plant || '';
+    const city = btn.dataset.city || '';
+    const context = btn.dataset.context || '';
+    const answer = btn.dataset.answer || '';
+
+    let text = 'Q: ' + question + '\n';
+
+    // Build context line with non-empty values
+    const contextParts = [];
+    if (plant) contextParts.push('Plant: ' + plant);
+    if (context) contextParts.push('Location: ' + (contextLabels[context] || context));
+    if (city) contextParts.push('City: ' + city);
+
+    if (contextParts.length > 0) {
+      text += contextParts.join(' | ') + '\n';
+    }
+
+    text += '\nA: ' + answer + '\n\n— via PlantCareAI.app';
+
+    return text;
+  }
+
+  /**
+   * Copy text to clipboard with feedback
+   */
+  async function copyToClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (err) {
+      // Fallback for older browsers
+      var textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        return true;
+      } catch (e) {
+        document.body.removeChild(textarea);
+        return false;
+      }
+    }
+  }
+
+  /**
+   * Show "Copied!" feedback on button
+   */
+  function showCopiedFeedback(btn) {
+    var textEl = btn.querySelector('#copy-text') || btn.querySelector('span:last-child');
+    var iconEl = btn.querySelector('#copy-icon') || btn.querySelector('span:first-child');
+    var originalText = textEl.textContent;
+    var originalIcon = iconEl.textContent;
+
+    textEl.textContent = 'Copied!';
+    iconEl.textContent = '✓';
+    btn.classList.add('!bg-emerald-100', 'dark:!bg-emerald-900/30');
+
+    setTimeout(function() {
+      textEl.textContent = originalText;
+      iconEl.textContent = originalIcon;
+      btn.classList.remove('!bg-emerald-100', 'dark:!bg-emerald-900/30');
+    }, 2000);
+  }
+
+  // Copy button handler
+  if (copyBtn) {
+    copyBtn.addEventListener('click', async function() {
+      var text = buildShareText(this);
+      var success = await copyToClipboard(text);
+      if (success) {
+        showCopiedFeedback(this);
+      }
+    });
+  }
+
+  // Share button handler
+  if (shareBtn) {
+    shareBtn.addEventListener('click', async function() {
+      var text = buildShareText(this);
+
+      // Check if Web Share API is available
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: 'Plant Care Advice from PlantCareAI',
+            text: text,
+            url: 'https://plantcareai.app/ask'
+          });
+        } catch (err) {
+          // User cancelled or share failed - fall back to copy
+          if (err.name !== 'AbortError') {
+            var success = await copyToClipboard(text);
+            if (success) {
+              showCopiedFeedback(copyBtn || this);
+            }
+          }
+        }
+      } else {
+        // Desktop fallback - copy to clipboard
+        var success = await copyToClipboard(text);
+        if (success) {
+          showCopiedFeedback(copyBtn || this);
+        }
+      }
+    });
+  }
+})();
+
+// --- Micro-Feedback Functionality ---
+(function() {
+  'use strict';
+
+  var feedbackSection = document.getElementById('feedback-section');
+  var feedbackButtons = document.getElementById('feedback-buttons');
+  var feedbackThanks = document.getElementById('feedback-thanks');
+  var feedbackDataEl = document.getElementById('feedback-data');
+
+  if (!feedbackSection || !feedbackButtons || !feedbackDataEl) return;
+
+  // Parse feedback context data
+  var feedbackData = {};
+  try {
+    feedbackData = JSON.parse(feedbackDataEl.textContent);
+  } catch (e) {
+    console.error('Failed to parse feedback data');
+    return;
+  }
+
+  // Check if feedback already submitted (session storage)
+  var feedbackKey = 'pcai-feedback-' + btoa(feedbackData.question || '').slice(0, 20);
+  if (sessionStorage.getItem(feedbackKey)) {
+    feedbackButtons.classList.add('hidden');
+    feedbackThanks.classList.remove('hidden');
+    return;
+  }
+
+  // Handle feedback button clicks
+  feedbackButtons.addEventListener('click', async function(e) {
+    var btn = e.target.closest('.feedback-btn');
+    if (!btn) return;
+
+    var rating = btn.dataset.rating;
+    if (!rating) return;
+
+    // Disable buttons immediately
+    feedbackButtons.querySelectorAll('.feedback-btn').forEach(function(b) {
+      b.disabled = true;
+      b.classList.add('opacity-50', 'cursor-not-allowed');
+    });
+
+    // Highlight selected button
+    btn.classList.remove('opacity-50');
+    btn.classList.add('ring-2', 'ring-emerald-500');
+
+    try {
+      var response = await fetch('/api/v1/feedback/answer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          rating: rating,
+          question: feedbackData.question,
+          plant: feedbackData.plant,
+          city: feedbackData.city,
+          care_context: feedbackData.care_context,
+          ai_source: feedbackData.ai_source
+        })
+      });
+
+      if (response.ok) {
+        // Mark as submitted
+        sessionStorage.setItem(feedbackKey, rating);
+
+        // Show thanks message
+        feedbackButtons.classList.add('hidden');
+        feedbackThanks.classList.remove('hidden');
+      } else {
+        // Re-enable buttons on error
+        feedbackButtons.querySelectorAll('.feedback-btn').forEach(function(b) {
+          b.disabled = false;
+          b.classList.remove('opacity-50', 'cursor-not-allowed');
+        });
+        btn.classList.remove('ring-2', 'ring-emerald-500');
+      }
+    } catch (err) {
+      // Re-enable buttons on network error
+      feedbackButtons.querySelectorAll('.feedback-btn').forEach(function(b) {
+        b.disabled = false;
+        b.classList.remove('opacity-50', 'cursor-not-allowed');
+      });
+      btn.classList.remove('ring-2', 'ring-emerald-500');
+    }
+  });
+})();

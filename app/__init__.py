@@ -138,6 +138,8 @@ def create_app() -> Flask:
 
     # Initialize CSRF Protection
     csrf = CSRFProtect(app)
+    # Exempt API blueprint from CSRF (used for AJAX requests)
+    csrf.exempt(api_bp)
 
     # Initialize Supabase client
     supabase_client.init_supabase(app)

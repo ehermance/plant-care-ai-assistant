@@ -173,12 +173,87 @@
         </div>
       </div>
       <p class="prewrap whitespace-pre-wrap text-slate-900 dark:text-slate-100">{{ answer }}</p>
+
+      <!-- Copy/Share Buttons -->
+      <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 flex flex-wrap gap-2">
+        <button type="button" id="copy-answer-btn" class="btn btn-sm btn-secondary"
+                data-question="{{ form_values.question | e }}"
+                data-plant="{{ form_values.plant | e }}"
+                data-city="{{ form_values.city | e }}"
+                data-context="{{ form_values.care_context | e }}"
+                data-answer="{{ answer | e }}">
+          <span id="copy-icon" aria-hidden="true">📋</span>
+          <span id="copy-text">Copy</span>
+        </button>
+        <button type="button" id="share-answer-btn" class="btn btn-sm btn-secondary"
+                data-question="{{ form_values.question | e }}"
+                data-plant="{{ form_values.plant | e }}"
+                data-city="{{ form_values.city | e }}"
+                data-context="{{ form_values.care_context | e }}"
+                data-answer="{{ answer | e }}">
+          <span aria-hidden="true">↗</span>
+          <span>Share</span>
+        </button>
+      </div>
+
+      <!-- Micro-Feedback -->
+      <div id="feedback-section" class="mt-3 flex flex-wrap items-center gap-2 text-sm">
+        <span class="text-slate-500 dark:text-slate-400">Did this help?</span>
+        <div id="feedback-buttons" class="flex gap-1">
+          <button type="button" class="feedback-btn px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700
+                         text-slate-600 dark:text-slate-400 hover:border-emerald-500 hover:text-emerald-600
+                         dark:hover:border-emerald-400 dark:hover:text-emerald-400 transition-colors"
+                  data-rating="yes">👍 Yes</button>
+          <button type="button" class="feedback-btn px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700
+                         text-slate-600 dark:text-slate-400 hover:border-amber-500 hover:text-amber-600
+                         dark:hover:border-amber-400 dark:hover:text-amber-400 transition-colors"
+                  data-rating="somewhat">🤔 Somewhat</button>
+          <button type="button" class="feedback-btn px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700
+                         text-slate-600 dark:text-slate-400 hover:border-rose-500 hover:text-rose-600
+                         dark:hover:border-rose-400 dark:hover:text-rose-400 transition-colors"
+                  data-rating="no">👎 No</button>
+        </div>
+        <span id="feedback-thanks" class="hidden text-emerald-600 dark:text-emerald-400">
+          Thanks for your feedback!
+        </span>
+      </div>
+
+      <!-- Hidden data for feedback submission -->
+      <script type="application/json" id="feedback-data">
+        {
+          "question": {{ form_values.question | tojson }},
+          "plant": {{ (form_values.plant or '') | tojson }},
+          "city": {{ (form_values.city or '') | tojson }},
+          "care_context": {{ (form_values.care_context or '') | tojson }},
+          "ai_source": {{ (source or '') | tojson }}
+        }
+      </script>
     {% else %}
       <h2 id="answer-title" class="section-title">Answer</h2>
       <p class="text-slate-500 dark:text-slate-400">Submit a question to see guidance here.</p>
     {% endif %}
   </div>
 </section>
+
+<!-- Signup Prompt for Unauthenticated Users -->
+{% if not is_authenticated and answer %}
+<section class="mb-8">
+  <div class="bg-gradient-to-r from-emerald-50 to-cyan-50 dark:from-emerald-900/20 dark:to-cyan-900/20
+              border border-emerald-200 dark:border-emerald-700/50 rounded-xl p-4
+              flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl" aria-hidden="true">🌱</span>
+      <p class="text-slate-700 dark:text-slate-300 text-sm sm:text-base">
+        <strong class="text-emerald-700 dark:text-emerald-400">Want personalized care advice?</strong>
+        <span class="hidden sm:inline"> Sign up free to save your plants and get tailored reminders.</span>
+      </p>
+    </div>
+    <a href="{{ url_for('auth.signup') }}" class="btn btn-sm btn-primary whitespace-nowrap">
+      Sign Up Free
+    </a>
+  </div>
+</section>
+{% endif %}
 
 <!-- Your Plants Section (Compact, below form) -->
 {% if user_plants %}

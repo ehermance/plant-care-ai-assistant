@@ -6,9 +6,11 @@ Endpoints:
 - /user/theme: Update user theme preferences
 - /user/context: Get user context for AI (plants, reminders, activities)
 - /user/plant/<id>/context: Get detailed context for specific plant
+- /feedback/answer: Submit feedback on AI answers
 """
 
-from flask import Blueprint, request, jsonify
+import uuid
+from flask import Blueprint, request, jsonify, make_response
 from ..utils.presets import infer_region_from_latlon, infer_region_from_city, region_presets
 from ..utils.auth import require_auth, get_current_user_id
 from ..utils.errors import sanitize_error, GENERIC_MESSAGES
@@ -210,3 +212,97 @@ def get_plant_context(plant_id: str):
             "success": False,
             "error": sanitized_msg
         }), 500
+
+
+@api_bp.route("/feedback/answer", methods=["POST"])
+@limiter.limit("10 per minute")
+def submit_answer_feedback():
+    """
+    Submit feedback for an AI answer.
+
+    Available to both authenticated and unauthenticated users.
+    Uses session cookie for anonymous tracking.
+
+    Rate limit: 10 requests per minute
+
+    Request body (JSON):
+        {
+            "rating": "yes" | "somewhat" | "no",
+            "question": "...",
+            "plant": "...",
+            "city": "...",
+            "care_context": "...",
+            "ai_source": "openai" | "gemini" | "rule"
+        }
+
+    Returns:
+        200: {"success": true}
+        400: {"success": false, "error": "..."}
+        500: {"success": false, "error": "..."}
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"success": False, "error": "Invalid request"}), 400
+
+        # Validate rating
+        rating = data.get("rating", "").strip().lower()
+        if rating not in ["yes", "somewhat", "no"]:
+            return jsonify({"success": False, "error": "Invalid rating"}), 400
+
+        # Validate question exists
+        question = data.get("question", "").strip()
+        if not question:
+            return jsonify({"success": False, "error": "Question is required"}), 400
+
+        # Get user ID if authenticated (optional)
+        user_id = None
+        try:
+            user_id = get_current_user_id()
+        except Exception:
+            pass
+
+        # Get or generate session ID for anonymous users
+        session_id = request.cookies.get("pcai_session_id")
+        if not session_id and not user_id:
+            session_id = str(uuid.uuid4())
+
+        # Build feedback record
+        feedback_data = {
+            "user_id": user_id,
+            "session_id": session_id if not user_id else None,
+            "question": question[:600],  # Truncate for safety
+            "plant": (data.get("plant") or "")[:120],
+            "city": (data.get("city") or "")[:120],
+            "care_context": (data.get("care_context") or "")[:80],
+            "ai_source": data.get("ai_source") or None,
+            "rating": rating,
+            "page_url": request.referrer or request.url,
+            "user_agent": request.headers.get("User-Agent", "")[:255],
+        }
+
+        # Insert into database
+        admin_client = supabase_client.get_admin_client()
+        if not admin_client:
+            return jsonify({"success": False, "error": "Service unavailable"}), 503
+
+        result = admin_client.table("answer_feedback").insert(feedback_data).execute()
+
+        if result.data:
+            response = make_response(jsonify({"success": True}), 200)
+            # Set session cookie for anonymous tracking if not already set
+            if session_id and not request.cookies.get("pcai_session_id"):
+                response.set_cookie(
+                    "pcai_session_id",
+                    session_id,
+                    max_age=60 * 60 * 24 * 30,  # 30 days
+                    httponly=True,
+                    samesite="Lax",
+                )
+            return response
+        else:
+            return jsonify({"success": False, "error": "Failed to save feedback"}), 500
+
+    except Exception as e:
+        sanitized_msg = sanitize_error(e, "database", "Feedback submission failed")
+        return jsonify({"success": False, "error": sanitized_msg}), 500
