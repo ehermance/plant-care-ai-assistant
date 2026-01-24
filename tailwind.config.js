@@ -73,23 +73,23 @@ module.exports = {
           800: '#9f1239',
           900: '#881337',
         },
-        // Neutrals - Earth & Space
+        // Neutrals - Warm Earth Tones
         slate: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
+          50: '#faf8f6',   // Warm off-white (cream)
+          100: '#f4f1ed',  // Warm light gray (linen)
+          200: '#e8e3dd',  // Warm light-medium
+          300: '#d5cec5',  // Warm sand
+          400: '#a69d91',  // Warm taupe
+          500: '#78716c',  // Warm gray
+          600: '#57534e',  // Warm dark gray
+          700: '#44403c',  // Warm darker
+          800: '#292524',  // Warm near-black
+          900: '#1c1917',  // Warm almost-black
         },
       },
       fontFamily: {
         sans: ['Inter var', 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Fraunces', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'monospace'],
       },
       fontSize: {
