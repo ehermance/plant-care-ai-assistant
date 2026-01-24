@@ -174,12 +174,12 @@ def _get_email_footer(unsubscribe_url: str) -> str:
     return f"""
                     <!-- Footer -->
                     <tr>
-                        <td style="background-color: #f9fafb; padding: 24px 40px; border-top: 1px solid #e5e7eb;">
-                            <p style="margin: 0 0 8px; color: #6b7280; font-size: 12px; text-align: center;">
+                        <td style="background-color: #faf8f6; padding: 24px 40px; border-top: 1px solid #e8e3dd;">
+                            <p style="margin: 0 0 8px; color: #78716c; font-size: 12px; text-align: center;">
                                 You received this because you signed up for PlantCareAI updates.
                             </p>
-                            <p style="margin: 0; color: #9ca3af; font-size: 11px; text-align: center;">
-                                <a href="{unsubscribe_url}" style="color: #9ca3af; text-decoration: underline;">Unsubscribe</a>
+                            <p style="margin: 0; color: #a69d91; font-size: 11px; text-align: center;">
+                                <a href="{unsubscribe_url}" style="color: #a69d91; text-decoration: underline;">Unsubscribe</a>
                                 from marketing emails
                             </p>
                         </td>
@@ -197,8 +197,8 @@ def _get_welcome_day0_email(unsubscribe_url: str) -> Dict[str, str]:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to PlantCareAI!</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f1ed;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f1ed; padding: 20px;">
         <tr>
             <td align="center">
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -214,7 +214,7 @@ def _get_welcome_day0_email(unsubscribe_url: str) -> Dict[str, str]:
                     <tr>
                         <td style="padding: 40px;">
                             <h2 style="margin: 0 0 16px; color: #111827; font-size: 20px; font-weight: 600;">You're all set to grow! 🎉</h2>
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 16px; line-height: 1.6;">
                                 Thanks for joining PlantCareAI. We're here to help your plants thrive with smart care reminders and AI-powered advice.
                             </p>
 
@@ -249,7 +249,7 @@ def _get_welcome_day0_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
+                            <p style="margin: 0; color: #57534e; font-size: 14px; line-height: 1.5;">
                                 Happy growing! 🌿<br>
                                 Ellen
                             </p>
@@ -306,8 +306,8 @@ def _get_welcome_day3_email(unsubscribe_url: str) -> Dict[str, str]:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plant Care Tips from PlantCareAI</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f1ed;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f1ed; padding: 20px;">
         <tr>
             <td align="center">
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -322,22 +322,22 @@ def _get_welcome_day3_email(unsubscribe_url: str) -> Dict[str, str]:
                     <!-- Content -->
                     <tr>
                         <td style="padding: 40px;">
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 16px; line-height: 1.6;">
                                 Here are some expert tips to help your plants flourish:
                             </p>
 
                             <h3 style="margin: 0 0 12px; color: #111827; font-size: 18px; font-weight: 600;">🌊 Tip #1: Check the soil, not the calendar</h3>
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 14px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 14px; line-height: 1.6;">
                                 Instead of watering on a fixed schedule, stick your finger 1-2 inches into the soil. If it's dry, water thoroughly. If moist, wait another day or two. Most houseplant problems come from overwatering!
                             </p>
 
                             <h3 style="margin: 0 0 12px; color: #111827; font-size: 18px; font-weight: 600;">☀️ Tip #2: Light matters more than you think</h3>
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 14px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 14px; line-height: 1.6;">
                                 "Bright indirect light" means near a window but not in direct sun rays. North-facing windows = low light. South-facing = bright. East/West = medium. Match your plants to their light needs!
                             </p>
 
                             <h3 style="margin: 0 0 12px; color: #111827; font-size: 18px; font-weight: 600;">🔄 Tip #3: Rotate for even growth</h3>
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 14px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 14px; line-height: 1.6;">
                                 Give your plants a quarter turn every time you water. This helps them grow evenly instead of leaning toward the light. Your future self will thank you!
                             </p>
 
@@ -354,7 +354,7 @@ def _get_welcome_day3_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
+                            <p style="margin: 0; color: #57534e; font-size: 14px; line-height: 1.5;">
                                 Keep growing! 🌿<br>
                                 Ellen
                             </p>
@@ -409,8 +409,8 @@ def _get_welcome_day7_email(unsubscribe_url: str) -> Dict[str, str]:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Plants Check the Weather Now</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f1ed;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f1ed; padding: 20px;">
         <tr>
             <td align="center">
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -425,7 +425,7 @@ def _get_welcome_day7_email(unsubscribe_url: str) -> Dict[str, str]:
                     <!-- Content -->
                     <tr>
                         <td style="padding: 40px;">
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 16px; line-height: 1.6;">
                                 Here's something most people don't realize about PlantCareAI: <strong>it adjusts your reminders based on weather.</strong>
                             </p>
 
@@ -462,7 +462,7 @@ def _get_welcome_day7_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <p style="margin: 0 0 16px; color: #4b5563; font-size: 14px; line-height: 1.6;">
+                            <p style="margin: 0 0 16px; color: #57534e; font-size: 14px; line-height: 1.6;">
                                 This happens automatically — you don't have to do anything. Just make sure your location is set in settings.
                             </p>
 
@@ -479,11 +479,11 @@ def _get_welcome_day7_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 14px; line-height: 1.5;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 14px; line-height: 1.5;">
                                 Honestly, this single feature has saved me from overwatering more times than I can count. Turns out plants don't need water when it's about to rain. Who knew? (The AI knew.)
                             </p>
 
-                            <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
+                            <p style="margin: 0; color: #57534e; font-size: 14px; line-height: 1.5;">
                                 Happy growing! 🌿<br>
                                 Ellen
                             </p>
@@ -542,8 +542,8 @@ def _get_welcome_day10_email(unsubscribe_url: str) -> Dict[str, str]:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Best Way to Improve at Plant Care</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f1ed;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f1ed; padding: 20px;">
         <tr>
             <td align="center">
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -558,31 +558,31 @@ def _get_welcome_day10_email(unsubscribe_url: str) -> Dict[str, str]:
                     <!-- Content -->
                     <tr>
                         <td style="padding: 40px;">
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 16px; line-height: 1.6;">
                                 Want to know the #1 way to get better at plant care? <strong>Track what you do.</strong>
                             </p>
 
-                            <p style="margin: 0 0 16px; color: #4b5563; font-size: 14px; line-height: 1.6;">
+                            <p style="margin: 0 0 16px; color: #57534e; font-size: 14px; line-height: 1.6;">
                                 I know, I know — it sounds tedious. But here's why it matters:
                             </p>
 
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 14px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 14px; line-height: 1.6;">
                                 After a few months of logging, you'll know:
                             </p>
 
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
-                                    <td style="padding: 16px; background-color: #f3f4f6; border-radius: 8px;">
-                                        <p style="margin: 0 0 12px; color: #374151; font-size: 14px; line-height: 1.6;">
+                                    <td style="padding: 16px; background-color: #f4f1ed; border-radius: 8px;">
+                                        <p style="margin: 0 0 12px; color: #44403c; font-size: 14px; line-height: 1.6;">
                                             ✓ How often your monstera <em>actually</em> needs water (not what Google says)
                                         </p>
-                                        <p style="margin: 0 0 12px; color: #374151; font-size: 14px; line-height: 1.6;">
+                                        <p style="margin: 0 0 12px; color: #44403c; font-size: 14px; line-height: 1.6;">
                                             ✓ When you fertilized last (was it 2 weeks ago or 2 months?)
                                         </p>
-                                        <p style="margin: 0 0 12px; color: #374151; font-size: 14px; line-height: 1.6;">
+                                        <p style="margin: 0 0 12px; color: #44403c; font-size: 14px; line-height: 1.6;">
                                             ✓ What worked when your plant was struggling
                                         </p>
-                                        <p style="margin: 0; color: #374151; font-size: 14px; line-height: 1.6;">
+                                        <p style="margin: 0; color: #44403c; font-size: 14px; line-height: 1.6;">
                                             ✓ How much it's grown (photos don't lie!)
                                         </p>
                                     </td>
@@ -620,7 +620,7 @@ def _get_welcome_day10_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
+                            <p style="margin: 0; color: #57534e; font-size: 14px; line-height: 1.5;">
                                 Happy growing! 🌿<br>
                                 Ellen
                             </p>
@@ -681,8 +681,8 @@ def _get_reengagement_14day_email(unsubscribe_url: str) -> Dict[str, str]:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Plants Miss You</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f1ed;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f1ed; padding: 20px;">
         <tr>
             <td align="center">
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -697,11 +697,11 @@ def _get_reengagement_14day_email(unsubscribe_url: str) -> Dict[str, str]:
                     <!-- Content -->
                     <tr>
                         <td style="padding: 40px;">
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 16px; line-height: 1.6;">
                                 Hey! It's been a little while since we've seen you.
                             </p>
 
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 14px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 14px; line-height: 1.6;">
                                 Whether you've been busy, traveling, or just taking a break from screens — we get it. But your plants are still growing, and we're here to help whenever you're ready!
                             </p>
 
@@ -733,7 +733,7 @@ def _get_reengagement_14day_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
+                            <p style="margin: 0; color: #57534e; font-size: 14px; line-height: 1.5;">
                                 Happy growing! 🌿<br>
                                 Ellen
                             </p>
@@ -787,8 +787,8 @@ def _get_seasonal_spring_email(unsubscribe_url: str) -> Dict[str, str]:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spring Plant Care Checklist</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f1ed;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f1ed; padding: 20px;">
         <tr>
             <td align="center">
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -800,7 +800,7 @@ def _get_seasonal_spring_email(unsubscribe_url: str) -> Dict[str, str]:
                     </tr>
                     <tr>
                         <td style="padding: 40px;">
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 16px; line-height: 1.6;">
                                 Spring is here! Your plants are waking up from their winter rest, and now's the perfect time to give them some extra love.
                             </p>
 
@@ -833,7 +833,7 @@ def _get_seasonal_spring_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
+                            <p style="margin: 0; color: #57534e; font-size: 14px; line-height: 1.5;">
                                 Happy spring! 🌿<br>
                                 Ellen
                             </p>
@@ -887,8 +887,8 @@ def _get_seasonal_summer_email(unsubscribe_url: str) -> Dict[str, str]:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Summer Plant Care Tips</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f1ed;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f1ed; padding: 20px;">
         <tr>
             <td align="center">
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -900,7 +900,7 @@ def _get_seasonal_summer_email(unsubscribe_url: str) -> Dict[str, str]:
                     </tr>
                     <tr>
                         <td style="padding: 40px;">
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 16px; line-height: 1.6;">
                                 Summer heat is here! Here's how to keep your plants happy when temperatures rise.
                             </p>
 
@@ -933,7 +933,7 @@ def _get_seasonal_summer_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
+                            <p style="margin: 0; color: #57534e; font-size: 14px; line-height: 1.5;">
                                 Stay cool! 🌿<br>
                                 Ellen
                             </p>
@@ -987,8 +987,8 @@ def _get_seasonal_fall_email(unsubscribe_url: str) -> Dict[str, str]:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Preparing Your Plants for Fall</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f1ed;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f1ed; padding: 20px;">
         <tr>
             <td align="center">
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -1000,7 +1000,7 @@ def _get_seasonal_fall_email(unsubscribe_url: str) -> Dict[str, str]:
                     </tr>
                     <tr>
                         <td style="padding: 40px;">
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 16px; line-height: 1.6;">
                                 As days get shorter and cooler, your plants are starting to slow down. Here's how to help them transition.
                             </p>
 
@@ -1033,7 +1033,7 @@ def _get_seasonal_fall_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
+                            <p style="margin: 0; color: #57534e; font-size: 14px; line-height: 1.5;">
                                 Happy fall! 🌿<br>
                                 Ellen
                             </p>
@@ -1087,8 +1087,8 @@ def _get_seasonal_winter_email(unsubscribe_url: str) -> Dict[str, str]:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Winter Dormancy Tips</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f1ed;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f1ed; padding: 20px;">
         <tr>
             <td align="center">
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -1100,7 +1100,7 @@ def _get_seasonal_winter_email(unsubscribe_url: str) -> Dict[str, str]:
                     </tr>
                     <tr>
                         <td style="padding: 40px;">
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 16px; line-height: 1.6;">
                                 Winter is here, and your plants are taking a well-deserved rest. Here's how to care for them during their dormant period.
                             </p>
 
@@ -1133,7 +1133,7 @@ def _get_seasonal_winter_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
+                            <p style="margin: 0; color: #57534e; font-size: 14px; line-height: 1.5;">
                                 Stay cozy! 🌿<br>
                                 Ellen
                             </p>
@@ -1187,8 +1187,8 @@ def _get_milestone_first_plant_email(unsubscribe_url: str) -> Dict[str, str]:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your First Plant Is In!</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f1ed;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f1ed; padding: 20px;">
         <tr>
             <td align="center">
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -1200,11 +1200,11 @@ def _get_milestone_first_plant_email(unsubscribe_url: str) -> Dict[str, str]:
                     </tr>
                     <tr>
                         <td style="padding: 40px;">
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 16px; line-height: 1.6;">
                                 You just added your first plant to PlantCareAI. This is where the magic starts!
                             </p>
 
-                            <p style="margin: 0 0 16px; color: #4b5563; font-size: 14px; line-height: 1.6;">
+                            <p style="margin: 0 0 16px; color: #57534e; font-size: 14px; line-height: 1.6;">
                                 Here's what happens next:
                             </p>
 
@@ -1234,7 +1234,7 @@ def _get_milestone_first_plant_email(unsubscribe_url: str) -> Dict[str, str]:
                                 </tr>
                             </table>
 
-                            <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
+                            <p style="margin: 0; color: #57534e; font-size: 14px; line-height: 1.5;">
                                 Happy growing! 🌿<br>
                                 Ellen
                             </p>
@@ -1286,8 +1286,8 @@ def _get_milestone_anniversary_30_email(unsubscribe_url: str, plant_name: str) -
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>One Month Together!</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f1ed;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f1ed; padding: 20px;">
         <tr>
             <td align="center">
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -1299,11 +1299,11 @@ def _get_milestone_anniversary_30_email(unsubscribe_url: str, plant_name: str) -
                     </tr>
                     <tr>
                         <td style="padding: 40px;">
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 16px; line-height: 1.6;">
                                 Your <strong>{safe_plant_name}</strong> has been with you for 1 month now! <span aria-label="party">🎉</span>
                             </p>
 
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 14px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 14px; line-height: 1.6;">
                                 That's 30 days of learning what makes your plant happy. You've probably figured out its favorite spot, how thirsty it gets, and maybe even started to notice new growth.
                             </p>
 
@@ -1320,7 +1320,7 @@ def _get_milestone_anniversary_30_email(unsubscribe_url: str, plant_name: str) -
                                 </tr>
                             </table>
 
-                            <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
+                            <p style="margin: 0; color: #57534e; font-size: 14px; line-height: 1.5;">
                                 Here's to many more months together! 🌿<br>
                                 Ellen
                             </p>
@@ -1368,8 +1368,8 @@ def _get_milestone_streak_5_email(unsubscribe_url: str, streak_count: int) -> Di
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>You're on a Streak!</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f1ed;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f1ed; padding: 20px;">
         <tr>
             <td align="center">
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -1381,7 +1381,7 @@ def _get_milestone_streak_5_email(unsubscribe_url: str, streak_count: int) -> Di
                     </tr>
                     <tr>
                         <td style="padding: 40px;">
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 16px; line-height: 1.6;">
                                 You've logged plant care for <strong>{streak_count} days in a row!</strong> Your plants are lucky to have you.
                             </p>
 
@@ -1398,11 +1398,11 @@ def _get_milestone_streak_5_email(unsubscribe_url: str, streak_count: int) -> Di
                                 </tr>
                             </table>
 
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 14px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 14px; line-height: 1.6;">
                                 Consistency is the secret to happy plants. Keep it up and watch your garden thrive!
                             </p>
 
-                            <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
+                            <p style="margin: 0; color: #57534e; font-size: 14px; line-height: 1.5;">
                                 Keep growing! 🌿<br>
                                 Ellen
                             </p>
@@ -1449,8 +1449,8 @@ def _get_milestone_collection_5_email(unsubscribe_url: str, plant_count: int) ->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Collection Is Growing!</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f1ed;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f1ed; padding: 20px;">
         <tr>
             <td align="center">
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -1462,7 +1462,7 @@ def _get_milestone_collection_5_email(unsubscribe_url: str, plant_count: int) ->
                     </tr>
                     <tr>
                         <td style="padding: 40px;">
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                            <p style="margin: 0 0 24px; color: #57534e; font-size: 16px; line-height: 1.6;">
                                 You now have <strong>{plant_count} plants</strong> in your collection! 🎉
                             </p>
 
@@ -1479,27 +1479,27 @@ def _get_milestone_collection_5_email(unsubscribe_url: str, plant_count: int) ->
                                 </tr>
                             </table>
 
-                            <p style="margin: 0 0 16px; color: #4b5563; font-size: 14px; line-height: 1.6;">
+                            <p style="margin: 0 0 16px; color: #57534e; font-size: 14px; line-height: 1.6;">
                                 As your collection grows, here are some tips to stay organized:
                             </p>
 
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
                                 <tr>
-                                    <td style="padding: 16px; background-color: #f3f4f6; border-radius: 8px;">
-                                        <p style="margin: 0 0 8px; color: #374151; font-size: 14px;">
+                                    <td style="padding: 16px; background-color: #f4f1ed; border-radius: 8px;">
+                                        <p style="margin: 0 0 8px; color: #44403c; font-size: 14px;">
                                             ✓ Group plants with similar water needs together
                                         </p>
-                                        <p style="margin: 0 0 8px; color: #374151; font-size: 14px;">
+                                        <p style="margin: 0 0 8px; color: #44403c; font-size: 14px;">
                                             ✓ Use our location tags to track where each plant lives
                                         </p>
-                                        <p style="margin: 0; color: #374151; font-size: 14px;">
+                                        <p style="margin: 0; color: #44403c; font-size: 14px;">
                                             ✓ Check your reminders regularly — more plants = more care!
                                         </p>
                                     </td>
                                 </tr>
                             </table>
 
-                            <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.5;">
+                            <p style="margin: 0; color: #57534e; font-size: 14px; line-height: 1.5;">
                                 Happy growing! 🌿<br>
                                 Ellen
                             </p>

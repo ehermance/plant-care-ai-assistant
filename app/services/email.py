@@ -79,13 +79,13 @@ def send_otp_email(email: str, code: str) -> Dict[str, Any]:
           </tr>
 
           <tr>
-            <td style="padding:0 0 16px; font-size:14px; color:#374151; line-height:1.5;">
+            <td style="padding:0 0 16px; font-size:14px; color:#44403c; line-height:1.5;">
               Enter this code to sign in:
             </td>
           </tr>
 
           <tr>
-            <td style="padding:16px; border:1px solid #e5e7eb; border-radius:6px; text-align:center;">
+            <td style="padding:16px; border:1px solid #e8e3dd; border-radius:6px; text-align:center;">
               <div style="font-size:32px; font-weight:bold; letter-spacing:4px; color:#111827;">
                 {code}
               </div>
@@ -93,19 +93,19 @@ def send_otp_email(email: str, code: str) -> Dict[str, Any]:
           </tr>
 
           <tr>
-            <td style="padding:16px 0 0; font-size:13px; color:#6b7280; line-height:1.5;">
+            <td style="padding:16px 0 0; font-size:13px; color:#78716c; line-height:1.5;">
               This code expires in 15 minutes. Don’t share it with anyone.
             </td>
           </tr>
 
           <tr>
-            <td style="padding:16px 0 0; font-size:13px; color:#6b7280; line-height:1.5;">
+            <td style="padding:16px 0 0; font-size:13px; color:#78716c; line-height:1.5;">
               If you didn’t request this, you can safely ignore this email.
             </td>
           </tr>
 
           <tr>
-            <td style="padding:24px 0 0; font-size:12px; color:#9ca3af; line-height:1.5;">
+            <td style="padding:24px 0 0; font-size:12px; color:#a69d91; line-height:1.5;">
               Automated message from PlantCareAI.
               Need help? support@plantcareai.app
             </td>
