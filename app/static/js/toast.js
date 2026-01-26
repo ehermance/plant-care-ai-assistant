@@ -4,6 +4,14 @@
  * Usage: showToast('Success!', 'Your plant was added', 'success')
  */
 
+// Escape HTML to prevent XSS
+function escapeHTML(str) {
+  if (!str) return '';
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 // Create toast container if it doesn't exist
 function ensureToastContainer() {
   let container = document.querySelector('.toast-container');
@@ -37,8 +45,8 @@ function showToast(title, message, type = 'info', duration = 4000) {
   toast.innerHTML = `
     <div class="toast-icon" aria-hidden="true">${icons[type] || icons.info}</div>
     <div class="toast-content">
-      ${title ? `<div class="toast-title">${title}</div>` : ''}
-      ${message ? `<div class="toast-message">${message}</div>` : ''}
+      ${title ? `<div class="toast-title">${escapeHTML(title)}</div>` : ''}
+      ${message ? `<div class="toast-message">${escapeHTML(message)}</div>` : ''}
     </div>
     <button class="toast-close" aria-label="Close notification">×</button>
   `;

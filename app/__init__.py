@@ -138,7 +138,9 @@ def create_app() -> Flask:
 
     # Initialize CSRF Protection
     csrf = CSRFProtect(app)
-    # Exempt API blueprint from CSRF (used for AJAX requests)
+    # Exempt API blueprint from Flask-WTF CSRF tokens.
+    # API endpoints use custom header validation (@require_ajax decorator)
+    # which provides CSRF protection by requiring X-Requested-With header.
     csrf.exempt(api_bp)
 
     # Initialize Supabase client
