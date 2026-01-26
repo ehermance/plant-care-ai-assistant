@@ -394,6 +394,11 @@ def delete(reminder_id):
 @require_auth
 def toggle_status(reminder_id):
     """Toggle reminder's active status (activate/deactivate)."""
+    # Validate UUID format before database query
+    if not is_valid_uuid(reminder_id):
+        flash("Invalid reminder ID.", "error")
+        return redirect(url_for("reminders.index"))
+
     user_id = get_current_user_id()
     if not user_id:
         flash("Please log in to toggle reminder status.", "error")
@@ -413,6 +418,11 @@ def toggle_status(reminder_id):
 @require_auth
 def adjust_weather(reminder_id):
     """Manually trigger weather adjustment for a reminder."""
+    # Validate UUID format before database query
+    if not is_valid_uuid(reminder_id):
+        flash("Invalid reminder ID.", "error")
+        return redirect(url_for("reminders.index"))
+
     user_id = get_current_user_id()
 
     # Get city from form or user profile

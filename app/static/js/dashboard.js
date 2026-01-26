@@ -6,6 +6,14 @@
 (function() {
   'use strict';
 
+  // Escape HTML to prevent XSS
+  function escapeHTML(str) {
+    if (!str) return '';
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
   document.addEventListener('DOMContentLoaded', function() {
 
     // ========================================================================
@@ -496,7 +504,7 @@
         detailsHTML += `
           <div>
             <dt class="text-sm font-semibold text-slate-700 dark:text-slate-300">Condition</dt>
-            <dd class="text-sm text-slate-600 dark:text-slate-400 capitalize">${details.weather_condition.replace(/_/g, ' ')}</dd>
+            <dd class="text-sm text-slate-600 dark:text-slate-400 capitalize">${escapeHTML(details.weather_condition.replace(/_/g, ' '))}</dd>
           </div>
         `;
       }
@@ -563,9 +571,9 @@
 
           <div class="p-4 bg-cyan-50 dark:bg-cyan-900/20 border-l-4 border-cyan-400 dark:border-cyan-500 rounded-r mb-4">
             <p class="text-sm font-medium text-slate-700 dark:text-slate-300">
-              ${adjustment.reason}
+              ${escapeHTML(adjustment.reason)}
             </p>
-            ${adjustedAt ? `<p class="text-xs text-slate-500 dark:text-slate-500 mt-1">Adjusted ${adjustedAt}</p>` : ''}
+            ${adjustedAt ? `<p class="text-xs text-slate-500 dark:text-slate-500 mt-1">Adjusted ${escapeHTML(adjustedAt)}</p>` : ''}
           </div>
 
           ${detailsHTML}

@@ -120,7 +120,7 @@ class ThemeManager {
    */
   async syncWithDatabase() {
     try {
-      const response = await fetch('/api/user/theme', {
+      const response = await fetch('/api/v1/user/theme', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

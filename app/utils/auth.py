@@ -8,6 +8,7 @@ Provides:
 """
 
 from __future__ import annotations
+from datetime import datetime
 from functools import wraps
 from typing import Optional, Dict, Any
 from flask import session, redirect, url_for, request, flash, g
@@ -266,12 +267,46 @@ def inject_auth_context():
     user = get_current_user()
     user_id = user.get("id") if user else None
 
+    # Default values for unauthenticated users
+    if not user_id:
+        return {
+            "current_user": None,
+            "is_authenticated": False,
+            "is_premium": False,
+            "is_in_trial": False,
+            "trial_days_remaining": 0,
+            "has_premium_access": False,
+            "profile": None,
+        }
+
+    # Fetch profile once (avoids N+1 queries)
+    profile = supabase_client.get_user_profile(user_id)
+
+    # Compute premium status from profile
+    is_premium = profile.get("plan") == "premium" if profile else False
+
+    # Compute trial status from profile
+    is_in_trial = False
+    trial_days_remaining = 0
+    if profile:
+        trial_ends_at = profile.get("trial_ends_at")
+        if trial_ends_at:
+            try:
+                trial_end = datetime.fromisoformat(trial_ends_at.replace("Z", "+00:00"))
+                now = datetime.utcnow()
+                is_in_trial = now < trial_end.replace(tzinfo=None)
+                if is_in_trial:
+                    delta = trial_end.replace(tzinfo=None) - now
+                    trial_days_remaining = max(0, delta.days)
+            except Exception:
+                pass
+
     return {
         "current_user": user,
-        "is_authenticated": user is not None,
-        "is_premium": supabase_client.is_premium(user_id) if user_id else False,
-        "is_in_trial": supabase_client.is_in_trial(user_id) if user_id else False,
-        "trial_days_remaining": supabase_client.trial_days_remaining(user_id) if user_id else 0,
-        "has_premium_access": supabase_client.has_premium_access(user_id) if user_id else False,
-        "profile": supabase_client.get_user_profile(user_id) if user_id else None,
+        "is_authenticated": True,
+        "is_premium": is_premium,
+        "is_in_trial": is_in_trial,
+        "trial_days_remaining": trial_days_remaining,
+        "has_premium_access": is_premium or is_in_trial,
+        "profile": profile,
     }
