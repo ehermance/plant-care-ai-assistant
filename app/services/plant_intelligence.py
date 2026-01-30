@@ -45,7 +45,7 @@ def _get_cache_key(plant_data: Dict[str, Any]) -> str:
     key_string = "|".join(str(p) for p in key_parts)
 
     # Hash to fixed length
-    return hashlib.md5(key_string.encode()).hexdigest()
+    return hashlib.md5(key_string.encode(), usedforsecurity=False).hexdigest()
 
 
 def _get_cached_inference(cache_key: str) -> Optional[Dict[str, Any]]:

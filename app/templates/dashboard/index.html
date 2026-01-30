@@ -127,20 +127,20 @@
 </section>
 {% endif %}
 
-<!-- Today's Care Tasks (Consolidated from Today's Focus + Care Reminders Due Today) -->
+<!-- Today's Plant Check (Consolidated from Today's Focus + Care Reminders Due Today) -->
 {% if due_reminders %}
-<section class="card mb-8 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/10 dark:to-cyan-900/10 border-2 border-emerald-200 dark:border-emerald-700" aria-labelledby="focus-title">
+<section class="card mb-8 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/10 dark:to-cyan-900/10 border-2 border-emerald-200 dark:border-emerald-700" aria-labelledby="plant-check-title">
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
     <div class="flex items-center gap-3">
-      <div class="text-4xl" aria-hidden="true">🎯</div>
+      <div class="text-4xl" aria-hidden="true">🌱</div>
       <div>
-        <h3 id="focus-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1 flex items-center gap-3 flex-wrap">
-          <span>Today's Care Tasks</span>
+        <h3 id="plant-check-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1 flex items-center gap-3 flex-wrap">
+          <span>Today's Plant Check</span>
           {% if due_reminders %}
           <span class="badge-amber">{{ due_reminders|length }}</span>
           {% endif %}
         </h3>
-        <p class="text-sm text-slate-600 dark:text-slate-400">Your plant care priorities for today</p>
+        <p class="text-sm text-slate-600 dark:text-slate-400">Here's what needs attention today</p>
       </div>
     </div>
     <a href="{{ url_for('reminders.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
@@ -149,7 +149,7 @@
   </div>
 
   <div class="space-y-3" id="todays-focus-list">
-    {% for reminder in due_reminders[:5] %}
+    {% for reminder in due_reminders[:3] %}
     <div class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:shadow-md hover:border-emerald-400 dark:hover:border-emerald-500" data-reminder-id="{{ reminder.id }}">
       <div class="text-3xl flex-shrink-0">
         {% if reminder.reminder_type == 'watering' %}💧
@@ -175,6 +175,8 @@
           <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-700">
             <span aria-hidden="true">☔</span> Weather adjusted
           </span>
+          {% else %}
+          <span class="text-xs text-slate-500 dark:text-slate-400">Reminder due today</span>
           {% endif %}
         </p>
 
@@ -225,30 +227,28 @@
     {% endfor %}
   </div>
 
-  {% if due_reminders|length > 5 %}
+  {% if due_reminders|length > 3 %}
   <div class="text-center text-sm text-slate-600 dark:text-slate-400 mt-4 pt-4 border-t border-emerald-200 dark:border-emerald-700">
     <a href="{{ url_for('reminders.index') }}" class="font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
-      + {{ due_reminders|length - 5 }} more task{% if due_reminders|length > 6 %}s{% endif %} due today →
+      + {{ due_reminders|length - 3 }} more task{% if due_reminders|length > 4 %}s{% endif %} due today →
     </a>
   </div>
   {% endif %}
 </section>
 
 {% elif plant_count > 0 %}
-<section class="card mb-8 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/10 dark:to-cyan-900/10 border-2 border-emerald-200 dark:border-emerald-700" aria-labelledby="focus-title">
-  <div class="flex items-center gap-3 mb-4">
-    <div class="text-4xl" aria-hidden="true">✨</div>
+<section class="card mb-8 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/10 dark:to-cyan-900/10 border-2 border-emerald-200 dark:border-emerald-700" aria-labelledby="all-clear-title">
+  <div class="flex items-center gap-3 mb-2">
+    <div class="text-4xl" aria-hidden="true">✅</div>
     <div>
-      <h3 id="focus-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">All Clear!</h3>
-      <p class="text-sm text-slate-600 dark:text-slate-400">No tasks due today. Great job staying on top of your plant care!</p>
+      <h3 id="all-clear-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">You're all set today</h3>
+      <p class="text-base text-slate-600 dark:text-slate-400">{{ reassurance_message }}</p>
     </div>
   </div>
-  <div class="flex gap-3 flex-wrap">
-    <a href="{{ url_for('web.assistant') }}" class="btn btn-secondary">
-      <span aria-hidden="true">🤖</span> Ask Care Assistant
-    </a>
-    <a href="{{ url_for('plants.index') }}" class="btn btn-secondary">
-      <span aria-hidden="true">🌿</span> Check Your Plants
+  <p class="text-xs text-slate-500 dark:text-slate-400 italic mt-3 mb-4">💡 {{ daily_tip }}</p>
+  <div>
+    <a href="{{ url_for('web.assistant') }}" class="text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+      🤖 Ask the Care Assistant about your plants →
     </a>
   </div>
 </section>
