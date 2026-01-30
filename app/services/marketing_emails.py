@@ -2145,6 +2145,11 @@ def trigger_milestone_event(
         True if event was recorded, False otherwise
     """
     from app.services.supabase_client import get_admin_client
+    from app.utils.validation import is_valid_uuid
+
+    if not is_valid_uuid(user_id):
+        _safe_log_error(f"Invalid UUID passed to trigger_milestone_event: {user_id!r}")
+        return False
 
     try:
         client = get_admin_client()
@@ -2257,8 +2262,14 @@ def get_pending_milestone_emails() -> List[Dict[str, Any]]:
         if not events_result.data:
             return pending
 
-        # Get user emails and check marketing opt-in
-        user_ids = list(set(e["user_id"] for e in events_result.data))
+        # Get user emails and check marketing opt-in (filter out invalid UUIDs)
+        from app.utils.validation import is_valid_uuid
+        user_ids = list(set(
+            e["user_id"] for e in events_result.data if is_valid_uuid(e.get("user_id"))
+        ))
+
+        if not user_ids:
+            return pending
 
         profiles_result = client.table("profiles").select(
             "id, email, marketing_opt_in"
@@ -2294,6 +2305,10 @@ def check_watering_streak(user_id: str) -> None:
     Streak milestones: 5, 7, 14, 30, 60, 100 days
     """
     from app.services.supabase_client import get_admin_client
+    from app.utils.validation import is_valid_uuid
+
+    if not is_valid_uuid(user_id):
+        return
 
     try:
         client = get_admin_client()
@@ -2305,10 +2320,10 @@ def check_watering_streak(user_id: str) -> None:
         hundred_days_ago = now - timedelta(days=100)
 
         result = client.table("plant_actions").select(
-            "created_at"
+            "action_at"
         ).eq("user_id", user_id).gte(
-            "created_at", hundred_days_ago.isoformat()
-        ).order("created_at", desc=True).execute()
+            "action_at", hundred_days_ago.isoformat()
+        ).order("action_at", desc=True).execute()
 
         if not result.data:
             return
@@ -2318,7 +2333,7 @@ def check_watering_streak(user_id: str) -> None:
         for action in result.data:
             try:
                 action_date = datetime.fromisoformat(
-                    action["created_at"].replace("Z", "+00:00")
+                    action["action_at"].replace("Z", "+00:00")
                 ).date()
                 activity_dates.add(action_date)
             except (ValueError, TypeError):

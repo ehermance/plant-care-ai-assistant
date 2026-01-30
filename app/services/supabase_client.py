@@ -731,6 +731,12 @@ def get_user_profile(user_id: str) -> Optional[Dict[str, Any]]:
     if not _supabase_client:
         return None
 
+    # Validate UUID format before sending to Postgres
+    from app.utils.validation import is_valid_uuid
+    if not is_valid_uuid(user_id):
+        _safe_log_error(f"Invalid UUID passed to get_user_profile: {user_id!r}")
+        return None
+
     try:
         # Use maybeSingle() instead of single() to handle 0 rows gracefully
         response = _supabase_client.table("profiles").select("*").eq("id", user_id).maybe_single().execute()
