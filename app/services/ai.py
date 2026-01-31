@@ -265,34 +265,35 @@ def _get_response_guidance(question: str) -> str:
     """
     q_lower = question.lower()
 
-    # Simple yes/no or "should I" questions - direct answers
-    if any(kw in q_lower for kw in ["should i", "can i", "is it", "when should"]):
-        return (
-            "Answer directly first, then briefly explain why. "
-            "Keep under 400 characters."
-        )
-
-    # Diagnostic questions (yellowing, drooping, etc.) - focused troubleshooting
+    # Diagnostic questions first - most specific signal, avoids mis-classification
+    # when diagnostic keywords co-occur with yes/no phrases
     if any(kw in q_lower for kw in [
         "why is", "what's wrong", "yellow", "brown", "drooping",
         "wilting", "dying", "spots", "curling"
     ]):
         return (
             "Identify the most likely cause first, then suggest 2-3 solutions. "
-            "Keep under 700 characters."
+            "Respond in 4-6 sentences (under 700 characters)."
+        )
+
+    # Simple yes/no or "should I" questions - direct answers
+    if any(kw in q_lower for kw in ["should i", "can i", "is it", "when should"]):
+        return (
+            "Answer directly first, then briefly explain why. "
+            "Respond in 2-3 sentences (under 400 characters)."
         )
 
     # How-to questions - clear steps
     if any(kw in q_lower for kw in ["how do i", "how to", "how often", "how much"]):
         return (
             "Provide clear, practical steps. Use a numbered list only if sequence matters. "
-            "Keep under 600 characters."
+            "Respond in 3-5 sentences (under 600 characters)."
         )
 
     # General care questions - conversational tips
     return (
         "Be helpful and conversational. Use 2-4 key points if listing tips. "
-        "Keep under 800 characters."
+        "Respond in 4-7 sentences (under 800 characters)."
     )
 
 
@@ -315,8 +316,11 @@ def build_system_prompt(
     base = (
         "You are a friendly, knowledgeable plant care advisor—like a neighbor who's great with plants. "
         "Give practical, actionable advice in a warm, conversational tone. "
-        "Be concise but thorough. Reference the user's specific situation when relevant. "
-        "If you're uncertain, say so honestly."
+        "Reference the user's specific situation using the provided context. "
+        "Do not invent details about the user's plants or history that are not in the context. "
+        "If you're uncertain, say so honestly. "
+        "Only answer questions about plant care, gardening, and related topics. "
+        "Respond in plain text with short paragraphs. No markdown formatting."
     )
 
     if not user_context_data:
@@ -331,13 +335,21 @@ def build_system_prompt(
                 "You are a patient, encouraging plant mentor helping someone new to plant care. "
                 "Explain concepts simply without jargon. Give clear, step-by-step guidance. "
                 "Reassure them that mistakes are part of learning. "
-                "Keep advice practical and achievable."
+                "Keep advice practical and achievable. "
+                "Reference the user's specific situation using the provided context. "
+                "Do not invent details not in the context. "
+                "Only answer questions about plant care, gardening, and related topics. "
+                "Respond in plain text with short paragraphs. No markdown formatting."
             )
         elif experience == "expert":
             base = (
                 "You are a fellow plant enthusiast having a knowledgeable conversation. "
                 "Use technical terminology when useful. Discuss nuances and trade-offs. "
-                "Skip basics and get to the specifics. Share insights they might not know."
+                "Skip basics and get to the specifics. Share insights they might not know. "
+                "Reference the user's specific situation using the provided context. "
+                "Do not invent details not in the context. "
+                "Only answer questions about plant care, gardening, and related topics. "
+                "Respond in plain text with short paragraphs. No markdown formatting."
             )
 
     # Build enhanced context summary for prompt
@@ -554,7 +566,7 @@ def build_system_prompt(
 
     # Build final context section
     if context_lines:
-        context_section = "\n\nUser Context:\n" + "\n".join(f"- {line}" for line in context_lines)
+        context_section = "\n\nUser Context (use this to personalize your advice):\n" + "\n".join(f"- {line}" for line in context_lines)
         return base + context_section
 
     return base
@@ -648,14 +660,21 @@ def _ai_advice(
     # Build system message with enhanced user context and context level
     sys_msg = build_system_prompt(user_context_data, context_level=context_level)
 
+    # Append compact weather summary if not already covered by user_context_data
+    has_weather_in_context = (
+        user_context_data
+        and (user_context_data.get("weather_context") or user_context_data.get("weather"))
+    )
+    if w_summary and not has_weather_in_context:
+        sys_msg += f"\n\nCurrent weather: {w_summary}"
+
     # Get adaptive response guidance based on question type
     response_guidance = _get_response_guidance(question)
 
     user_msg = (
         f"Plant: {(plant or '').strip() or 'unspecified'}\n"
         f"Care context: {context_str}\n"
-        f"Question: {question.strip()}\n"
-        f"Weather: {w_summary or 'n/a'}\n\n"
+        f"Question: {question.strip()}\n\n"
         f"{response_guidance}"
     )
 
@@ -674,6 +693,8 @@ def _ai_advice(
                 {"role": "system", "content": sys_msg},
                 {"role": "user", "content": user_msg}
             ],
+            temperature=0.7,
+            max_tokens=300,
         )
 
         txt = (resp.choices[0].message.content or "").strip()
