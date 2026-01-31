@@ -2,6 +2,8 @@
 
 {% block title %}Check Your Email - Plant Care AI Assistant - PlantCareAI{% endblock %}
 
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
 {% block content %}
 <div class="max-w-lg mx-auto">
   <section class="card text-center" aria-labelledby="check-email-title">
@@ -74,7 +76,7 @@
 
 <!-- Accessibility note -->
 <div class="sr-only" role="status" aria-live="polite">
-  A magic link has been sent to {{ email }}. Please check your email to continue.
+  A verification code has been sent to {{ email }}. Please check your email to continue.
 </div>
 {% endblock %}
 

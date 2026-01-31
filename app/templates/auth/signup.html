@@ -3,6 +3,8 @@
 {% block title %}Sign Up - Plant Care AI Assistant - PlantCareAI{% endblock %}
 {% block description %}Create your free account to track plants, set reminders, and get personalized care tips.{% endblock %}
 
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
 {% block content %}
 <div class="max-w-md mx-auto">
   <!-- Signup Card -->
@@ -35,8 +37,8 @@
       </li>
     </ul>
 
-    <!-- Magic Link Signup Form -->
-    <form method="POST" action="{{ url_for('auth.signup') }}" novalidate>
+    <!-- OTP Signup Form -->
+    <form method="POST" action="{{ url_for('auth.signup') }}" class="auth-form" novalidate>
       <!-- CSRF Protection -->
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
@@ -87,6 +89,21 @@
         </div>
       </div>
 
+      <!-- Age Confirmation (COPPA compliance) -->
+      <div class="flex items-start gap-3 mb-6">
+        <input
+          type="checkbox"
+          id="age_confirmation"
+          name="age_confirmation"
+          class="mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-emerald-600 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+          required
+          aria-required="true"
+        />
+        <label for="age_confirmation" class="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
+          I confirm I am 13 years of age or older
+        </label>
+      </div>
+
       <!-- Hidden field to preserve 'next' parameter -->
       {% if next %}
         <input type="hidden" name="next" value="{{ next }}">
@@ -118,7 +135,7 @@
       </li>
       <li class="flex items-start gap-2">
         <span class="text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" aria-hidden="true">✓</span>
-        <span>Your data is encrypted and never shared with third parties</span>
+        <span>Your data is encrypted and only shared with essential service providers per our <a href="{{ url_for('legal.privacy') }}" class="underline">Privacy Policy</a></span>
       </li>
       <li class="flex items-start gap-2">
         <span class="text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" aria-hidden="true">✓</span>

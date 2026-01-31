@@ -2,7 +2,7 @@
 Authentication routes for signup, login, and logout.
 
 Handles:
-- Magic link signup/login (passwordless)
+- OTP signup/login (passwordless)
 - Auth callback from Supabase
 - Logout
 - Current user info endpoint
@@ -94,6 +94,12 @@ def signup():
         from flask import session
         session["pending_email"] = "blocked@example.com"
         return redirect(url_for("auth.check_email"))
+
+    # Age confirmation check (COPPA compliance)
+    age_confirmed = request.form.get("age_confirmation") == "on"
+    if not age_confirmed:
+        flash("You must confirm you are 13 years of age or older to sign up.", "error")
+        return redirect(url_for("auth.signup"))
 
     email = request.form.get("email", "").strip().lower()
 

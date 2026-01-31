@@ -128,7 +128,7 @@ def _hash_otp_code(code: str) -> str:
     OTP codes are hashed before database storage so that if the database
     is compromised, attackers cannot see active codes. SHA-256 is used
     instead of bcrypt/argon2 because:
-    1. OTP codes are short-lived (5 minutes)
+    1. OTP codes are short-lived (15 minutes)
     2. They're already high-entropy (6 random digits = 1 million combinations)
     3. Fast hashing is acceptable since brute force is impractical
 
@@ -141,7 +141,7 @@ def _hash_otp_code(code: str) -> str:
     return hashlib.sha256(code.encode('utf-8')).hexdigest()
 
 
-def _store_otp_code(email: str, code: str, expiration_minutes: int = 5) -> Dict[str, Any]:
+def _store_otp_code(email: str, code: str, expiration_minutes: int = 15) -> Dict[str, Any]:
     """
     Store OTP code in database with expiration.
 
@@ -151,7 +151,7 @@ def _store_otp_code(email: str, code: str, expiration_minutes: int = 5) -> Dict[
     Args:
         email: User's email address
         code: 6-digit OTP code (will be hashed before storage)
-        expiration_minutes: Minutes until code expires (default 5)
+        expiration_minutes: Minutes until code expires (default 15)
 
     Returns:
         Dict with 'success' bool and 'message' or 'error'
@@ -282,7 +282,7 @@ def send_otp_code(email: str) -> Dict[str, Any]:
     Send a 6-digit OTP code to the user's email for passwordless login.
 
     Uses custom OTP system with:
-    - 5-minute expiration (vs Supabase's hardcoded 60 seconds)
+    - 15-minute expiration (vs Supabase's hardcoded 60 seconds)
     - Resend email service (avoids Supabase email delays)
     - Database storage for verification
 
@@ -301,8 +301,8 @@ def send_otp_code(email: str) -> Dict[str, Any]:
         # Generate secure 6-digit code
         code = _generate_otp_code()
 
-        # Store code in database with 5-minute expiration
-        store_result = _store_otp_code(email, code, expiration_minutes=5)
+        # Store code in database with 15-minute expiration
+        store_result = _store_otp_code(email, code)
         if not store_result["success"]:
             _safe_log_error(f"Failed to store OTP code: {store_result.get('error')}")
             return {
