@@ -53,7 +53,7 @@ pillow==11.3.0
 pluggy==1.6.0
 postgrest==2.22.3
 propcache==0.4.1
-protobuf>=5.29.5,<6.0.0
+protobuf>=5.29.5,<7.0.0
 psutil==7.1.2
 pycparser==2.23
 pydantic==2.11.9
