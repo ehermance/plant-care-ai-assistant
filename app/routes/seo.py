@@ -26,6 +26,9 @@ SLUG_TO_ROUTE = {
     "how-often-should-i-water-my-plant": "watering_frequency",
     "why-are-my-plant-leaves-turning-yellow": "yellow_leaves",
     "should-i-water-my-plant-today": "water_today",
+    "why-is-my-plant-not-growing": "not_growing",
+    "indoor-plant-care-for-beginners": "beginners_guide",
+    "why-are-my-plant-leaves-curling": "curling_leaves",
 }
 
 
@@ -201,6 +204,108 @@ LANDING_PAGES = {
         "cta_question": "Should I water my plant today?",
         "related_pages": ["how-often-should-i-water-my-plant", "am-i-overwatering-my-plant"],
     },
+    "why-is-my-plant-not-growing": {
+        "slug": "why-is-my-plant-not-growing",
+        "route_name": "not_growing",
+        "title": "Why Is My Plant Not Growing? Common Causes",
+        "meta_description": "Your plant seems stuck? Learn why houseplants stop growing and what you can do to get them thriving again.",
+        "emoji": "🌱",
+        "intro": "You've been watering, feeding, and waiting—but your plant hasn't put out a new leaf in weeks (or months). Before you worry, know that stalled growth is incredibly common and usually has a straightforward explanation.",
+        "causes": [
+            {
+                "title": "It's dormant",
+                "description": "Most houseplants slow down or stop growing in fall and winter. Shorter days and cooler temps trigger a natural rest period. This is normal—your plant is conserving energy, not dying."
+            },
+            {
+                "title": "Not enough light",
+                "description": "Light is the engine of growth. A plant in a dim corner may survive but won't actively grow. Try moving it closer to a window or supplementing with a grow light."
+            },
+            {
+                "title": "Root bound",
+                "description": "If roots are circling the bottom of the pot or poking out of drainage holes, your plant has outgrown its container. Repot into something 1-2 inches wider with fresh soil."
+            },
+            {
+                "title": "Nutrient depletion",
+                "description": "Potting soil loses its nutrients over time. If you haven't fertilized in months, your plant may be hungry. A balanced liquid fertilizer during the growing season can make a big difference."
+            },
+            {
+                "title": "Watering issues",
+                "description": "Both overwatering and underwatering stress roots and stall growth. Consistent, appropriate watering lets your plant focus energy on new leaves instead of survival."
+            }
+        ],
+        "bottom_line": "Patience is the most underrated plant care skill. If your plant looks healthy but isn't growing, check the season, light, and pot size first. Growth often picks up once one of these is addressed.",
+        "cta_text": "Ask PlantCareAI why your plant stopped growing",
+        "cta_question": "Why is my plant not growing?",
+        "related_pages": ["how-often-should-i-water-my-plant", "why-are-my-plant-leaves-turning-yellow"],
+    },
+    "indoor-plant-care-for-beginners": {
+        "slug": "indoor-plant-care-for-beginners",
+        "route_name": "beginners_guide",
+        "title": "Indoor Plant Care for Beginners (Simple Guide)",
+        "meta_description": "New to houseplants? This beginner-friendly guide covers the essentials—watering, light, soil, and common mistakes—so your first plants thrive.",
+        "emoji": "🪴",
+        "intro": "Welcome to the world of houseplants. It's easier than you think—most plants are surprisingly forgiving, and you don't need a green thumb to keep them alive. Here are the fundamentals that will set you up for success.",
+        "causes": [
+            {
+                "title": "Water only when needed",
+                "description": "Forget rigid schedules. Stick your finger an inch into the soil—if it's dry, water thoroughly until it drains out the bottom. If it's still moist, wait. This single habit prevents the #1 killer of houseplants."
+            },
+            {
+                "title": "Give them the right light",
+                "description": "Most houseplants thrive in bright, indirect light—near a window but not in harsh direct sun. Low-light tolerant plants like pothos and snake plants can handle dimmer spots."
+            },
+            {
+                "title": "Don't repot right away",
+                "description": "A new plant needs time to adjust to your home. Wait at least a few weeks before repotting. When you do, only go 1-2 inches bigger—too much soil holds excess moisture."
+            },
+            {
+                "title": "Start with forgiving plants",
+                "description": "Pothos, snake plants, ZZ plants, and spider plants are nearly indestructible. They tolerate irregular watering and low light. Build your confidence before graduating to fussier species."
+            },
+            {
+                "title": "Watch and learn",
+                "description": "Your plant communicates through its leaves. Yellowing? Possibly overwatered. Drooping? Might need water. Brown tips? Could be low humidity. Pay attention and you'll learn to read the signals."
+            }
+        ],
+        "bottom_line": "Plant care isn't about perfection—it's about paying attention. Start with easy plants, water when the soil tells you to, give them decent light, and you'll be surprised how well they do.",
+        "cta_text": "Get personalized advice for your first plants",
+        "cta_question": "I'm new to plants, what should I know?",
+        "related_pages": ["how-often-should-i-water-my-plant", "am-i-overwatering-my-plant"],
+    },
+    "why-are-my-plant-leaves-curling": {
+        "slug": "why-are-my-plant-leaves-curling",
+        "route_name": "curling_leaves",
+        "title": "Why Are My Plant Leaves Curling?",
+        "meta_description": "Curling leaves are a sign your plant is stressed. Learn whether it's a watering, humidity, light, or pest issue—and how to fix it.",
+        "emoji": "🍃",
+        "intro": "When your plant's leaves start curling inward, outward, or crisping at the edges, it's telling you something is off in its environment. The good news? Curling is usually reversible once you figure out the trigger.",
+        "causes": [
+            {
+                "title": "Underwatering",
+                "description": "The most common reason for curling. When a plant doesn't have enough water, leaves curl inward to reduce surface area and conserve moisture. Check if the soil is dry several inches down."
+            },
+            {
+                "title": "Low humidity",
+                "description": "Many tropical houseplants—calatheas, ferns, alocasias—curl when the air is too dry, especially during winter heating season. Grouping plants together or using a humidifier can help."
+            },
+            {
+                "title": "Too much direct light",
+                "description": "Intense sun can cause leaves to curl downward or develop crispy edges as the plant tries to protect itself. Move it back from the window or add a sheer curtain."
+            },
+            {
+                "title": "Temperature stress",
+                "description": "Cold drafts, hot radiators, or sudden temperature swings can cause curling. Most houseplants prefer stable temperatures between 60-80°F, away from vents and exterior doors."
+            },
+            {
+                "title": "Pests",
+                "description": "Aphids, thrips, and spider mites feed on plant sap, causing leaves to curl and distort. Check the undersides of leaves and along stems for tiny insects or webbing."
+            }
+        ],
+        "bottom_line": "Leaf curling is your plant's stress response—not a death sentence. Start by checking moisture and humidity levels, then investigate light and pests. Most plants bounce back quickly once the cause is addressed.",
+        "cta_text": "Ask PlantCareAI to diagnose your curling leaves",
+        "cta_question": "Why are my plant's leaves curling?",
+        "related_pages": ["why-are-my-plant-leaves-drooping", "why-are-my-plant-leaves-turning-yellow"],
+    },
 }
 
 
@@ -258,5 +363,29 @@ def yellow_leaves():
 def water_today():
     """Should I water my plant today? landing page."""
     page = _get_page("should-i-water-my-plant-today")
+    related = _get_related_pages(page["related_pages"])
+    return render_template("seo/landing.html", page=page, related_pages=related)
+
+
+@seo_bp.route("/why-is-my-plant-not-growing")
+def not_growing():
+    """Why is my plant not growing? landing page."""
+    page = _get_page("why-is-my-plant-not-growing")
+    related = _get_related_pages(page["related_pages"])
+    return render_template("seo/landing.html", page=page, related_pages=related)
+
+
+@seo_bp.route("/indoor-plant-care-for-beginners")
+def beginners_guide():
+    """Indoor plant care for beginners landing page."""
+    page = _get_page("indoor-plant-care-for-beginners")
+    related = _get_related_pages(page["related_pages"])
+    return render_template("seo/landing.html", page=page, related_pages=related)
+
+
+@seo_bp.route("/why-are-my-plant-leaves-curling")
+def curling_leaves():
+    """Why are my plant leaves curling? landing page."""
+    page = _get_page("why-are-my-plant-leaves-curling")
     related = _get_related_pages(page["related_pages"])
     return render_template("seo/landing.html", page=page, related_pages=related)

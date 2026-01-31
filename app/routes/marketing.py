@@ -73,6 +73,9 @@ def sitemap():
         "/how-often-should-i-water-my-plant",
         "/why-are-my-plant-leaves-turning-yellow",
         "/should-i-water-my-plant-today",
+        "/why-is-my-plant-not-growing",
+        "/indoor-plant-care-for-beginners",
+        "/why-are-my-plant-leaves-curling",
     ]
     for slug in seo_landing_pages:
         pages.append({"loc": slug, "priority": "0.8", "changefreq": "monthly"})

@@ -9,6 +9,8 @@ Shows:
 """
 
 from __future__ import annotations
+import hashlib
+from datetime import date
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from app.utils.auth import require_auth, get_current_user_id
 from app.services import supabase_client
@@ -99,6 +101,34 @@ def index():
             "alerts": weather_alerts
         }
 
+    # Build reassurance context for "all clear" state
+    reassurance_parts = []
+    if weather_context and weather_context.get("current"):
+        w_city = weather_context["current"].get("city", "")
+        if w_city and not weather_context.get("alerts"):
+            reassurance_parts.append(f"Conditions look good in {w_city}")
+    upcoming = reminder_stats.get("upcoming_7_days", 0) if reminder_stats else 0
+    if upcoming > 0:
+        reassurance_parts.append(
+            f"{upcoming} task{'s' if upcoming != 1 else ''} coming up this week"
+        )
+    else:
+        reassurance_parts.append("No upcoming tasks this week")
+    reassurance_message = " \u00b7 ".join(reassurance_parts) if reassurance_parts else "Your plants are on track."
+
+    # Rotating daily care tip for "all clear" state
+    care_tips = [
+        "Overwatering is more common than underwatering. When in doubt, wait a day.",
+        "Most houseplants prefer to dry out slightly between waterings.",
+        "Yellow leaves? Check drainage before adding more water.",
+        "Morning light is gentler than afternoon sun for most indoor plants.",
+        "Dust on leaves blocks light. A quick wipe goes a long way.",
+        "Grouping plants together raises humidity naturally.",
+        "Room temperature water is easier on roots than cold water.",
+    ]
+    day_index = int(hashlib.md5(str(date.today()).encode(), usedforsecurity=False).hexdigest(), 16) % len(care_tips)
+    daily_tip = care_tips[day_index]
+
     return render_template(
         "dashboard/index.html",
         profile=profile,
@@ -112,6 +142,8 @@ def index():
         due_reminders=due_reminders,
         weather_suggestions=weather_suggestions,
         weather_context=weather_context,
+        reassurance_message=reassurance_message,
+        daily_tip=daily_tip,
     )
 
 

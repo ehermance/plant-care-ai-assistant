@@ -3,12 +3,80 @@
 {% block title %}Features - Plant Care AI Assistant - PlantCareAI{% endblock %}
 {% block description %}Free forever for plant parents. Track plants, get AI care advice, and never miss a watering.{% endblock %}
 
+{% block extra_head %}
+<!-- SoftwareApplication Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "PlantCareAI",
+  "applicationCategory": "LifestyleApplication",
+  "operatingSystem": "Web",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "Free AI-powered plant care assistant with weather-aware reminders and personalized tips."
+}
+</script>
+<!-- FAQPage Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is it really free forever?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! Our core features will always be free. We're building this for plant parents, and we want everyone to have access to quality plant care tools."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why is it free? What's the catch?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No catch! We're focused on building features users love first. Once we launch premium features, those will be optional paid add-ons. The free tier stays free, always."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When will Premium features launch?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We're currently in active development. Premium features will launch once our free tier is solid and users love it."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will I lose my plants if Premium launches?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Never! Your free tier will always include 20 plants. Any plants you add now will stay in your account forever."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my data safe?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! Your data is encrypted at rest and in transit. We never share your information with third parties."
+      }
+    }
+  ]
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <!-- Hero Section -->
 <section class="mb-12 text-center">
-  <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+  <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
     Currently Free for All Plant Parents <span class="inline-block" aria-hidden="true">🌱</span>
-  </h2>
+  </h1>
   <p class="text-lg text-slate-600 dark:text-slate-400">
     We're building features you love. Premium options coming soon.
   </p>
