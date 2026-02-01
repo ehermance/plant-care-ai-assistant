@@ -2,6 +2,8 @@
 
 {% block title %}Account Settings - Plant Care AI Assistant - PlantCareAI{% endblock %}
 
+{% block robots %}<meta name="robots" content="noindex, follow">{% endblock %}
+
 {% block content %}
 <!-- Breadcrumb Navigation -->
 <nav aria-label="Breadcrumb" class="mb-6">
@@ -299,6 +301,7 @@
     </div>
 
     <!-- Email Preferences -->
+    {% if config.MARKETING_EMAILS_ENABLED %}
     <div class="mb-8">
       <label class="label">
         Email Preferences
@@ -331,6 +334,7 @@
       </p>
       {% endif %}
     </div>
+    {% endif %}
 
     <!-- Plant Care Preferences (AI Personalization) -->
     <div class="mb-8 p-4 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/10 dark:to-cyan-900/10 rounded-xl border border-emerald-200 dark:border-emerald-800">

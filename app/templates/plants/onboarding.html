@@ -3,6 +3,8 @@
 {% block title %}Welcome to PlantCareAI - Getting Started{% endblock %}
 {% block description %}Set up your first plant and start your plant care journey.{% endblock %}
 
+{% block robots %}<meta name="robots" content="noindex, follow">{% endblock %}
+
 {% block content %}
 <!-- Onboarding Container -->
 <div class="max-w-3xl mx-auto">
@@ -61,7 +63,7 @@
       </div>
 
       <!-- Marketing Opt-in Reminder (for users who didn't opt in at signup) -->
-      {% if not marketing_opt_in %}
+      {% if config.MARKETING_EMAILS_ENABLED and not marketing_opt_in %}
       <div class="mt-8 p-4 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl border-2 border-amber-200 dark:border-amber-700">
         <div class="flex items-start gap-3">
           <span class="text-2xl flex-shrink-0" aria-hidden="true">📬</span>
@@ -92,7 +94,7 @@
       </div>
       {% endif %}
 
-      <div class="flex flex-col sm:flex-row gap-3 justify-center {% if not marketing_opt_in %}mt-6{% endif %}">
+      <div class="flex flex-col sm:flex-row gap-3 justify-center {% if config.MARKETING_EMAILS_ENABLED and not marketing_opt_in %}mt-6{% endif %}">
         <button type="button" data-action="next-step" class="btn btn-primary">
           Get Started <span aria-hidden="true">→</span>
         </button>

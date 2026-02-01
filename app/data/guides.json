@@ -1,6 +1,7 @@
 [
   {
     "slug": "monstera-deliciosa",
+    "last_updated": "2025-12-18",
     "name": "Monstera Deliciosa",
     "scientific_name": "Monstera deliciosa",
     "emoji": "🌿",
@@ -30,6 +31,7 @@
   },
   {
     "slug": "pothos",
+    "last_updated": "2025-12-18",
     "name": "Pothos",
     "scientific_name": "Epipremnum aureum",
     "emoji": "💚",
@@ -59,6 +61,7 @@
   },
   {
     "slug": "snake-plant",
+    "last_updated": "2025-12-18",
     "name": "Snake Plant",
     "scientific_name": "Dracaena trifasciata",
     "emoji": "🌵",
@@ -88,6 +91,7 @@
   },
   {
     "slug": "fiddle-leaf-fig",
+    "last_updated": "2025-12-18",
     "name": "Fiddle Leaf Fig",
     "scientific_name": "Ficus lyrata",
     "emoji": "🎻",
@@ -117,6 +121,7 @@
   },
   {
     "slug": "peace-lily",
+    "last_updated": "2025-12-18",
     "name": "Peace Lily",
     "scientific_name": "Spathiphyllum",
     "emoji": "☮️",
@@ -146,6 +151,7 @@
   },
   {
     "slug": "spider-plant",
+    "last_updated": "2025-12-18",
     "name": "Spider Plant",
     "scientific_name": "Chlorophytum comosum",
     "emoji": "🕷️",
@@ -175,6 +181,7 @@
   },
   {
     "slug": "zz-plant",
+    "last_updated": "2025-12-18",
     "name": "ZZ Plant",
     "scientific_name": "Zamioculcas zamiifolia",
     "emoji": "✨",
@@ -204,6 +211,7 @@
   },
   {
     "slug": "philodendron",
+    "last_updated": "2025-12-18",
     "name": "Philodendron",
     "scientific_name": "Philodendron spp.",
     "emoji": "💖",
@@ -233,6 +241,7 @@
   },
   {
     "slug": "rubber-plant",
+    "last_updated": "2025-12-18",
     "name": "Rubber Plant",
     "scientific_name": "Ficus elastica",
     "emoji": "🌳",
@@ -262,6 +271,7 @@
   },
   {
     "slug": "aloe-vera",
+    "last_updated": "2025-12-18",
     "name": "Aloe Vera",
     "scientific_name": "Aloe barbadensis miller",
     "emoji": "🧴",
