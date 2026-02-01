@@ -28,8 +28,11 @@ def _load_landing_pages() -> dict:
         "data",
         "seo_landing_pages.json"
     )
-    with open(pages_path, "r", encoding="utf-8") as f:
-        pages_list = json.load(f)
+    try:
+        with open(pages_path, "r", encoding="utf-8") as f:
+            pages_list = json.load(f)
+    except FileNotFoundError:
+        return {}
     return {page["slug"]: page for page in pages_list}
 
 
