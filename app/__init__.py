@@ -270,6 +270,9 @@ def create_app() -> Flask:
     # Add Jinja global for Cloudflare Web Analytics
     app.jinja_env.globals["CF_BEACON_TOKEN"] = os.getenv("CF_BEACON_TOKEN", "")
 
+    # Marketing emails feature flag (disabled until CAN-SPAM physical address is added)
+    app.config["MARKETING_EMAILS_ENABLED"] = os.getenv("MARKETING_EMAILS_ENABLED", "").lower() in ("true", "1", "yes")
+
     # --- Background Scheduler for Weather Adjustments (Phase 2C) ---
     # Initialize APScheduler for daily weather adjustment job
     # Runs at 6:00 AM daily to adjust reminders based on weather forecasts
@@ -302,15 +305,16 @@ def create_app() -> Flask:
                 replace_existing=True
             )
 
-            # Schedule welcome email processing every hour
-            scheduler.add_job(
-                func=run_welcome_email_job,
-                trigger="interval",
-                hours=1,
-                id="welcome_email_job",
-                name="Process Welcome Email Queue",
-                replace_existing=True
-            )
+            # Schedule welcome email processing every hour (only if marketing emails enabled)
+            if app.config["MARKETING_EMAILS_ENABLED"]:
+                scheduler.add_job(
+                    func=run_welcome_email_job,
+                    trigger="interval",
+                    hours=1,
+                    id="welcome_email_job",
+                    name="Process Welcome Email Queue",
+                    replace_existing=True
+                )
 
             scheduler.start()
             app.logger.info("[Scheduler] Daily weather adjustment job scheduled for 6:00 AM UTC")

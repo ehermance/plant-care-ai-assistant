@@ -8,6 +8,7 @@ Provides:
 """
 
 from __future__ import annotations
+from datetime import date
 from flask import Blueprint, render_template, Response, current_app
 from xml.sax.saxutils import escape
 import os
@@ -53,17 +54,17 @@ def sitemap():
     # Use configured base URL (not request.url_root to prevent Host header injection)
     base_url = os.getenv("APP_URL", "https://plantcareai.app")
 
-    # Static public pages with priorities
+    today = date.today().isoformat()
+
+    # Static public pages with priorities and lastmod dates
     pages = [
-        {"loc": "/", "priority": "1.0", "changefreq": "weekly"},
-        {"loc": "/ask", "priority": "0.9", "changefreq": "weekly"},
-        {"loc": "/ai-plant-doctor", "priority": "0.9", "changefreq": "monthly"},
-        {"loc": "/plant-care-guides/", "priority": "0.8", "changefreq": "weekly"},
-        {"loc": "/features/", "priority": "0.8", "changefreq": "monthly"},
-        {"loc": "/auth/signup", "priority": "0.7", "changefreq": "monthly"},
-        {"loc": "/auth/login", "priority": "0.6", "changefreq": "monthly"},
-        {"loc": "/terms", "priority": "0.3", "changefreq": "yearly"},
-        {"loc": "/privacy", "priority": "0.3", "changefreq": "yearly"},
+        {"loc": "/", "priority": "1.0", "changefreq": "weekly", "lastmod": today},
+        {"loc": "/ask", "priority": "0.9", "changefreq": "weekly", "lastmod": today},
+        {"loc": "/ai-plant-doctor", "priority": "0.9", "changefreq": "monthly", "lastmod": "2025-12-18"},
+        {"loc": "/plant-care-guides/", "priority": "0.8", "changefreq": "weekly", "lastmod": "2026-01-30"},
+        {"loc": "/features/", "priority": "0.8", "changefreq": "monthly", "lastmod": "2026-01-30"},
+        {"loc": "/terms", "priority": "0.3", "changefreq": "yearly", "lastmod": "2026-01-31"},
+        {"loc": "/privacy", "priority": "0.3", "changefreq": "yearly", "lastmod": "2026-01-31"},
     ]
 
     # SEO landing pages (problem-first content pages)
@@ -78,14 +79,15 @@ def sitemap():
         "/why-are-my-plant-leaves-curling",
     ]
     for slug in seo_landing_pages:
-        pages.append({"loc": slug, "priority": "0.8", "changefreq": "monthly"})
+        pages.append({"loc": slug, "priority": "0.8", "changefreq": "monthly", "lastmod": "2026-01-30"})
 
     # Add individual guide pages
     for slug in _load_guide_slugs():
         pages.append({
             "loc": f"/plant-care-guides/{slug}",
             "priority": "0.7",
-            "changefreq": "monthly"
+            "changefreq": "monthly",
+            "lastmod": "2026-01-30",
         })
 
     # Build XML
@@ -95,6 +97,7 @@ def sitemap():
     for page in pages:
         xml_content += "  <url>\n"
         xml_content += f"    <loc>{escape(base_url + page['loc'])}</loc>\n"
+        xml_content += f"    <lastmod>{escape(page['lastmod'])}</lastmod>\n"
         xml_content += f"    <changefreq>{escape(page['changefreq'])}</changefreq>\n"
         xml_content += f"    <priority>{escape(page['priority'])}</priority>\n"
         xml_content += "  </url>\n"

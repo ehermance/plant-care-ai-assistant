@@ -3,7 +3,7 @@
 {% block title %}Sign Up - Plant Care AI Assistant - PlantCareAI{% endblock %}
 {% block description %}Create your free account to track plants, set reminders, and get personalized care tips.{% endblock %}
 
-{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block robots %}<meta name="robots" content="noindex, follow">{% endblock %}
 
 {% block content %}
 <div class="max-w-md mx-auto">
@@ -71,6 +71,7 @@
       </div>
 
       <!-- Marketing Email Opt-in -->
+      {% if config.MARKETING_EMAILS_ENABLED %}
       <div class="flex items-start gap-3 mb-6">
         <input
           type="checkbox"
@@ -88,6 +89,7 @@
           </p>
         </div>
       </div>
+      {% endif %}
 
       <!-- Age Confirmation (COPPA compliance) -->
       <div class="flex items-start gap-3 mb-6">

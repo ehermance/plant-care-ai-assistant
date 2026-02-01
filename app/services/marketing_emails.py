@@ -38,6 +38,11 @@ MILESTONE_STREAK_5 = "milestone_streak_5"
 MILESTONE_COLLECTION_5 = "milestone_collection_5"
 
 
+def _is_marketing_enabled() -> bool:
+    """Check if marketing emails are enabled via environment variable."""
+    return os.getenv("MARKETING_EMAILS_ENABLED", "").lower() in ("true", "1", "yes")
+
+
 def _safe_log_error(message: str) -> None:
     """Log error message only if Flask app context is available."""
     try:
@@ -2053,6 +2058,9 @@ def process_welcome_email_queue() -> Dict[str, Any]:
     """
     stats = {"sent": 0, "failed": 0, "skipped": 0}
 
+    if not _is_marketing_enabled():
+        return stats
+
     try:
         # Get all pending emails (welcome series + re-engagement)
         pending = get_pending_welcome_emails()
@@ -2144,6 +2152,9 @@ def trigger_milestone_event(
     Returns:
         True if event was recorded, False otherwise
     """
+    if not _is_marketing_enabled():
+        return False
+
     from app.services.supabase_client import get_admin_client
     from app.utils.validation import is_valid_uuid
 
@@ -2426,6 +2437,9 @@ def sync_to_resend_audience(email: str, subscribed: bool) -> bool:
     Returns:
         True if successful, False otherwise
     """
+    if not _is_marketing_enabled():
+        return True
+
     api_key = os.getenv("RESEND_API_KEY")
     audience_id = os.getenv("RESEND_AUDIENCE_ID")
 
