@@ -12,32 +12,16 @@ Each page:
 """
 
 from __future__ import annotations
-from flask import Blueprint, render_template, abort
+from flask import Blueprint, render_template
 from typing import Optional
-import os
-import json
+from app.utils.data import load_data_file
 
 
 seo_bp = Blueprint("seo", __name__)
 
 
-def _load_landing_pages() -> dict:
-    """Load SEO landing page data from JSON file."""
-    pages_path = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)),
-        "data",
-        "seo_landing_pages.json"
-    )
-    try:
-        with open(pages_path, "r", encoding="utf-8") as f:
-            pages_list = json.load(f)
-    except FileNotFoundError:
-        return {}
-    return {page["slug"]: page for page in pages_list}
-
-
 # Load once at import time
-LANDING_PAGES = _load_landing_pages()
+LANDING_PAGES = {page["slug"]: page for page in load_data_file("seo_landing_pages.json")}
 
 # Slug to route name mapping for URL generation
 SLUG_TO_ROUTE = {page["slug"]: page["route_name"] for page in LANDING_PAGES.values()}

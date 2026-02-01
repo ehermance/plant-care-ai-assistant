@@ -10,25 +10,15 @@ Provides:
 from __future__ import annotations
 from flask import Blueprint, render_template, Response, current_app
 from xml.sax.saxutils import escape
+from app.utils.data import load_data_file
 import os
-import json
 
 
 marketing_bp = Blueprint("marketing", __name__)
 
-
-def _load_data_file(filename):
-    """Load a JSON data file from app/data/."""
-    filepath = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)),
-        "data",
-        filename
-    )
-    try:
-        with open(filepath, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return []
+# Load once at import time for sitemap generation
+_SEO_PAGES = load_data_file("seo_landing_pages.json")
+_GUIDES = load_data_file("guides.json")
 
 
 @marketing_bp.route("/ai-plant-doctor")
@@ -64,7 +54,7 @@ def sitemap():
     ]
 
     # SEO landing pages (problem-first content pages, from seo_landing_pages.json)
-    for page in _load_data_file("seo_landing_pages.json"):
+    for page in _SEO_PAGES:
         pages.append({
             "loc": f"/{page['slug']}",
             "priority": "0.8",
@@ -73,7 +63,7 @@ def sitemap():
         })
 
     # Individual guide pages (from guides.json)
-    for guide in _load_data_file("guides.json"):
+    for guide in _GUIDES:
         if guide.get("slug"):
             pages.append({
                 "loc": f"/plant-care-guides/{guide['slug']}",
