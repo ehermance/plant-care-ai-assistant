@@ -8,7 +8,6 @@ Provides:
 """
 
 from __future__ import annotations
-from datetime import date
 from flask import Blueprint, render_template, Response, current_app
 from xml.sax.saxutils import escape
 import os
@@ -18,17 +17,16 @@ import json
 marketing_bp = Blueprint("marketing", __name__)
 
 
-def _load_guide_slugs():
-    """Load guide slugs for sitemap generation."""
-    guides_path = os.path.join(
+def _load_data_file(filename):
+    """Load a JSON data file from app/data/."""
+    filepath = os.path.join(
         os.path.dirname(os.path.dirname(__file__)),
         "data",
-        "guides.json"
+        filename
     )
     try:
-        with open(guides_path, "r", encoding="utf-8") as f:
-            guides = json.load(f)
-            return [g.get("slug") for g in guides if g.get("slug")]
+        with open(filepath, "r", encoding="utf-8") as f:
+            return json.load(f)
     except FileNotFoundError:
         return []
 
@@ -54,12 +52,10 @@ def sitemap():
     # Use configured base URL (not request.url_root to prevent Host header injection)
     base_url = os.getenv("APP_URL", "https://plantcareai.app")
 
-    today = date.today().isoformat()
-
     # Static public pages with priorities and lastmod dates
     pages = [
-        {"loc": "/", "priority": "1.0", "changefreq": "weekly", "lastmod": today},
-        {"loc": "/ask", "priority": "0.9", "changefreq": "weekly", "lastmod": today},
+        {"loc": "/", "priority": "1.0", "changefreq": "weekly", "lastmod": "2026-01-31"},
+        {"loc": "/ask", "priority": "0.9", "changefreq": "weekly", "lastmod": "2026-01-30"},
         {"loc": "/ai-plant-doctor", "priority": "0.9", "changefreq": "monthly", "lastmod": "2025-12-18"},
         {"loc": "/plant-care-guides/", "priority": "0.8", "changefreq": "weekly", "lastmod": "2026-01-30"},
         {"loc": "/features/", "priority": "0.8", "changefreq": "monthly", "lastmod": "2026-01-30"},
@@ -67,28 +63,24 @@ def sitemap():
         {"loc": "/privacy", "priority": "0.3", "changefreq": "yearly", "lastmod": "2026-01-31"},
     ]
 
-    # SEO landing pages (problem-first content pages)
-    seo_landing_pages = [
-        "/why-are-my-plant-leaves-drooping",
-        "/am-i-overwatering-my-plant",
-        "/how-often-should-i-water-my-plant",
-        "/why-are-my-plant-leaves-turning-yellow",
-        "/should-i-water-my-plant-today",
-        "/why-is-my-plant-not-growing",
-        "/indoor-plant-care-for-beginners",
-        "/why-are-my-plant-leaves-curling",
-    ]
-    for slug in seo_landing_pages:
-        pages.append({"loc": slug, "priority": "0.8", "changefreq": "monthly", "lastmod": "2026-01-30"})
-
-    # Add individual guide pages
-    for slug in _load_guide_slugs():
+    # SEO landing pages (problem-first content pages, from seo_landing_pages.json)
+    for page in _load_data_file("seo_landing_pages.json"):
         pages.append({
-            "loc": f"/plant-care-guides/{slug}",
-            "priority": "0.7",
+            "loc": f"/{page['slug']}",
+            "priority": "0.8",
             "changefreq": "monthly",
-            "lastmod": "2026-01-30",
+            "lastmod": page.get("last_updated", "2026-01-30"),
         })
+
+    # Individual guide pages (from guides.json)
+    for guide in _load_data_file("guides.json"):
+        if guide.get("slug"):
+            pages.append({
+                "loc": f"/plant-care-guides/{guide['slug']}",
+                "priority": "0.7",
+                "changefreq": "monthly",
+                "lastmod": guide.get("last_updated", "2025-12-18"),
+            })
 
     # Build XML
     xml_content = '<?xml version="1.0" encoding="UTF-8"?>\n'
