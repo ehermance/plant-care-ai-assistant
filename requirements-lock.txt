@@ -1,5 +1,5 @@
 aiohappyeyeballs==2.6.1
-aiohttp==3.13.2
+aiohttp==3.13.3
 aiosignal==1.4.0
 annotated-types==0.7.0
 anyio==4.10.0
@@ -79,9 +79,9 @@ pluggy==1.6.0
 postgrest==2.22.3
 propcache==0.4.1
 proto-plus==1.26.1
-protobuf==5.29.5
+protobuf==5.29.6
 psutil==7.1.2
-pyasn1==0.6.1
+pyasn1==0.6.2
 pyasn1_modules==0.4.2
 pycparser==2.23
 pydantic==2.11.9
