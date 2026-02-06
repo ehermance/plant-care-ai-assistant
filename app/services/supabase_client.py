@@ -588,7 +588,7 @@ def verify_session(access_token: str, refresh_token: Optional[str] = None) -> Op
         return None
 
 
-def sign_out(access_token: str) -> bool:
+def sign_out() -> bool:
     """
     Sign out a user session.
 
@@ -596,14 +596,9 @@ def sign_out(access_token: str) -> bool:
     The Flask route clears session cookies, which is the primary sign-out
     mechanism. JWT tokens will naturally expire.
 
-    Args:
-        access_token: JWT access token (unused, kept for API compatibility)
-
     Returns:
         True always (cookie clearing handles actual sign-out)
     """
-    # Cookie clearing in Flask route is the actual sign-out mechanism
-    # JWT tokens expire naturally; no server-side revocation available
     return True
 
 

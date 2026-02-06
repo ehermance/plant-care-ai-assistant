@@ -387,6 +387,16 @@
         mobileMenuBtn.focus();
       }
     });
+
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+      if (mobileMenuBtn.getAttribute('aria-expanded') === 'true') {
+        if (!mobileMenuPanel.contains(e.target) && e.target !== mobileMenuBtn && !mobileMenuBtn.contains(e.target)) {
+          mobileMenuPanel.classList.add('hidden');
+          mobileMenuBtn.setAttribute('aria-expanded', 'false');
+        }
+      }
+    });
   }
 
   // --- Flash Message Dismissal (WCAG Compliant) ---

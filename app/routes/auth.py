@@ -318,12 +318,7 @@ def logout():
     """
     Log out current user and clear session.
     """
-    from flask import session
-    access_token = session.get("access_token")
-
-    if access_token:
-        supabase_client.sign_out(access_token)
-
+    supabase_client.sign_out()
     clear_session()
     flash("You've been logged out successfully.", "info")
 
