@@ -302,7 +302,7 @@
           </p>
         </div>
         {% if action.photo_url_thumb or action.photo_url %}
-          <img src="{{ action.photo_url_thumb or action.photo_url }}" alt="Care photo" class="w-16 h-16 object-cover rounded-lg flex-shrink-0">
+          <img src="{{ action.photo_url_thumb or action.photo_url }}" alt="{{ action.action_type }} photo from {{ action.action_at|relative_date }}" class="w-16 h-16 object-cover rounded-lg flex-shrink-0">
         {% endif %}
       </div>
       {% endfor %}

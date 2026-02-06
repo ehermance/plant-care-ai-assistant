@@ -27,7 +27,7 @@
   <!-- Plants Grid -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for plant in plants %}
-      <article class="card group">
+      <article class="card group relative focus-within:ring-2 focus-within:ring-emerald-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-slate-900">
         <!-- Plant Photo -->
         {% if plant.photo_url %}
           <div class="aspect-square w-full mb-4 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800">
@@ -47,7 +47,9 @@
         <!-- Plant Info -->
         <div class="space-y-3">
           <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100">
-            {{ plant.name }}
+            <a href="{{ url_for('plants.view', plant_id=plant.id) }}" class="after:absolute after:inset-0 focus:outline-none">
+              {{ plant.name }}
+            </a>
             {% if plant.nickname %}
               <span class="text-base font-normal text-emerald-600 dark:text-emerald-400">"{{ plant.nickname }}"</span>
             {% endif %}
@@ -72,8 +74,8 @@
           </div>
 
           <!-- Actions -->
-          <div class="pt-2">
-            <a href="{{ url_for('plants.view', plant_id=plant.id) }}" class="btn btn-secondary w-full">
+          <div class="pt-2 relative z-10">
+            <a href="{{ url_for('plants.view', plant_id=plant.id) }}" class="btn btn-secondary w-full" tabindex="-1" aria-hidden="true">
               View Details →
             </a>
           </div>

@@ -74,7 +74,54 @@
     </a>
   </div>
 
-  <table class="w-full table-fixed border-collapse" role="grid" aria-label="Care calendar for {{ month_name }} {{ year }}">
+  <!-- Mobile Agenda View (hidden on desktop) -->
+  <div class="md:hidden space-y-4">
+    {% set all_dates = reminders_by_date.keys()|list|sort %}
+    {% if all_dates %}
+      {% for date_key in all_dates %}
+        {% set day_reminders = reminders_by_date[date_key] %}
+        {% set is_today = date_key == today|string %}
+        <div class="rounded-lg border {% if is_today %}border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20{% else %}border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800{% endif %} p-4">
+          <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
+            {% if is_today %}<span class="inline-flex items-center justify-center w-6 h-6 text-xs bg-emerald-600 text-white rounded-full">Today</span>{% endif %}
+            {{ date_key }}
+          </h3>
+          <ul class="space-y-2">
+            {% for reminder in day_reminders %}
+            <li>
+              <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}"
+                 class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                <span class="text-xl" aria-hidden="true">
+                  {% if reminder.reminder_type == 'watering' %}💧
+                  {% elif reminder.reminder_type == 'fertilizing' %}🌿
+                  {% elif reminder.reminder_type == 'misting' %}💦
+                  {% elif reminder.reminder_type == 'pruning' %}✂️
+                  {% elif reminder.reminder_type == 'repotting' %}🪴
+                  {% elif reminder.reminder_type == 'inspection' %}🔍
+                  {% else %}📝
+                  {% endif %}
+                </span>
+                <div class="flex-1 min-w-0">
+                  <div class="font-medium text-slate-900 dark:text-slate-100 truncate">
+                    {{ reminder.plants.name if reminder.plants else 'Plant' }}
+                  </div>
+                  <div class="text-sm text-slate-600 dark:text-slate-400 capitalize">
+                    {{ reminder.reminder_type }}
+                  </div>
+                </div>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-slate-600 dark:text-slate-400 text-center py-8">No reminders scheduled for this month.</p>
+    {% endif %}
+  </div>
+
+  <!-- Desktop Table View (hidden on mobile) -->
+  <table class="hidden md:table w-full table-fixed border-collapse" role="grid" aria-label="Care calendar for {{ month_name }} {{ year }}">
     <thead>
       <tr class="border-b-2 border-slate-200 dark:border-slate-700">
         <th scope="col" class="w-1/7 p-3 text-sm font-semibold text-slate-700 dark:text-slate-300 text-center" abbr="Sunday">Sun</th>

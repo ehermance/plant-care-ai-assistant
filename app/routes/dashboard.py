@@ -11,7 +11,7 @@ Shows:
 from __future__ import annotations
 import hashlib
 from datetime import date
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session
 from app.utils.auth import require_auth, get_current_user_id
 from app.services import supabase_client
 from app.services.supabase_client import TIMEZONE_GROUPS
@@ -179,6 +179,7 @@ def account():
             if success:
                 updates_made.append("timezone")
                 timezone_explicitly_set = True
+                session.pop("user_timezone", None)  # clear cache
             else:
                 flash(f"Failed to update timezone: {error}", "error")
 
@@ -195,6 +196,7 @@ def account():
                         updated_profile = supabase_client.get_user_profile(user_id)
                         if updated_profile and updated_profile.get("timezone"):
                             updates_made.append(f"timezone auto-detected")
+                            session.pop("user_timezone", None)  # clear cache
                 else:
                     updates_made.append("location (cleared)")
             else:

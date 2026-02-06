@@ -134,8 +134,8 @@
 
   <!-- Site Header -->
   <header class="relative cosmic-header border-b border-purple-700/30 sticky top-0 z-40 shadow-lg shadow-purple-900/50 overflow-visible backdrop-blur-sm" role="banner">
-    <div class="container mx-auto px-1 py-7 overflow-visible">
-      <div class="flex items-center justify-between gap-1 overflow-visible">
+    <div class="container mx-auto px-4 py-7 overflow-visible">
+      <div class="flex items-center justify-between gap-3 overflow-visible">
         <!-- Logo & Branding -->
         <div class="flex items-start gap-1 min-w-1">
           <a href="{{ url_for('web.index') }}" aria-label="PlantCareAI Home Logo" class="flex-shrink-0 hover:bg-purple-900/40 rounded-lg p-0.5 transition-all duration-200 group">
@@ -157,13 +157,24 @@
 
         {% if is_authenticated and profile and profile.get("is_admin", False) %}
         <!-- Admin Links -->
-        <div class="flex justify-end text-right">
+        <div class="hidden md:flex justify-end text-right">
           <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('admin.') %} bg-amber-500/20 text-amber-300{% endif %}"
               href="{{ url_for('admin.index') }}"
               title="View your admin dashboard with key product metrics and user behavior insights"
               {% if request.endpoint and request.endpoint.startswith('admin.') %}aria-current="page"{% endif %}>Admin</a>
         </div>
         {% endif %}
+
+        <!-- Mobile Hamburger Button -->
+        <button class="md:hidden p-2 rounded-lg text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors"
+                id="mobile-menu-btn"
+                aria-expanded="false"
+                aria-controls="mobile-menu-panel"
+                aria-label="Toggle navigation menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
 
         <!-- Desktop Navigation -->
         <nav class="hidden md:flex items-center gap-3 overflow-visible" aria-label="Main navigation">
@@ -225,6 +236,57 @@
           {% endif %}
         </nav>
       </div>
+
+      <!-- Mobile Navigation Panel -->
+      <nav class="hidden md:hidden border-t border-purple-700/30 mt-4 pt-4"
+           id="mobile-menu-panel"
+           aria-label="Mobile navigation">
+        <div class="flex flex-col gap-2">
+          {% if is_authenticated %}
+            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('dashboard.') %} bg-amber-500/20 text-amber-300{% endif %}"
+               href="{{ url_for('dashboard.index') }}"
+               {% if request.endpoint and request.endpoint.startswith('dashboard.') %}aria-current="page"{% endif %}>Dashboard</a>
+            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint == 'plants.index' %} bg-amber-500/20 text-amber-300{% endif %}"
+               href="{{ url_for('plants.index') }}"
+               {% if request.endpoint == 'plants.index' %}aria-current="page"{% endif %}>My Plants</a>
+            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('reminders.') %} bg-amber-500/20 text-amber-300{% endif %}"
+               href="{{ url_for('reminders.index') }}"
+               {% if request.endpoint and request.endpoint.startswith('reminders.') %}aria-current="page"{% endif %}>Reminders</a>
+            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint == 'web.assistant' %} bg-amber-500/20 text-amber-300{% endif %}"
+               href="{{ url_for('web.assistant') }}"
+               {% if request.endpoint == 'web.assistant' %}aria-current="page"{% endif %}>Assistant</a>
+            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('guides.') %} bg-amber-500/20 text-amber-300{% endif %}"
+               href="{{ url_for('guides.index') }}"
+               {% if request.endpoint and request.endpoint.startswith('guides.') %}aria-current="page"{% endif %}>Guides</a>
+            {% if profile and profile.get("is_admin", False) %}
+            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('admin.') %} bg-amber-500/20 text-amber-300{% endif %}"
+               href="{{ url_for('admin.index') }}"
+               {% if request.endpoint and request.endpoint.startswith('admin.') %}aria-current="page"{% endif %}>Admin Dashboard</a>
+            {% endif %}
+            <div class="border-t border-purple-700/30 my-2"></div>
+            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint == 'dashboard.account' %} bg-amber-500/20 text-amber-300{% endif %}"
+               href="{{ url_for('dashboard.account') }}"
+               {% if request.endpoint == 'dashboard.account' %}aria-current="page"{% endif %}>Account Settings</a>
+            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors"
+               href="{{ url_for('auth.logout') }}">Log Out</a>
+          {% else %}
+            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint == 'web.assistant' %} bg-amber-500/20 text-amber-300{% endif %}"
+               href="{{ url_for('web.assistant') }}"
+               {% if request.endpoint == 'web.assistant' %}aria-current="page"{% endif %}>Assistant</a>
+            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('guides.') %} bg-amber-500/20 text-amber-300{% endif %}"
+               href="{{ url_for('guides.index') }}"
+               {% if request.endpoint and request.endpoint.startswith('guides.') %}aria-current="page"{% endif %}>Guides</a>
+            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('pricing.') %} bg-amber-500/20 text-amber-300{% endif %}"
+               href="{{ url_for('pricing.index') }}"
+               {% if request.endpoint and request.endpoint.startswith('pricing.') %}aria-current="page"{% endif %}>Features</a>
+            <div class="border-t border-purple-700/30 my-2"></div>
+            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('auth.login') %} bg-amber-500/20 text-amber-300{% endif %}"
+               href="{{ url_for('auth.login') }}"
+               {% if request.endpoint and request.endpoint.startswith('auth.login') %}aria-current="page"{% endif %}>Log In</a>
+            <a class="btn btn-primary text-center" href="{{ url_for('auth.signup') }}">Sign Up Free</a>
+          {% endif %}
+        </div>
+      </nav>
 
       {% set show_debug = (config.UI_DEBUG_LINKS or request.args.get('debug') == 'true') %}
       {% if show_debug %}

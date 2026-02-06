@@ -10,15 +10,22 @@
   function toggleCustomInterval(frequencyValue) {
     const customGroup = document.getElementById('custom-interval-group');
     const customInput = document.getElementById('custom_interval_days');
+    const frequencySelect = document.getElementById('frequency');
 
     if (!customGroup || !customInput) return;
 
-    if (frequencyValue === 'custom') {
+    var isCustom = frequencyValue === 'custom';
+    if (isCustom) {
       customGroup.classList.remove('hidden');
       customInput.required = true;
     } else {
       customGroup.classList.add('hidden');
       customInput.required = false;
+    }
+
+    // Update aria-expanded on the controlling select
+    if (frequencySelect) {
+      frequencySelect.setAttribute('aria-expanded', isCustom ? 'true' : 'false');
     }
   }
 

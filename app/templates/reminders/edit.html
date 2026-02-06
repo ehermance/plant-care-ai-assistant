@@ -46,7 +46,7 @@
       <label for="frequency" class="label label-required">
         Frequency
       </label>
-      <select id="frequency" name="frequency" class="input" required aria-describedby="frequency-help">
+      <select id="frequency" name="frequency" class="input" required aria-describedby="frequency-help" aria-controls="custom-interval-group">
         <option value="daily" {% if reminder.frequency == 'daily' %}selected{% endif %}>Daily</option>
         <option value="every_2_days" {% if reminder.frequency == 'every_2_days' %}selected{% endif %}>Every 2 Days</option>
         <option value="every_3_days" {% if reminder.frequency == 'every_3_days' %}selected{% endif %}>Every 3 Days</option>

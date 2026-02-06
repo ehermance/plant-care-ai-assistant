@@ -322,22 +322,32 @@
       }
     });
 
-    // Arrow key navigation in dropdown (WCAG 2.4.3)
+    // Arrow key + Tab navigation in dropdown (WCAG 2.4.3)
     userMenuDropdown.addEventListener('keydown', function(e) {
+      const menuItems = Array.from(userMenuDropdown.querySelectorAll('a[role="menuitem"]'));
+      const currentIndex = menuItems.indexOf(document.activeElement);
+
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         e.preventDefault();
-        const menuItems = Array.from(userMenuDropdown.querySelectorAll('a[role="menuitem"]'));
-        const currentIndex = menuItems.indexOf(document.activeElement);
-
         let nextIndex;
         if (e.key === 'ArrowDown') {
           nextIndex = (currentIndex + 1) % menuItems.length;
         } else {
           nextIndex = currentIndex <= 0 ? menuItems.length - 1 : currentIndex - 1;
         }
-
         if (menuItems[nextIndex]) {
           menuItems[nextIndex].focus();
+        }
+      }
+
+      // Trap Tab within dropdown — wrap focus to keep it inside
+      if (e.key === 'Tab' && menuItems.length > 0) {
+        if (e.shiftKey && currentIndex <= 0) {
+          e.preventDefault();
+          menuItems[menuItems.length - 1].focus();
+        } else if (!e.shiftKey && currentIndex >= menuItems.length - 1) {
+          e.preventDefault();
+          menuItems[0].focus();
         }
       }
     });
@@ -353,11 +363,37 @@
     }
   }
 
+  // --- Mobile Hamburger Menu Toggle ---
+  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+
+  if (mobileMenuBtn && mobileMenuPanel) {
+    mobileMenuBtn.addEventListener('click', function() {
+      const isExpanded = mobileMenuBtn.getAttribute('aria-expanded') === 'true';
+      if (isExpanded) {
+        mobileMenuPanel.classList.add('hidden');
+        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+      } else {
+        mobileMenuPanel.classList.remove('hidden');
+        mobileMenuBtn.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && mobileMenuBtn.getAttribute('aria-expanded') === 'true') {
+        mobileMenuPanel.classList.add('hidden');
+        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+        mobileMenuBtn.focus();
+      }
+    });
+  }
+
   // --- Flash Message Dismissal (WCAG Compliant) ---
   const flashMessages = document.querySelectorAll('.flash');
 
   flashMessages.forEach(function(flash) {
-    const closeBtn = flash.querySelector('.flash-close');
+    const closeBtn = flash.querySelector('.flash-dismiss-btn');
 
     if (closeBtn) {
       // Click handler
@@ -392,6 +428,13 @@
         flashEl.remove();
       }, 300);
     }
+  }
+
+  // --- Focus Management: move focus to error alerts on page load (WCAG 3.3.1) ---
+  var errorAlert = document.querySelector('[role="alert"]');
+  if (errorAlert) {
+    errorAlert.setAttribute('tabindex', '-1');
+    errorAlert.focus({ preventScroll: false });
   }
 
   // --- Flash Message Dismissal (Event Delegation for base.html alerts) ---

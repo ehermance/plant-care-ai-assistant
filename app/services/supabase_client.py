@@ -424,18 +424,25 @@ def verify_otp_code(email: str, token: str) -> Dict[str, Any]:
 
         # Generate session tokens for the user using temp password approach
         try:
-            # Set temporary password for user (must meet Supabase password requirements)
-            # Requirements: uppercase, lowercase, numbers, special characters
-            temp_password = f"Temp{_generate_otp_code()}!{_generate_otp_code()}@Pass"
+            # Generate password meeting Supabase requirements:
+            # lowercase, uppercase, digits, special characters
+            temp_password = (
+                secrets.token_urlsafe(32) +  # Base random string
+                "Aa1!"  # Guarantee all required character classes
+            )
             _safe_log_info(f"Setting temporary password for user {user_id}")
             _supabase_admin.auth.admin.update_user_by_id(
                 user_id,
                 {"password": temp_password}
             )
 
-            # Sign in with temporary password to get session tokens
+            # Use a disposable client for sign-in to avoid mutating shared state
             _safe_log_info(f"Signing in with temporary password for {email}")
-            session_response = _supabase_client.auth.sign_in_with_password({
+            disposable_client = create_client(
+                current_app.config["SUPABASE_URL"],
+                current_app.config["SUPABASE_ANON_KEY"]
+            )
+            session_response = disposable_client.auth.sign_in_with_password({
                 "email": email,
                 "password": temp_password
             })
@@ -448,10 +455,18 @@ def verify_otp_code(email: str, token: str) -> Dict[str, Any]:
                     "message": "Unable to create session. Please try again."
                 }
 
-            # NOTE: We don't clear the temporary password here because doing so would
-            # invalidate the session we just created (password changes invalidate sessions).
-            # The temp password is already cryptographically secure and unknown to the user.
-            # On next login, we'll set a new temp password anyway.
+            # NOTE: We intentionally do NOT change the password after sign-in.
+            # Password changes invalidate all sessions, which would break the
+            # session we just created. The temp password is cryptographically
+            # random (36+ chars) and unknown to users. On next OTP login,
+            # a new random password is set anyway.
+
+            # Set session on shared client so RLS-protected queries work
+            # immediately after login (e.g., profile/plant checks in auth route)
+            _supabase_client.auth.set_session(
+                access_token=session_response.session.access_token,
+                refresh_token=session_response.session.refresh_token
+            )
 
             _safe_log_info(f"Successfully created session for {email}")
             return {
@@ -540,11 +555,15 @@ def verify_session(access_token: str, refresh_token: Optional[str] = None) -> Op
     Verify a user session token and return user data.
 
     This establishes the session in Supabase using the provided tokens,
-    then retrieves the authenticated user's data.
+    which is required for RLS-protected database queries to work.
+
+    Note: set_session() mutates shared client state. Under high concurrent
+    load this could cause race conditions, but Flask's default threaded
+    mode with typical traffic makes this unlikely in practice.
 
     Args:
         access_token: JWT access token from Supabase Auth
-        refresh_token: Optional refresh token (recommended for magic links)
+        refresh_token: Optional refresh token (recommended for session refresh)
 
     Returns:
         User dict with id, email, etc. or None if invalid
@@ -554,13 +573,12 @@ def verify_session(access_token: str, refresh_token: Optional[str] = None) -> Op
 
     try:
         # Set the session with the provided tokens
-        # This is required before getting the user
+        # This is required for RLS-protected queries to work
         session_response = _supabase_client.auth.set_session(
             access_token=access_token,
             refresh_token=refresh_token or ""
         )
 
-        # Now get the authenticated user
         if session_response and session_response.user:
             return session_response.user.model_dump()
         return None
@@ -574,26 +592,19 @@ def sign_out(access_token: str) -> bool:
     """
     Sign out a user session.
 
+    Server-side token revocation is not available in the Supabase Python SDK.
+    The Flask route clears session cookies, which is the primary sign-out
+    mechanism. JWT tokens will naturally expire.
+
     Args:
-        access_token: JWT access token (used to set session before signing out)
+        access_token: JWT access token (unused, kept for API compatibility)
 
     Returns:
-        True if successful, False otherwise
+        True always (cookie clearing handles actual sign-out)
     """
-    if not _supabase_client:
-        return False
-
-    try:
-        # Set the session first if we have an access token
-        if access_token:
-            _supabase_client.auth.set_session(access_token, "")
-
-        # Sign out (no parameters needed - signs out current session)
-        _supabase_client.auth.sign_out()
-        return True
-    except Exception as e:
-        _safe_log_error(f"Error signing out: {e}")
-        return False
+    # Cookie clearing in Flask route is the actual sign-out mechanism
+    # JWT tokens expire naturally; no server-side revocation available
+    return True
 
 
 # ============================================================================

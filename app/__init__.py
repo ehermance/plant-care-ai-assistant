@@ -12,7 +12,7 @@ after the project was modularized.
 
 from __future__ import annotations
 import os
-from flask import Flask, Response, g, request
+from flask import Flask, Response, g, request, session
 from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv  # <-- ensure .env is loaded for local dev
 from .extensions import limiter
@@ -152,19 +152,33 @@ def create_app() -> Flask:
     # Set user timezone in request context (for client-side timestamp conversion)
     @app.before_request
     def load_user_timezone():
-        """Load user's timezone preference into request context."""
+        """Load user's timezone preference into request context.
+
+        Caches the timezone in the session to avoid a Supabase API call on
+        every request.  Skips entirely for anonymous visitors.
+        """
         g.user_timezone = None
 
-        # Skip for static files and certain paths to avoid unnecessary API calls
+        # Skip for static files and certain paths
         if request.path.startswith('/static/') or request.path.endswith('.ico'):
             return
 
         try:
             user_id = auth.get_current_user_id()
-            if user_id:
-                profile = supabase_client.get_user_profile(user_id)
-                if profile:
-                    g.user_timezone = profile.get("timezone")
+            if not user_id:
+                return
+
+            # Use cached value from session when available
+            cached = session.get("user_timezone")
+            if cached is not None:
+                g.user_timezone = cached or None  # "" stored as falsy → None
+                return
+
+            profile = supabase_client.get_user_profile(user_id)
+            tz = profile.get("timezone") if profile else None
+            g.user_timezone = tz
+            # Cache in session (store "" for None so we don't re-fetch)
+            session["user_timezone"] = tz or ""
         except Exception:
             pass  # Don't fail request on timezone lookup errors
 
@@ -226,45 +240,11 @@ def create_app() -> Flask:
     app.register_blueprint(seo_bp)
 
     # Add Jinja global for templates that need current date/time
-    from datetime import datetime, date
+    from datetime import datetime
     app.jinja_env.globals["now"] = lambda: datetime.now()
 
-    # Add Jinja filter for relative dates ("today", "yesterday", "3 days ago")
-    def relative_date(value):
-        """Convert a date/datetime to relative format like 'today', 'yesterday', '3 days ago'."""
-        if not value:
-            return "Unknown"
-
-        # Parse string to date if needed
-        if isinstance(value, str):
-            try:
-                # Handle ISO format (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)
-                value = datetime.fromisoformat(value.replace("Z", "+00:00")).date()
-            except (ValueError, AttributeError):
-                return value[:10] if len(value) >= 10 else value
-        elif isinstance(value, datetime):
-            value = value.date()
-
-        today = date.today()
-        delta = (today - value).days
-
-        if delta == 0:
-            return "Today"
-        elif delta == 1:
-            return "Yesterday"
-        elif delta < 7:
-            return f"{delta} days ago"
-        elif delta < 14:
-            return "1 week ago"
-        elif delta < 30:
-            weeks = delta // 7
-            return f"{weeks} weeks ago"
-        elif delta < 60:
-            return "1 month ago"
-        else:
-            # Fall back to formatted date for older entries
-            return value.strftime("%b %d, %Y")
-
+    # Register Jinja filters (defined in app/utils/filters.py for testability)
+    from .utils.filters import relative_date
     app.jinja_env.filters["relative_date"] = relative_date
 
     # Add Jinja global for Cloudflare Web Analytics

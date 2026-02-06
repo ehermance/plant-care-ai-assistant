@@ -16,9 +16,9 @@
 
 <!-- Page Header -->
 <div class="mb-8">
-  <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+  <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
     Account Settings <span class="inline-block" aria-hidden="true">⚙️</span>
-  </h2>
+  </h1>
   <p class="text-lg text-slate-600 dark:text-slate-400">
     Manage your profile, plan, and preferences.
   </p>
@@ -229,10 +229,10 @@
     <script src="{{ url_for('static', filename='js/account.js') }}"></script>
 
     <!-- Theme Preference -->
-    <div class="mb-8">
-      <label class="label">
+    <fieldset class="mb-8 border-0 p-0 m-0">
+      <legend class="label">
         Theme Preference
-      </label>
+      </legend>
       <p id="theme-help" class="help-text">
         Choose your preferred color scheme. "Auto" follows your device's system setting.
       </p>
@@ -298,7 +298,7 @@
           </span>
         </label>
       </div>
-    </div>
+    </fieldset>
 
     <!-- Email Preferences -->
     {% if config.MARKETING_EMAILS_ENABLED %}

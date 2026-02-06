@@ -24,6 +24,9 @@ AI_LAST_PROVIDER: Optional[str] = None
 # Cache for LiteLLM Router to avoid recreating on every request
 _ROUTER_CACHE: Optional[object] = None
 
+# Locations treated as indoor for weather filtering purposes
+_INDOOR_LOCATIONS = frozenset({"indoor_potted", "office", "greenhouse"})
+
 
 def _clear_router_cache():
     """Clear the router cache. Used for testing and when API keys change."""
@@ -139,8 +142,8 @@ def _weather_tip(weather: Optional[dict], plant: Optional[str], care_context: Op
     # Get care_context from parameter or weather dict, default to outdoor_potted for backward compatibility
     context = care_context or weather.get("care_context", "outdoor_potted")
 
-    # Only show weather tips for outdoor plants (not indoor)
-    if "indoor" in context.lower():
+    # Only show weather tips for outdoor plants (not indoor/office/greenhouse)
+    if context in _INDOOR_LOCATIONS:
         return None
 
     t_c = weather["temp_c"]
@@ -646,11 +649,13 @@ def _ai_advice(
         "indoor_potted": "potted house plant (indoors)",
         "outdoor_potted": "potted plant kept outdoors",
         "outdoor_bed": "plant grown in an outdoor garden bed",
+        "greenhouse": "plant grown in a greenhouse",
+        "office": "plant kept in an office or workspace",
     }
     context_str = context_map.get(care_context, "potted house plant (indoors)")
 
     # Add indoor-specific weather guidance to context
-    if care_context == "indoor_potted":
+    if care_context in _INDOOR_LOCATIONS:
         context_str += (
             " - Note: Indoor plants are shielded from direct outdoor weather effects. "
             "Outdoor conditions only matter for: (1) light levels through windows on cloudy days, "
