@@ -398,8 +398,8 @@ def get_light_adjustment_factor(
         >>> print(factor)
         1.3
     """
-    location = plant.get("location", "indoor_potted")
-    light = plant.get("light", "bright_indirect")
+    location = plant.get("location") or "indoor_potted"
+    light = plant.get("light") or "bright_indirect"
 
     # INDOOR PLANTS
     if "indoor" in location.lower():

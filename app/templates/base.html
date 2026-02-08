@@ -21,13 +21,13 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
 
   <!-- Canonical URL -->
-  <link rel="canonical" href="{{ request.base_url }}" />
+  <link rel="canonical" href="{{ APP_URL }}{{ request.path }}" />
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="PlantCareAI.app" />
   <meta property="og:locale" content="en_US" />
-  <meta property="og:url" content="{{ request.url }}" />
+  <meta property="og:url" content="{{ APP_URL }}{{ request.path }}" />
   <meta property="og:title" content="{% block og_title %}PlantCareAI 🌿 Your Smart Plant Assistant{% endblock %}" />
   <meta property="og:description" content="{% block og_description %}Personalized, weather-aware plant care powered by AI. No ads, just greener growth.{% endblock %}" />
   <meta property="og:image" content="{{ url_for('static', filename='images/logos/og-preview.png', _external=True) }}" />
@@ -72,7 +72,7 @@
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "PlantCareAI",
-    "url": "{{ request.url_root }}",
+    "url": "{{ APP_URL }}/",
     "description": "AI-powered plant care assistant with weather-aware reminders and personalized tips."
   }
   </script>
@@ -87,13 +87,13 @@
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "{{ request.url_root }}"
+        "item": "{{ APP_URL }}/"
       }{% if request.path != '/' %},
       {
         "@type": "ListItem",
         "position": 2,
         "name": "{{ self.title() | replace(' | PlantCareAI', '') | replace(' - PlantCareAI', '') | replace(' — PlantCareAI', '') | truncate(60) }}",
-        "item": "{{ request.base_url }}"
+        "item": "{{ APP_URL }}{{ request.path }}"
       }{% endif %}
     ]
   }
@@ -113,7 +113,7 @@
       "priceCurrency": "USD"
     },
     "description": "AI-powered plant care assistant that provides personalized, weather-aware care reminders and tips for your plants.",
-    "url": "{{ request.url_root }}",
+    "url": "{{ APP_URL }}/",
     "author": {
       "@type": "Organization",
       "name": "EDH Dev"
@@ -134,7 +134,7 @@
 
   <!-- Site Header -->
   <header class="relative cosmic-header border-b border-purple-700/30 sticky top-0 z-40 shadow-lg shadow-purple-900/50 overflow-visible backdrop-blur-sm" role="banner">
-    <div class="container mx-auto px-4 py-7 overflow-visible">
+    <div class="container mx-auto px-4 py-3 overflow-visible">
       <div class="flex items-center justify-between gap-3 overflow-visible">
         <!-- Logo & Branding -->
         <div class="flex items-start gap-1 min-w-1">
@@ -308,7 +308,7 @@
       <div class="container mx-auto px-4 py-4">
         <div role="region" aria-label="Notifications" class="space-y-3">
           {% for category, message in messages %}
-            <div class="flex items-center justify-between gap-4 p-4 rounded-lg border-2 {% if category == 'success' %}bg-emerald-50 dark:bg-emerald-900/20 border-emerald-500 dark:border-emerald-600 text-emerald-800 dark:text-emerald-200{% elif category == 'error' %}bg-rose-50 dark:bg-rose-900/20 border-rose-500 dark:border-rose-600 text-rose-800 dark:text-rose-200{% elif category == 'warning' %}bg-amber-50 dark:bg-amber-900/20 border-amber-500 dark:border-amber-600 text-amber-800 dark:text-amber-200{% else %}bg-blue-50 dark:bg-blue-900/20 border-blue-500 dark:border-blue-600 text-blue-800 dark:text-blue-200{% endif %}"
+            <div class="flash-{{ category if category in ('success', 'error', 'warning') else 'info' }}"
                  role="alert"
                  aria-live="polite">
               <span class="flex-1">{{ message }}</span>

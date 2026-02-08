@@ -98,9 +98,10 @@
         <button type="button" data-action="next-step" class="btn btn-primary">
           Get Started <span aria-hidden="true">→</span>
         </button>
-        <a href="{{ url_for('plants.onboarding_skip') }}" class="btn btn-secondary">
-          Skip for Now
-        </a>
+        <form method="POST" action="{{ url_for('plants.onboarding_skip') }}" class="inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn btn-secondary">Skip for Now</button>
+        </form>
       </div>
     </div>
   </div>

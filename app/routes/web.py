@@ -113,7 +113,7 @@ def debug_info():
     return info
 
 
-@web_bp.route("/history/clear")
+@web_bp.route("/history/clear", methods=["POST"])
 @limiter.exempt  # optional: exempt from rate limit noise
 def clear_history():
     session.pop("history", None)  # only this user's session history

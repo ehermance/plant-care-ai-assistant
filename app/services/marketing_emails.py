@@ -16,6 +16,7 @@ import os
 import requests
 from flask import current_app, has_app_context
 from itsdangerous import URLSafeSerializer
+from app.utils.sanitize import mask_email as _mask_email
 
 
 # Email type constants
@@ -1628,7 +1629,7 @@ def send_welcome_email(
             if "duplicate key" not in str(e) and "23505" not in str(e):
                 _safe_log_error(f"Error recording welcome email: {e}")
 
-        _safe_log_info(f"Welcome email {email_type} sent to {email}")
+        _safe_log_info(f"Welcome email {email_type} sent to {_mask_email(email)}")
 
     return result
 
@@ -2245,7 +2246,7 @@ def send_milestone_email(
         except Exception as e:
             _safe_log_error(f"Error marking milestone event as sent: {e}")
 
-        _safe_log_info(f"Milestone email {event_type} sent to {email}")
+        _safe_log_info(f"Milestone email {event_type} sent to {_mask_email(email)}")
 
     return result
 
@@ -2469,7 +2470,7 @@ def sync_to_resend_audience(email: str, subscribed: bool) -> bool:
 
         if response.status_code in (200, 201, 204):
             action = "added to" if subscribed else "removed from"
-            _safe_log_info(f"Contact {email} {action} Resend Audience")
+            _safe_log_info(f"Contact {_mask_email(email)} {action} Resend Audience")
             return True
         else:
             _safe_log_error(

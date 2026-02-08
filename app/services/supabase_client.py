@@ -15,6 +15,7 @@ from supabase import create_client, Client
 import secrets
 import string
 import hashlib
+from app.utils.sanitize import mask_email as _mask_email
 
 
 def _safe_log_error(message: str) -> None:
@@ -319,7 +320,7 @@ def send_otp_code(email: str) -> Dict[str, Any]:
             # Email failed - return the specific error from email service
             return email_result
 
-        _safe_log_info(f"OTP code sent successfully to {email}")
+        _safe_log_info(f"OTP code sent successfully to {_mask_email(email)}")
         return {
             "success": True,
             "message": f"A 6-digit code has been sent to {email}. Please check your inbox."
@@ -378,7 +379,7 @@ def verify_otp_code(email: str, token: str) -> Dict[str, Any]:
             # Try to create the user first (optimistic approach)
             # If they already exist, we'll catch the error and look them up
             try:
-                _safe_log_info(f"Attempting to create user for {email}")
+                _safe_log_info(f"Attempting to create user for {_mask_email(email)}")
                 new_user = _supabase_admin.auth.admin.create_user({
                     "email": email,
                     "email_confirm": True,  # Auto-confirm since they verified OTP
@@ -391,23 +392,19 @@ def verify_otp_code(email: str, token: str) -> Dict[str, Any]:
                 # Check if error is "user already exists"
                 error_msg = str(create_error).lower()
                 if "already been registered" in error_msg or "already exists" in error_msg:
-                    _safe_log_info(f"User {email} already exists, looking them up")
-                    # User exists - look them up
-                    users = _supabase_admin.auth.admin.list_users()
-                    existing_user = None
-                    if users:
-                        for u in users:
-                            if u.email and u.email.lower() == email.lower():
-                                existing_user = u
-                                break
-
-                    if not existing_user:
-                        # If we still can't find them, there's a problem
-                        _safe_log_error(f"User exists but couldn't be found in list_users()")
+                    _safe_log_info(f"User {_mask_email(email)} already exists, looking them up")
+                    # Look up by email via profiles table, then get auth user by ID.
+                    # Avoids list_users() which fetches ALL users (enumeration risk).
+                    profile_result = _supabase_admin.table("profiles").select("id").eq("email", email).limit(1).execute()
+                    if profile_result and profile_result.data and len(profile_result.data) > 0:
+                        found_id = profile_result.data[0]["id"]
+                        existing = _supabase_admin.auth.admin.get_user_by_id(found_id)
+                        user_id = existing.user.id
+                        user_data = existing.user.model_dump()
+                    else:
+                        _safe_log_error("User exists in auth but not in profiles table")
                         raise Exception("User exists but couldn't be retrieved")
 
-                    user_id = existing_user.id
-                    user_data = existing_user.model_dump()
                     _safe_log_info(f"Found existing user with ID {user_id}")
                 else:
                     # Different error - re-raise it
@@ -437,7 +434,7 @@ def verify_otp_code(email: str, token: str) -> Dict[str, Any]:
             )
 
             # Use a disposable client for sign-in to avoid mutating shared state
-            _safe_log_info(f"Signing in with temporary password for {email}")
+            _safe_log_info(f"Signing in with temporary password for {_mask_email(email)}")
             disposable_client = create_client(
                 current_app.config["SUPABASE_URL"],
                 current_app.config["SUPABASE_ANON_KEY"]
@@ -448,7 +445,7 @@ def verify_otp_code(email: str, token: str) -> Dict[str, Any]:
             })
 
             if not session_response or not session_response.session:
-                _safe_log_error(f"Failed to create session for {email}")
+                _safe_log_error(f"Failed to create session for {_mask_email(email)}")
                 return {
                     "success": False,
                     "error": "session_creation_failed",
@@ -468,7 +465,7 @@ def verify_otp_code(email: str, token: str) -> Dict[str, Any]:
                 refresh_token=session_response.session.refresh_token
             )
 
-            _safe_log_info(f"Successfully created session for {email}")
+            _safe_log_info(f"Successfully created session for {_mask_email(email)}")
             return {
                 "success": True,
                 "user": session_response.user.model_dump(),

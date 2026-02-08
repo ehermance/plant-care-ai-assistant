@@ -11,6 +11,7 @@ from typing import Dict, Any
 import os
 import requests
 from flask import current_app, has_app_context
+from app.utils.sanitize import mask_email as _mask_email
 
 
 def _safe_log_error(message: str) -> None:
@@ -154,7 +155,7 @@ Need help? support@plantcareai.app
         )
 
         if response.status_code == 200:
-            _safe_log_info(f"OTP email sent successfully to {email}")
+            _safe_log_info(f"OTP email sent successfully to {_mask_email(email)}")
             return {
                 "success": True,
                 "message": f"Verification code sent to {email}"

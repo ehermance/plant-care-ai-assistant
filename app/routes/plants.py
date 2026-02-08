@@ -504,7 +504,7 @@ def onboarding():
     return redirect(url_for("plants.onboarding"))
 
 
-@plants_bp.route("/onboarding/skip", methods=["GET"])
+@plants_bp.route("/onboarding/skip", methods=["POST"])
 @require_auth
 def onboarding_skip():
     """Skip onboarding and mark it as complete without creating a plant."""
