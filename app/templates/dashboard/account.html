@@ -1,22 +1,19 @@
 {% extends "base.html" %}
+{% from "components/breadcrumb.html" import breadcrumb %}
 
 {% block title %}Account Settings - Plant Care AI Assistant - PlantCareAI{% endblock %}
 
 {% block robots %}<meta name="robots" content="noindex, follow">{% endblock %}
 
 {% block content %}
-<!-- Breadcrumb Navigation -->
-<nav aria-label="Breadcrumb" class="mb-6">
-  <ol class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-    <li><a href="{{ url_for('dashboard.index') }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Dashboard</a></li>
-    <li aria-hidden="true">→</li>
-    <li aria-current="page" class="text-slate-900 dark:text-slate-100 font-medium">Account Settings</li>
-  </ol>
-</nav>
+{{ breadcrumb([
+  {"label": "Dashboard", "url": url_for('dashboard.index')},
+  {"label": "Account Settings"},
+]) }}
 
 <!-- Page Header -->
 <div class="mb-8">
-  <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+  <h1 class="page-title">
     Account Settings <span class="inline-block" aria-hidden="true">⚙️</span>
   </h1>
   <p class="text-lg text-slate-600 dark:text-slate-400">
@@ -225,8 +222,6 @@
       </select>
       <p class="help-text mt-1">Override if auto-detection is incorrect or you prefer to set it manually</p>
     </div>
-
-    <script src="{{ url_for('static', filename='js/account.js') }}"></script>
 
     <!-- Theme Preference -->
     <fieldset class="mb-8 border-0 p-0 m-0">
@@ -447,20 +442,59 @@
       </a>
     </div>
 
+    <!-- Export Data -->
+    <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+      <div>
+        <strong class="text-slate-900 dark:text-slate-100">Export My Data</strong>
+        <p class="text-sm text-slate-500 dark:text-slate-400">Download all your data as a JSON file.</p>
+      </div>
+      <form method="POST" action="{{ url_for('dashboard.export_data') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="btn btn-secondary flex-shrink-0">
+          Export Data
+        </button>
+      </form>
+    </div>
+
     <!-- Delete Account -->
     <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
       <div>
         <strong class="text-slate-900 dark:text-slate-100">Delete Account</strong>
         <p class="text-sm text-slate-500 dark:text-slate-400">Permanently delete your account and all data. This action cannot be undone.</p>
       </div>
-      <div>
-        <button class="btn btn-secondary flex-shrink-0" disabled>
-          Delete Account (Coming Soon)
-        </button>
-      </div>
+      <button type="button" class="btn btn-danger flex-shrink-0"
+              onclick="document.getElementById('delete-modal').classList.remove('hidden')">
+        Delete Account
+      </button>
     </div>
   </div>
 </section>
+
+<!-- Delete Account Confirmation Modal -->
+<div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+     role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+  <div class="card max-w-md w-full">
+    <h3 id="delete-modal-title" class="text-xl font-bold text-rose-600 dark:text-rose-400 mb-2">Delete Account</h3>
+    <p class="text-slate-600 dark:text-slate-400 mb-4">
+      This will <strong>permanently delete</strong> your account and all associated data including plants, reminders, journal entries, and photos. This cannot be undone.
+    </p>
+    <form method="POST" action="{{ url_for('dashboard.delete_account') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <label for="confirm-delete" class="label">Type <strong>DELETE</strong> to confirm:</label>
+      <input type="text" id="confirm-delete" name="confirm_delete"
+             class="input mb-4" placeholder="DELETE" autocomplete="off" required/>
+      <div class="flex gap-3 justify-end">
+        <button type="button" class="btn btn-secondary"
+                onclick="document.getElementById('delete-modal').classList.add('hidden')">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-danger">
+          Permanently Delete
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <!-- Back to Dashboard -->
 <div class="mb-8">
@@ -469,4 +503,8 @@
   </a>
 </div>
 
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/account.js') }}"></script>
 {% endblock %}

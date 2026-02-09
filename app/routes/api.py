@@ -10,7 +10,6 @@ Endpoints:
 """
 
 import uuid
-from functools import wraps
 from flask import Blueprint, request, jsonify, make_response, current_app
 from ..utils.presets import infer_region_from_latlon, infer_region_from_city, region_presets
 from ..utils.auth import require_auth, get_current_user_id
@@ -22,29 +21,25 @@ from ..extensions import limiter
 api_bp = Blueprint("api", __name__)
 
 
-def require_ajax():
-    """
-    CSRF protection for AJAX endpoints.
+@api_bp.before_request
+def _enforce_ajax_for_mutations():
+    """Enforce X-Requested-With header on all state-changing API requests.
 
-    Requires the X-Requested-With header to be set to 'XMLHttpRequest'.
-    This provides CSRF protection because:
+    Provides CSRF protection for the entire API blueprint because:
     1. Custom headers cannot be set by cross-origin requests without CORS
-    2. Forms cannot set custom headers
-    3. Only JavaScript can set this header
+    2. HTML forms cannot set custom headers
+    3. Only JavaScript (same-origin) can set this header
 
-    Apply to POST/PUT/DELETE endpoints that modify data.
+    This replaces the per-endpoint @require_ajax() decorator pattern so
+    new POST/PUT/DELETE endpoints are automatically protected.
     """
-    def decorator(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            if request.headers.get("X-Requested-With") != "XMLHttpRequest":
-                return jsonify({
-                    "success": False,
-                    "error": "Invalid request. Please refresh the page and try again."
-                }), 403
-            return f(*args, **kwargs)
-        return decorated_function
-    return decorator
+    if request.method in ("POST", "PUT", "DELETE", "PATCH"):
+        if request.headers.get("X-Requested-With") != "XMLHttpRequest":
+            return jsonify({
+                "success": False,
+                "error": "Invalid request. Please refresh the page and try again."
+            }), 403
+
 
 @api_bp.route("/presets")
 def presets_api():
@@ -75,7 +70,6 @@ def presets_api():
 
 @api_bp.route("/user/theme", methods=["POST"])
 @require_auth
-@require_ajax()
 def update_theme():
     """
     Updates user's theme preference (light, dark, or auto).
@@ -243,7 +237,6 @@ def get_plant_context(plant_id: str):
 
 @api_bp.route("/feedback/answer", methods=["POST"])
 @limiter.limit("10 per minute")
-@require_ajax()
 def submit_answer_feedback():
     """
     Submit feedback for an AI answer.
@@ -305,7 +298,7 @@ def submit_answer_feedback():
             "care_context": (data.get("care_context") or "")[:80],
             "ai_source": data.get("ai_source") or None,
             "rating": rating,
-            "page_url": request.referrer or request.url,
+            "page_url": (request.referrer or request.url or "")[:500],
             "user_agent": request.headers.get("User-Agent", "")[:255],
         }
 

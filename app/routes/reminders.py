@@ -8,7 +8,7 @@ from __future__ import annotations
 from datetime import date
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from app.utils.auth import require_auth, get_current_user_id
-from app.utils.validation import is_valid_uuid
+from app.utils.validation import is_valid_uuid, safe_referrer_or
 from app.services import reminders as reminder_service
 from app.services import analytics
 from app.services.supabase_client import get_user_profile
@@ -294,7 +294,7 @@ def complete(reminder_id):
 
     if not success:
         flash(f"Error completing reminder: {error}", "error")
-        return redirect(request.referrer or url_for("reminders.index"))
+        return redirect(safe_referrer_or(url_for("reminders.index")))
 
     # Track analytics event
     analytics.track_event(
@@ -304,7 +304,7 @@ def complete(reminder_id):
     )
 
     flash("Reminder marked complete! Next reminder scheduled.", "success")
-    return redirect(request.referrer or url_for("reminders.index"))
+    return redirect(safe_referrer_or(url_for("reminders.index")))
 
 
 @reminders_bp.route("/bulk-complete", methods=["POST"])
@@ -356,7 +356,7 @@ def snooze(reminder_id):
 
     if not success:
         flash(f"Error snoozing reminder: {error}", "error")
-        return redirect(request.referrer or url_for("reminders.index"))
+        return redirect(safe_referrer_or(url_for("reminders.index")))
 
     # Track analytics event
     analytics.track_event(
@@ -366,7 +366,7 @@ def snooze(reminder_id):
     )
 
     flash(f"Reminder snoozed for {days} day(s).", "success")
-    return redirect(request.referrer or url_for("reminders.index"))
+    return redirect(safe_referrer_or(url_for("reminders.index")))
 
 
 @reminders_bp.route("/<reminder_id>/delete", methods=["POST"])
@@ -384,7 +384,7 @@ def delete(reminder_id):
 
     if not success:
         flash(f"Error deleting reminder: {error}", "error")
-        return redirect(request.referrer or url_for("reminders.index"))
+        return redirect(safe_referrer_or(url_for("reminders.index")))
 
     flash("Reminder deleted successfully.", "success")
     return redirect(url_for("reminders.index"))
@@ -402,16 +402,16 @@ def toggle_status(reminder_id):
     user_id = get_current_user_id()
     if not user_id:
         flash("Please log in to toggle reminder status.", "error")
-        return redirect(request.referrer or url_for("reminders.index"))
+        return redirect(safe_referrer_or(url_for("reminders.index")))
 
     success, error = reminder_service.toggle_reminder_status(reminder_id, user_id)
 
     if not success:
         flash(f"Error toggling reminder status: {error}", "error")
-        return redirect(request.referrer or url_for("reminders.index"))
+        return redirect(safe_referrer_or(url_for("reminders.index")))
 
     flash("Reminder status updated successfully.", "success")
-    return redirect(request.referrer or url_for("reminders.index"))
+    return redirect(safe_referrer_or(url_for("reminders.index")))
 
 
 @reminders_bp.route("/<reminder_id>/adjust-weather", methods=["POST"])
@@ -433,7 +433,7 @@ def adjust_weather(reminder_id):
 
     if not city:
         flash("City required for weather adjustment.", "error")
-        return redirect(request.referrer or url_for("reminders.index"))
+        return redirect(safe_referrer_or(url_for("reminders.index")))
 
     # Get reminder to find plant location
     reminder = reminder_service.get_reminder_by_id(reminder_id, user_id)
@@ -453,7 +453,7 @@ def adjust_weather(reminder_id):
     else:
         flash(f"No adjustment made: {message}", "info")
 
-    return redirect(request.referrer or url_for("reminders.index"))
+    return redirect(safe_referrer_or(url_for("reminders.index")))
 
 
 @reminders_bp.route("/<reminder_id>/clear-weather", methods=["POST"])
@@ -466,10 +466,10 @@ def clear_weather(reminder_id):
 
     if not success:
         flash(f"Error clearing weather adjustment: {error}", "error")
-        return redirect(request.referrer or url_for("reminders.index"))
+        return redirect(safe_referrer_or(url_for("reminders.index")))
 
     flash("Weather adjustment cleared. Reverted to original schedule.", "success")
-    return redirect(request.referrer or url_for("reminders.index"))
+    return redirect(safe_referrer_or(url_for("reminders.index")))
 
 
 # JSON API endpoints for AJAX calls
@@ -648,7 +648,7 @@ def toggle_weather_adjustment(reminder_id):
         flash(f"Failed to update: {error}", "error")
 
     # Redirect back to referrer or reminder detail page
-    return redirect(request.referrer or url_for("reminders.view", reminder_id=reminder_id))
+    return redirect(safe_referrer_or(url_for("reminders.view", reminder_id=reminder_id)))
 
 
 @reminders_bp.route("/calendar")

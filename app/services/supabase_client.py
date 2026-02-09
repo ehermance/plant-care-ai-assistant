@@ -50,6 +50,7 @@ _supabase_admin: Optional[Client] = None   # Admin client (service role key)
 # Format: {cache_key: (data, timestamp)}
 _PLANT_CACHE: Dict[str, tuple[list[dict], datetime]] = {}
 _CACHE_TTL_SECONDS = 300  # 5 minutes
+_CACHE_MAX_SIZE = 500     # Prevent unbounded memory growth
 
 
 def init_supabase(app) -> None:
@@ -1309,6 +1310,10 @@ def _get_cached_plants(cache_key: str) -> list[dict] | None:
 
 def _cache_plants(cache_key: str, plants: list[dict]) -> None:
     """Store plants in cache with current timestamp."""
+    # Evict oldest entries if cache is full
+    if len(_PLANT_CACHE) >= _CACHE_MAX_SIZE and cache_key not in _PLANT_CACHE:
+        oldest_key = min(_PLANT_CACHE, key=lambda k: _PLANT_CACHE[k][1])
+        del _PLANT_CACHE[oldest_key]
     _PLANT_CACHE[cache_key] = (plants, datetime.now())
 
 
@@ -1760,3 +1765,123 @@ def mark_onboarding_complete(user_id: str) -> bool:
     except Exception as e:
         _safe_log_error(f"Error marking onboarding complete: {e}")
         return False
+
+
+def export_user_data(user_id: str) -> Dict[str, Any]:
+    """Export all user data for GDPR data portability (Article 20).
+
+    Returns a dict containing profile, plants, reminders, journal entries,
+    and feedback.  Uses the admin client to bypass RLS and ensure complete
+    results.  Uses explicit column lists to avoid leaking internal fields.
+    """
+    if not _supabase_admin:
+        return {"error": "Service unavailable"}
+
+    _PROFILE_EXPORT_COLS = "id,email,plan,city,timezone,hemisphere,theme,experience_level,primary_goal,time_commitment,environment_preference,marketing_opt_in,onboarding_completed,created_at,trial_ends_at"
+    _PLANT_EXPORT_COLS = "id,user_id,name,species,description,photo_url,light,watering_frequency,environment,created_at"
+    _REMINDER_EXPORT_COLS = "id,user_id,plant_id,reminder_type,frequency_days,next_due,last_completed,is_active,skip_weather_adjustment,weather_adjusted,weather_adjustment_reason,created_at"
+
+    data: Dict[str, Any] = {"exported_at": datetime.now().isoformat() + "Z"}
+
+    try:
+        # Profile (explicit columns — no internal flags)
+        profile = _supabase_admin.table("profiles").select(_PROFILE_EXPORT_COLS).eq("id", user_id).maybe_single().execute()
+        data["profile"] = profile.data if profile and profile.data else {}
+
+        # Plants
+        plants = _supabase_admin.table("plants").select(_PLANT_EXPORT_COLS).eq("user_id", user_id).execute()
+        data["plants"] = plants.data if plants and plants.data else []
+
+        # Reminders (all, including inactive)
+        reminders = _supabase_admin.table("reminders").select(_REMINDER_EXPORT_COLS).eq("user_id", user_id).execute()
+        data["reminders"] = reminders.data if reminders and reminders.data else []
+
+        # Journal entries (plant_actions)
+        actions = _supabase_admin.table("plant_actions").select("*").eq("user_id", user_id).execute()
+        data["journal_entries"] = actions.data if actions and actions.data else []
+
+        # Answer feedback
+        feedback = _supabase_admin.table("answer_feedback").select("question,plant,city,care_context,ai_source,rating,created_at").eq("user_id", user_id).execute()
+        data["feedback"] = feedback.data if feedback and feedback.data else []
+
+    except Exception as e:
+        _safe_log_error(f"Error exporting user data: {e}")
+        return {"error": "Failed to export data"}
+
+    return data
+
+
+def delete_user_account(user_id: str) -> tuple[bool, str]:
+    """Delete all user data and the auth account (GDPR Article 17).
+
+    Cascade order: photos (storage) → answer_feedback → plant_actions →
+    reminders → plants → email records → otp_codes → profile → auth user.
+
+    Returns (success, message).
+    """
+    if not _supabase_admin:
+        return False, "Service unavailable"
+
+    errors: list[str] = []
+
+    try:
+        # Fetch email before any deletions (needed for OTP cleanup)
+        profile_row = _supabase_admin.table("profiles").select("email").eq("id", user_id).maybe_single().execute()
+        user_email = profile_row.data.get("email") if profile_row and profile_row.data else None
+
+        # 1. Delete plant photos from storage
+        plants = _supabase_admin.table("plants").select("photo_url").eq("user_id", user_id).execute()
+        if plants and plants.data:
+            for plant in plants.data:
+                if plant.get("photo_url"):
+                    delete_plant_photo(plant["photo_url"])
+
+        # 2. Delete from child tables first (foreign key order)
+        for table in ("answer_feedback", "plant_actions", "reminders"):
+            try:
+                _supabase_admin.table(table).delete().eq("user_id", user_id).execute()
+            except Exception as e:
+                errors.append(table)
+                _safe_log_error(f"Error deleting from {table}: {e}")
+
+        # 3. Delete plants
+        try:
+            _supabase_admin.table("plants").delete().eq("user_id", user_id).execute()
+        except Exception as e:
+            errors.append("plants")
+            _safe_log_error(f"Error deleting plants: {e}")
+
+        # 4. Delete email records
+        for table in ("welcome_emails_sent", "seasonal_emails_sent", "email_events"):
+            try:
+                _supabase_admin.table(table).delete().eq("user_id", user_id).execute()
+            except Exception as e:
+                _safe_log_error(f"Error deleting from {table}: {e}")
+
+        # 5. Delete OTP codes (using email fetched at top)
+        if user_email:
+            try:
+                _supabase_admin.table("otp_codes").delete().eq("email", user_email).execute()
+            except Exception:
+                pass  # Non-critical — OTP codes expire anyway
+
+        # 6. Delete profile
+        try:
+            _supabase_admin.table("profiles").delete().eq("id", user_id).execute()
+        except Exception as e:
+            errors.append("profiles")
+            _safe_log_error(f"Error deleting profile: {e}")
+
+        # 7. Delete auth user
+        _supabase_admin.auth.admin.delete_user(user_id)
+
+        if errors:
+            _safe_log_error(f"Account {user_id} deleted with partial failures: {errors}")
+            return True, "Account deleted (some data may require manual cleanup)."
+
+        _safe_log_info(f"Account deleted for user {user_id}")
+        return True, "Account deleted successfully"
+
+    except Exception as e:
+        _safe_log_error(f"Error deleting account for {user_id}: {e}")
+        return False, "Failed to delete account. Please contact support."

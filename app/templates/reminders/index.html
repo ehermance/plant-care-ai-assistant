@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components/reminder_icon.html" import reminder_icon %}
 
 {% block title %}Care Reminders - Plant Care AI Assistant - PlantCareAI{% endblock %}
 {% block description %}Stay on top of your plant care schedule with smart reminders.{% endblock %}
@@ -8,7 +9,7 @@
 {% block content %}
 <!-- Page Header -->
 <div class="mb-8">
-  <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+  <h1 class="page-title">
     Care Reminders <span class="inline-block" aria-hidden="true">⏰</span>
   </h1>
   <p class="text-lg text-slate-600 dark:text-slate-400">
@@ -77,15 +78,7 @@
   <div class="space-y-3">
     {% for reminder in due_reminders %}
     <div class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border-2 border-amber-200 dark:border-amber-700 transition-all duration-200 hover:border-amber-400 dark:hover:border-amber-500">
-      <div class="text-2xl flex-shrink-0" aria-hidden="true">
-        {% if reminder.reminder_type == 'watering' %}💧
-        {% elif reminder.reminder_type == 'fertilizing' %}🌿
-        {% elif reminder.reminder_type == 'misting' %}💦
-        {% elif reminder.reminder_type == 'pruning' %}✂️
-        {% elif reminder.reminder_type == 'repotting' %}🪴
-        {% elif reminder.reminder_type == 'inspection' %}🔍
-        {% else %}📝{% endif %}
-      </div>
+      {{ reminder_icon(reminder.reminder_type, size="text-2xl") }}
 
       <div class="flex-1 min-w-0">
         <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
@@ -137,15 +130,7 @@
   <div class="space-y-3">
     {% for reminder in upcoming_reminders %}
     <div class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:border-emerald-500 dark:hover:border-emerald-400">
-      <div class="text-2xl flex-shrink-0" aria-hidden="true">
-        {% if reminder.reminder_type == 'watering' %}💧
-        {% elif reminder.reminder_type == 'fertilizing' %}🌿
-        {% elif reminder.reminder_type == 'misting' %}💦
-        {% elif reminder.reminder_type == 'pruning' %}✂️
-        {% elif reminder.reminder_type == 'repotting' %}🪴
-        {% elif reminder.reminder_type == 'inspection' %}🔍
-        {% else %}📝{% endif %}
-      </div>
+      {{ reminder_icon(reminder.reminder_type, size="text-2xl") }}
 
       <div class="flex-1 min-w-0">
         <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
@@ -189,15 +174,7 @@
   <div class="space-y-3">
     {% for reminder in all_reminders %}
     <div class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:border-emerald-500 dark:hover:border-emerald-400">
-      <div class="text-2xl flex-shrink-0" aria-hidden="true">
-        {% if reminder.reminder_type == 'watering' %}💧
-        {% elif reminder.reminder_type == 'fertilizing' %}🌿
-        {% elif reminder.reminder_type == 'misting' %}💦
-        {% elif reminder.reminder_type == 'pruning' %}✂️
-        {% elif reminder.reminder_type == 'repotting' %}🪴
-        {% elif reminder.reminder_type == 'inspection' %}🔍
-        {% else %}📝{% endif %}
-      </div>
+      {{ reminder_icon(reminder.reminder_type, size="text-2xl") }}
 
       <div class="flex-1 min-w-0">
         <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">

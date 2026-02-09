@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% from "components/breadcrumb.html" import breadcrumb %}
+{% from "components/reminder_icon.html" import reminder_icon %}
 
 {% block title %}{{ plant.name }} - Plant Care AI Assistant - PlantCareAI{% endblock %}
 {% block description %}View details for {{ plant.name }}.{% endblock %}
@@ -6,9 +8,15 @@
 {% block robots %}<meta name="robots" content="noindex, follow">{% endblock %}
 
 {% block content %}
+{{ breadcrumb([
+  {"label": "Dashboard", "url": url_for('dashboard.index')},
+  {"label": "My Plants", "url": url_for('plants.index')},
+  {"label": plant.name},
+]) }}
+
 <!-- Page Header -->
 <div class="mb-8">
-  <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+  <h1 class="page-title">
     {{ plant.name }}
     {% if plant.nickname %}
       <span class="text-2xl sm:text-3xl font-normal text-emerald-600 dark:text-emerald-400">"{{ plant.nickname }}"</span>
@@ -212,15 +220,7 @@
     <div class="space-y-3">
       {% for reminder in plant_reminders %}
       <div class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:border-emerald-500 dark:hover:border-emerald-400">
-        <div class="text-2xl flex-shrink-0" aria-hidden="true">
-          {% if reminder.reminder_type == 'watering' %}💧
-          {% elif reminder.reminder_type == 'fertilizing' %}🌿
-          {% elif reminder.reminder_type == 'misting' %}💦
-          {% elif reminder.reminder_type == 'pruning' %}✂️
-          {% elif reminder.reminder_type == 'repotting' %}🪴
-          {% elif reminder.reminder_type == 'inspection' %}🔍
-          {% else %}📝{% endif %}
-        </div>
+        {{ reminder_icon(reminder.reminder_type, size="text-2xl") }}
 
         <div class="flex-1 min-w-0">
           <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">

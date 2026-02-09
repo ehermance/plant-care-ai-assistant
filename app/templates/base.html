@@ -158,7 +158,7 @@
         {% if is_authenticated and profile and profile.get("is_admin", False) %}
         <!-- Admin Links -->
         <div class="hidden md:flex justify-end text-right">
-          <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('admin.') %} bg-amber-500/20 text-amber-300{% endif %}"
+          <a class="{% if request.endpoint and request.endpoint.startswith('admin.') %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %}"
               href="{{ url_for('admin.index') }}"
               title="View your admin dashboard with key product metrics and user behavior insights"
               {% if request.endpoint and request.endpoint.startswith('admin.') %}aria-current="page"{% endif %}>Admin</a>
@@ -179,18 +179,18 @@
         <!-- Desktop Navigation -->
         <nav class="hidden md:flex items-center gap-3 overflow-visible" aria-label="Main navigation">
           {% if is_authenticated %}
-            <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('dashboard.') %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="{% if request.endpoint and request.endpoint.startswith('dashboard.') %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %}"
                href="{{ url_for('dashboard.index') }}"
                title="View your plant dashboard with reminders and stats"
                {% if request.endpoint and request.endpoint.startswith('dashboard.') %}aria-current="page"{% endif %}>Dashboard</a>
-            <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint == 'web.assistant' %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="{% if request.endpoint == 'web.assistant' %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %}"
                href="{{ url_for('web.assistant') }}"
                title="Get AI-powered plant care advice"
                {% if request.endpoint == 'web.assistant' %}aria-current="page"{% endif %}>Assistant</a>
 
             <!-- User Menu Dropdown -->
             <div class="relative">
-              <button class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors flex items-center gap-1"
+              <button class="nav-link-cosmic flex items-center gap-1"
                       aria-expanded="false"
                       aria-haspopup="true"
                       id="user-menu-btn">
@@ -216,19 +216,19 @@
               </div>
             </div>
           {% else %}
-            <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint == 'web.assistant' %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="{% if request.endpoint == 'web.assistant' %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %}"
                href="{{ url_for('web.assistant') }}"
                title="Get AI-powered plant care advice"
                {% if request.endpoint == 'web.assistant' %}aria-current="page"{% endif %}>Assistant</a>
-            <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('guides.') %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="{% if request.endpoint and request.endpoint.startswith('guides.') %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %}"
                href="{{ url_for('guides.index') }}"
                title="Browse plant care guides"
                {% if request.endpoint and request.endpoint.startswith('guides.') %}aria-current="page"{% endif %}>Guides</a>
-            <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('pricing.') %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="{% if request.endpoint and request.endpoint.startswith('pricing.') %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %}"
                href="{{ url_for('pricing.index') }}"
                title="View features and pricing plans"
                {% if request.endpoint and request.endpoint.startswith('pricing.') %}aria-current="page"{% endif %}>Features</a>
-            <a class="px-4 py-2 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors whitespace-nowrap{% if request.endpoint and request.endpoint.startswith('auth.login') %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="{% if request.endpoint and request.endpoint.startswith('auth.login') %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %} whitespace-nowrap"
                href="{{ url_for('auth.login') }}"
                title="Log in to your account"
                {% if request.endpoint and request.endpoint.startswith('auth.login') %}aria-current="page"{% endif %}>Log In</a>
@@ -243,44 +243,44 @@
            aria-label="Mobile navigation">
         <div class="flex flex-col gap-2">
           {% if is_authenticated %}
-            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('dashboard.') %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="{% if request.endpoint and request.endpoint.startswith('dashboard.') %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %} py-3"
                href="{{ url_for('dashboard.index') }}"
                {% if request.endpoint and request.endpoint.startswith('dashboard.') %}aria-current="page"{% endif %}>Dashboard</a>
-            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint == 'plants.index' %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="{% if request.endpoint == 'plants.index' %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %} py-3"
                href="{{ url_for('plants.index') }}"
                {% if request.endpoint == 'plants.index' %}aria-current="page"{% endif %}>My Plants</a>
-            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('reminders.') %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="{% if request.endpoint and request.endpoint.startswith('reminders.') %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %} py-3"
                href="{{ url_for('reminders.index') }}"
                {% if request.endpoint and request.endpoint.startswith('reminders.') %}aria-current="page"{% endif %}>Reminders</a>
-            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint == 'web.assistant' %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="{% if request.endpoint == 'web.assistant' %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %} py-3"
                href="{{ url_for('web.assistant') }}"
                {% if request.endpoint == 'web.assistant' %}aria-current="page"{% endif %}>Assistant</a>
-            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('guides.') %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="{% if request.endpoint and request.endpoint.startswith('guides.') %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %} py-3"
                href="{{ url_for('guides.index') }}"
                {% if request.endpoint and request.endpoint.startswith('guides.') %}aria-current="page"{% endif %}>Guides</a>
             {% if profile and profile.get("is_admin", False) %}
-            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('admin.') %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="{% if request.endpoint and request.endpoint.startswith('admin.') %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %} py-3"
                href="{{ url_for('admin.index') }}"
                {% if request.endpoint and request.endpoint.startswith('admin.') %}aria-current="page"{% endif %}>Admin Dashboard</a>
             {% endif %}
             <div class="border-t border-purple-700/30 my-2"></div>
-            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint == 'dashboard.account' %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="{% if request.endpoint == 'dashboard.account' %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %} py-3"
                href="{{ url_for('dashboard.account') }}"
                {% if request.endpoint == 'dashboard.account' %}aria-current="page"{% endif %}>Account Settings</a>
-            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors"
+            <a class="nav-link-cosmic py-3"
                href="{{ url_for('auth.logout') }}">Log Out</a>
           {% else %}
-            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint == 'web.assistant' %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="{% if request.endpoint == 'web.assistant' %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %} py-3"
                href="{{ url_for('web.assistant') }}"
                {% if request.endpoint == 'web.assistant' %}aria-current="page"{% endif %}>Assistant</a>
-            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('guides.') %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="{% if request.endpoint and request.endpoint.startswith('guides.') %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %} py-3"
                href="{{ url_for('guides.index') }}"
                {% if request.endpoint and request.endpoint.startswith('guides.') %}aria-current="page"{% endif %}>Guides</a>
-            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('pricing.') %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="{% if request.endpoint and request.endpoint.startswith('pricing.') %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %} py-3"
                href="{{ url_for('pricing.index') }}"
                {% if request.endpoint and request.endpoint.startswith('pricing.') %}aria-current="page"{% endif %}>Features</a>
             <div class="border-t border-purple-700/30 my-2"></div>
-            <a class="px-4 py-3 rounded-lg font-medium text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors{% if request.endpoint and request.endpoint.startswith('auth.login') %} bg-amber-500/20 text-amber-300{% endif %}"
+            <a class="{% if request.endpoint and request.endpoint.startswith('auth.login') %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %} py-3"
                href="{{ url_for('auth.login') }}"
                {% if request.endpoint and request.endpoint.startswith('auth.login') %}aria-current="page"{% endif %}>Log In</a>
             <a class="btn btn-primary text-center" href="{{ url_for('auth.signup') }}">Sign Up Free</a>

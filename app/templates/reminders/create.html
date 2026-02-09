@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components/breadcrumb.html" import breadcrumb %}
 
 {% block title %}New Reminder - Plant Care AI Assistant - PlantCareAI{% endblock %}
 {% block description %}Create a new care reminder for your plants.{% endblock %}
@@ -6,9 +7,15 @@
 {% block robots %}<meta name="robots" content="noindex, follow">{% endblock %}
 
 {% block content %}
+{{ breadcrumb([
+  {"label": "Dashboard", "url": url_for('dashboard.index')},
+  {"label": "Reminders", "url": url_for('reminders.index')},
+  {"label": "New Reminder"},
+]) }}
+
 <!-- Page Header -->
 <div class="mb-8">
-  <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+  <h1 class="page-title">
     Create Care Reminder <span class="inline-block" aria-hidden="true">📝</span>
   </h1>
   <p class="text-lg text-slate-600 dark:text-slate-400">
@@ -171,6 +178,8 @@
   </form>
 </div>
 
-<script src="{{ url_for('static', filename='js/reminders.js') }}"></script>
+{% endblock %}
 
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/reminders.js') }}"></script>
 {% endblock %}

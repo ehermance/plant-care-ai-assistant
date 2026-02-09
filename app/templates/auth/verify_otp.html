@@ -14,7 +14,7 @@
         <span class="text-3xl" aria-hidden="true">📧</span>
       </div>
 
-      <h1 id="verify-title" class="section-title">
+      <h1 id="verify-title" class="page-title">
         Check Your Email
       </h1>
 
@@ -103,5 +103,8 @@
   </section>
 </div>
 
+{% endblock %}
+
+{% block extra_scripts %}
 <script src="{{ url_for('static', filename='js/verify-otp.js') }}"></script>
 {% endblock %}

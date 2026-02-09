@@ -244,6 +244,15 @@
            bg-emerald-50 dark:bg-emerald-900/20;
   }
 
+  .nav-link-cosmic {
+    @apply px-4 py-2 rounded-lg font-medium text-slate-100
+           hover:text-amber-300 hover:bg-purple-900/30 transition-colors;
+  }
+
+  .nav-link-cosmic-active {
+    @apply nav-link-cosmic bg-amber-500/20 text-amber-300;
+  }
+
   /* === FLASH MESSAGES === */
   .flash {
     @apply flex items-center justify-between gap-4 p-4 rounded-lg border-2;
@@ -303,8 +312,13 @@
     @apply py-12 sm:py-16 lg:py-20;
   }
 
-  .section-title {
+  .page-title {
     @apply text-3xl sm:text-4xl font-bold tracking-tight
+           text-slate-900 dark:text-slate-100 mb-2;
+  }
+
+  .section-title {
+    @apply text-2xl font-bold tracking-tight
            text-slate-900 dark:text-slate-100 mb-4;
   }
 

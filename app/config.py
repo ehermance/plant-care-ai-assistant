@@ -13,11 +13,13 @@ Notes:
 
 from __future__ import annotations
 import os
+import secrets
 from datetime import timedelta
 
 class BaseConfig:
-    # Secrets & basics
-    SECRET_KEY = os.getenv("FLASK_SECRET_KEY", "")
+    # Secrets & basics — generate a random key if env var is missing so dev/test
+    # never runs with an empty string (production enforces a real key at startup)
+    SECRET_KEY = os.getenv("FLASK_SECRET_KEY") or secrets.token_hex(32)
     DEBUG = False
     TESTING = False
 

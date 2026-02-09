@@ -1,19 +1,20 @@
 {% extends "base.html" %}
+{% from "components/breadcrumb.html" import breadcrumb %}
 
 {% block title %}{{ plant.name }} Care Journal - PlantCareAI{% endblock %}
 
 {% block robots %}<meta name="robots" content="noindex, follow">{% endblock %}
 
 {% block content %}
+{{ breadcrumb([
+  {"label": "Dashboard", "url": url_for('dashboard.index')},
+  {"label": plant.name, "url": url_for('plants.view', plant_id=plant.id)},
+  {"label": "Care Journal"},
+]) }}
+
 <!-- Page Header -->
 <div class="mb-8">
-  <div class="flex items-center gap-3 mb-4">
-    <a href="{{ url_for('plants.view', plant_id=plant.id) }}" class="text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-      <span aria-hidden="true">←</span> Back to {{ plant.name }}
-    </a>
-  </div>
-
-  <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+  <h1 class="page-title">
     Care Journal: {{ plant.name }}
   </h1>
   {% if plant.species %}

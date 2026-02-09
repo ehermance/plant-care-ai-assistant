@@ -36,7 +36,7 @@
 
   <!-- Form Card -->
   <div class="card" aria-labelledby="form-title">
-    <h1 id="form-title" class="section-title">Get Plant Care Advice</h1>
+    <h1 id="form-title" class="page-title">Get Plant Care Advice</h1>
 
     <form id="ask-form" action="{{ url_for('web.assistant') }}" method="post" novalidate>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components/breadcrumb.html" import breadcrumb %}
 
 {% block title %}{{ guide.name }} Care Guide - How to Grow & Water | PlantCareAI{% endblock %}
 
@@ -57,18 +58,10 @@
 {% endblock %}
 
 {% block content %}
-<!-- Breadcrumb -->
-<nav class="mb-6" aria-label="Breadcrumb">
-  <ol class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-    <li>
-      <a href="{{ url_for('guides.index') }}" class="hover:text-emerald-600 dark:hover:text-emerald-400">
-        Plant Care Guides
-      </a>
-    </li>
-    <li aria-hidden="true">/</li>
-    <li class="text-slate-900 dark:text-slate-100 font-medium">{{ guide.name }}</li>
-  </ol>
-</nav>
+{{ breadcrumb([
+  {"label": "Plant Care Guides", "url": url_for('guides.index')},
+  {"label": guide.name},
+]) }}
 
 <!-- Header -->
 <header class="mb-8">

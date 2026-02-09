@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components/reminder_icon.html" import reminder_icon %}
 
 {% block title %}Care Calendar - {{ month_name }} {{ year }} - Plant Care AI Assistant - PlantCareAI{% endblock %}
 {% block description %}Track all your plant care activities at a glance.{% endblock %}
@@ -8,7 +9,7 @@
 {% block content %}
 <!-- Page Header -->
 <div class="mb-8">
-  <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+  <h1 class="page-title">
     Care Calendar <span class="inline-block" aria-hidden="true">📅</span>
   </h1>
   <p class="text-lg text-slate-600 dark:text-slate-400">
@@ -93,16 +94,7 @@
             <li>
               <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}"
                  class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-                <span class="text-xl" aria-hidden="true">
-                  {% if reminder.reminder_type == 'watering' %}💧
-                  {% elif reminder.reminder_type == 'fertilizing' %}🌿
-                  {% elif reminder.reminder_type == 'misting' %}💦
-                  {% elif reminder.reminder_type == 'pruning' %}✂️
-                  {% elif reminder.reminder_type == 'repotting' %}🪴
-                  {% elif reminder.reminder_type == 'inspection' %}🔍
-                  {% else %}📝
-                  {% endif %}
-                </span>
+                {{ reminder_icon(reminder.reminder_type, size="text-xl") }}
                 <div class="flex-1 min-w-0">
                   <div class="font-medium text-slate-900 dark:text-slate-100 truncate">
                     {{ reminder.plants.name if reminder.plants else 'Plant' }}
@@ -156,16 +148,7 @@
               {% for reminder in day_reminders[:3] %}
               <div class="text-xs rounded-lg px-2 py-1 bg-slate-100 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 hover:border-emerald-500 dark:hover:border-emerald-400 transition-colors">
                 <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="flex items-center gap-1 text-slate-900 dark:text-slate-100 hover:text-emerald-600 dark:hover:text-emerald-400">
-                  <span aria-hidden="true">
-                    {% if reminder.reminder_type == 'watering' %}💧
-                    {% elif reminder.reminder_type == 'fertilizing' %}🌿
-                    {% elif reminder.reminder_type == 'misting' %}💦
-                    {% elif reminder.reminder_type == 'pruning' %}✂️
-                    {% elif reminder.reminder_type == 'repotting' %}🪴
-                    {% elif reminder.reminder_type == 'inspection' %}🔍
-                    {% else %}📝
-                    {% endif %}
-                  </span>
+                  {{ reminder_icon(reminder.reminder_type, size="") }}
                   <span class="truncate">
                     {{ reminder.plants.name if reminder.plants else 'Plant' }}
                   </span>
