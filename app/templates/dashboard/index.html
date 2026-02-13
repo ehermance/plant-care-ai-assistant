@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components/reminder_icon.html" import reminder_icon %}
 
 {% block title %}Dashboard - Plant Care AI Assistant - PlantCareAI{% endblock %}
 
@@ -7,7 +8,7 @@
 {% block content %}
 <!-- Welcome Section -->
 <section class="mb-8">
-  <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+  <h1 class="page-title">
     <span id="greeting-display">Welcome!</span>
     <span class="inline-block animate-float" aria-hidden="true">🌱</span>
   </h1>
@@ -153,15 +154,7 @@
   <div class="space-y-3" id="todays-focus-list">
     {% for reminder in due_reminders[:3] %}
     <div class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:shadow-md hover:border-emerald-400 dark:hover:border-emerald-500" data-reminder-id="{{ reminder.id }}">
-      <div class="text-3xl flex-shrink-0">
-        {% if reminder.reminder_type == 'watering' %}💧
-        {% elif reminder.reminder_type == 'fertilizing' %}🌿
-        {% elif reminder.reminder_type == 'misting' %}💦
-        {% elif reminder.reminder_type == 'pruning' %}✂️
-        {% elif reminder.reminder_type == 'repotting' %}🪴
-        {% elif reminder.reminder_type == 'inspection' %}🔍
-        {% else %}📝{% endif %}
-      </div>
+      {{ reminder_icon(reminder.reminder_type) }}
 
       <div class="flex-1 min-w-0">
         <h4 class="text-lg font-semibold mb-2">

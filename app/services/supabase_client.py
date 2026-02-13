@@ -15,6 +15,7 @@ from supabase import create_client, Client
 import secrets
 import string
 import hashlib
+from app.utils.sanitize import mask_email as _mask_email
 
 
 def _safe_log_error(message: str) -> None:
@@ -49,6 +50,7 @@ _supabase_admin: Optional[Client] = None   # Admin client (service role key)
 # Format: {cache_key: (data, timestamp)}
 _PLANT_CACHE: Dict[str, tuple[list[dict], datetime]] = {}
 _CACHE_TTL_SECONDS = 300  # 5 minutes
+_CACHE_MAX_SIZE = 500     # Prevent unbounded memory growth
 
 
 def init_supabase(app) -> None:
@@ -319,7 +321,7 @@ def send_otp_code(email: str) -> Dict[str, Any]:
             # Email failed - return the specific error from email service
             return email_result
 
-        _safe_log_info(f"OTP code sent successfully to {email}")
+        _safe_log_info(f"OTP code sent successfully to {_mask_email(email)}")
         return {
             "success": True,
             "message": f"A 6-digit code has been sent to {email}. Please check your inbox."
@@ -378,7 +380,7 @@ def verify_otp_code(email: str, token: str) -> Dict[str, Any]:
             # Try to create the user first (optimistic approach)
             # If they already exist, we'll catch the error and look them up
             try:
-                _safe_log_info(f"Attempting to create user for {email}")
+                _safe_log_info(f"Attempting to create user for {_mask_email(email)}")
                 new_user = _supabase_admin.auth.admin.create_user({
                     "email": email,
                     "email_confirm": True,  # Auto-confirm since they verified OTP
@@ -391,23 +393,19 @@ def verify_otp_code(email: str, token: str) -> Dict[str, Any]:
                 # Check if error is "user already exists"
                 error_msg = str(create_error).lower()
                 if "already been registered" in error_msg or "already exists" in error_msg:
-                    _safe_log_info(f"User {email} already exists, looking them up")
-                    # User exists - look them up
-                    users = _supabase_admin.auth.admin.list_users()
-                    existing_user = None
-                    if users:
-                        for u in users:
-                            if u.email and u.email.lower() == email.lower():
-                                existing_user = u
-                                break
-
-                    if not existing_user:
-                        # If we still can't find them, there's a problem
-                        _safe_log_error(f"User exists but couldn't be found in list_users()")
+                    _safe_log_info(f"User {_mask_email(email)} already exists, looking them up")
+                    # Look up by email via profiles table, then get auth user by ID.
+                    # Avoids list_users() which fetches ALL users (enumeration risk).
+                    profile_result = _supabase_admin.table("profiles").select("id").eq("email", email).limit(1).execute()
+                    if profile_result and profile_result.data and len(profile_result.data) > 0:
+                        found_id = profile_result.data[0]["id"]
+                        existing = _supabase_admin.auth.admin.get_user_by_id(found_id)
+                        user_id = existing.user.id
+                        user_data = existing.user.model_dump()
+                    else:
+                        _safe_log_error("User exists in auth but not in profiles table")
                         raise Exception("User exists but couldn't be retrieved")
 
-                    user_id = existing_user.id
-                    user_data = existing_user.model_dump()
                     _safe_log_info(f"Found existing user with ID {user_id}")
                 else:
                     # Different error - re-raise it
@@ -437,7 +435,7 @@ def verify_otp_code(email: str, token: str) -> Dict[str, Any]:
             )
 
             # Use a disposable client for sign-in to avoid mutating shared state
-            _safe_log_info(f"Signing in with temporary password for {email}")
+            _safe_log_info(f"Signing in with temporary password for {_mask_email(email)}")
             disposable_client = create_client(
                 current_app.config["SUPABASE_URL"],
                 current_app.config["SUPABASE_ANON_KEY"]
@@ -448,7 +446,7 @@ def verify_otp_code(email: str, token: str) -> Dict[str, Any]:
             })
 
             if not session_response or not session_response.session:
-                _safe_log_error(f"Failed to create session for {email}")
+                _safe_log_error(f"Failed to create session for {_mask_email(email)}")
                 return {
                     "success": False,
                     "error": "session_creation_failed",
@@ -468,7 +466,7 @@ def verify_otp_code(email: str, token: str) -> Dict[str, Any]:
                 refresh_token=session_response.session.refresh_token
             )
 
-            _safe_log_info(f"Successfully created session for {email}")
+            _safe_log_info(f"Successfully created session for {_mask_email(email)}")
             return {
                 "success": True,
                 "user": session_response.user.model_dump(),
@@ -1312,6 +1310,10 @@ def _get_cached_plants(cache_key: str) -> list[dict] | None:
 
 def _cache_plants(cache_key: str, plants: list[dict]) -> None:
     """Store plants in cache with current timestamp."""
+    # Evict oldest entries if cache is full
+    if len(_PLANT_CACHE) >= _CACHE_MAX_SIZE and cache_key not in _PLANT_CACHE:
+        oldest_key = min(_PLANT_CACHE, key=lambda k: _PLANT_CACHE[k][1])
+        del _PLANT_CACHE[oldest_key]
     _PLANT_CACHE[cache_key] = (plants, datetime.now())
 
 
@@ -1763,3 +1765,127 @@ def mark_onboarding_complete(user_id: str) -> bool:
     except Exception as e:
         _safe_log_error(f"Error marking onboarding complete: {e}")
         return False
+
+
+def export_user_data(user_id: str) -> Dict[str, Any]:
+    """Export all user data for GDPR data portability (Article 20).
+
+    Returns a dict containing profile, plants, reminders, journal entries,
+    and feedback.  Uses the admin client to bypass RLS and ensure complete
+    results.  Uses explicit column lists to avoid leaking internal fields.
+    """
+    if not _supabase_admin:
+        return {"error": "Service unavailable"}
+
+    _PROFILE_EXPORT_COLS = "id,email,plan,city,timezone,hemisphere,theme_preference,experience_level,primary_goal,time_commitment,environment_preference,marketing_opt_in,onboarding_completed,created_at,trial_ends_at"
+    _PLANT_EXPORT_COLS = "id,user_id,name,species,nickname,location,light,notes,photo_url,current_watering_schedule,initial_health_state,ownership_duration,initial_concerns,created_at,updated_at"
+    _REMINDER_EXPORT_COLS = "id,user_id,plant_id,reminder_type,title,notes,frequency,custom_interval_days,next_due,last_completed_at,is_active,is_recurring,skip_weather_adjustment,weather_adjusted_due,weather_adjustment_reason,created_at"
+
+    data: Dict[str, Any] = {"exported_at": datetime.now().isoformat() + "Z"}
+
+    def _safe_query(table: str, columns: str, id_col: str = "user_id", fallback=None):
+        """Run a query, returning fallback on 204/empty or error."""
+        if fallback is None:
+            fallback = []
+        try:
+            result = _supabase_admin.table(table).select(columns).eq(id_col, user_id).execute()
+            return result.data if result and result.data else fallback
+        except Exception as e:
+            _safe_log_error(f"Error exporting {table}: {e}")
+            return fallback
+
+    # Profile (explicit columns — no internal flags)
+    data["profile"] = _safe_query("profiles", _PROFILE_EXPORT_COLS, id_col="id", fallback={})
+
+    # Plants
+    data["plants"] = _safe_query("plants", _PLANT_EXPORT_COLS)
+
+    # Reminders (all, including inactive)
+    data["reminders"] = _safe_query("reminders", _REMINDER_EXPORT_COLS)
+
+    # Journal entries (plant_actions)
+    data["journal_entries"] = _safe_query("plant_actions", "*")
+
+    # Answer feedback
+    data["feedback"] = _safe_query(
+        "answer_feedback",
+        "question,plant,city,care_context,ai_source,rating,created_at",
+    )
+
+    return data
+
+
+def delete_user_account(user_id: str) -> tuple[bool, str]:
+    """Delete all user data and the auth account (GDPR Article 17).
+
+    Cascade order: photos (storage) → answer_feedback → plant_actions →
+    reminders → plants → email records → otp_codes → profile → auth user.
+
+    Returns (success, message).
+    """
+    if not _supabase_admin:
+        return False, "Service unavailable"
+
+    errors: list[str] = []
+
+    try:
+        # Fetch email before any deletions (needed for OTP cleanup)
+        profile_row = _supabase_admin.table("profiles").select("email").eq("id", user_id).maybe_single().execute()
+        user_email = profile_row.data.get("email") if profile_row and profile_row.data else None
+
+        # 1. Delete plant photos from storage
+        plants = _supabase_admin.table("plants").select("photo_url").eq("user_id", user_id).execute()
+        if plants and plants.data:
+            for plant in plants.data:
+                if plant.get("photo_url"):
+                    delete_plant_photo(plant["photo_url"])
+
+        # 2. Delete from child tables first (foreign key order)
+        for table in ("answer_feedback", "plant_actions", "reminders"):
+            try:
+                _supabase_admin.table(table).delete().eq("user_id", user_id).execute()
+            except Exception as e:
+                errors.append(table)
+                _safe_log_error(f"Error deleting from {table}: {e}")
+
+        # 3. Delete plants
+        try:
+            _supabase_admin.table("plants").delete().eq("user_id", user_id).execute()
+        except Exception as e:
+            errors.append("plants")
+            _safe_log_error(f"Error deleting plants: {e}")
+
+        # 4. Delete email records
+        for table in ("welcome_emails_sent", "seasonal_emails_sent", "email_events"):
+            try:
+                _supabase_admin.table(table).delete().eq("user_id", user_id).execute()
+            except Exception as e:
+                _safe_log_error(f"Error deleting from {table}: {e}")
+
+        # 5. Delete OTP codes (using email fetched at top)
+        if user_email:
+            try:
+                _supabase_admin.table("otp_codes").delete().eq("email", user_email).execute()
+            except Exception:
+                pass  # Non-critical — OTP codes expire anyway
+
+        # 6. Delete profile
+        try:
+            _supabase_admin.table("profiles").delete().eq("id", user_id).execute()
+        except Exception as e:
+            errors.append("profiles")
+            _safe_log_error(f"Error deleting profile: {e}")
+
+        # 7. Delete auth user
+        _supabase_admin.auth.admin.delete_user(user_id)
+
+        if errors:
+            _safe_log_error(f"Account {user_id} deleted with partial failures: {errors}")
+            return True, "Account deleted (some data may require manual cleanup)."
+
+        _safe_log_info(f"Account deleted for user {user_id}")
+        return True, "Account deleted successfully"
+
+    except Exception as e:
+        _safe_log_error(f"Error deleting account for {user_id}: {e}")
+        return False, "Failed to delete account. Please contact support."

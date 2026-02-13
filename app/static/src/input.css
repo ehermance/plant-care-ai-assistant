@@ -45,6 +45,11 @@
   .skip-link {
     @apply absolute left-0 top-0 -translate-y-full bg-emerald-600 text-white px-4 py-2 rounded-br-lg focus:translate-y-0 z-50 transition-transform;
   }
+
+  /* Prevent anchor targets from scrolling behind sticky header */
+  [id] {
+    scroll-margin-top: 5rem;
+  }
 }
 
 /**
@@ -55,16 +60,12 @@
   /* === CARDS === */
   .card {
     @apply bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700
-           rounded-2xl shadow-lg p-6 transition-all duration-200
-           hover:shadow-xl hover:shadow-emerald-500/5 dark:hover:shadow-emerald-500/10;
+           rounded-2xl shadow-lg p-6;
   }
 
-  .card-glass {
-    @apply bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm
-           border border-slate-200/50 dark:border-slate-700/50
-           rounded-2xl shadow-lg shadow-emerald-500/5 p-6
-           hover:shadow-xl hover:shadow-emerald-500/10
-           transition-all duration-300;
+  .card-interactive {
+    @apply card transition-all duration-200
+           hover:shadow-xl hover:shadow-emerald-500/5 dark:hover:shadow-emerald-500/10;
   }
 
   /* === BUTTONS === */
@@ -244,34 +245,42 @@
            bg-emerald-50 dark:bg-emerald-900/20;
   }
 
+  .nav-link-cosmic {
+    @apply px-4 py-2 rounded-lg font-medium text-slate-100
+           hover:text-amber-300 hover:bg-purple-900/30 transition-colors;
+  }
+
+  .nav-link-cosmic-active {
+    @apply nav-link-cosmic bg-amber-500/20 text-amber-300;
+  }
+
   /* === FLASH MESSAGES === */
   .flash {
-    @apply flex items-start gap-3 p-4 rounded-xl border-2
-           shadow-lg transition-all duration-300;
+    @apply flex items-center justify-between gap-4 p-4 rounded-lg border-2;
   }
 
   .flash-success {
     @apply flash bg-emerald-50 dark:bg-emerald-900/20
-           border-emerald-200 dark:border-emerald-700
+           border-emerald-500 dark:border-emerald-600
            text-emerald-800 dark:text-emerald-200;
   }
 
   .flash-error {
     @apply flash bg-rose-50 dark:bg-rose-900/20
-           border-rose-200 dark:border-rose-700
+           border-rose-500 dark:border-rose-600
            text-rose-800 dark:text-rose-200;
   }
 
   .flash-warning {
     @apply flash bg-amber-50 dark:bg-amber-900/20
-           border-amber-200 dark:border-amber-700
+           border-amber-500 dark:border-amber-600
            text-amber-800 dark:text-amber-200;
   }
 
   .flash-info {
-    @apply flash bg-cyan-50 dark:bg-cyan-900/20
-           border-cyan-200 dark:border-cyan-700
-           text-cyan-800 dark:text-cyan-200;
+    @apply flash bg-blue-50 dark:bg-blue-900/20
+           border-blue-500 dark:border-blue-600
+           text-blue-800 dark:text-blue-200;
   }
 
   /* === EMPTY STATES === */
@@ -304,8 +313,13 @@
     @apply py-12 sm:py-16 lg:py-20;
   }
 
-  .section-title {
+  .page-title {
     @apply text-3xl sm:text-4xl font-bold tracking-tight
+           text-slate-900 dark:text-slate-100 mb-2;
+  }
+
+  .section-title {
+    @apply text-2xl font-bold tracking-tight
            text-slate-900 dark:text-slate-100 mb-4;
   }
 

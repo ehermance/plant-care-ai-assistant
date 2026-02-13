@@ -236,7 +236,7 @@ def verify_otp():
     next_url = request.args.get("next", "")
     if next_url and is_safe_redirect_url(next_url):
         flash(f"Welcome back!", "success")
-        return redirect(next_url)
+        return redirect(next_url)  # safe: validated by is_safe_redirect_url
 
     # Check if this is a new signup (profile just created)
     is_new_user = profile is None
@@ -299,7 +299,7 @@ def callback():
     next_url = request.args.get("next", "")
     if next_url and is_safe_redirect_url(next_url):
         flash(f"Welcome back, {email}!", "success")
-        return redirect(next_url)
+        return redirect(next_url)  # safe: validated by is_safe_redirect_url
 
     # Check if this is a new signup (profile just created)
     is_new_user = profile is None

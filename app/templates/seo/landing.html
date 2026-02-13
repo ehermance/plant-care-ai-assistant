@@ -16,8 +16,8 @@
 {
   "@context": "https://schema.org",
   "@type": "Article",
-  "headline": "{{ page.title }}",
-  "description": "{{ page.meta_description }}",
+  "headline": {{ page.title | tojson }},
+  "description": {{ page.meta_description | tojson }},
   "author": {
     "@type": "Organization",
     "name": "PlantCareAI"
@@ -39,10 +39,10 @@
     {% for cause in page.causes %}
     {
       "@type": "Question",
-      "name": "{{ cause.title }}",
+      "name": {{ cause.title | tojson }},
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "{{ cause.description }}"
+        "text": {{ cause.description | tojson }}
       }
     }{% if not loop.last %},{% endif %}
     {% endfor %}

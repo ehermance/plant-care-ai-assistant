@@ -155,7 +155,7 @@ def ttl_cache(seconds: int = OPENWEATHER_CACHE_TTL, maxsize: int = OPENWEATHER_C
     return decorator
 
 
-_US_STATE_LIKE = re.compile(r"^\s*([^,]+),\s*([A-Za-z]{2})\s*$")
+_US_STATE_LIKE = re.compile(r"^([^,]+),\s?([A-Za-z]{2})$")
 _US_ZIP = re.compile(r"^\s*(\d{5})(?:-\d{4})?\s*$")
 
 # Hawaiian island names mapped to their main towns (for OpenWeather API compatibility)
@@ -170,6 +170,7 @@ _HAWAIIAN_ISLANDS = {
 }
 
 def _normalize_city_query(city: str) -> str:
+    city = city.strip()
     m = _US_STATE_LIKE.match(city)
     if m:
         city_part = m.group(1).strip()
@@ -178,7 +179,7 @@ def _normalize_city_query(city: str) -> str:
         if state == "HI" and city_part.lower() in _HAWAIIAN_ISLANDS:
             return f"{_HAWAIIAN_ISLANDS[city_part.lower()]}, HI, US"
         return f"{city_part}, {state}, US"
-    return city.strip()
+    return city
 
 def _get_api_key() -> str | None:
     key = os.getenv("OPENWEATHER_API_KEY")

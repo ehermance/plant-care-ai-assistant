@@ -278,5 +278,122 @@
         "cta_question": "Why are my plant's leaves curling?",
         "related_pages": ["why-are-my-plant-leaves-drooping", "why-are-my-plant-leaves-turning-yellow"],
         "last_updated": "2026-01-30"
+    },
+    {
+        "slug": "how-to-get-rid-of-fungus-gnats",
+        "route_name": "fungus_gnats",
+        "title": "How to Get Rid of Fungus Gnats on Houseplants",
+        "meta_description": "Tiny flies buzzing around your plants? Fungus gnats thrive in moist soil. Learn proven methods to eliminate them and prevent them from coming back.",
+        "emoji": "\ud83e\udeb0",
+        "intro": "If you see tiny dark flies hovering around your houseplants or zigzagging near the soil surface, you're dealing with fungus gnats. They're more annoying than dangerous to mature plants, but their larvae feed on organic matter in the soil\u2014and sometimes young roots. Here's how to get rid of them for good.",
+        "causes": [
+            {
+                "title": "Let the soil dry out between waterings",
+                "description": "Fungus gnats lay eggs in moist topsoil. Allowing the top 1-2 inches to dry completely between waterings breaks their life cycle. This is the single most effective long-term fix."
+            },
+            {
+                "title": "Use yellow sticky traps",
+                "description": "Place yellow sticky traps near the soil surface to catch adult gnats. This reduces the breeding population quickly while you address the root cause. Replace traps every 1-2 weeks."
+            },
+            {
+                "title": "Try a hydrogen peroxide soil drench",
+                "description": "Mix one part 3% hydrogen peroxide with four parts water and water your plants with it. The fizzing action kills larvae in the soil without harming roots. Repeat once a week for 2-3 weeks."
+            },
+            {
+                "title": "Add a sand or gravel top layer",
+                "description": "A half-inch layer of coarse sand, perlite, or decorative gravel on top of the soil prevents gnats from laying eggs. The dry surface barrier breaks their reproductive cycle."
+            },
+            {
+                "title": "Use mosquito dunks (BTI)",
+                "description": "Bacillus thuringiensis israelensis (BTI) is a biological larvicide safe for plants. Soak a piece of mosquito dunk in your watering can overnight, then use that water for your plants. It kills larvae specifically."
+            },
+            {
+                "title": "Repot with fresh, well-draining soil",
+                "description": "If the infestation is severe, repot your plant in fresh sterile potting mix with perlite for better drainage. Discard the old soil outside\u2014don't compost it indoors."
+            }
+        ],
+        "bottom_line": "Fungus gnats are a moisture problem in disguise. Fix your watering habits, trap the adults, and treat the soil\u2014and they'll be gone within 2-3 weeks. Prevention is simple: never let soil stay constantly soggy.",
+        "cta_text": "Ask PlantCareAI about your gnat problem",
+        "cta_question": "How do I get rid of fungus gnats on my plants?",
+        "related_pages": ["am-i-overwatering-my-plant", "how-often-should-i-water-my-plant"],
+        "last_updated": "2026-02-09"
+    },
+    {
+        "slug": "why-are-my-plant-leaves-turning-brown",
+        "route_name": "brown_leaves",
+        "title": "Why Are My Plant Leaves Turning Brown? Causes & Fixes",
+        "meta_description": "Brown leaves can mean many things\u2014from low humidity to sunburn to root issues. Learn to identify the pattern and fix the cause before it spreads.",
+        "emoji": "\ud83c\udf42",
+        "intro": "Brown spots, crispy edges, or entire leaves turning brown? The pattern matters. Where and how the browning appears tells you a lot about what's going wrong. Let's decode what your plant is trying to say.",
+        "causes": [
+            {
+                "title": "Low humidity (crispy brown edges)",
+                "description": "If leaf edges turn brown and papery while the rest stays green, your air is too dry. This is especially common in winter when heating dries out indoor air. Group plants together, use a pebble tray, or run a humidifier."
+            },
+            {
+                "title": "Overwatering (soft brown spots)",
+                "description": "Mushy, dark brown spots\u2014especially with yellow halos\u2014often signal overwatering or root rot. Check the roots: if they're brown and mushy instead of white and firm, trim the damage and repot in fresh soil."
+            },
+            {
+                "title": "Sunburn (bleached or crispy patches)",
+                "description": "Direct harsh sunlight can scorch leaves, leaving bleached white or crispy brown patches. This is common when plants are moved from indirect to direct sun too quickly. Move the plant back and let it acclimate gradually."
+            },
+            {
+                "title": "Underwatering (dry, crispy brown leaves)",
+                "description": "If entire leaves turn brown and feel dry and crispy\u2014starting from the tips and edges\u2014your plant needs more water. Check the soil: if it's pulled away from the pot edges, it's been too dry for too long."
+            },
+            {
+                "title": "Mineral buildup from tap water",
+                "description": "Brown tips on spider plants, dracaenas, and calatheas often come from fluoride and chlorine in tap water. Try using filtered water, rainwater, or leave tap water out overnight before using."
+            },
+            {
+                "title": "Fertilizer burn",
+                "description": "Too much fertilizer causes salt buildup that burns roots and leaf tips. If you see brown tips after fertilizing, flush the soil with plenty of water and reduce your feeding schedule."
+            }
+        ],
+        "bottom_line": "The pattern of browning is your biggest clue: edges mean humidity, spots mean water issues, patches mean light damage, and tips mean water quality. Identify the pattern first, then fix the cause.",
+        "cta_text": "Ask PlantCareAI to diagnose your brown leaves",
+        "cta_question": "Why are my plant's leaves turning brown?",
+        "related_pages": ["why-are-my-plant-leaves-turning-yellow", "why-are-my-plant-leaves-curling"],
+        "last_updated": "2026-02-09"
+    },
+    {
+        "slug": "how-to-treat-root-rot",
+        "route_name": "root_rot",
+        "title": "How to Treat Root Rot (Step-by-Step Recovery Guide)",
+        "meta_description": "Root rot doesn't have to kill your plant. Learn how to identify it early, trim damaged roots, and save your plant with this step-by-step guide.",
+        "emoji": "\ud83e\udeb5",
+        "intro": "Root rot is one of the most common killers of houseplants\u2014but catching it early gives your plant a fighting chance. If your plant is wilting despite moist soil, has yellowing leaves, or smells musty at the base, root rot could be the culprit.",
+        "causes": [
+            {
+                "title": "Recognize the signs early",
+                "description": "Wilting despite wet soil, yellow or dropping leaves, mushy brown stems near the soil line, and a musty or sour smell from the pot are all red flags. The sooner you act, the better your plant's chances."
+            },
+            {
+                "title": "Remove the plant and inspect roots",
+                "description": "Gently remove the plant from its pot and rinse the roots under lukewarm water. Healthy roots are white or tan and feel firm. Rotting roots are brown, black, or gray, and feel mushy or slimy."
+            },
+            {
+                "title": "Trim all damaged roots",
+                "description": "Using clean, sharp scissors or pruning shears sterilized with rubbing alcohol, cut away all brown, mushy, or slimy roots. Cut back to where you see healthy white tissue. Don't be afraid to remove a lot\u2014it's better to have fewer healthy roots than many rotting ones."
+            },
+            {
+                "title": "Treat with hydrogen peroxide or fungicide",
+                "description": "After trimming, soak the remaining roots in a solution of one part 3% hydrogen peroxide to two parts water for 10 minutes. This kills remaining fungal spores. Alternatively, dust with a powdered fungicide."
+            },
+            {
+                "title": "Repot in fresh, well-draining soil",
+                "description": "Discard all old soil and clean the pot with a diluted bleach solution (or use a new pot). Repot in fresh potting mix amended with perlite or pumice for extra drainage. Choose a pot with drainage holes\u2014always."
+            },
+            {
+                "title": "Adjust your watering going forward",
+                "description": "Root rot is almost always caused by overwatering or poor drainage. After repotting, wait 2-3 days before watering lightly. Then adopt the \u201cfinger test\u201d: only water when the top 1-2 inches of soil are dry."
+            }
+        ],
+        "bottom_line": "Root rot is serious but survivable if caught early. The key steps: remove, trim, treat, repot, and fix your watering habits. Prevention is easier than cure\u2014always use pots with drainage holes and never let plants sit in standing water.",
+        "cta_text": "Ask PlantCareAI for help saving your plant",
+        "cta_question": "My plant has root rot, how do I save it?",
+        "related_pages": ["am-i-overwatering-my-plant", "why-are-my-plant-leaves-turning-yellow"],
+        "last_updated": "2026-02-09"
     }
 ]

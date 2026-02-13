@@ -36,7 +36,7 @@
 
   <!-- Form Card -->
   <div class="card" aria-labelledby="form-title">
-    <h1 id="form-title" class="section-title">Get Plant Care Advice</h1>
+    <h1 id="form-title" class="page-title">Get Plant Care Advice</h1>
 
     <form id="ask-form" action="{{ url_for('web.assistant') }}" method="post" novalidate>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -503,7 +503,10 @@
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
     <h2 id="history-title" class="section-title !mb-0">Recent Q&amp;A</h2>
     {% if has_history %}
-      <a class="text-sm text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors" href="{{ url_for('web.clear_history') }}">Clear</a>
+      <form method="POST" action="{{ url_for('web.clear_history') }}" class="inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="text-sm text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Clear</button>
+      </form>
     {% endif %}
   </div>
 

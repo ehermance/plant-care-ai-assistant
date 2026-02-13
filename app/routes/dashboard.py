@@ -11,8 +11,10 @@ Shows:
 from __future__ import annotations
 import hashlib
 from datetime import date
-from flask import Blueprint, render_template, redirect, url_for, request, flash, session
+import json
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session, Response
 from app.utils.auth import require_auth, get_current_user_id
+from app.extensions import limiter
 from app.services import supabase_client
 from app.services.supabase_client import TIMEZONE_GROUPS
 from app.services import reminders as reminder_service
@@ -290,3 +292,47 @@ def account():
         timezone_groups=TIMEZONE_GROUPS,
         detected_hemisphere=detected_hemisphere,
     )
+
+
+@dashboard_bp.route("/export", methods=["POST"])
+@require_auth
+@limiter.limit("3 per hour")
+def export_data():
+    """Export all user data as a JSON download (GDPR Article 20)."""
+    user_id = get_current_user_id()
+    data = supabase_client.export_user_data(user_id)
+
+    if "error" in data:
+        flash("Unable to export data. Please try again later.", "error")
+        return redirect(url_for("dashboard.account"))
+
+    response = Response(
+        json.dumps(data, indent=2, default=str),
+        mimetype="application/json",
+        headers={"Content-Disposition": "attachment; filename=plantcareai-data-export.json"}
+    )
+    return response
+
+
+@dashboard_bp.route("/delete-account", methods=["POST"])
+@require_auth
+@limiter.limit("3 per hour")
+def delete_account():
+    """Permanently delete user account and all data (GDPR Article 17)."""
+    user_id = get_current_user_id()
+
+    # Require explicit confirmation
+    if request.form.get("confirm_delete") != "DELETE":
+        flash("Please type DELETE to confirm account deletion.", "error")
+        return redirect(url_for("dashboard.account"))
+
+    success, message = supabase_client.delete_user_account(user_id)
+
+    if not success:
+        flash(message, "error")
+        return redirect(url_for("dashboard.account"))
+
+    # Clear session and redirect to home
+    session.clear()
+    flash("Your account and all data have been permanently deleted.", "info")
+    return redirect(url_for("web.index"))

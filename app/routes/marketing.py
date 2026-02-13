@@ -18,6 +18,7 @@ marketing_bp = Blueprint("marketing", __name__)
 
 # Load once at import time for sitemap generation
 _SEO_PAGES = load_data_file("seo_landing_pages.json")
+_HUB_PAGES = load_data_file("seo_hub_pages.json")
 _GUIDES = load_data_file("guides.json")
 
 
@@ -49,8 +50,8 @@ def sitemap():
         {"loc": "/ai-plant-doctor", "priority": "0.9", "changefreq": "monthly", "lastmod": "2025-12-18"},
         {"loc": "/plant-care-guides/", "priority": "0.8", "changefreq": "weekly", "lastmod": "2026-01-30"},
         {"loc": "/features/", "priority": "0.8", "changefreq": "monthly", "lastmod": "2026-01-30"},
-        {"loc": "/terms", "priority": "0.3", "changefreq": "yearly", "lastmod": "2026-01-31"},
-        {"loc": "/privacy", "priority": "0.3", "changefreq": "yearly", "lastmod": "2026-01-31"},
+        {"loc": "/terms", "priority": "0.3", "changefreq": "yearly", "lastmod": "2026-02-09"},
+        {"loc": "/privacy", "priority": "0.3", "changefreq": "yearly", "lastmod": "2026-02-09"},
     ]
 
     # SEO landing pages (problem-first content pages, from seo_landing_pages.json)
@@ -60,6 +61,15 @@ def sitemap():
             "priority": "0.8",
             "changefreq": "monthly",
             "lastmod": page.get("last_updated", "2026-01-30"),
+        })
+
+    # SEO hub/pillar pages (from seo_hub_pages.json)
+    for page in _HUB_PAGES:
+        pages.append({
+            "loc": f"/{page['slug']}",
+            "priority": "0.9",
+            "changefreq": "monthly",
+            "lastmod": page.get("last_updated", "2026-02-09"),
         })
 
     # Individual guide pages (from guides.json)

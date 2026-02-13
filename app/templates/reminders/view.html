@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components/breadcrumb.html" import breadcrumb %}
 
 {% block title %}{{ reminder.title }} - Reminder - Plant Care AI Assistant - PlantCareAI{% endblock %}
 {% block description %}View details for {{ reminder.title }} reminder.{% endblock %}
@@ -6,9 +7,15 @@
 {% block robots %}<meta name="robots" content="noindex, follow">{% endblock %}
 
 {% block content %}
+{{ breadcrumb([
+  {"label": "Dashboard", "url": url_for('dashboard.index')},
+  {"label": "Reminders", "url": url_for('reminders.index')},
+  {"label": reminder.title},
+]) }}
+
 <!-- Page Header -->
 <div class="mb-8">
-  <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+  <h1 class="page-title">
     {{ reminder.title }}
   </h1>
   <p class="text-lg text-slate-600 dark:text-slate-400">

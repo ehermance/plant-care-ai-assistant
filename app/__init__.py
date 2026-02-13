@@ -106,8 +106,8 @@ def _validate_production_security(app: Flask, cfg_path: str) -> None:
 
 def create_app() -> Flask:
     # Load .env early (for local dev)
-    # Use override=True to ensure .env values take precedence over system environment
-    load_dotenv(override=True)
+    # override=False so production env vars are not overwritten by a stale .env file
+    load_dotenv(override=False)
 
     app = Flask(
         __name__,
@@ -247,6 +247,9 @@ def create_app() -> Flask:
     from .utils.filters import relative_date
     app.jinja_env.filters["relative_date"] = relative_date
 
+    # Add Jinja global for app base URL (avoids host header injection via request.url_root)
+    app.jinja_env.globals["APP_URL"] = os.getenv("APP_URL", "https://plantcareai.app").rstrip("/")
+
     # Add Jinja global for Cloudflare Web Analytics
     app.jinja_env.globals["CF_BEACON_TOKEN"] = os.getenv("CF_BEACON_TOKEN", "")
 
@@ -298,7 +301,10 @@ def create_app() -> Flask:
 
             scheduler.start()
             app.logger.info("[Scheduler] Daily weather adjustment job scheduled for 6:00 AM UTC")
-            app.logger.info("[Scheduler] Welcome email job scheduled to run hourly")
+            if app.config["MARKETING_EMAILS_ENABLED"]:
+                app.logger.info("[Scheduler] Welcome email job scheduled to run hourly")
+            else:
+                app.logger.info("[Scheduler] Marketing emails disabled (MARKETING_EMAILS_ENABLED=false)")
 
             # Shutdown scheduler gracefully on app exit
             import atexit

@@ -15,4 +15,4 @@ app = create_app()
 
 if __name__ == "__main__":
     # Use host='0.0.0.0' so it’s reachable on LAN (e.g., for testing on mobile)
-    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)), debug=True)
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)), debug=os.getenv("FLASK_DEBUG", "1") == "1")

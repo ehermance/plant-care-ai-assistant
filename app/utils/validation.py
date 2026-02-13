@@ -129,6 +129,40 @@ def validate_inputs(form: Dict[str, Any]) -> Tuple[Dict[str, Any], str | None]:
     }, None
 
 
+def safe_referrer_or(fallback: str) -> str:
+    """Return request.referrer if it points back to this app, otherwise fallback.
+
+    Prevents open redirect attacks by validating that the referrer is a
+    same-origin, path-only URL matching allowed prefixes.  Reuses the
+    ``ALLOWED_REDIRECT_PREFIXES`` whitelist from ``app.routes.auth``.
+    """
+    from flask import request
+    from urllib.parse import urlparse
+
+    referrer = request.referrer
+    if not referrer:
+        return fallback
+
+    parsed = urlparse(referrer)
+
+    # If the referrer has a host, it must match the current request host
+    if parsed.netloc and parsed.netloc != request.host:
+        return fallback
+
+    path = parsed.path or ""
+
+    # Must start with / but not // (protocol-relative)
+    if not path.startswith("/") or path.startswith("//"):
+        return fallback
+
+    # Must match one of the allowed prefixes (same whitelist as auth.py)
+    from app.routes.auth import ALLOWED_REDIRECT_PREFIXES
+    if not any(path.startswith(prefix) for prefix in ALLOWED_REDIRECT_PREFIXES):
+        return fallback
+
+    return referrer
+
+
 def is_valid_uuid(value: str | None) -> bool:
     """
     Check if a string is a valid UUID (RFC 4122 format).
