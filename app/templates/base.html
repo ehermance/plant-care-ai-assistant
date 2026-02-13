@@ -51,8 +51,10 @@
 
   <!-- Performance hints -->
   <link rel="preconnect" href="https://static.cloudflareinsights.com" crossorigin>
+  <link rel="dns-prefetch" href="//static.cloudflareinsights.com">
 
   <!-- Tailwind CSS (Horti-Futuristic Design System) -->
+  <link rel="preload" href="{{ url_for('static', filename='css/output.css') }}" as="style">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}" />
 
   <!-- Theme & timezone configuration for JavaScript (CSP-compliant) -->
@@ -106,6 +108,7 @@
     "@type": "WebApplication",
     "name": "PlantCareAI",
     "applicationCategory": "LifestyleApplication",
+    "applicationSubCategory": "Plant Care",
     "operatingSystem": "Web",
     "offers": {
       "@type": "Offer",
@@ -114,6 +117,12 @@
     },
     "description": "AI-powered plant care assistant that provides personalized, weather-aware care reminders and tips for your plants.",
     "url": "{{ APP_URL }}/",
+    "featureList": [
+      "AI plant care advice powered by GPT-4o-mini",
+      "Weather-aware watering reminders",
+      "Plant health tracking with photo journal",
+      "Automated care schedule with rain detection"
+    ],
     "author": {
       "@type": "Organization",
       "name": "EDH Dev"
@@ -433,6 +442,9 @@
       </div>
     </div>
   </footer>
+
+  <!-- Form enhancements: character counters + submit loading state -->
+  <script src="{{ url_for('static', filename='js/forms.js') }}"></script>
 
   {% block extra_scripts %}{% endblock %}
 

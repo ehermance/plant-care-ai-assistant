@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} | PlantCareAI{% endblock %}
+
+{% block description %}{{ page.meta_description }}{% endblock %}
+
+{% block og_title %}{{ page.title }} | PlantCareAI{% endblock %}
+{% block og_description %}{{ page.meta_description }}{% endblock %}
+
+{% block twitter_title %}{{ page.title }}{% endblock %}
+{% block twitter_description %}{{ page.meta_description }}{% endblock %}
+
+{% block extra_head %}
+<!-- Article Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": {{ page.title | tojson }},
+  "description": {{ page.meta_description | tojson }},
+  "author": {
+    "@type": "Organization",
+    "name": "PlantCareAI"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "PlantCareAI"
+  },
+  "datePublished": "2026-02-09",
+  "dateModified": "{{ page.last_updated }}"
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<header class="mb-10 text-center max-w-3xl mx-auto">
+  <div class="text-6xl mb-4" aria-hidden="true">{{ page.emoji }}</div>
+  <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+    {{ page.title }}
+  </h1>
+  <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+    {{ page.intro }}
+  </p>
+</header>
+
+<!-- Main Content Sections -->
+<div class="max-w-4xl mx-auto space-y-8">
+  {% for section in page.sections %}
+  <section class="card" id="{{ section.title | lower | replace(' ', '-') | replace('&', 'and') | replace(':', '') | replace('.', '') | truncate(40, false, '') }}">
+    <div class="flex items-start gap-4">
+      <div class="text-3xl flex-shrink-0" aria-hidden="true">{{ section.icon }}</div>
+      <div>
+        <h2 class="section-title">{{ section.title }}</h2>
+        <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+          {{ section.content }}
+        </p>
+      </div>
+    </div>
+  </section>
+  {% endfor %}
+
+  <!-- Related Deep Dives -->
+  {% if spoke_pages %}
+  <section class="card bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/20 dark:to-cyan-900/20 border-2 border-emerald-200 dark:border-emerald-700">
+    <h2 class="section-title">Deep Dive Articles</h2>
+    <p class="text-slate-600 dark:text-slate-400 mb-6">
+      Explore these detailed guides for specific topics covered in this guide:
+    </p>
+    <div class="grid sm:grid-cols-2 gap-4">
+      {% for spoke in spoke_pages %}
+      <a href="{{ url_for('seo.' ~ spoke.route_name) }}"
+         class="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors group">
+        <span class="text-2xl" aria-hidden="true">{{ spoke.emoji }}</span>
+        <span class="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
+          {{ spoke.title }}
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+
+<!-- Bottom CTA -->
+<section class="mt-12 py-10 text-center bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/10 dark:to-cyan-900/10 -mx-4 px-4 rounded-2xl max-w-4xl mx-auto">
+  <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-3">
+    Get Personalized Plant Care Advice
+  </h2>
+  <p class="text-slate-600 dark:text-slate-400 mb-6 max-w-xl mx-auto">
+    PlantCareAI uses your location and local weather to give you advice tailored to your exact situation. No signup required to try.
+  </p>
+  <a href="{{ url_for('web.assistant') }}?question={{ page.cta_question | urlencode }}" class="btn btn-primary btn-lg">
+    {{ page.cta_text }} &rarr;
+  </a>
+</section>
+
+<!-- Bottom Navigation -->
+<nav class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700" aria-label="Related content">
+  <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">More plant care resources:</p>
+  <div class="flex flex-wrap gap-3">
+    <a href="{{ url_for('guides.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
+      Plant Care Guides
+    </a>
+    <span class="text-slate-300 dark:text-slate-600">|</span>
+    <a href="{{ url_for('web.assistant') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
+      AI Plant Assistant
+    </a>
+    <span class="text-slate-300 dark:text-slate-600">|</span>
+    <a href="{{ url_for('pricing.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
+      Features & Pricing
+    </a>
+  </div>
+</nav>
+{% endblock %}

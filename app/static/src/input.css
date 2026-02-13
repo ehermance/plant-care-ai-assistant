@@ -45,6 +45,11 @@
   .skip-link {
     @apply absolute left-0 top-0 -translate-y-full bg-emerald-600 text-white px-4 py-2 rounded-br-lg focus:translate-y-0 z-50 transition-transform;
   }
+
+  /* Prevent anchor targets from scrolling behind sticky header */
+  [id] {
+    scroll-margin-top: 5rem;
+  }
 }
 
 /**
@@ -55,16 +60,12 @@
   /* === CARDS === */
   .card {
     @apply bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700
-           rounded-2xl shadow-lg p-6 transition-all duration-200
-           hover:shadow-xl hover:shadow-emerald-500/5 dark:hover:shadow-emerald-500/10;
+           rounded-2xl shadow-lg p-6;
   }
 
-  .card-glass {
-    @apply bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm
-           border border-slate-200/50 dark:border-slate-700/50
-           rounded-2xl shadow-lg shadow-emerald-500/5 p-6
-           hover:shadow-xl hover:shadow-emerald-500/10
-           transition-all duration-300;
+  .card-interactive {
+    @apply card transition-all duration-200
+           hover:shadow-xl hover:shadow-emerald-500/5 dark:hover:shadow-emerald-500/10;
   }
 
   /* === BUTTONS === */

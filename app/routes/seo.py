@@ -1,8 +1,8 @@
 """
-SEO Landing Pages for high-intent plant care searches.
+SEO content pages for high-intent plant care searches.
 
-Problem-first pages targeting common plant care pain points like
-"why are my plant leaves drooping", "am I overwatering my plant", etc.
+Landing pages target specific pain points ("why are my plant leaves drooping").
+Hub pages are pillar content linking to related landing pages (spoke pages).
 
 Each page:
 - Addresses a specific user pain point
@@ -12,7 +12,7 @@ Each page:
 """
 
 from __future__ import annotations
-from flask import Blueprint, render_template
+from flask import Blueprint, abort, render_template
 from typing import Optional
 from app.utils.data import load_data_file
 
@@ -22,14 +22,26 @@ seo_bp = Blueprint("seo", __name__)
 
 # Load once at import time
 LANDING_PAGES = {page["slug"]: page for page in load_data_file("seo_landing_pages.json")}
+HUB_PAGES = {page["slug"]: page for page in load_data_file("seo_hub_pages.json")}
 
 # Slug to route name mapping for URL generation
 SLUG_TO_ROUTE = {page["slug"]: page["route_name"] for page in LANDING_PAGES.values()}
 
 
-def _get_page(slug: str) -> Optional[dict]:
-    """Get landing page data by slug."""
-    return LANDING_PAGES.get(slug)
+def _get_page(slug: str) -> dict:
+    """Get landing page data by slug, or abort 404."""
+    page = LANDING_PAGES.get(slug)
+    if page is None:
+        abort(404)
+    return page
+
+
+def _get_hub_page(slug: str) -> dict:
+    """Get hub page data by slug, or abort 404."""
+    page = HUB_PAGES.get(slug)
+    if page is None:
+        abort(404)
+    return page
 
 
 def _get_related_pages(slugs: list[str]) -> list[dict]:
@@ -39,6 +51,20 @@ def _get_related_pages(slugs: list[str]) -> list[dict]:
             "slug": slug,
             "title": LANDING_PAGES[slug]["title"],
             "route_name": LANDING_PAGES[slug]["route_name"],
+        }
+        for slug in slugs
+        if slug in LANDING_PAGES
+    ]
+
+
+def _get_spoke_pages(slugs: list[str]) -> list[dict]:
+    """Get landing page data for hub spoke links."""
+    return [
+        {
+            "slug": slug,
+            "title": LANDING_PAGES[slug]["title"],
+            "route_name": LANDING_PAGES[slug]["route_name"],
+            "emoji": LANDING_PAGES[slug]["emoji"],
         }
         for slug in slugs
         if slug in LANDING_PAGES
@@ -107,3 +133,46 @@ def curling_leaves():
     page = _get_page("why-are-my-plant-leaves-curling")
     related = _get_related_pages(page["related_pages"])
     return render_template("seo/landing.html", page=page, related_pages=related)
+
+
+@seo_bp.route("/how-to-get-rid-of-fungus-gnats")
+def fungus_gnats():
+    """How to get rid of fungus gnats landing page."""
+    page = _get_page("how-to-get-rid-of-fungus-gnats")
+    related = _get_related_pages(page["related_pages"])
+    return render_template("seo/landing.html", page=page, related_pages=related)
+
+
+@seo_bp.route("/why-are-my-plant-leaves-turning-brown")
+def brown_leaves():
+    """Why are my plant leaves turning brown? landing page."""
+    page = _get_page("why-are-my-plant-leaves-turning-brown")
+    related = _get_related_pages(page["related_pages"])
+    return render_template("seo/landing.html", page=page, related_pages=related)
+
+
+@seo_bp.route("/how-to-treat-root-rot")
+def root_rot():
+    """How to treat root rot landing page."""
+    page = _get_page("how-to-treat-root-rot")
+    related = _get_related_pages(page["related_pages"])
+    return render_template("seo/landing.html", page=page, related_pages=related)
+
+
+# --- Hub (Pillar) Pages ---
+
+
+@seo_bp.route("/plant-watering-guide")
+def watering_hub():
+    """Complete guide to watering houseplants — hub page."""
+    page = _get_hub_page("plant-watering-guide")
+    spoke_pages = _get_spoke_pages(page["spoke_pages"])
+    return render_template("seo/hub.html", page=page, spoke_pages=spoke_pages)
+
+
+@seo_bp.route("/plant-leaf-problems")
+def leaf_problems_hub():
+    """Plant leaf problems diagnosis & treatment — hub page."""
+    page = _get_hub_page("plant-leaf-problems")
+    spoke_pages = _get_spoke_pages(page["spoke_pages"])
+    return render_template("seo/hub.html", page=page, spoke_pages=spoke_pages)

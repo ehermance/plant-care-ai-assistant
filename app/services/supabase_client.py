@@ -1777,36 +1777,40 @@ def export_user_data(user_id: str) -> Dict[str, Any]:
     if not _supabase_admin:
         return {"error": "Service unavailable"}
 
-    _PROFILE_EXPORT_COLS = "id,email,plan,city,timezone,hemisphere,theme,experience_level,primary_goal,time_commitment,environment_preference,marketing_opt_in,onboarding_completed,created_at,trial_ends_at"
-    _PLANT_EXPORT_COLS = "id,user_id,name,species,description,photo_url,light,watering_frequency,environment,created_at"
-    _REMINDER_EXPORT_COLS = "id,user_id,plant_id,reminder_type,frequency_days,next_due,last_completed,is_active,skip_weather_adjustment,weather_adjusted,weather_adjustment_reason,created_at"
+    _PROFILE_EXPORT_COLS = "id,email,plan,city,timezone,hemisphere,theme_preference,experience_level,primary_goal,time_commitment,environment_preference,marketing_opt_in,onboarding_completed,created_at,trial_ends_at"
+    _PLANT_EXPORT_COLS = "id,user_id,name,species,nickname,location,light,notes,photo_url,current_watering_schedule,initial_health_state,ownership_duration,initial_concerns,created_at,updated_at"
+    _REMINDER_EXPORT_COLS = "id,user_id,plant_id,reminder_type,title,notes,frequency,custom_interval_days,next_due,last_completed_at,is_active,is_recurring,skip_weather_adjustment,weather_adjusted_due,weather_adjustment_reason,created_at"
 
     data: Dict[str, Any] = {"exported_at": datetime.now().isoformat() + "Z"}
 
-    try:
-        # Profile (explicit columns — no internal flags)
-        profile = _supabase_admin.table("profiles").select(_PROFILE_EXPORT_COLS).eq("id", user_id).maybe_single().execute()
-        data["profile"] = profile.data if profile and profile.data else {}
+    def _safe_query(table: str, columns: str, id_col: str = "user_id", fallback=None):
+        """Run a query, returning fallback on 204/empty or error."""
+        if fallback is None:
+            fallback = []
+        try:
+            result = _supabase_admin.table(table).select(columns).eq(id_col, user_id).execute()
+            return result.data if result and result.data else fallback
+        except Exception as e:
+            _safe_log_error(f"Error exporting {table}: {e}")
+            return fallback
 
-        # Plants
-        plants = _supabase_admin.table("plants").select(_PLANT_EXPORT_COLS).eq("user_id", user_id).execute()
-        data["plants"] = plants.data if plants and plants.data else []
+    # Profile (explicit columns — no internal flags)
+    data["profile"] = _safe_query("profiles", _PROFILE_EXPORT_COLS, id_col="id", fallback={})
 
-        # Reminders (all, including inactive)
-        reminders = _supabase_admin.table("reminders").select(_REMINDER_EXPORT_COLS).eq("user_id", user_id).execute()
-        data["reminders"] = reminders.data if reminders and reminders.data else []
+    # Plants
+    data["plants"] = _safe_query("plants", _PLANT_EXPORT_COLS)
 
-        # Journal entries (plant_actions)
-        actions = _supabase_admin.table("plant_actions").select("*").eq("user_id", user_id).execute()
-        data["journal_entries"] = actions.data if actions and actions.data else []
+    # Reminders (all, including inactive)
+    data["reminders"] = _safe_query("reminders", _REMINDER_EXPORT_COLS)
 
-        # Answer feedback
-        feedback = _supabase_admin.table("answer_feedback").select("question,plant,city,care_context,ai_source,rating,created_at").eq("user_id", user_id).execute()
-        data["feedback"] = feedback.data if feedback and feedback.data else []
+    # Journal entries (plant_actions)
+    data["journal_entries"] = _safe_query("plant_actions", "*")
 
-    except Exception as e:
-        _safe_log_error(f"Error exporting user data: {e}")
-        return {"error": "Failed to export data"}
+    # Answer feedback
+    data["feedback"] = _safe_query(
+        "answer_feedback",
+        "question,plant,city,care_context,ai_source,rating,created_at",
+    )
 
     return data
 

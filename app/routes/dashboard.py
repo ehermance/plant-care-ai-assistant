@@ -335,4 +335,4 @@ def delete_account():
     # Clear session and redirect to home
     session.clear()
     flash("Your account and all data have been permanently deleted.", "info")
-    return redirect(url_for("web.home"))
+    return redirect(url_for("web.index"))
