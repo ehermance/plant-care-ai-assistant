@@ -49,18 +49,28 @@
       if (!btn || btn.disabled) return;
 
       btn.disabled = true;
-      btn.setAttribute('data-original-text', btn.innerHTML);
+      // Save original child nodes as clones (avoids innerHTML round-trip via data attribute)
+      btn._savedNodes = Array.from(btn.childNodes).map(function(n) { return n.cloneNode(true); });
+      btn.classList.add('is-loading');
       var loadingText = btn.getAttribute('data-loading-text') || btn.textContent.trim();
-      btn.innerHTML = spinner + loadingText + '\u2026';
+      // Build loading state via DOM APIs (no DOM-text-to-innerHTML conversion)
+      btn.textContent = '';
+      btn.insertAdjacentHTML('afterbegin', spinner);
+      btn.appendChild(document.createTextNode(' ' + loadingText + '\u2026'));
     });
   });
 
   // Restore on bfcache navigation (back/forward) — single listener for all forms
   window.addEventListener('pageshow', function (e) {
     if (e.persisted) {
-      document.querySelectorAll('[data-original-text]').forEach(function (btn) {
+      document.querySelectorAll('.is-loading').forEach(function (btn) {
         btn.disabled = false;
-        btn.innerHTML = btn.getAttribute('data-original-text');
+        btn.textContent = '';
+        if (btn._savedNodes) {
+          btn._savedNodes.forEach(function(n) { btn.appendChild(n); });
+          delete btn._savedNodes;
+        }
+        btn.classList.remove('is-loading');
       });
     }
   });
