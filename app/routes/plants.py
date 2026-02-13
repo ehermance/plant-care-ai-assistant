@@ -402,7 +402,8 @@ def onboarding():
                 )
 
                 if upload_error:
-                    return jsonify({"success": False, "message": f"Photo upload failed: {upload_error}"}), 400
+                    current_app.logger.error(f"Photo upload failed: {upload_error}")
+                    return jsonify({"success": False, "message": "Photo upload failed. Please try again."}), 400
                 elif photo_urls:
                     photo_url = photo_urls['display']
                     photo_url_thumb = photo_urls['thumbnail']

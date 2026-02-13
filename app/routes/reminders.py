@@ -6,7 +6,7 @@ Handles displaying, creating, updating, and completing reminders.
 
 from __future__ import annotations
 from datetime import date
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, current_app, render_template, request, redirect, url_for, flash, jsonify
 from app.utils.auth import require_auth, get_current_user_id
 from app.utils.validation import is_valid_uuid, safe_referrer_or
 from app.services import reminders as reminder_service
@@ -546,9 +546,9 @@ def api_complete(reminder_id):
     if success:
         return jsonify({"success": True, "message": "Reminder completed"})
     else:
-        # Sanitize error messages for security
-        safe_error = error if error else "Failed to complete reminder"
-        return jsonify({"success": False, "error": safe_error}), 400
+        if error:
+            current_app.logger.error(f"Complete reminder failed: {error}")
+        return jsonify({"success": False, "error": "Failed to complete reminder"}), 400
 
 
 @reminders_bp.route("/api/<reminder_id>/adjust", methods=["POST"])
@@ -610,9 +610,9 @@ def api_adjust(reminder_id):
             "message": f"Reminder {action} by {abs(days)} day(s)"
         })
     else:
-        # Sanitize error messages for security
-        safe_error = error if error else "Failed to adjust reminder"
-        return jsonify({"success": False, "error": safe_error}), 400
+        if error:
+            current_app.logger.error(f"Adjust reminder failed: {error}")
+        return jsonify({"success": False, "error": "Failed to adjust reminder"}), 400
 
 
 @reminders_bp.route("/<reminder_id>/toggle-weather", methods=["POST"])

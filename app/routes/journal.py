@@ -268,7 +268,8 @@ def api_quick_log():
         )
 
         if error:
-            return jsonify({"success": False, "error": error}), 400
+            current_app.logger.error(f"Quick-log action failed: {error}")
+            return jsonify({"success": False, "error": "Failed to log action. Please try again."}), 400
 
         # Check for watering streak milestone
         from app.services.marketing_emails import check_watering_streak
