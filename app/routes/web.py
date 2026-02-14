@@ -124,18 +124,16 @@ def clear_history():
 @web_bp.route("/")
 def index():
     """
-    Homepage - redirects based on authentication state:
-    - Authenticated: Dashboard
-    - Unauthenticated: Signup page
+    Homepage - renders based on authentication state:
+    - Authenticated: redirect to Dashboard
+    - Unauthenticated: render public landing page (SEO-indexable)
     """
     from ..utils.auth import get_current_user
 
     if get_current_user():
-        # User is logged in - go to dashboard
         return redirect(url_for("dashboard.index"))
     else:
-        # User not logged in - go to signup
-        return redirect(url_for("auth.signup"))
+        return render_template("home.html")
 
 
 # Read rate string from config at request time (supports env/config changes)
