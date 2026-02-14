@@ -45,7 +45,7 @@ def sitemap():
 
     # Static public pages with priorities and lastmod dates
     pages = [
-        {"loc": "/", "priority": "1.0", "changefreq": "weekly", "lastmod": "2026-01-31"},
+        {"loc": "/", "priority": "1.0", "changefreq": "weekly", "lastmod": "2026-02-13"},
         {"loc": "/ask", "priority": "0.9", "changefreq": "weekly", "lastmod": "2026-01-30"},
         {"loc": "/ai-plant-doctor", "priority": "0.9", "changefreq": "monthly", "lastmod": "2025-12-18"},
         {"loc": "/plant-care-guides/", "priority": "0.8", "changefreq": "weekly", "lastmod": "2026-01-30"},
