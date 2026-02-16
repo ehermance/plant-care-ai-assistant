@@ -6,11 +6,12 @@ Endpoints:
 - /user/theme: Update user theme preferences
 - /user/context: Get user context for AI (plants, reminders, activities)
 - /user/plant/<id>/context: Get detailed context for specific plant
+- /acknowledge-legal: Record user acknowledgment of legal updates
 - /feedback/answer: Submit feedback on AI answers
 """
 
 import uuid
-from flask import Blueprint, request, jsonify, make_response, current_app
+from flask import Blueprint, request, jsonify, make_response, current_app, session
 from ..utils.presets import infer_region_from_latlon, infer_region_from_city, region_presets
 from ..utils.auth import require_auth, get_current_user_id
 from ..utils.errors import sanitize_error, GENERIC_MESSAGES
@@ -233,6 +234,23 @@ def get_plant_context(plant_id: str):
             "success": False,
             "error": sanitized_msg
         }), 500
+
+
+@api_bp.route("/acknowledge-legal", methods=["POST"])
+@require_auth
+@limiter.limit("10 per minute")
+def acknowledge_legal():
+    """Record that the user has acknowledged the latest legal updates."""
+    try:
+        user_id = get_current_user_id()
+        success, error = supabase_client.update_legal_acknowledgment(user_id)
+        if success:
+            session["legal_acknowledged"] = True
+            return jsonify({"success": True})
+        return jsonify({"success": False, "error": GENERIC_MESSAGES["database"]}), 500
+    except Exception as e:
+        sanitized_msg = sanitize_error(e, "database", "Legal acknowledgment failed")
+        return jsonify({"success": False, "error": sanitized_msg}), 500
 
 
 @api_bp.route("/feedback/answer", methods=["POST"])

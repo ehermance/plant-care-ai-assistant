@@ -262,7 +262,9 @@ def inject_auth_context():
         - is_premium: Boolean
         - is_in_trial: Boolean
         - trial_days_remaining: Integer
+        - has_premium_access: Boolean
         - profile: User profile dict or None (includes theme_preference)
+        - show_legal_banner: Boolean (True when user hasn't acknowledged latest legal update)
     """
     user = get_current_user()
     user_id = user.get("id") if user else None
@@ -277,6 +279,7 @@ def inject_auth_context():
             "trial_days_remaining": 0,
             "has_premium_access": False,
             "profile": None,
+            "show_legal_banner": False,
         }
 
     # Fetch profile once (avoids N+1 queries)
@@ -301,6 +304,22 @@ def inject_auth_context():
             except Exception:
                 pass
 
+    # Check if user needs to acknowledge latest legal update
+    show_legal_banner = False
+    if session.get("legal_acknowledged"):
+        show_legal_banner = False
+    elif profile:
+        ack = profile.get("legal_acknowledged_at")
+        if not ack:
+            show_legal_banner = True
+        else:
+            try:
+                from flask import current_app
+                legal_date = current_app.config.get("LEGAL_LAST_UPDATED", "")
+                show_legal_banner = ack[:10] < legal_date
+            except (TypeError, ValueError):
+                show_legal_banner = True
+
     return {
         "current_user": user,
         "is_authenticated": True,
@@ -309,4 +328,5 @@ def inject_auth_context():
         "trial_days_remaining": trial_days_remaining,
         "has_premium_access": is_premium or is_in_trial,
         "profile": profile,
+        "show_legal_banner": show_legal_banner,
     }
