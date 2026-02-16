@@ -458,6 +458,29 @@
     }
   });
 
+  // --- Legal Banner Acknowledgment ---
+  var legalBtn = document.getElementById('legal-acknowledge-btn');
+  if (legalBtn) {
+    legalBtn.addEventListener('click', function() {
+      fetch('/api/v1/acknowledge-legal', {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/json'
+        }
+      }).then(function(response) {
+        return response.json();
+      }).then(function(data) {
+        if (data.success) {
+          var container = document.getElementById('legal-banner-container');
+          if (container) {
+            dismissFlash(container);
+          }
+        }
+      });
+    });
+  }
+
   // --- Form Confirmation Handler (CSP-compliant alternative to onclick confirm) ---
   document.addEventListener('submit', function(e) {
     const form = e.target;

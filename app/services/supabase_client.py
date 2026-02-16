@@ -917,6 +917,38 @@ def update_marketing_preference(
         return False, f"Error updating marketing preference: {str(e)}"
 
 
+def update_legal_acknowledgment(user_id: str) -> tuple[bool, Optional[str]]:
+    """
+    Record that the user has acknowledged the latest legal updates.
+
+    Args:
+        user_id: User's UUID
+
+    Returns:
+        tuple[bool, Optional[str]]: (success, error_message)
+    """
+    if not _supabase_client:
+        return False, "Database not configured"
+
+    try:
+        from datetime import datetime, timezone
+
+        response = (
+            _supabase_client.table("profiles")
+            .update({"legal_acknowledged_at": datetime.now(timezone.utc).isoformat()})
+            .eq("id", user_id)
+            .execute()
+        )
+
+        if response.data:
+            return True, None
+        return False, "Failed to update legal acknowledgment"
+
+    except Exception as e:
+        _safe_log_error(f"Error updating legal acknowledgment: {e}")
+        return False, f"Error updating legal acknowledgment: {str(e)}"
+
+
 def update_user_theme(user_id: str, theme: str) -> tuple[bool, Optional[str]]:
     """
     Update user's theme preference (light, dark, or auto).

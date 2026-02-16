@@ -91,6 +91,10 @@ class BaseConfig:
     WEATHER_AI_INFERENCE_ENABLED = os.getenv("WEATHER_AI_INFERENCE_ENABLED", "true").lower() == "true"
     WEATHER_AI_INFERENCE_CACHE_HOURS = 168  # 1 week cache for AI plant inferences
 
+    # Legal notification — bump this date when ToS/Privacy are materially changed
+    # to re-show the in-app banner for all users.
+    LEGAL_LAST_UPDATED = "2026-02-15"
+
     # Misc
     PREFERRED_URL_SCHEME = os.getenv("PREFERRED_URL_SCHEME", "https")
     SEND_FILE_MAX_AGE_DEFAULT = int(os.getenv("SEND_FILE_MAX_AGE_DEFAULT", "3600"))
