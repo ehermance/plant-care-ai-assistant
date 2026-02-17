@@ -187,11 +187,11 @@ def create_app() -> Flask:
     supabase_domain = app.config.get("SUPABASE_URL", "").replace("https://", "").replace("http://", "")
 
     # Content Security Policy
-    # Note: 'unsafe-inline' is needed for JSON-LD structured data (SEO)
-    # This is safe as JSON-LD scripts are type="application/ld+json" (data, not executable)
+    # JSON-LD scripts (type="application/ld+json") are data blocks, not executable,
+    # so they don't require 'unsafe-inline' in script-src.
     csp = (
         "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; "
+        "script-src 'self' https://static.cloudflareinsights.com; "
         "style-src 'self' 'unsafe-inline'; "  # Allow inline styles (modernization CSS)
         f"img-src 'self' data: https://{supabase_domain}; "
         "font-src 'self'; "

@@ -500,9 +500,5 @@
     }
   });
 
-  // --- Copyright Year ---
-  const copyrightYear = document.getElementById('copyright-year');
-  if (copyrightYear) {
-    copyrightYear.textContent = new Date().getFullYear();
-  }
+  // Footer year handled above in DOMContentLoaded
 })();

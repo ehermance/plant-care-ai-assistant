@@ -42,6 +42,8 @@
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
       <!-- Hidden field to store selected plant ID for AI context -->
       <input type="hidden" id="selected_plant_id" name="selected_plant_id" value="{{ selected_plant_id or '' }}"/>
+      
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Fields marked with <span class="text-rose-500">*</span> are required.</p>
 
       <!-- Plant & City (Two Columns) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
@@ -322,7 +324,7 @@
     <div id="gradient-left"
          class="absolute left-0 top-0 bottom-0 w-4 sm:w-8
                 bg-gradient-to-r from-white via-white/90 to-transparent
-                dark:from-slate-900 dark:via-slate-900/90 dark:to-transparent
+                dark:from-slate-800 dark:via-slate-800/90 dark:to-transparent
                 shadow-[inset_-4px_0_8px_-4px_rgba(0,0,0,0.1)]
                 dark:shadow-[inset_-4px_0_8px_-4px_rgba(0,0,0,0.3)]
                 pointer-events-none z-10 opacity-0 transition-opacity duration-300"
@@ -332,7 +334,7 @@
     <div id="gradient-right"
          class="absolute right-0 top-0 bottom-0 w-4 sm:w-8
                 bg-gradient-to-l from-white via-white/90 to-transparent
-                dark:from-slate-900 dark:via-slate-900/90 dark:to-transparent
+                dark:from-slate-800 dark:via-slate-800/90 dark:to-transparent
                 shadow-[inset_4px_0_8px_-4px_rgba(0,0,0,0.1)]
                 dark:shadow-[inset_4px_0_8px_-4px_rgba(0,0,0,0.3)]
                 pointer-events-none z-10 transition-opacity duration-300"
@@ -344,7 +346,7 @@
          role="region"
          aria-label="Your plants carousel"
          tabindex="0">
-      <div id="user-plants-grid" class="flex gap-3" role="list">
+      <div id="user-plants-grid" class="flex gap-3">
         {% for plant in user_plants %}
         <button type="button"
                 class="plant-select-btn flex flex-col items-center p-2 bg-slate-50 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 flex-shrink-0 w-28"
@@ -352,7 +354,6 @@
                 data-plant-name="{{ plant.name }}"
                 data-plant-species="{{ plant.species or '' }}"
                 data-plant-location="{{ plant.location or 'indoor_potted' }}"
-                role="listitem"
                 aria-label="Select {{ plant.name }}{% if plant.nickname %}, also known as {{ plant.nickname }}{% endif %}">
           {% if plant.photo_url_thumb or plant.photo_url %}
             <img src="{{ plant.photo_url_thumb or plant.photo_url }}" alt="{{ plant.name }}" class="w-16 h-16 object-cover rounded-lg mb-2" loading="lazy" decoding="async">

@@ -27,6 +27,7 @@
 <div class="max-w-2xl">
   <form method="POST" action="{{ url_for('reminders.create') }}" class="card">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Fields marked with <span class="text-rose-500">*</span> are required.</p>
 
     <!-- Plant Selection -->
     <div class="mb-6">
