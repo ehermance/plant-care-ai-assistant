@@ -298,10 +298,24 @@ def assistant():
     if isinstance(hourly, list) and not hourly:
         hourly = None
 
-    # Forecast (best-effort): we will only show 5 future days in the UI (today + 5 = 6 cards)
+    # Forecast (best-effort): today's high/low merged into the Today card,
+    # then up to 5 future days shown as separate cards
     forecast = get_forecast_for_city(city) if city else None
     if isinstance(forecast, list):
-        forecast = forecast[:5]  # enforce exactly +5 days in UI
+        forecast = forecast[:6]  # today + 5 future days
+        # Blend current temp into today's high/low so the card reflects
+        # the full day range, not just remaining future hours
+        if forecast and forecast[0].get("is_today") and weather:
+            cur_c = weather.get("temp_c")
+            if isinstance(cur_c, (int, float)):
+                cur_f = round((cur_c * 9 / 5) + 32, 1)
+                today = forecast[0]
+                if cur_c > today["temp_max_c"]:
+                    today["temp_max_c"] = round(cur_c, 1)
+                    today["temp_max_f"] = cur_f
+                if cur_c < today["temp_min_c"]:
+                    today["temp_min_c"] = round(cur_c, 1)
+                    today["temp_min_f"] = cur_f
 
     # Record history
     _push_history_item({

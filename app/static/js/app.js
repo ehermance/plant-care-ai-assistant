@@ -340,15 +340,9 @@
         }
       }
 
-      // Trap Tab within dropdown — wrap focus to keep it inside
-      if (e.key === 'Tab' && menuItems.length > 0) {
-        if (e.shiftKey && currentIndex <= 0) {
-          e.preventDefault();
-          menuItems[menuItems.length - 1].focus();
-        } else if (!e.shiftKey && currentIndex >= menuItems.length - 1) {
-          e.preventDefault();
-          menuItems[0].focus();
-        }
+      // Tab dismisses menu and returns focus to natural tab order
+      if (e.key === 'Tab') {
+        closeUserMenu();
       }
     });
 
@@ -395,6 +389,22 @@
           mobileMenuPanel.classList.add('hidden');
           mobileMenuBtn.setAttribute('aria-expanded', 'false');
         }
+      }
+    });
+
+    // Tab past last menu item closes the menu
+    mobileMenuPanel.addEventListener('keydown', function(e) {
+      if (e.key !== 'Tab') return;
+      var links = mobileMenuPanel.querySelectorAll('a[href]');
+      if (!links.length) return;
+      var lastLink = links[links.length - 1];
+      var firstLink = links[0];
+      if (!e.shiftKey && document.activeElement === lastLink) {
+        mobileMenuPanel.classList.add('hidden');
+        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+      } else if (e.shiftKey && document.activeElement === firstLink) {
+        mobileMenuPanel.classList.add('hidden');
+        mobileMenuBtn.setAttribute('aria-expanded', 'false');
       }
     });
   }
