@@ -64,7 +64,7 @@
       <!-- Care Context -->
       <div class="mb-6">
         <label for="care_context" class="label">Where is the plant?</label>
-        <select id="care_context" name="care_context" class="input" aria-label="Where is the plant?">
+        <select id="care_context" name="care_context" class="input">
           <option value="indoor_potted"
             {% if (form_values and form_values.care_context == 'indoor_potted') or (not form_values) %}selected{% endif %}>
             Indoor (potted)
