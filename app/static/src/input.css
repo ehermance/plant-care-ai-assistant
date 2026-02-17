@@ -3,9 +3,7 @@
  * Tailwind CSS Entry Point
  */
 
-/* Import Fraunces (headings) and Inter (body) from Google Fonts */
-/* NOTE: @import must be at top of file, before @tailwind directives */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* Google Fonts (Fraunces + Inter) loaded via <link> in base.html to avoid render-blocking @import */
 
 @tailwind base;
 @tailwind components;

@@ -50,8 +50,14 @@
   <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
 
   <!-- Performance hints -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://static.cloudflareinsights.com" crossorigin>
   <link rel="dns-prefetch" href="//static.cloudflareinsights.com">
+
+  <!-- Google Fonts (non-render-blocking) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&display=swap"></noscript>
 
   <!-- Tailwind CSS (Horti-Futuristic Design System) -->
   <link rel="preload" href="{{ url_for('static', filename='css/output.css') }}" as="style">
@@ -367,34 +373,40 @@
       {% if is_authenticated %}
         {# Authenticated users: Dashboard, Assistant, Account #}
         <a href="{{ url_for('dashboard.index') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('dashboard.') and request.endpoint != 'dashboard.account' %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}">
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('dashboard.') and request.endpoint != 'dashboard.account' %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}"
+           {% if request.endpoint and request.endpoint.startswith('dashboard.') and request.endpoint != 'dashboard.account' %}aria-current="page"{% endif %}>
           <span class="text-3xl" aria-hidden="true">🏡</span>
           <span>Dashboard</span>
         </a>
         <a href="{{ url_for('web.assistant') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint == 'web.assistant' %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}">
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint == 'web.assistant' %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}"
+           {% if request.endpoint == 'web.assistant' %}aria-current="page"{% endif %}>
           <span class="text-3xl" aria-hidden="true">💡</span>
           <span>Assistant</span>
         </a>
         <a href="{{ url_for('dashboard.account') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint == 'dashboard.account' %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}">
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint == 'dashboard.account' %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}"
+           {% if request.endpoint == 'dashboard.account' %}aria-current="page"{% endif %}>
           <span class="text-3xl" aria-hidden="true">👤</span>
           <span>Account</span>
         </a>
       {% else %}
         {# Unauthenticated users: Assistant, Guides, Sign Up #}
         <a href="{{ url_for('web.assistant') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint == 'web.assistant' %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}">
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint == 'web.assistant' %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}"
+           {% if request.endpoint == 'web.assistant' %}aria-current="page"{% endif %}>
           <span class="text-3xl" aria-hidden="true">💡</span>
           <span>Assistant</span>
         </a>
         <a href="{{ url_for('guides.index') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('guides.') %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}">
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('guides.') %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}"
+           {% if request.endpoint and request.endpoint.startswith('guides.') %}aria-current="page"{% endif %}>
           <span class="text-2xl" aria-hidden="true">📚</span>
           <span>Guides</span>
         </a>
         <a href="{{ url_for('auth.signup') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('auth.signup') %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}">
+           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('auth.signup') %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}"
+           {% if request.endpoint and request.endpoint.startswith('auth.signup') %}aria-current="page"{% endif %}>
           <span class="text-2xl" aria-hidden="true">🌱</span>
           <span>Sign Up</span>
         </a>
