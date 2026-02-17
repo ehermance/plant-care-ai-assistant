@@ -396,15 +396,29 @@
         </form>
       </div>
 
-      <!-- Hourly forecast -->
-      {% if hourly %}
-      <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
-        Hourly Forecast <span class="text-sm font-normal text-slate-500 dark:text-slate-400">— 3-hour intervals</span>
-      </h3>
-      <div class="mb-6 overflow-x-auto" aria-label="Hourly forecast for the rest of today">
+      <!-- Upcoming hours (Now card + 3-hour intervals, blends today + tomorrow) -->
+      <div class="mb-6 overflow-x-auto" aria-label="Upcoming hourly forecast, 3-hour intervals">
         <div class="flex gap-3 pb-2" role="list">
+          <!-- Now card -->
+          <div class="flex-shrink-0 w-20 text-center p-3 rounded-xl border-2 bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-700" role="listitem" aria-label="Current temperature">
+            <div class="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-2">Now</div>
+            <div class="text-3xl mb-2" aria-hidden="true">{{ weather.emoji or '⛅' }}</div>
+            <div class="text-sm font-semibold text-slate-900 dark:text-slate-100">
+              <span class="only-f">{{ (weather.temp_f is not none) and (weather.temp_f|round(0)|string + '°F') or '—' }}</span>
+              <span class="only-c">{{ (weather.temp_c is not none) and (weather.temp_c|round(0)|string + '°C') or '—' }}</span>
+            </div>
+          </div>
+
+          {% if hourly %}
+          {% set ns = namespace(prev_label='') %}
           {% for h in hourly %}
-            <div class="flex-shrink-0 w-20 text-center p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700" role="listitem" aria-label="{{ h.time }}">
+            {% if h.date_label != ns.prev_label and not loop.first %}
+            <div class="flex-shrink-0 flex items-center px-1" role="separator" aria-label="{{ h.date_label }}">
+              <div class="text-xs font-semibold text-slate-400 dark:text-slate-500 whitespace-nowrap">{{ h.date_label }}</div>
+            </div>
+            {% endif %}
+            {% set ns.prev_label = h.date_label %}
+            <div class="flex-shrink-0 w-20 text-center p-3 rounded-xl border bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700" role="listitem" aria-label="{{ h.time }} ({{ h.date_label }})">
               <div class="text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">{{ h.time }}</div>
               <div class="text-3xl mb-2" aria-hidden="true">{{ h.emoji }}</div>
               <div class="text-sm font-semibold text-slate-900 dark:text-slate-100">
@@ -413,79 +427,47 @@
               </div>
             </div>
           {% endfor %}
+          {% endif %}
         </div>
+      </div>
+
+      <!-- Daily forecast (Today highlighted + future days) -->
+      {% if forecast %}
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        {% for f in forecast %}
+          <div class="p-4 rounded-xl border {{ 'bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/20 dark:to-cyan-900/20 border-2 border-emerald-200 dark:border-emerald-700' if f.is_today else 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700' }}">
+            <div class="flex items-start justify-between mb-3">
+              <div class="text-sm font-bold text-slate-900 dark:text-slate-100">{{ 'Today' if f.is_today else f.day }}</div>
+              <div class="text-4xl" aria-hidden="true">{{ f.emoji or '⛅' }}</div>
+            </div>
+
+            <div class="text-xs text-slate-600 dark:text-slate-400 mb-1">{{ f.date }}</div>
+            <div class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">{{ (f.conditions or 'N/A')|capitalize }}</div>
+
+            <div class="text-sm mb-1">
+              <span class="text-slate-600 dark:text-slate-400">High:</span>
+              <span class="font-semibold text-slate-900 dark:text-slate-100">
+                <span class="only-f">{{ (f.temp_max_f is not none) and (f.temp_max_f|round(0)|string + '°F') or '—' }}</span>
+                <span class="only-c">{{ (f.temp_max_c is not none) and (f.temp_max_c|round(0)|string + '°C') or '—' }}</span>
+              </span>
+            </div>
+            <div class="text-sm mb-2">
+              <span class="text-slate-600 dark:text-slate-400">Low:</span>
+              <span class="font-semibold text-slate-900 dark:text-slate-100">
+                <span class="only-f">{{ (f.temp_min_f is not none) and (f.temp_min_f|round(0)|string + '°F') or '—' }}</span>
+                <span class="only-c">{{ (f.temp_min_c is not none) and (f.temp_min_c|round(0)|string + '°C') or '—' }}</span>
+              </span>
+            </div>
+
+            <div class="text-xs text-slate-500 dark:text-slate-400">
+              Humidity: {{ f.humidity }}% • Wind:
+              <span class="only-f">{{ f.wind_mph }} mph</span>
+              <span class="only-c">{{ (f.wind_mps is not none) and (f.wind_mps|round(1)|string + ' m/s') or '—' }}</span>
+            </div>
+          </div>
+        {% endfor %}
       </div>
       {% endif %}
-
-      <!-- Daily forecast -->
-      <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
-        Daily Forecast <span class="text-sm font-normal text-slate-500 dark:text-slate-400">— Today & next 5 days</span>
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        <!-- Today card -->
-        <div class="p-4 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/20 dark:to-cyan-900/20 rounded-xl border-2 border-emerald-200 dark:border-emerald-700" aria-labelledby="today-title">
-          <div class="flex items-start justify-between mb-3">
-            <div>
-              <div id="today-title" class="text-sm font-bold text-slate-900 dark:text-slate-100">Today</div>
-              <span class="badge badge-emerald mt-1">Now</span>
-            </div>
-            <div class="text-4xl" aria-hidden="true">{{ weather.emoji or '⛅' }}</div>
-          </div>
-
-          <div class="text-xs text-slate-600 dark:text-slate-400 mb-1">{{ today_str }}</div>
-          <div class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">{{ (weather.conditions or 'N/A')|capitalize }}</div>
-
-          <div class="text-sm mb-2">
-            <span class="text-slate-600 dark:text-slate-400">Current:</span>
-            <span class="font-semibold text-slate-900 dark:text-slate-100">
-              <span class="only-f">{{ (weather.temp_f is not none) and (weather.temp_f|round(0)|string + '°F') or '—' }}</span>
-              <span class="only-c">{{ (weather.temp_c is not none) and (weather.temp_c|round(0)|string + '°C') or '—' }}</span>
-            </span>
-          </div>
-
-          <div class="text-xs text-slate-500 dark:text-slate-400">
-            Humidity: {{ weather.humidity }}% • Wind:
-            <span class="only-f">{{ weather.wind_mph }} mph</span>
-            <span class="only-c">{{ (weather.wind_mps is not none) and (weather.wind_mps|round(1)|string + ' m/s') or '—' }}</span>
-          </div>
-        </div>
-
-        <!-- Next 5 days -->
-        {% if forecast %}
-          {% for f in forecast[:5] %}
-            <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-              <div class="flex items-start justify-between mb-3">
-                <div class="text-sm font-bold text-slate-900 dark:text-slate-100">{{ f.day }}</div>
-                <div class="text-4xl" aria-hidden="true">{{ f.emoji or '⛅' }}</div>
-              </div>
-
-              <div class="text-xs text-slate-600 dark:text-slate-400 mb-1">{{ f.date }}</div>
-              <div class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">{{ (f.conditions or 'N/A')|capitalize }}</div>
-
-              <div class="text-sm mb-1">
-                <span class="text-slate-600 dark:text-slate-400">High:</span>
-                <span class="font-semibold text-slate-900 dark:text-slate-100">
-                  <span class="only-f">{{ (f.temp_max_f is not none) and (f.temp_max_f|round(0)|string + '°F') or '—' }}</span>
-                  <span class="only-c">{{ (f.temp_max_c is not none) and (f.temp_max_c|round(0)|string + '°C') or '—' }}</span>
-                </span>
-              </div>
-              <div class="text-sm mb-2">
-                <span class="text-slate-600 dark:text-slate-400">Low:</span>
-                <span class="font-semibold text-slate-900 dark:text-slate-100">
-                  <span class="only-f">{{ (f.temp_min_f is not none) and (f.temp_min_f|round(0)|string + '°F') or '—' }}</span>
-                  <span class="only-c">{{ (f.temp_min_c is not none) and (f.temp_min_c|round(0)|string + '°C') or '—' }}</span>
-                </span>
-              </div>
-
-              <div class="text-xs text-slate-500 dark:text-slate-400">
-                Humidity: {{ f.humidity }}% • Wind:
-                <span class="only-f">{{ f.wind_mph }} mph</span>
-                <span class="only-c">{{ (f.wind_mps is not none) and (f.wind_mps|round(1)|string + ' m/s') or '—' }}</span>
-              </div>
-            </div>
-          {% endfor %}
-        {% endif %}
-      </div>
     </div>
   {% elif form_values and form_values.city %}
     <div class="card">

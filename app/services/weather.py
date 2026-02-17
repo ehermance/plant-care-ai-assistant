@@ -326,6 +326,9 @@ def get_forecast_for_city(city: str | None) -> Optional[List[Dict]]:
         r.raise_for_status()
         data = r.json()
         items = data.get("list") or []
+        now_utc = datetime.now(tz=timezone.utc)
+        today_local = (now_utc + timedelta(seconds=tz_offset)).strftime("%Y-%m-%d")
+
         by_date: dict[str, list[dict]] = defaultdict(list)
         for it in items:
             dt_utc = datetime.fromtimestamp(it["dt"], tz=timezone.utc)
@@ -356,6 +359,7 @@ def get_forecast_for_city(city: str | None) -> Optional[List[Dict]]:
             daily.append({
                 "date": date_str,
                 "day": day,
+                "is_today": date_str == today_local,
                 "temp_min_c": round(tmin_c, 1),
                 "temp_max_c": round(tmax_c, 1),
                 "temp_min_f": round((tmin_c * 9/5) + 32, 1),
@@ -378,10 +382,10 @@ def _fmt_hour_label(dt_local: datetime) -> str:
 
 @ttl_cache()
 def get_hourly_for_city(city: str | None) -> Optional[List[Dict]]:
-    """
-    Return hourly entries:
-      - Remaining hours for today (3-hour steps)
-      - If none remain (end of day), return the first few hours of tomorrow.
+    """Return all upcoming hourly entries (3-hour steps) from the forecast API.
+
+    Each entry includes a ``date_label`` (e.g. "Mon") so the UI can show
+    date-change dividers in the scrollable row.
     """
     if not city:
         return None
@@ -403,13 +407,18 @@ def get_hourly_for_city(city: str | None) -> Optional[List[Dict]]:
 
         now_local = datetime.now(timezone.utc) + timedelta(seconds=tz_offset)
         today_str = now_local.strftime("%Y-%m-%d")
+        tomorrow_str = (now_local + timedelta(days=1)).strftime("%Y-%m-%d")
 
-        today_future = []
-        tomorrow = []
+        upcoming = []
 
         for it in items:
             dt_local = datetime.fromtimestamp(it["dt"], tz=timezone.utc) + timedelta(seconds=tz_offset)
+            if dt_local <= now_local:
+                continue
+
             date_str = dt_local.strftime("%Y-%m-%d")
+            if date_str > tomorrow_str:
+                break
 
             temp_c = it.get("main", {}).get("temp")
             if not isinstance(temp_c, (int, float)):
@@ -419,25 +428,16 @@ def get_hourly_for_city(city: str | None) -> Optional[List[Dict]]:
             wmain = (it.get("weather") or [{}])[0].get("main", "")
             wdesc = (it.get("weather") or [{}])[0].get("description", "")
 
-            entry = {
+            upcoming.append({
                 "time": _fmt_hour_label(dt_local),
                 "temp_c": temp_c,
                 "temp_f": round((temp_c * 9/5) + 32, 1),
                 "emoji": _emoji_for(wid, wmain, wdesc),
-            }
+                "is_tomorrow": date_str == tomorrow_str,
+                "date_label": dt_local.strftime("%a"),
+            })
 
-            if date_str == today_str and dt_local > now_local:
-                today_future.append(entry)
-            elif len(tomorrow) < 8 and date_str != today_str:
-                # collect next day early hours (cap to keep UI tight)
-                tomorrow.append(entry)
-
-        if today_future:
-            return today_future[:8]
-        if tomorrow:
-            return tomorrow[:8]
-
-        return []
+        return upcoming
     except Exception:
         return None
 
