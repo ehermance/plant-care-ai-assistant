@@ -148,7 +148,7 @@
   </a>
 
   <!-- Site Header -->
-  <header class="relative cosmic-header border-b border-purple-700/30 sticky top-0 z-40 shadow-lg shadow-purple-900/50 overflow-visible backdrop-blur-sm" role="banner">
+  <header class="relative cosmic-header border-b border-purple-700/30 sticky top-0 z-40 shadow-lg shadow-purple-900/50 overflow-visible backdrop-blur-sm">
     <div class="container mx-auto px-4 py-3 overflow-visible">
       <div class="flex items-center justify-between gap-3 overflow-visible">
         <!-- Logo & Branding -->
@@ -362,7 +362,7 @@
 
   <!-- Main Content -->
   <div class="container mx-auto px-4 py-8 flex-1">
-    <main id="main" role="main">
+    <main id="main">
       {% block content %}{% endblock %}
     </main>
   </div>
@@ -373,40 +373,46 @@
       {% if is_authenticated %}
         {# Authenticated users: Dashboard, Assistant, Account #}
         <a href="{{ url_for('dashboard.index') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('dashboard.') and request.endpoint != 'dashboard.account' %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}"
+           class="relative flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-all duration-200 {% if request.endpoint and request.endpoint.startswith('dashboard.') and request.endpoint != 'dashboard.account' %}text-amber-300 scale-105{% else %}text-slate-100 hover:text-amber-300 active:scale-95{% endif %}"
            {% if request.endpoint and request.endpoint.startswith('dashboard.') and request.endpoint != 'dashboard.account' %}aria-current="page"{% endif %}>
+          {% if request.endpoint and request.endpoint.startswith('dashboard.') and request.endpoint != 'dashboard.account' %}<span class="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-amber-300 rounded-full"></span>{% endif %}
           <span class="text-3xl" aria-hidden="true">🏡</span>
           <span>Dashboard</span>
         </a>
         <a href="{{ url_for('web.assistant') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint == 'web.assistant' %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}"
+           class="relative flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-all duration-200 {% if request.endpoint == 'web.assistant' %}text-amber-300 scale-105{% else %}text-slate-100 hover:text-amber-300 active:scale-95{% endif %}"
            {% if request.endpoint == 'web.assistant' %}aria-current="page"{% endif %}>
+          {% if request.endpoint == 'web.assistant' %}<span class="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-amber-300 rounded-full"></span>{% endif %}
           <span class="text-3xl" aria-hidden="true">💡</span>
           <span>Assistant</span>
         </a>
         <a href="{{ url_for('dashboard.account') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint == 'dashboard.account' %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}"
+           class="relative flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-all duration-200 {% if request.endpoint == 'dashboard.account' %}text-amber-300 scale-105{% else %}text-slate-100 hover:text-amber-300 active:scale-95{% endif %}"
            {% if request.endpoint == 'dashboard.account' %}aria-current="page"{% endif %}>
+          {% if request.endpoint == 'dashboard.account' %}<span class="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-amber-300 rounded-full"></span>{% endif %}
           <span class="text-3xl" aria-hidden="true">👤</span>
           <span>Account</span>
         </a>
       {% else %}
         {# Unauthenticated users: Assistant, Guides, Sign Up #}
         <a href="{{ url_for('web.assistant') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint == 'web.assistant' %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}"
+           class="relative flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-all duration-200 {% if request.endpoint == 'web.assistant' %}text-amber-300 scale-105{% else %}text-slate-100 hover:text-amber-300 active:scale-95{% endif %}"
            {% if request.endpoint == 'web.assistant' %}aria-current="page"{% endif %}>
+          {% if request.endpoint == 'web.assistant' %}<span class="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-amber-300 rounded-full"></span>{% endif %}
           <span class="text-3xl" aria-hidden="true">💡</span>
           <span>Assistant</span>
         </a>
         <a href="{{ url_for('guides.index') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('guides.') %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}"
+           class="relative flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-all duration-200 {% if request.endpoint and request.endpoint.startswith('guides.') %}text-amber-300 scale-105{% else %}text-slate-100 hover:text-amber-300 active:scale-95{% endif %}"
            {% if request.endpoint and request.endpoint.startswith('guides.') %}aria-current="page"{% endif %}>
+          {% if request.endpoint and request.endpoint.startswith('guides.') %}<span class="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-amber-300 rounded-full"></span>{% endif %}
           <span class="text-2xl" aria-hidden="true">📚</span>
           <span>Guides</span>
         </a>
         <a href="{{ url_for('auth.signup') }}"
-           class="flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-colors {% if request.endpoint and request.endpoint.startswith('auth.signup') %}text-amber-300{% else %}text-slate-100 hover:text-amber-300{% endif %}"
+           class="relative flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-all duration-200 {% if request.endpoint and request.endpoint.startswith('auth.signup') %}text-amber-300 scale-105{% else %}text-slate-100 hover:text-amber-300 active:scale-95{% endif %}"
            {% if request.endpoint and request.endpoint.startswith('auth.signup') %}aria-current="page"{% endif %}>
+          {% if request.endpoint and request.endpoint.startswith('auth.signup') %}<span class="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-amber-300 rounded-full"></span>{% endif %}
           <span class="text-2xl" aria-hidden="true">🌱</span>
           <span>Sign Up</span>
         </a>
@@ -415,7 +421,7 @@
   </nav>
 
   <!-- Footer -->
-  <footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 mt-auto mb-16 md:mb-0" role="contentinfo">
+  <footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 mt-auto mb-16 md:mb-0">
     <div class="container mx-auto px-4 py-6">
       <div class="flex flex-col gap-4 text-sm text-slate-600 dark:text-slate-400">
         <!-- Row 1: Navigation -->
