@@ -192,9 +192,9 @@ def create_app() -> Flask:
     csp = (
         "default-src 'self'; "
         "script-src 'self' https://static.cloudflareinsights.com; "
-        "style-src 'self' 'unsafe-inline'; "  # Allow inline styles (modernization CSS)
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
         f"img-src 'self' data: https://{supabase_domain}; "
-        "font-src 'self'; "
+        "font-src 'self' https://fonts.gstatic.com; "
         f"connect-src 'self' https://cloudflareinsights.com https://static.cloudflareinsights.com https://{supabase_domain}; "
         "object-src 'none'; "
         "base-uri 'self'; "

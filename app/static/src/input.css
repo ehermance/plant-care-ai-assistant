@@ -296,6 +296,24 @@
     @apply animate-pulse bg-slate-200 dark:bg-slate-700 rounded;
   }
 
+  /* === DISCLOSURE (details/summary) === */
+  .disclosure summary {
+    @apply list-none flex items-center justify-between;
+  }
+
+  .disclosure summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .disclosure summary::after {
+    content: '▾';
+    @apply text-slate-400 dark:text-slate-500 transition-transform duration-200 ml-2 flex-shrink-0;
+  }
+
+  .disclosure[open] summary::after {
+    transform: rotate(180deg);
+  }
+
   /* === DIVIDERS === */
   .divider {
     @apply border-t border-slate-200 dark:border-slate-700;
