@@ -151,8 +151,8 @@
     currentPhraseIndex = 0;
     loadingMessage.textContent = plantLoadingPhrases[currentPhraseIndex];
 
-    // Rotate through messages every 2 seconds
-    loadingPhraseInterval = setInterval(rotateLoadingMessage, 2000);
+    // Rotate through messages every 4 seconds (longer interval avoids excessive screen reader announcements)
+    loadingPhraseInterval = setInterval(rotateLoadingMessage, 4000);
   }
 
   function stopLoadingRotation() {

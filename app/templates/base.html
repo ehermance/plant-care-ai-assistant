@@ -55,9 +55,8 @@
   <link rel="preconnect" href="https://static.cloudflareinsights.com" crossorigin>
   <link rel="dns-prefetch" href="//static.cloudflareinsights.com">
 
-  <!-- Google Fonts (non-render-blocking) -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&display=swap"></noscript>
+  <!-- Google Fonts (preconnect hints above minimize latency) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&display=swap">
 
   <!-- Tailwind CSS (Horti-Futuristic Design System) -->
   <link rel="preload" href="{{ url_for('static', filename='css/output.css') }}" as="style">
@@ -170,16 +169,6 @@
           </div>
         </div>
 
-        {% if is_authenticated and profile and profile.get("is_admin", False) %}
-        <!-- Admin Links -->
-        <div class="hidden md:flex justify-end text-right">
-          <a class="{% if request.endpoint and request.endpoint.startswith('admin.') %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %}"
-              href="{{ url_for('admin.index') }}"
-              title="View your admin dashboard with key product metrics and user behavior insights"
-              {% if request.endpoint and request.endpoint.startswith('admin.') %}aria-current="page"{% endif %}>Admin</a>
-        </div>
-        {% endif %}
-
         <!-- Mobile Hamburger Button -->
         <button class="md:hidden p-2 rounded-lg text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors"
                 id="mobile-menu-btn"
@@ -202,6 +191,12 @@
                href="{{ url_for('web.assistant') }}"
                title="Get AI-powered plant care advice"
                {% if request.endpoint == 'web.assistant' %}aria-current="page"{% endif %}>Assistant</a>
+            {% if profile and profile.get("is_admin", False) %}
+            <a class="{% if request.endpoint and request.endpoint.startswith('admin.') %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %}"
+               href="{{ url_for('admin.index') }}"
+               title="Admin dashboard with product metrics"
+               {% if request.endpoint and request.endpoint.startswith('admin.') %}aria-current="page"{% endif %}>Admin</a>
+            {% endif %}
 
             <!-- User Menu Dropdown -->
             <div class="relative">
@@ -393,6 +388,15 @@
           <span class="text-3xl" aria-hidden="true">👤</span>
           <span>Account</span>
         </a>
+        {% if profile and profile.get("is_admin", False) %}
+        <a href="{{ url_for('admin.index') }}"
+           class="relative flex flex-col items-center justify-center flex-1 h-full gap-1 text-sm font-medium transition-all duration-200 {% if request.endpoint and request.endpoint.startswith('admin.') %}text-amber-300 scale-105{% else %}text-slate-100 hover:text-amber-300 active:scale-95{% endif %}"
+           {% if request.endpoint and request.endpoint.startswith('admin.') %}aria-current="page"{% endif %}>
+          {% if request.endpoint and request.endpoint.startswith('admin.') %}<span class="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-amber-300 rounded-full"></span>{% endif %}
+          <span class="text-2xl" aria-hidden="true">⚙️</span>
+          <span>Admin</span>
+        </a>
+        {% endif %}
       {% else %}
         {# Unauthenticated users: Assistant, Guides, Sign Up #}
         <a href="{{ url_for('web.assistant') }}"
