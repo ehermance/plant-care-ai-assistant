@@ -27,6 +27,12 @@ HUB_PAGES = {page["slug"]: page for page in load_data_file("seo_hub_pages.json")
 # Slug to route name mapping for URL generation
 SLUG_TO_ROUTE = {page["slug"]: page["route_name"] for page in LANDING_PAGES.values()}
 
+# Reverse lookup: landing page slug → parent hub page (for breadcrumbs)
+SPOKE_TO_HUB: dict[str, dict] = {}
+for _hub in HUB_PAGES.values():
+    for _spoke_slug in _hub.get("spoke_pages", []):
+        SPOKE_TO_HUB[_spoke_slug] = _hub
+
 
 def _get_page(slug: str) -> dict:
     """Get landing page data by slug, or abort 404."""
@@ -71,92 +77,80 @@ def _get_spoke_pages(slugs: list[str]) -> list[dict]:
     ]
 
 
+def _render_landing(slug: str):
+    """Shared renderer for all landing pages — includes parent hub for breadcrumbs."""
+    page = _get_page(slug)
+    related = _get_related_pages(page["related_pages"])
+    parent_hub = SPOKE_TO_HUB.get(slug)
+    return render_template(
+        "seo/landing.html", page=page, related_pages=related, parent_hub=parent_hub
+    )
+
+
 @seo_bp.route("/why-are-my-plant-leaves-drooping")
 def drooping():
     """Why are my plant leaves drooping? landing page."""
-    page = _get_page("why-are-my-plant-leaves-drooping")
-    related = _get_related_pages(page["related_pages"])
-    return render_template("seo/landing.html", page=page, related_pages=related)
+    return _render_landing("why-are-my-plant-leaves-drooping")
 
 
 @seo_bp.route("/am-i-overwatering-my-plant")
 def overwatering():
     """Am I overwatering my plant? landing page."""
-    page = _get_page("am-i-overwatering-my-plant")
-    related = _get_related_pages(page["related_pages"])
-    return render_template("seo/landing.html", page=page, related_pages=related)
+    return _render_landing("am-i-overwatering-my-plant")
 
 
 @seo_bp.route("/how-often-should-i-water-my-plant")
 def watering_frequency():
     """How often should I water my plant? landing page."""
-    page = _get_page("how-often-should-i-water-my-plant")
-    related = _get_related_pages(page["related_pages"])
-    return render_template("seo/landing.html", page=page, related_pages=related)
+    return _render_landing("how-often-should-i-water-my-plant")
 
 
 @seo_bp.route("/why-are-my-plant-leaves-turning-yellow")
 def yellow_leaves():
     """Why are my plant leaves turning yellow? landing page."""
-    page = _get_page("why-are-my-plant-leaves-turning-yellow")
-    related = _get_related_pages(page["related_pages"])
-    return render_template("seo/landing.html", page=page, related_pages=related)
+    return _render_landing("why-are-my-plant-leaves-turning-yellow")
 
 
 @seo_bp.route("/should-i-water-my-plant-today")
 def water_today():
     """Should I water my plant today? landing page."""
-    page = _get_page("should-i-water-my-plant-today")
-    related = _get_related_pages(page["related_pages"])
-    return render_template("seo/landing.html", page=page, related_pages=related)
+    return _render_landing("should-i-water-my-plant-today")
 
 
 @seo_bp.route("/why-is-my-plant-not-growing")
 def not_growing():
     """Why is my plant not growing? landing page."""
-    page = _get_page("why-is-my-plant-not-growing")
-    related = _get_related_pages(page["related_pages"])
-    return render_template("seo/landing.html", page=page, related_pages=related)
+    return _render_landing("why-is-my-plant-not-growing")
 
 
 @seo_bp.route("/indoor-plant-care-for-beginners")
 def beginners_guide():
     """Indoor plant care for beginners landing page."""
-    page = _get_page("indoor-plant-care-for-beginners")
-    related = _get_related_pages(page["related_pages"])
-    return render_template("seo/landing.html", page=page, related_pages=related)
+    return _render_landing("indoor-plant-care-for-beginners")
 
 
 @seo_bp.route("/why-are-my-plant-leaves-curling")
 def curling_leaves():
     """Why are my plant leaves curling? landing page."""
-    page = _get_page("why-are-my-plant-leaves-curling")
-    related = _get_related_pages(page["related_pages"])
-    return render_template("seo/landing.html", page=page, related_pages=related)
+    return _render_landing("why-are-my-plant-leaves-curling")
 
 
 @seo_bp.route("/how-to-get-rid-of-fungus-gnats")
 def fungus_gnats():
     """How to get rid of fungus gnats landing page."""
-    page = _get_page("how-to-get-rid-of-fungus-gnats")
-    related = _get_related_pages(page["related_pages"])
-    return render_template("seo/landing.html", page=page, related_pages=related)
+    return _render_landing("how-to-get-rid-of-fungus-gnats")
 
 
 @seo_bp.route("/why-are-my-plant-leaves-turning-brown")
 def brown_leaves():
     """Why are my plant leaves turning brown? landing page."""
-    page = _get_page("why-are-my-plant-leaves-turning-brown")
-    related = _get_related_pages(page["related_pages"])
-    return render_template("seo/landing.html", page=page, related_pages=related)
+    return _render_landing("why-are-my-plant-leaves-turning-brown")
 
 
 @seo_bp.route("/how-to-treat-root-rot")
 def root_rot():
     """How to treat root rot landing page."""
-    page = _get_page("how-to-treat-root-rot")
-    related = _get_related_pages(page["related_pages"])
-    return render_template("seo/landing.html", page=page, related_pages=related)
+    return _render_landing("how-to-treat-root-rot")
 
 
 # --- Hub (Pillar) Pages ---
