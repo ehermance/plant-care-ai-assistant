@@ -46,7 +46,7 @@
         ],
         "cta_text": "Get personalized watering advice for your plants",
         "cta_question": "How should I water my plants?",
-        "last_updated": "2026-02-09"
+        "last_updated": "2026-02-21"
     },
     {
         "slug": "plant-leaf-problems",
@@ -96,6 +96,6 @@
         ],
         "cta_text": "Get AI diagnosis for your plant's symptoms",
         "cta_question": "What's wrong with my plant's leaves?",
-        "last_updated": "2026-02-09"
+        "last_updated": "2026-02-21"
     }
 ]
