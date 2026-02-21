@@ -32,7 +32,10 @@
         "cta_text": "Ask PlantCareAI why your plant is drooping",
         "cta_question": "Why is my plant drooping?",
         "related_pages": ["am-i-overwatering-my-plant", "why-are-my-plant-leaves-turning-yellow"],
-        "last_updated": "2026-01-17"
+        "last_updated": "2026-02-21",
+        "quick_answer": "Plant leaves usually droop from underwatering, overwatering, or temperature stress. Check the soil first — if the top 2 inches are dry, water thoroughly.",
+        "h2_causes": "Common Causes of Drooping Plant Leaves",
+        "h2_bottom_line": "The Bottom Line on Drooping Leaves"
     },
     {
         "slug": "am-i-overwatering-my-plant",
@@ -67,7 +70,10 @@
         "cta_text": "Get personalized watering advice for your plant",
         "cta_question": "How often should I water my plant?",
         "related_pages": ["how-often-should-i-water-my-plant", "why-are-my-plant-leaves-drooping"],
-        "last_updated": "2026-01-17"
+        "last_updated": "2026-02-21",
+        "quick_answer": "Signs of overwatering include yellow lower leaves, mushy stems, and soil that stays wet for days. Let the soil dry out between waterings and ensure your pot has drainage.",
+        "h2_causes": "Signs You're Overwatering Your Plant",
+        "h2_bottom_line": "The Bottom Line on Overwatering"
     },
     {
         "slug": "how-often-should-i-water-my-plant",
@@ -102,7 +108,10 @@
         "cta_text": "Get a personalized watering recommendation",
         "cta_question": "When should I water my plant?",
         "related_pages": ["am-i-overwatering-my-plant", "should-i-water-my-plant-today"],
-        "last_updated": "2026-01-17"
+        "last_updated": "2026-02-21",
+        "quick_answer": "Most houseplants need water every 1-2 weeks, but frequency depends on light, humidity, pot size, and season. Always check soil moisture rather than following a fixed schedule.",
+        "h2_causes": "Factors That Affect Watering Frequency",
+        "h2_bottom_line": "The Bottom Line on Watering Frequency"
     },
     {
         "slug": "why-are-my-plant-leaves-turning-yellow",
@@ -137,7 +146,10 @@
         "cta_text": "Ask PlantCareAI to diagnose your yellow leaves",
         "cta_question": "Why are my plant's leaves turning yellow?",
         "related_pages": ["am-i-overwatering-my-plant", "why-are-my-plant-leaves-drooping"],
-        "last_updated": "2026-01-17"
+        "last_updated": "2026-02-21",
+        "quick_answer": "Yellow leaves are most often caused by overwatering or natural aging. If lower leaves yellow and the soil is soggy, reduce watering — if only old leaves yellow, it's normal.",
+        "h2_causes": "Common Causes of Yellow Leaves",
+        "h2_bottom_line": "The Bottom Line on Yellow Leaves"
     },
     {
         "slug": "should-i-water-my-plant-today",
@@ -172,7 +184,10 @@
         "cta_text": "Get a weather-aware watering recommendation",
         "cta_question": "Should I water my plant today?",
         "related_pages": ["how-often-should-i-water-my-plant", "am-i-overwatering-my-plant"],
-        "last_updated": "2026-01-17"
+        "last_updated": "2026-02-21",
+        "quick_answer": "Check the top 1-2 inches of soil with your finger. If it's dry, water thoroughly until it drains from the bottom. If it's still moist, wait another day or two.",
+        "h2_causes": "How to Tell If Your Plant Needs Water",
+        "h2_bottom_line": "The Bottom Line on Watering Today"
     },
     {
         "slug": "why-is-my-plant-not-growing",
@@ -207,7 +222,10 @@
         "cta_text": "Ask PlantCareAI why your plant stopped growing",
         "cta_question": "Why is my plant not growing?",
         "related_pages": ["how-often-should-i-water-my-plant", "why-are-my-plant-leaves-turning-yellow"],
-        "last_updated": "2026-01-30"
+        "last_updated": "2026-02-21",
+        "quick_answer": "Slow or stalled plant growth is usually caused by insufficient light, wrong season (dormancy), or a root-bound pot. Most houseplants naturally slow down in fall and winter.",
+        "h2_causes": "Common Reasons Your Plant Stopped Growing",
+        "h2_bottom_line": "The Bottom Line on Slow Plant Growth"
     },
     {
         "slug": "indoor-plant-care-for-beginners",
@@ -242,7 +260,10 @@
         "cta_text": "Get personalized advice for your first plants",
         "cta_question": "I'm new to plants, what should I know?",
         "related_pages": ["how-often-should-i-water-my-plant", "am-i-overwatering-my-plant"],
-        "last_updated": "2026-01-30"
+        "last_updated": "2026-02-21",
+        "quick_answer": "Start with low-maintenance plants like pothos, snake plants, or ZZ plants. Water only when the top inch of soil is dry, and place plants near bright indirect light.",
+        "h2_causes": "Essential Indoor Plant Care Tips",
+        "h2_bottom_line": "The Bottom Line for New Plant Parents"
     },
     {
         "slug": "why-are-my-plant-leaves-curling",
@@ -277,7 +298,10 @@
         "cta_text": "Ask PlantCareAI to diagnose your curling leaves",
         "cta_question": "Why are my plant's leaves curling?",
         "related_pages": ["why-are-my-plant-leaves-drooping", "why-are-my-plant-leaves-turning-yellow"],
-        "last_updated": "2026-01-30"
+        "last_updated": "2026-02-21",
+        "quick_answer": "Leaf curling is usually a stress response to underwatering, low humidity, or too much direct sun. Check soil moisture and move the plant away from heat sources.",
+        "h2_causes": "Common Causes of Curling Plant Leaves",
+        "h2_bottom_line": "The Bottom Line on Leaf Curling"
     },
     {
         "slug": "how-to-get-rid-of-fungus-gnats",
@@ -316,7 +340,10 @@
         "cta_text": "Ask PlantCareAI about your gnat problem",
         "cta_question": "How do I get rid of fungus gnats on my plants?",
         "related_pages": ["am-i-overwatering-my-plant", "how-often-should-i-water-my-plant"],
-        "last_updated": "2026-02-09"
+        "last_updated": "2026-02-21",
+        "quick_answer": "Fungus gnats breed in moist topsoil. Let the top 2 inches of soil dry between waterings, use yellow sticky traps for adults, and apply a hydrogen peroxide soil drench to kill larvae.",
+        "h2_causes": "How to Identify and Eliminate Fungus Gnats",
+        "h2_bottom_line": "The Bottom Line on Fungus Gnats"
     },
     {
         "slug": "why-are-my-plant-leaves-turning-brown",
@@ -355,7 +382,10 @@
         "cta_text": "Ask PlantCareAI to diagnose your brown leaves",
         "cta_question": "Why are my plant's leaves turning brown?",
         "related_pages": ["why-are-my-plant-leaves-turning-yellow", "why-are-my-plant-leaves-curling"],
-        "last_updated": "2026-02-09"
+        "last_updated": "2026-02-21",
+        "quick_answer": "The pattern of browning reveals the cause: crispy brown edges mean low humidity, brown spots mean overwatering, and dry brown patches mean too much direct sunlight.",
+        "h2_causes": "Common Causes of Brown Leaves on Plants",
+        "h2_bottom_line": "The Bottom Line on Brown Leaves"
     },
     {
         "slug": "how-to-treat-root-rot",
@@ -394,6 +424,9 @@
         "cta_text": "Ask PlantCareAI for help saving your plant",
         "cta_question": "My plant has root rot, how do I save it?",
         "related_pages": ["am-i-overwatering-my-plant", "why-are-my-plant-leaves-turning-yellow"],
-        "last_updated": "2026-02-09"
+        "last_updated": "2026-02-21",
+        "quick_answer": "Root rot is caused by overwatering and poor drainage. To save your plant, remove it from the pot, trim away mushy brown roots, repot in fresh soil, and reduce watering frequency.",
+        "h2_causes": "Steps to Identify and Treat Root Rot",
+        "h2_bottom_line": "The Bottom Line on Root Rot Recovery"
     }
 ]

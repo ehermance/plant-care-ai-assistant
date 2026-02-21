@@ -87,13 +87,25 @@
   </p>
 </header>
 
+<!-- Quick Answer (targets featured snippets) -->
+{% if page.quick_answer %}
+<section class="max-w-3xl mx-auto mb-8" aria-label="Quick answer">
+  <div class="card bg-emerald-50 dark:bg-emerald-900/20 border-l-4 border-emerald-500">
+    <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+      <strong class="text-slate-900 dark:text-slate-100">Quick Answer:</strong>
+      {{ page.quick_answer }}
+    </p>
+  </div>
+</section>
+{% endif %}
+
 <!-- Main Content -->
 <div class="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
   <!-- Causes Section -->
   <div class="lg:col-span-2">
     <section class="card mb-8">
       <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-        Common Causes
+        {{ page.h2_causes | default('Common Causes') }}
       </h2>
       <div class="space-y-6">
         {% for cause in page.causes %}
@@ -117,7 +129,7 @@
     <!-- Bottom Line -->
     <section id="bottom-line" class="card bg-slate-50 dark:bg-slate-800/50 border-l-4 border-emerald-500 scroll-mt-20">
       <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">
-        The Bottom Line
+        {{ page.h2_bottom_line | default('The Bottom Line') }}
       </h2>
       <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
         {{ page.bottom_line }}
@@ -142,7 +154,7 @@
         {% endfor %}
         <li>
           <a href="#bottom-line" class="text-emerald-600 dark:text-emerald-400 hover:underline font-medium">
-            The Bottom Line
+            {{ page.h2_bottom_line | default('The Bottom Line') }}
           </a>
         </li>
       </ol>
@@ -205,22 +217,4 @@
     Try the AI Plant Doctor
   </a>
 </section>
-
-<!-- Breadcrumb at bottom for easy navigation -->
-<nav class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700" aria-label="Related content">
-  <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">More plant care resources:</p>
-  <div class="flex flex-wrap gap-3">
-    <a href="{{ url_for('guides.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
-      Plant Care Guides
-    </a>
-    <span class="text-slate-300 dark:text-slate-600">|</span>
-    <a href="{{ url_for('web.assistant') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
-      AI Plant Assistant
-    </a>
-    <span class="text-slate-300 dark:text-slate-600">|</span>
-    <a href="{{ url_for('pricing.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
-      Features & Pricing
-    </a>
-  </div>
-</nav>
 {% endblock %}

@@ -21,6 +21,18 @@ _SEO_PAGES = load_data_file("seo_landing_pages.json")
 _HUB_PAGES = load_data_file("seo_hub_pages.json")
 _GUIDES = load_data_file("guides.json")
 
+# Sitemap lastmod dates for static pages (not driven by JSON data files).
+# Update these when deploying changes that affect the corresponding page.
+# Legal pages (terms, privacy) are read from config.LEGAL_LAST_UPDATED instead.
+# JSON-driven pages (landing, hub, guides) use their own `last_updated` field.
+STATIC_PAGE_DATES = {
+    "/": "2026-02-21",
+    "/ask": "2026-01-30",
+    "/ai-plant-doctor": "2025-12-18",
+    "/plant-care-guides/": "2026-02-21",
+    "/features/": "2026-01-30",
+}
+
 
 @marketing_bp.route("/ai-plant-doctor")
 def ai_plant_doctor():
@@ -43,16 +55,23 @@ def sitemap():
     # Use configured base URL (not request.url_root to prevent Host header injection)
     base_url = os.getenv("APP_URL", "https://plantcareai.app")
 
-    # Static public pages with priorities and lastmod dates
+    # Static pages — dates from STATIC_PAGE_DATES dict
     pages = [
-        {"loc": "/", "priority": "1.0", "changefreq": "weekly", "lastmod": "2026-02-13"},
-        {"loc": "/ask", "priority": "0.9", "changefreq": "weekly", "lastmod": "2026-01-30"},
-        {"loc": "/ai-plant-doctor", "priority": "0.9", "changefreq": "monthly", "lastmod": "2025-12-18"},
-        {"loc": "/plant-care-guides/", "priority": "0.8", "changefreq": "weekly", "lastmod": "2026-01-30"},
-        {"loc": "/features/", "priority": "0.8", "changefreq": "monthly", "lastmod": "2026-01-30"},
-        {"loc": "/terms", "priority": "0.3", "changefreq": "yearly", "lastmod": "2026-02-09"},
-        {"loc": "/privacy", "priority": "0.3", "changefreq": "yearly", "lastmod": "2026-02-09"},
+        {"loc": loc, "priority": p, "changefreq": cf, "lastmod": STATIC_PAGE_DATES[loc]}
+        for loc, p, cf in [
+            ("/", "1.0", "weekly"),
+            ("/ask", "0.9", "weekly"),
+            ("/ai-plant-doctor", "0.9", "monthly"),
+            ("/plant-care-guides/", "0.8", "weekly"),
+            ("/features/", "0.8", "monthly"),
+        ]
     ]
+    # Legal pages — date synced from LEGAL_LAST_UPDATED config
+    legal_date = current_app.config.get("LEGAL_LAST_UPDATED", "2026-02-15")
+    pages.extend([
+        {"loc": "/terms", "priority": "0.3", "changefreq": "yearly", "lastmod": legal_date},
+        {"loc": "/privacy", "priority": "0.3", "changefreq": "yearly", "lastmod": legal_date},
+    ])
 
     # SEO landing pages (problem-first content pages, from seo_landing_pages.json)
     for page in _SEO_PAGES:
