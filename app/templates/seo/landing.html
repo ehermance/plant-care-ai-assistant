@@ -36,8 +36,9 @@
     "@type": "Organization",
     "name": "PlantCareAI"
   },
-  "datePublished": "{{ page.date_published | default('2026-01-17') }}",
-  "dateModified": "{{ page.date_modified | default('2026-01-30') }}"
+  "image": "{{ url_for('static', filename='images/og/seo-' ~ page.slug ~ '.png', _external=True) }}",
+  "datePublished": "2026-01-17",
+  "dateModified": "{{ page.last_updated }}"
 }
 </script>
 <!-- FAQPage Structured Data -->
@@ -62,6 +63,19 @@
 {% endblock %}
 
 {% block content %}
+{% from "components/breadcrumb.html" import breadcrumb %}
+{% if parent_hub %}
+{{ breadcrumb([
+  {"label": parent_hub.title, "url": url_for('seo.' ~ parent_hub.route_name)},
+  {"label": page.title},
+]) }}
+{% else %}
+{{ breadcrumb([
+  {"label": "Plant Care Guides", "url": url_for('guides.index')},
+  {"label": page.title},
+]) }}
+{% endif %}
+
 <!-- Header -->
 <header class="mb-8 text-center max-w-3xl mx-auto">
   <div class="text-6xl mb-4" aria-hidden="true">{{ page.emoji }}</div>
@@ -83,7 +97,7 @@
       </h2>
       <div class="space-y-6">
         {% for cause in page.causes %}
-        <div class="flex items-start gap-4">
+        <div id="cause-{{ loop.index }}" class="flex items-start gap-4 scroll-mt-20">
           <div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold text-sm">
             {{ loop.index }}
           </div>
@@ -101,7 +115,7 @@
     </section>
 
     <!-- Bottom Line -->
-    <section class="card bg-slate-50 dark:bg-slate-800/50 border-l-4 border-emerald-500">
+    <section id="bottom-line" class="card bg-slate-50 dark:bg-slate-800/50 border-l-4 border-emerald-500 scroll-mt-20">
       <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">
         The Bottom Line
       </h2>
@@ -113,6 +127,27 @@
 
   <!-- Sidebar -->
   <aside class="space-y-6">
+    <!-- Table of Contents -->
+    <nav class="card" aria-label="Table of contents">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-3">
+        On This Page
+      </h3>
+      <ol class="space-y-2 text-sm list-decimal list-inside">
+        {% for cause in page.causes %}
+        <li>
+          <a href="#cause-{{ loop.index }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">
+            {{ cause.title }}
+          </a>
+        </li>
+        {% endfor %}
+        <li>
+          <a href="#bottom-line" class="text-emerald-600 dark:text-emerald-400 hover:underline font-medium">
+            The Bottom Line
+          </a>
+        </li>
+      </ol>
+    </nav>
+
     <!-- Primary CTA -->
     <div class="card bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/20 dark:to-cyan-900/20 border-2 border-emerald-200 dark:border-emerald-700">
       <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">

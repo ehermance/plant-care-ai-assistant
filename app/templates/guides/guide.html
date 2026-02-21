@@ -27,8 +27,8 @@
 {
   "@context": "https://schema.org",
   "@type": "Article",
-  "headline": "{{ guide.name }} Care Guide",
-  "description": "{{ guide.meta_description }}",
+  "headline": {{ (guide.name ~ " Care Guide") | tojson }},
+  "description": {{ guide.meta_description | tojson }},
   "author": {
     "@type": "Organization",
     "name": "PlantCareAI"
@@ -36,7 +36,10 @@
   "publisher": {
     "@type": "Organization",
     "name": "PlantCareAI"
-  }
+  },
+  "image": "{{ url_for('static', filename='images/og/guide-' ~ guide.slug ~ '.png', _external=True) }}",
+  "datePublished": "2025-12-18",
+  "dateModified": "{{ guide.last_updated }}"
 }
 </script>
 <!-- HowTo Structured Data -->
@@ -117,7 +120,7 @@
 <div class="grid lg:grid-cols-3 gap-8">
   <div class="lg:col-span-2 space-y-8">
     <!-- Watering -->
-    <section class="card">
+    <section id="watering" class="card scroll-mt-20">
       <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
         <span aria-hidden="true">💧</span> Watering
       </h2>
@@ -127,7 +130,7 @@
     </section>
 
     <!-- Light -->
-    <section class="card">
+    <section id="light" class="card scroll-mt-20">
       <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
         <span aria-hidden="true">☀️</span> Light Requirements
       </h2>
@@ -137,7 +140,7 @@
     </section>
 
     <!-- Humidity & Temperature -->
-    <section class="card">
+    <section id="humidity" class="card scroll-mt-20">
       <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
         <span aria-hidden="true">🌡️</span> Humidity & Temperature
       </h2>
@@ -147,7 +150,7 @@
     </section>
 
     <!-- Fertilizing -->
-    <section class="card">
+    <section id="fertilizing" class="card scroll-mt-20">
       <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
         <span aria-hidden="true">🧪</span> Fertilizing
       </h2>
@@ -157,7 +160,7 @@
     </section>
 
     <!-- Common Problems -->
-    <section class="card">
+    <section id="common-problems" class="card scroll-mt-20">
       <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
         <span aria-hidden="true">⚠️</span> Common Problems
       </h2>
@@ -174,6 +177,20 @@
 
   <!-- Sidebar -->
   <aside class="space-y-6">
+    <!-- Table of Contents -->
+    <nav class="card" aria-label="Table of contents">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-3">
+        On This Page
+      </h3>
+      <ul class="space-y-2 text-sm">
+        <li><a href="#watering" class="text-emerald-600 dark:text-emerald-400 hover:underline">Watering</a></li>
+        <li><a href="#light" class="text-emerald-600 dark:text-emerald-400 hover:underline">Light Requirements</a></li>
+        <li><a href="#humidity" class="text-emerald-600 dark:text-emerald-400 hover:underline">Humidity & Temperature</a></li>
+        <li><a href="#fertilizing" class="text-emerald-600 dark:text-emerald-400 hover:underline">Fertilizing</a></li>
+        <li><a href="#common-problems" class="text-emerald-600 dark:text-emerald-400 hover:underline">Common Problems</a></li>
+      </ul>
+    </nav>
+
     <!-- Ask AI CTA -->
     <div class="card bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-900/20 dark:to-cyan-900/20 border-2 border-emerald-200 dark:border-emerald-700">
       <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">
