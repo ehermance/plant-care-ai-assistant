@@ -30,16 +30,20 @@
   <meta property="og:url" content="{{ APP_URL }}{{ request.path }}" />
   <meta property="og:title" content="{% block og_title %}PlantCareAI 🌿 Your Smart Plant Assistant{% endblock %}" />
   <meta property="og:description" content="{% block og_description %}Personalized, weather-aware plant care powered by AI. No ads, just greener growth.{% endblock %}" />
+  {% block og_image %}
   <meta property="og:image" content="{{ url_for('static', filename='images/logos/og-preview.png', _external=True) }}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="PlantCareAI - Smart Plant Assistant" />
+  {% endblock %}
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="{% block twitter_title %}PlantCareAI – Smart Plant Assistant{% endblock %}" />
   <meta name="twitter:description" content="{% block twitter_description %}AI-powered plant care reminders and weather-aware guidance.{% endblock %}" />
+  {% block twitter_image %}
   <meta name="twitter:image" content="{{ url_for('static', filename='images/logos/og-preview.png', _external=True) }}" />
   <meta name="twitter:image:alt" content="PlantCareAI - Smart Plant Assistant" />
+  {% endblock %}
 
    <!-- Icons & PWA -->
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/icons/favicon.svg') }}">

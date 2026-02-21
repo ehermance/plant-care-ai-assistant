@@ -7,8 +7,18 @@
 {% block og_title %}{{ page.title }} | PlantCareAI{% endblock %}
 {% block og_description %}{{ page.meta_description }}{% endblock %}
 
+{% block og_image %}
+<meta property="og:image" content="{{ url_for('static', filename='images/og/seo-' ~ page.slug ~ '.png', _external=True) }}" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="{{ page.title }} - PlantCareAI" />
+{% endblock %}
 {% block twitter_title %}{{ page.title }}{% endblock %}
 {% block twitter_description %}{{ page.meta_description }}{% endblock %}
+{% block twitter_image %}
+<meta name="twitter:image" content="{{ url_for('static', filename='images/og/seo-' ~ page.slug ~ '.png', _external=True) }}" />
+<meta name="twitter:image:alt" content="{{ page.title }} - PlantCareAI" />
+{% endblock %}
 
 {% block extra_head %}
 <!-- Article Structured Data for SEO -->

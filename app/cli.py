@@ -5,6 +5,8 @@ Usage:
     flask send-legal-notification                    # Dry run (count users)
     flask send-legal-notification --to you@email.com # Test with one email
     flask send-legal-notification --confirm          # Send to all users
+    flask generate-og-images                         # Generate missing OG images
+    flask generate-og-images --force                 # Regenerate all OG images
 """
 
 from __future__ import annotations
@@ -89,3 +91,79 @@ def send_legal_notification_command(confirm: bool, to: str | None) -> None:
             time.sleep(0.5)
 
     click.echo(f"\nDone. Sent: {sent}, Failed: {failed}, Skipped: {skipped}")
+
+
+@click.command("generate-og-images")
+@click.option("--force", is_flag=True, default=False,
+              help="Regenerate all images even if they already exist.")
+@with_appcontext
+def generate_og_images_command(force: bool) -> None:
+    """Generate OG preview images (1200x630) for all content pages."""
+    from pathlib import Path
+
+    from app.services.og_image import generate_og_image
+    from app.utils.data import load_data_file
+
+    output_dir = Path(__file__).parent / "static" / "images" / "og"
+
+    pages: list[dict[str, str]] = []
+
+    # Plant care guides
+    for guide in load_data_file("guides.json"):
+        pages.append({
+            "filename": f"guide-{guide['slug']}.png",
+            "title": f"{guide['name']} Care Guide",
+            "emoji": guide["emoji"],
+        })
+
+    # SEO landing pages
+    for page in load_data_file("seo_landing_pages.json"):
+        pages.append({
+            "filename": f"seo-{page['slug']}.png",
+            "title": page["title"],
+            "emoji": page["emoji"],
+        })
+
+    # SEO hub pages
+    for page in load_data_file("seo_hub_pages.json"):
+        pages.append({
+            "filename": f"hub-{page['slug']}.png",
+            "title": page["title"],
+            "emoji": page["emoji"],
+        })
+
+    # Static pages
+    pages.extend([
+        {"filename": "home.png", "title": "AI-Powered Plant Care Assistant", "emoji": "🌿"},
+        {"filename": "features.png", "title": "Features & Pricing", "emoji": "✨"},
+        {"filename": "ask.png", "title": "Ask the AI Plant Assistant", "emoji": "🤖"},
+        {"filename": "plant-doctor.png", "title": "AI Plant Doctor", "emoji": "🩺"},
+        {"filename": "guides-index.png", "title": "Plant Care Guides", "emoji": "📚"},
+    ])
+
+    generated = 0
+    skipped = 0
+    failed = 0
+
+    for page_info in pages:
+        # Sanitize filename to prevent path traversal
+        safe_name = Path(page_info["filename"]).name
+        out = output_dir / safe_name
+        if out.exists() and not force:
+            skipped += 1
+            continue
+
+        try:
+            generate_og_image(
+                title=page_info["title"],
+                emoji=page_info["emoji"],
+                output_path=out,
+            )
+            generated += 1
+            click.echo(f"  Generated: {safe_name}")
+        except Exception as e:
+            failed += 1
+            click.echo(f"  FAILED: {safe_name} ({e})")
+
+    click.echo(f"\nDone. Generated: {generated}, Failed: {failed}, Skipped (exists): {skipped}")
+    click.echo(f"Output: {output_dir}")
