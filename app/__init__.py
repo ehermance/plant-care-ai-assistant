@@ -314,8 +314,9 @@ def create_app() -> Flask:
             app.logger.warning(f"[Scheduler] Failed to initialize weather adjustment scheduler: {e}")
 
     # Register CLI commands
-    from app.cli import send_legal_notification_command
+    from app.cli import generate_og_images_command, send_legal_notification_command
     app.cli.add_command(send_legal_notification_command)
+    app.cli.add_command(generate_og_images_command)
 
     return app
 

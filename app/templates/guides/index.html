@@ -7,8 +7,18 @@
 {% block og_title %}Plant Care Guides - How to Care for Popular Houseplants{% endblock %}
 {% block og_description %}Detailed care guides for the most popular houseplants. Get tips on watering, light requirements, humidity, and troubleshooting common problems.{% endblock %}
 
+{% block og_image %}
+<meta property="og:image" content="{{ url_for('static', filename='images/og/guides-index.png', _external=True) }}" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Plant Care Guides - PlantCareAI" />
+{% endblock %}
 {% block twitter_title %}Plant Care Guides | PlantCareAI{% endblock %}
 {% block twitter_description %}Learn how to care for popular houseplants with our free guides.{% endblock %}
+{% block twitter_image %}
+<meta name="twitter:image" content="{{ url_for('static', filename='images/og/guides-index.png', _external=True) }}" />
+<meta name="twitter:image:alt" content="Plant Care Guides - PlantCareAI" />
+{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
