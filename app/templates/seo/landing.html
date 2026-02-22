@@ -47,13 +47,20 @@
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
+    {% set all_faqs = [] %}
     {% for cause in page.causes %}
+      {% set _ = all_faqs.append({"q": cause.title, "a": cause.description}) %}
+    {% endfor %}
+    {% for faq in page.faqs | default([]) %}
+      {% set _ = all_faqs.append({"q": faq.question, "a": faq.answer}) %}
+    {% endfor %}
+    {% for item in all_faqs %}
     {
       "@type": "Question",
-      "name": {{ cause.title | tojson }},
+      "name": {{ item.q | tojson }},
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": {{ cause.description | tojson }}
+        "text": {{ item.a | tojson }}
       }
     }{% if not loop.last %},{% endif %}
     {% endfor %}
@@ -107,23 +114,23 @@
       <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">
         {{ page.h2_causes | default('Common Causes') }}
       </h2>
-      <div class="space-y-6">
+      <ol class="space-y-6 list-none pl-0 m-0">
         {% for cause in page.causes %}
-        <div id="cause-{{ loop.index }}" class="flex items-start gap-4 scroll-mt-20">
-          <div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold text-sm">
+        <li id="cause-{{ loop.index }}" class="flex items-start gap-4 scroll-mt-20">
+          <div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold text-sm" aria-hidden="true">
             {{ loop.index }}
           </div>
           <div>
-            <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
+            <h3 class="font-bold text-slate-900 dark:text-slate-100 mb-1">
               {{ cause.title }}
             </h3>
             <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
               {{ cause.description }}
             </p>
           </div>
-        </div>
+        </li>
         {% endfor %}
-      </div>
+      </ol>
     </section>
 
     <!-- Bottom Line -->
