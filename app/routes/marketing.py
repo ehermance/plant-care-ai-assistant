@@ -56,16 +56,27 @@ def sitemap():
     base_url = os.getenv("APP_URL", "https://plantcareai.app")
 
     # Static pages — dates from STATIC_PAGE_DATES dict
-    pages = [
-        {"loc": loc, "priority": p, "changefreq": cf, "lastmod": STATIC_PAGE_DATES[loc]}
-        for loc, p, cf in [
-            ("/", "1.0", "weekly"),
-            ("/ask", "0.9", "weekly"),
-            ("/ai-plant-doctor", "0.9", "monthly"),
-            ("/plant-care-guides/", "0.8", "weekly"),
-            ("/features/", "0.8", "monthly"),
-        ]
-    ]
+    # OG image filenames for static pages that have unique images
+    _STATIC_IMAGES = {
+        "/": "home.png",
+        "/ask": "ask.png",
+        "/ai-plant-doctor": "plant-doctor.png",
+        "/plant-care-guides/": "guides-index.png",
+        "/features/": "features.png",
+    }
+    pages = []
+    for loc, p, cf in [
+        ("/", "1.0", "weekly"),
+        ("/ask", "0.9", "weekly"),
+        ("/ai-plant-doctor", "0.9", "monthly"),
+        ("/plant-care-guides/", "0.8", "weekly"),
+        ("/features/", "0.8", "monthly"),
+    ]:
+        entry = {"loc": loc, "priority": p, "changefreq": cf, "lastmod": STATIC_PAGE_DATES[loc]}
+        if loc in _STATIC_IMAGES:
+            entry["image"] = f"{base_url}/static/images/og/{_STATIC_IMAGES[loc]}"
+            entry["image_title"] = "PlantCareAI"
+        pages.append(entry)
     # Legal pages — date synced from LEGAL_LAST_UPDATED config
     legal_date = current_app.config.get("LEGAL_LAST_UPDATED", "2026-02-15")
     pages.extend([
@@ -80,6 +91,8 @@ def sitemap():
             "priority": "0.8",
             "changefreq": "monthly",
             "lastmod": page.get("last_updated", "2026-01-30"),
+            "image": f"{base_url}/static/images/og/seo-{page['slug']}.png",
+            "image_title": page.get("title", ""),
         })
 
     # SEO hub/pillar pages (from seo_hub_pages.json)
@@ -89,6 +102,8 @@ def sitemap():
             "priority": "0.9",
             "changefreq": "monthly",
             "lastmod": page.get("last_updated", "2026-02-09"),
+            "image": f"{base_url}/static/images/og/hub-{page['slug']}.png",
+            "image_title": page.get("title", ""),
         })
 
     # Individual guide pages (from guides.json)
@@ -99,11 +114,14 @@ def sitemap():
                 "priority": "0.7",
                 "changefreq": "monthly",
                 "lastmod": guide.get("last_updated", "2025-12-18"),
+                "image": f"{base_url}/static/images/og/guide-{guide['slug']}.png",
+                "image_title": f"{guide.get('name', '')} Care Guide",
             })
 
-    # Build XML
+    # Build XML (with image sitemap extension)
     xml_content = '<?xml version="1.0" encoding="UTF-8"?>\n'
-    xml_content += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    xml_content += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
+    xml_content += ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n'
 
     for page in pages:
         xml_content += "  <url>\n"
@@ -111,6 +129,11 @@ def sitemap():
         xml_content += f"    <lastmod>{escape(page['lastmod'])}</lastmod>\n"
         xml_content += f"    <changefreq>{escape(page['changefreq'])}</changefreq>\n"
         xml_content += f"    <priority>{escape(page['priority'])}</priority>\n"
+        if "image" in page:
+            xml_content += "    <image:image>\n"
+            xml_content += f"      <image:loc>{escape(page['image'])}</image:loc>\n"
+            xml_content += f"      <image:title>{escape(page['image_title'])}</image:title>\n"
+            xml_content += "    </image:image>\n"
         xml_content += "  </url>\n"
 
     xml_content += "</urlset>"

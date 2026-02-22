@@ -28,6 +28,20 @@
                 "description": "If roots are circling the pot with nowhere to grow, the plant can't absorb enough water or nutrients. Time for a bigger home."
             }
         ],
+        "faqs": [
+            {
+                "question": "Can drooping leaves recover?",
+                "answer": "Yes, most plants perk up within a few hours of watering if underwatering is the cause. Recovery from overwatering or root rot takes longer."
+            },
+            {
+                "question": "Should I cut off drooping leaves?",
+                "answer": "Only if they've turned yellow or brown. Healthy drooping leaves will usually recover once you fix the underlying issue."
+            },
+            {
+                "question": "Why is my plant drooping after repotting?",
+                "answer": "Transplant shock is normal. Keep soil lightly moist, avoid direct sun for a week, and your plant should recover within a few days."
+            }
+        ],
         "bottom_line": "Drooping can mean many things\u2014from a simple need for water to something more serious like root rot. The key is checking soil moisture first, then investigating other factors.",
         "cta_text": "Ask PlantCareAI why your plant is drooping",
         "cta_question": "Why is my plant drooping?",
@@ -64,6 +78,20 @@
             {
                 "title": "Mold on soil surface",
                 "description": "White fuzzy growth on top of your soil means it's staying too wet for too long. Good airflow and less frequent watering can help."
+            }
+        ],
+        "faqs": [
+            {
+                "question": "Can an overwatered plant be saved?",
+                "answer": "Yes — stop watering, let the soil dry out completely, and check for root rot. Trim mushy roots and repot in fresh soil if needed."
+            },
+            {
+                "question": "How long does it take for an overwatered plant to recover?",
+                "answer": "Most plants recover within 1-2 weeks after correcting watering habits, provided root rot hasn't set in."
+            },
+            {
+                "question": "Should I repot an overwatered plant?",
+                "answer": "Only if you suspect root rot. Otherwise, just let the soil dry out completely before watering again."
             }
         ],
         "bottom_line": "Most plants prefer to dry out somewhat between waterings. When in doubt, stick your finger 2 inches into the soil\u2014if it's still moist, wait a few more days.",
@@ -104,6 +132,20 @@
                 "description": "Terracotta dries faster than plastic. Well-draining soil dries faster than dense soil. Bigger pots hold moisture longer than small ones."
             }
         ],
+        "faqs": [
+            {
+                "question": "Do plants need more water in summer?",
+                "answer": "Yes, most houseplants need more frequent watering during spring and summer when they're actively growing and temperatures are higher."
+            },
+            {
+                "question": "Should I water plants on a schedule?",
+                "answer": "No — check soil moisture instead. Conditions change with weather, season, and environment, so a fixed schedule often leads to overwatering or underwatering."
+            },
+            {
+                "question": "Is it better to underwater or overwater?",
+                "answer": "Underwatering is safer. Most plants recover faster from short drought than from waterlogged roots, which can cause irreversible root rot."
+            }
+        ],
         "bottom_line": "There's no magic number. The best watering schedule is the one that responds to your plant's actual needs\u2014which change with light, temperature, humidity, and season.",
         "cta_text": "Get a personalized watering recommendation",
         "cta_question": "When should I water my plant?",
@@ -140,6 +182,20 @@
             {
                 "title": "Too much direct sun",
                 "description": "Some plants get \"sunburned.\" If yellow patches appear on leaves facing a window, your plant might be getting too much intense light."
+            }
+        ],
+        "faqs": [
+            {
+                "question": "Should I remove yellow leaves from my plant?",
+                "answer": "Yes — yellow leaves won't turn green again. Removing them lets the plant redirect energy to healthy new growth."
+            },
+            {
+                "question": "Can yellow leaves turn green again?",
+                "answer": "No. Once a leaf has turned yellow, the chlorophyll is gone and it won't recover. It's best to remove it."
+            },
+            {
+                "question": "Is one yellow leaf on my plant normal?",
+                "answer": "Yes — occasional yellowing of older lower leaves is natural leaf turnover and not a cause for concern."
             }
         ],
         "bottom_line": "Yellow leaves rarely mean immediate doom. Start by checking your watering habits\u2014that's the cause in most cases. If watering seems fine, consider light, nutrients, and natural leaf turnover.",
@@ -180,6 +236,20 @@
                 "description": "In winter, most plants slow down and need less water. In summer, they may need water twice as often. Adjust your expectations with the seasons."
             }
         ],
+        "faqs": [
+            {
+                "question": "What time of day is best to water plants?",
+                "answer": "Morning is ideal — it gives leaves time to dry and roots time to absorb moisture before cooler nighttime temperatures."
+            },
+            {
+                "question": "Can I use tap water for my plants?",
+                "answer": "Yes, most plants tolerate tap water fine. Sensitive species like calatheas and dracaenas prefer filtered or distilled water."
+            },
+            {
+                "question": "How do I know if I'm overwatering?",
+                "answer": "If soil stays wet for more than a week, leaves yellow, or you see fungus gnats hovering near the soil, you're likely watering too often."
+            }
+        ],
         "bottom_line": "When in doubt, wait. Most plants recover better from slight underwatering than from overwatering. If the soil is dry and the plant looks thirsty, go ahead and water thoroughly.",
         "cta_text": "Get a weather-aware watering recommendation",
         "cta_question": "Should I water my plant today?",
@@ -216,6 +286,20 @@
             {
                 "title": "Watering issues",
                 "description": "Both overwatering and underwatering stress roots and stall growth. Consistent, appropriate watering lets your plant focus energy on new leaves instead of survival."
+            }
+        ],
+        "faqs": [
+            {
+                "question": "Is it normal for plants not to grow in winter?",
+                "answer": "Yes — most houseplants enter dormancy in fall and winter, slowing or pausing growth until spring when light increases."
+            },
+            {
+                "question": "How can I make my plant grow faster?",
+                "answer": "Increase light, ensure proper watering, fertilize during the growing season, and check if the plant is root-bound and needs repotting."
+            },
+            {
+                "question": "Why is my new plant not growing?",
+                "answer": "New plants often pause growth while adjusting to their new environment. Give them 2-4 weeks to acclimate before worrying."
             }
         ],
         "bottom_line": "Patience is the most underrated plant care skill. If your plant looks healthy but isn't growing, check the season, light, and pot size first. Growth often picks up once one of these is addressed.",
@@ -256,6 +340,20 @@
                 "description": "Your plant communicates through its leaves. Yellowing? Possibly overwatered. Drooping? Might need water. Brown tips? Could be low humidity. Pay attention and you'll learn to read the signals."
             }
         ],
+        "faqs": [
+            {
+                "question": "What is the easiest houseplant to keep alive?",
+                "answer": "Pothos and snake plants are widely considered the most forgiving — they tolerate low light and irregular watering."
+            },
+            {
+                "question": "How often should beginners water their plants?",
+                "answer": "Check soil moisture every few days and water only when the top inch feels dry. Avoid watering on a fixed schedule."
+            },
+            {
+                "question": "Do indoor plants need direct sunlight?",
+                "answer": "Most houseplants prefer bright indirect light. Direct sun can burn leaves on many common species like pothos and peace lilies."
+            }
+        ],
         "bottom_line": "Plant care isn't about perfection\u2014it's about paying attention. Start with easy plants, water when the soil tells you to, give them decent light, and you'll be surprised how well they do.",
         "cta_text": "Get personalized advice for your first plants",
         "cta_question": "I'm new to plants, what should I know?",
@@ -292,6 +390,20 @@
             {
                 "title": "Pests",
                 "description": "Aphids, thrips, and spider mites feed on plant sap, causing leaves to curl and distort. Check the undersides of leaves and along stems for tiny insects or webbing."
+            }
+        ],
+        "faqs": [
+            {
+                "question": "Can curling leaves uncurl?",
+                "answer": "Yes — once you fix the underlying issue (usually watering or humidity), most leaves will unfurl within a few days."
+            },
+            {
+                "question": "Why are my leaves curling and turning brown?",
+                "answer": "This combination usually indicates underwatering or very low humidity. Increase watering frequency and consider using a humidifier."
+            },
+            {
+                "question": "Do pests cause leaves to curl?",
+                "answer": "Yes — aphids, thrips, and spider mites can cause leaf curling and distortion. Check leaf undersides for tiny insects or webbing."
             }
         ],
         "bottom_line": "Leaf curling is your plant's stress response\u2014not a death sentence. Start by checking moisture and humidity levels, then investigate light and pests. Most plants bounce back quickly once the cause is addressed.",
@@ -336,6 +448,20 @@
                 "description": "If the infestation is severe, repot your plant in fresh sterile potting mix with perlite for better drainage. Discard the old soil outside\u2014don't compost it indoors."
             }
         ],
+        "faqs": [
+            {
+                "question": "Are fungus gnats harmful to plants?",
+                "answer": "Adult gnats are mostly harmless, but their larvae can damage young roots and seedlings in large numbers."
+            },
+            {
+                "question": "How long does it take to get rid of fungus gnats?",
+                "answer": "With consistent treatment — drying soil, sticky traps, and soil drenches — most infestations clear up in 2-3 weeks."
+            },
+            {
+                "question": "Does cinnamon kill fungus gnats?",
+                "answer": "Cinnamon has mild antifungal properties and can deter gnats when sprinkled on topsoil, but it's not as effective as drying the soil or using BTI."
+            }
+        ],
         "bottom_line": "Fungus gnats are a moisture problem in disguise. Fix your watering habits, trap the adults, and treat the soil\u2014and they'll be gone within 2-3 weeks. Prevention is simple: never let soil stay constantly soggy.",
         "cta_text": "Ask PlantCareAI about your gnat problem",
         "cta_question": "How do I get rid of fungus gnats on my plants?",
@@ -378,6 +504,20 @@
                 "description": "Too much fertilizer causes salt buildup that burns roots and leaf tips. If you see brown tips after fertilizing, flush the soil with plenty of water and reduce your feeding schedule."
             }
         ],
+        "faqs": [
+            {
+                "question": "Should I cut off brown leaves?",
+                "answer": "Yes — fully brown leaves won't recover. Trim brown tips with clean scissors, cutting just inside the brown area to keep the plant tidy."
+            },
+            {
+                "question": "Why are only the tips of my leaves turning brown?",
+                "answer": "Brown leaf tips usually indicate low humidity, mineral buildup from tap water, or inconsistent watering."
+            },
+            {
+                "question": "Can brown leaves turn green again?",
+                "answer": "No — once leaf tissue has died and turned brown, it cannot regenerate. Remove damaged portions to keep the plant healthy-looking."
+            }
+        ],
         "bottom_line": "The pattern of browning is your biggest clue: edges mean humidity, spots mean water issues, patches mean light damage, and tips mean water quality. Identify the pattern first, then fix the cause.",
         "cta_text": "Ask PlantCareAI to diagnose your brown leaves",
         "cta_question": "Why are my plant's leaves turning brown?",
@@ -418,6 +558,20 @@
             {
                 "title": "Adjust your watering going forward",
                 "description": "Root rot is almost always caused by overwatering or poor drainage. After repotting, wait 2-3 days before watering lightly. Then adopt the \u201cfinger test\u201d: only water when the top 1-2 inches of soil are dry."
+            }
+        ],
+        "faqs": [
+            {
+                "question": "How do I know if my plant has root rot?",
+                "answer": "Mushy brown roots, a foul smell from the soil, wilting despite moist soil, and yellowing leaves are the main signs of root rot."
+            },
+            {
+                "question": "Can a plant survive root rot?",
+                "answer": "Yes, if caught early. Remove rotting roots, treat with hydrogen peroxide, repot in fresh well-draining soil, and adjust your watering."
+            },
+            {
+                "question": "What causes root rot in houseplants?",
+                "answer": "Overwatering combined with poor drainage is the primary cause. Roots suffocate in waterlogged soil, allowing fungal infection to take hold."
             }
         ],
         "bottom_line": "Root rot is serious but survivable if caught early. The key steps: remove, trim, treat, repot, and fix your watering habits. Prevention is easier than cure\u2014always use pots with drainage holes and never let plants sit in standing water.",

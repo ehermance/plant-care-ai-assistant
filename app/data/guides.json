@@ -27,6 +27,18 @@
       "Clean leaves monthly to remove dust",
       "Rotate plant quarterly for even growth",
       "Propagate easily from stem cuttings"
+    ],
+    "howto": {
+      "totalTime": "PT15M",
+      "supplies": ["Well-draining potting mix", "Moss pole or trellis", "Balanced liquid fertilizer"],
+      "tools": ["Watering can", "Spray bottle for misting", "Clean cloth for leaf wiping"]
+    },
+    "care_table": [
+      {"aspect": "Watering", "requirement": "When top 2\u2033 dry", "frequency": "Weekly (summer), every 10-14 days (winter)"},
+      {"aspect": "Light", "requirement": "Bright indirect", "frequency": "6+ hours daily"},
+      {"aspect": "Humidity", "requirement": "60%+ ideal", "frequency": "Mist 2-3 times weekly if dry"},
+      {"aspect": "Fertilizing", "requirement": "Balanced liquid, half strength", "frequency": "Monthly (spring-fall)"},
+      {"aspect": "Repotting", "requirement": "When root-bound", "frequency": "Every 1-2 years"}
     ]
   },
   {
@@ -57,6 +69,18 @@
       "Root cuttings easily in water",
       "Excellent air purifier",
       "Safe alternative: Peperomia if you have pets"
+    ],
+    "howto": {
+      "totalTime": "PT10M",
+      "supplies": ["Well-draining potting mix", "Balanced liquid fertilizer"],
+      "tools": ["Watering can", "Pruning shears"]
+    },
+    "care_table": [
+      {"aspect": "Watering", "requirement": "When top 1\u2033 dry", "frequency": "Weekly"},
+      {"aspect": "Light", "requirement": "Low to bright indirect", "frequency": "Adapts to any"},
+      {"aspect": "Humidity", "requirement": "Average home humidity", "frequency": "No misting needed"},
+      {"aspect": "Fertilizing", "requirement": "Balanced liquid, half strength", "frequency": "Monthly (spring-summer)"},
+      {"aspect": "Repotting", "requirement": "When root-bound", "frequency": "Every 1-2 years"}
     ]
   },
   {
@@ -87,6 +111,18 @@
       "Propagate by leaf cuttings or division",
       "Tolerates neglect better than most plants",
       "NASA-studied air purifier"
+    ],
+    "howto": {
+      "totalTime": "PT10M",
+      "supplies": ["Cactus or succulent potting mix", "Diluted balanced fertilizer"],
+      "tools": ["Watering can"]
+    },
+    "care_table": [
+      {"aspect": "Watering", "requirement": "When soil completely dry", "frequency": "Every 2-3 weeks (summer), monthly (winter)"},
+      {"aspect": "Light", "requirement": "Low to bright indirect", "frequency": "Adapts to any"},
+      {"aspect": "Humidity", "requirement": "Low — no extra needed", "frequency": "No misting needed"},
+      {"aspect": "Fertilizing", "requirement": "Diluted balanced fertilizer", "frequency": "2-3 times per growing season"},
+      {"aspect": "Repotting", "requirement": "When root-bound", "frequency": "Every 2-3 years"}
     ]
   },
   {
@@ -117,6 +153,18 @@
       "Stake or support young plants",
       "Don't move frequently – they hate change",
       "Prune to encourage branching"
+    ],
+    "howto": {
+      "totalTime": "PT20M",
+      "supplies": ["Well-draining potting mix", "Fiddle leaf fig fertilizer", "Plant stake or support"],
+      "tools": ["Watering can", "Clean cloth for leaf wiping", "Moisture meter"]
+    },
+    "care_table": [
+      {"aspect": "Watering", "requirement": "When top 2\u2033 dry", "frequency": "Weekly"},
+      {"aspect": "Light", "requirement": "Bright indirect, 6+ hrs", "frequency": "Daily, consistent location"},
+      {"aspect": "Humidity", "requirement": "30-65%", "frequency": "Mist if edges brown"},
+      {"aspect": "Fertilizing", "requirement": "FLF or balanced 3-1-2 fertilizer", "frequency": "Monthly (spring-summer)"},
+      {"aspect": "Repotting", "requirement": "When root-bound", "frequency": "Every 1-2 years"}
     ]
   },
   {
@@ -147,6 +195,18 @@
       "Remove spent blooms to encourage more",
       "Excellent bathroom plant",
       "Mildly toxic to pets if ingested"
+    ],
+    "howto": {
+      "totalTime": "PT15M",
+      "supplies": ["Well-draining potting mix", "Balanced liquid fertilizer", "Filtered or distilled water"],
+      "tools": ["Watering can", "Spray bottle for misting", "Pruning shears"]
+    },
+    "care_table": [
+      {"aspect": "Watering", "requirement": "When top 1\u2033 dry, use filtered water", "frequency": "Weekly"},
+      {"aspect": "Light", "requirement": "Low to medium indirect", "frequency": "Tolerates low light"},
+      {"aspect": "Humidity", "requirement": "50%+ ideal", "frequency": "Mist or use pebble tray"},
+      {"aspect": "Fertilizing", "requirement": "Balanced liquid, half strength", "frequency": "Monthly (spring-summer)"},
+      {"aspect": "Repotting", "requirement": "When root-bound (blooms more)", "frequency": "Every 1-2 years"}
     ]
   },
   {
@@ -177,6 +237,18 @@
       "Great hanging basket plant",
       "NASA-approved air purifier",
       "Safe for pets"
+    ],
+    "howto": {
+      "totalTime": "PT10M",
+      "supplies": ["Well-draining potting mix", "Balanced liquid fertilizer", "Filtered water"],
+      "tools": ["Watering can", "Pruning shears"]
+    },
+    "care_table": [
+      {"aspect": "Watering", "requirement": "When top 1\u2033 dry, use filtered water", "frequency": "Weekly"},
+      {"aspect": "Light", "requirement": "Bright indirect", "frequency": "4-6 hours daily"},
+      {"aspect": "Humidity", "requirement": "Average home humidity", "frequency": "No special needs"},
+      {"aspect": "Fertilizing", "requirement": "Balanced liquid, half strength", "frequency": "Monthly (spring-summer)"},
+      {"aspect": "Repotting", "requirement": "When root-bound", "frequency": "Every 1-2 years"}
     ]
   },
   {
@@ -207,6 +279,18 @@
       "Propagate by leaf or stem cuttings (patience required)",
       "Excellent office plant",
       "Wash hands after handling – sap can irritate skin"
+    ],
+    "howto": {
+      "totalTime": "PT10M",
+      "supplies": ["Cactus or succulent potting mix", "Diluted balanced fertilizer"],
+      "tools": ["Watering can"]
+    },
+    "care_table": [
+      {"aspect": "Watering", "requirement": "When soil completely dry", "frequency": "Every 2-3 weeks (summer), monthly (winter)"},
+      {"aspect": "Light", "requirement": "Low to bright indirect", "frequency": "Adapts to any"},
+      {"aspect": "Humidity", "requirement": "Low — no extra needed", "frequency": "No misting needed"},
+      {"aspect": "Fertilizing", "requirement": "Diluted balanced fertilizer", "frequency": "2-3 times per growing season"},
+      {"aspect": "Repotting", "requirement": "When root-bound", "frequency": "Every 2-3 years"}
     ]
   },
   {
@@ -237,6 +321,18 @@
       "Propagate easily from stem cuttings",
       "Prune to encourage bushier growth",
       "Toxic to pets – keep out of reach"
+    ],
+    "howto": {
+      "totalTime": "PT15M",
+      "supplies": ["Well-draining potting mix", "Balanced liquid fertilizer", "Moss pole for climbing types"],
+      "tools": ["Watering can", "Pruning shears", "Spray bottle for misting"]
+    },
+    "care_table": [
+      {"aspect": "Watering", "requirement": "When top 1\u2033 dry", "frequency": "Weekly"},
+      {"aspect": "Light", "requirement": "Medium to bright indirect", "frequency": "4-6 hours daily"},
+      {"aspect": "Humidity", "requirement": "50%+ ideal", "frequency": "Mist if edges brown"},
+      {"aspect": "Fertilizing", "requirement": "Balanced liquid fertilizer", "frequency": "Monthly (spring-summer)"},
+      {"aspect": "Repotting", "requirement": "When root-bound", "frequency": "Every 1-2 years"}
     ]
   },
   {
@@ -267,6 +363,18 @@
       "Prune to control height and encourage branching",
       "Rotate regularly for even growth",
       "Sap can irritate skin – wash hands after pruning"
+    ],
+    "howto": {
+      "totalTime": "PT15M",
+      "supplies": ["Well-draining potting mix", "Balanced liquid fertilizer"],
+      "tools": ["Watering can", "Clean cloth for leaf wiping", "Pruning shears"]
+    },
+    "care_table": [
+      {"aspect": "Watering", "requirement": "When top 2\u2033 dry", "frequency": "Every 1-2 weeks"},
+      {"aspect": "Light", "requirement": "Bright indirect", "frequency": "6+ hours daily"},
+      {"aspect": "Humidity", "requirement": "Average home humidity", "frequency": "No special needs"},
+      {"aspect": "Fertilizing", "requirement": "Balanced liquid fertilizer", "frequency": "Monthly (spring-summer)"},
+      {"aspect": "Repotting", "requirement": "When root-bound", "frequency": "Every 1-2 years"}
     ]
   },
   {
@@ -297,6 +405,18 @@
       "Propagate pups when they're 3-4 inches tall",
       "Use terracotta pots for better drainage",
       "Let cut ends callous before using gel"
+    ],
+    "howto": {
+      "totalTime": "PT10M",
+      "supplies": ["Cactus or succulent potting mix", "Succulent fertilizer", "Terracotta pot with drainage"],
+      "tools": ["Watering can", "Clean sharp knife for gel harvesting"]
+    },
+    "care_table": [
+      {"aspect": "Watering", "requirement": "When soil completely dry", "frequency": "Every 2-3 weeks (summer), monthly (winter)"},
+      {"aspect": "Light", "requirement": "Bright indirect to direct", "frequency": "6+ hours daily"},
+      {"aspect": "Humidity", "requirement": "Low — no extra needed", "frequency": "No misting needed"},
+      {"aspect": "Fertilizing", "requirement": "Succulent fertilizer", "frequency": "2-3 times per growing season"},
+      {"aspect": "Repotting", "requirement": "When root-bound or crowded by pups", "frequency": "Every 2-3 years"}
     ]
   }
 ]

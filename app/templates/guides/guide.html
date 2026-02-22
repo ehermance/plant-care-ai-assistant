@@ -47,23 +47,43 @@
 {
   "@context": "https://schema.org",
   "@type": "HowTo",
-  "name": "How to Care for {{ guide.name }}",
-  "description": "{{ guide.summary }}",
+  "name": {{ ("How to Care for " ~ guide.name) | tojson }},
+  "description": {{ guide.summary | tojson }},
+  "totalTime": {{ guide.howto.totalTime | tojson }},
+  "supply": [
+    {% for supply in guide.howto.supplies %}
+    { "@type": "HowToSupply", "name": {{ supply | tojson }} }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ],
+  "tool": [
+    {% for tool in guide.howto.tools %}
+    { "@type": "HowToTool", "name": {{ tool | tojson }} }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ],
   "step": [
     {
       "@type": "HowToStep",
+      "position": 1,
       "name": "Watering",
-      "text": "{{ guide.watering }}"
+      "text": {{ guide.watering | tojson }}
     },
     {
       "@type": "HowToStep",
+      "position": 2,
       "name": "Light Requirements",
-      "text": "{{ guide.light_details }}"
+      "text": {{ guide.light_details | tojson }}
     },
     {
       "@type": "HowToStep",
+      "position": 3,
       "name": "Humidity & Temperature",
-      "text": "{{ guide.humidity }}"
+      "text": {{ guide.humidity | tojson }}
+    },
+    {
+      "@type": "HowToStep",
+      "position": 4,
+      "name": "Fertilizing",
+      "text": {{ guide.fertilizing | tojson }}
     }
   ]
 }
@@ -115,6 +135,33 @@
     <div class="font-semibold text-slate-900 dark:text-slate-100">{{ guide.difficulty }}</div>
   </div>
 </section>
+
+<!-- Quick Care Reference Table -->
+{% if guide.care_table %}
+<section class="mb-8">
+  <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">Quick Care Reference</h2>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm text-left border-collapse">
+      <thead>
+        <tr class="border-b-2 border-slate-200 dark:border-slate-700">
+          <th scope="col" class="py-3 pr-4 font-semibold text-slate-900 dark:text-slate-100">Care Aspect</th>
+          <th scope="col" class="py-3 pr-4 font-semibold text-slate-900 dark:text-slate-100">Requirement</th>
+          <th scope="col" class="py-3 font-semibold text-slate-900 dark:text-slate-100">Frequency</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in guide.care_table %}
+        <tr class="border-b border-slate-100 dark:border-slate-800">
+          <td class="py-3 pr-4 font-medium text-slate-900 dark:text-slate-100">{{ row.aspect }}</td>
+          <td class="py-3 pr-4 text-slate-600 dark:text-slate-400">{{ row.requirement }}</td>
+          <td class="py-3 text-slate-600 dark:text-slate-400">{{ row.frequency }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
 
 <!-- Care Details -->
 <div class="grid lg:grid-cols-3 gap-8">
