@@ -38,7 +38,7 @@
     "name": "PlantCareAI"
   },
   "image": "{{ url_for('static', filename='images/og/guide-' ~ guide.slug ~ '.png', _external=True) }}",
-  "datePublished": "2025-12-18",
+  "datePublished": "{{ guide.last_updated }}",
   "dateModified": "{{ guide.last_updated }}"
 }
 </script>
@@ -84,7 +84,13 @@
       "position": 4,
       "name": "Fertilizing",
       "text": {{ guide.fertilizing | tojson }}
-    }
+    }{% if guide.propagation %},
+    {
+      "@type": "HowToStep",
+      "position": 5,
+      "name": "Propagation",
+      "text": {{ guide.propagation.intro | tojson }}
+    }{% endif %}
   ]
 }
 </script>
@@ -206,7 +212,119 @@
       </p>
     </section>
 
-    <!-- Common Problems -->
+    <!-- Propagation -->
+    {% if guide.propagation %}
+    <section id="propagation" class="card scroll-mt-20">
+      <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+        <span aria-hidden="true">✂️</span> Propagation
+      </h2>
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+        {{ guide.propagation.intro }}
+      </p>
+      {% for method in guide.propagation.methods %}
+      <div class="{% if not loop.first %}mt-6{% endif %}">
+        <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">{{ method.name }}</h3>
+        <ol class="list-decimal list-inside space-y-1 text-slate-600 dark:text-slate-400">
+          {% for step in method.steps %}
+          <li>{{ step }}</li>
+          {% endfor %}
+        </ol>
+      </div>
+      {% endfor %}
+      <div class="flex flex-wrap gap-3 mt-4">
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
+          Best time: {{ guide.propagation.best_time }}
+        </span>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300">
+          Difficulty: {{ guide.propagation.difficulty }}
+        </span>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Varieties & Cultivars -->
+    {% if guide.varieties %}
+    <section id="varieties" class="card scroll-mt-20">
+      <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+        <span aria-hidden="true">🌱</span> Popular Varieties
+      </h2>
+      <div class="grid sm:grid-cols-2 gap-4">
+        {% for variety in guide.varieties %}
+        <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+          <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">{{ variety.name }}</h3>
+          {% if variety.also_known_as %}
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-2 italic">Also known as: {{ variety.also_known_as }}</p>
+          {% endif %}
+          <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">{{ variety.description }}</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
+              {{ variety.light_needs }}
+            </span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+              {{ variety.difficulty }}
+            </span>
+          </div>
+          {% if variety.special_note %}
+          <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-2">{{ variety.special_note }}</p>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Seasonal Care Calendar -->
+    {% if guide.care_calendar %}
+    <section id="care-calendar" class="card scroll-mt-20">
+      <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+        <span aria-hidden="true">📅</span> Seasonal Care Calendar
+      </h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {% for season in guide.care_calendar %}
+        <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+          <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">{{ season.season }}</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">{{ season.months }}</p>
+          <ul class="space-y-1 text-sm text-slate-600 dark:text-slate-400">
+            {% for task in season.tasks %}
+            <li class="flex items-start gap-1.5">
+              <span class="text-emerald-500 mt-0.5" aria-hidden="true">•</span>
+              <span>{{ task }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Troubleshooting (replaces Common Problems when present) -->
+    {% if guide.troubleshooting %}
+    <section id="troubleshooting" class="card scroll-mt-20">
+      <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+        <span aria-hidden="true">🔍</span> Troubleshooting
+      </h2>
+      <div class="space-y-6">
+        {% for item in guide.troubleshooting %}
+        <div class="{% if not loop.first %}border-t border-slate-200 dark:border-slate-700 pt-6{% endif %}">
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">{{ item.symptom }}</h3>
+          <p class="text-slate-600 dark:text-slate-400 mb-2">
+            <span class="font-medium text-slate-700 dark:text-slate-300">Why it happens:</span> {{ item.causes }}
+          </p>
+          <p class="text-slate-600 dark:text-slate-400">
+            <span class="font-medium text-slate-700 dark:text-slate-300">What to do:</span> {{ item.fix }}
+          </p>
+          {% if item.landing_page_slug %}
+          <a href="/{{ item.landing_page_slug }}" class="inline-flex items-center gap-1 text-sm text-emerald-600 dark:text-emerald-400 hover:underline mt-2">
+            Learn more: {{ item.landing_page_title }} →
+          </a>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% elif guide.common_problems %}
+    <!-- Fallback: Common Problems (for guides not yet expanded) -->
     <section id="common-problems" class="card scroll-mt-20">
       <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
         <span aria-hidden="true">⚠️</span> Common Problems
@@ -220,6 +338,7 @@
         {% endfor %}
       </ul>
     </section>
+    {% endif %}
   </div>
 
   <!-- Sidebar -->
@@ -234,7 +353,20 @@
         <li><a href="#light" class="text-emerald-600 dark:text-emerald-400 hover:underline">Light Requirements</a></li>
         <li><a href="#humidity" class="text-emerald-600 dark:text-emerald-400 hover:underline">Humidity & Temperature</a></li>
         <li><a href="#fertilizing" class="text-emerald-600 dark:text-emerald-400 hover:underline">Fertilizing</a></li>
+        {% if guide.propagation %}
+        <li><a href="#propagation" class="text-emerald-600 dark:text-emerald-400 hover:underline">Propagation</a></li>
+        {% endif %}
+        {% if guide.varieties %}
+        <li><a href="#varieties" class="text-emerald-600 dark:text-emerald-400 hover:underline">Popular Varieties</a></li>
+        {% endif %}
+        {% if guide.care_calendar %}
+        <li><a href="#care-calendar" class="text-emerald-600 dark:text-emerald-400 hover:underline">Seasonal Care</a></li>
+        {% endif %}
+        {% if guide.troubleshooting %}
+        <li><a href="#troubleshooting" class="text-emerald-600 dark:text-emerald-400 hover:underline">Troubleshooting</a></li>
+        {% elif guide.common_problems %}
         <li><a href="#common-problems" class="text-emerald-600 dark:text-emerald-400 hover:underline">Common Problems</a></li>
+        {% endif %}
       </ul>
     </nav>
 
@@ -266,6 +398,27 @@
         {% endfor %}
       </ul>
     </div>
+
+    <!-- Related Articles -->
+    {% if guide.troubleshooting %}
+    {% set related = guide.troubleshooting | selectattr('landing_page_slug') | list %}
+    {% if related %}
+    <div class="card">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-3">
+        Related Articles
+      </h3>
+      <ul class="space-y-2 text-sm">
+        {% for item in related %}
+        <li>
+          <a href="/{{ item.landing_page_slug }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">
+            {{ item.landing_page_title }}
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    {% endif %}
 
     <!-- Related Guides -->
     <div class="card">
