@@ -37,8 +37,8 @@
     "name": "PlantCareAI"
   },
   "image": "{{ url_for('static', filename='images/og/hub-' ~ page.slug ~ '.png', _external=True) }}",
-  "datePublished": "2026-02-09",
-  "dateModified": "{{ page.last_updated }}"
+  "datePublished": "{{ page.last_updated }}T00:00:00+00:00",
+  "dateModified": "{{ page.last_updated }}T00:00:00+00:00"
 }
 </script>
 {% endblock %}

@@ -37,8 +37,8 @@
     "name": "PlantCareAI"
   },
   "image": "{{ url_for('static', filename='images/og/seo-' ~ page.slug ~ '.png', _external=True) }}",
-  "datePublished": "2026-01-17",
-  "dateModified": "{{ page.last_updated }}"
+  "datePublished": "{{ page.last_updated }}T00:00:00+00:00",
+  "dateModified": "{{ page.last_updated }}T00:00:00+00:00"
 }
 </script>
 <!-- FAQPage Structured Data -->
@@ -127,11 +127,73 @@
             <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
               {{ cause.description }}
             </p>
+            {% if cause.fix %}
+            <p class="text-slate-700 dark:text-slate-200 leading-relaxed mt-2">
+              <strong class="text-emerald-600 dark:text-emerald-400">How to fix it:</strong>
+              {{ cause.fix }}
+            </p>
+            {% endif %}
           </div>
         </li>
         {% endfor %}
       </ol>
     </section>
+
+    <!-- Comparison Table -->
+    {% if page.comparison_table %}
+    <section id="comparison" class="card mb-8 scroll-mt-20">
+      <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+        {{ page.comparison_table.title }}
+      </h2>
+      {% if page.comparison_table.intro %}
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+        {{ page.comparison_table.intro }}
+      </p>
+      {% endif %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead>
+            <tr class="border-b border-slate-200 dark:border-slate-700">
+              {% for header in page.comparison_table.headers %}
+              <th class="py-3 px-4 font-semibold text-slate-900 dark:text-slate-100">{{ header }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in page.comparison_table.rows %}
+            <tr class="border-b border-slate-100 dark:border-slate-800">
+              {% for cell in row %}
+              <td class="py-3 px-4 text-slate-600 dark:text-slate-400">{{ cell }}</td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Related Plant Care Guides -->
+    {% if page.related_guides %}
+    <section id="related-guides" class="card mb-8 scroll-mt-20">
+      <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+        Plant-Specific Guides
+      </h2>
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+        For care advice tailored to your specific plant, check out these guides:
+      </p>
+      <ul class="grid sm:grid-cols-2 gap-2">
+        {% for guide in page.related_guides %}
+        <li>
+          <a href="{{ url_for('guides.view', slug=guide.slug) }}"
+             class="text-emerald-600 dark:text-emerald-400 hover:underline">
+            {{ guide.name }} Care Guide &rarr;
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
 
     <!-- Bottom Line -->
     <section id="bottom-line" class="card bg-slate-50 dark:bg-slate-800/50 border-l-4 border-emerald-500 scroll-mt-20">
@@ -159,6 +221,20 @@
           </a>
         </li>
         {% endfor %}
+        {% if page.comparison_table %}
+        <li>
+          <a href="#comparison" class="text-emerald-600 dark:text-emerald-400 hover:underline">
+            {{ page.comparison_table.title }}
+          </a>
+        </li>
+        {% endif %}
+        {% if page.related_guides %}
+        <li>
+          <a href="#related-guides" class="text-emerald-600 dark:text-emerald-400 hover:underline">
+            Plant-Specific Guides
+          </a>
+        </li>
+        {% endif %}
         <li>
           <a href="#bottom-line" class="text-emerald-600 dark:text-emerald-400 hover:underline font-medium">
             {{ page.h2_bottom_line | default('The Bottom Line') }}
