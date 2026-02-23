@@ -38,8 +38,8 @@
     "name": "PlantCareAI"
   },
   "image": "{{ url_for('static', filename='images/og/guide-' ~ guide.slug ~ '.png', _external=True) }}",
-  "datePublished": "{{ guide.last_updated }}",
-  "dateModified": "{{ guide.last_updated }}"
+  "datePublished": "{{ guide.last_updated }}T00:00:00+00:00",
+  "dateModified": "{{ guide.last_updated }}T00:00:00+00:00"
 }
 </script>
 <!-- HowTo Structured Data -->
