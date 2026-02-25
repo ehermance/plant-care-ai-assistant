@@ -7,7 +7,7 @@
   'use strict';
 
   // Only initialize on mobile
-  if (window.innerWidth > 768) return;
+  if (window.innerWidth >= 1024) return;
 
   let lastScrollTop = 0;
   let ticking = false;
@@ -80,7 +80,7 @@
 
   // Re-check on window resize
   window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) {
+    if (window.innerWidth >= 1024) {
       // Desktop view - remove any hidden class
       const bottomNav = document.querySelector('.bottom-nav');
       if (bottomNav) {

@@ -437,9 +437,10 @@
         <strong class="text-slate-900 dark:text-slate-100">Log Out</strong>
         <p class="text-sm text-slate-500 dark:text-slate-400">Sign out of your account on this device.</p>
       </div>
-      <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary flex-shrink-0">
-        Log Out
-      </a>
+      <form method="POST" action="{{ url_for('auth.logout') }}" class="flex-shrink-0">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-secondary">Log Out</button>
+      </form>
     </div>
 
     <!-- Export Data -->

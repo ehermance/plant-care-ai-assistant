@@ -715,7 +715,7 @@ def update_user_timezone(user_id: str, timezone: str) -> tuple[bool, Optional[st
 
     except Exception as e:
         _safe_log_error(f"Error updating user timezone: {e}")
-        return False, f"Error updating timezone: {str(e)}"
+        return False, "Error updating timezone. Please try again later."
 
 
 # ============================================================================
@@ -865,7 +865,7 @@ def update_user_city(user_id: str, city: str) -> tuple[bool, Optional[str]]:
 
     except Exception as e:
         _safe_log_error(f"Error updating user city: {e}")
-        return False, f"Error updating city: {str(e)}"
+        return False, "Error updating city. Please try again later."
 
 
 def update_marketing_preference(
@@ -914,7 +914,7 @@ def update_marketing_preference(
 
     except Exception as e:
         _safe_log_error(f"Error updating marketing preference: {e}")
-        return False, f"Error updating marketing preference: {str(e)}"
+        return False, "Error updating marketing preference. Please try again later."
 
 
 def update_legal_acknowledgment(user_id: str) -> tuple[bool, Optional[str]]:
@@ -946,7 +946,7 @@ def update_legal_acknowledgment(user_id: str) -> tuple[bool, Optional[str]]:
 
     except Exception as e:
         _safe_log_error(f"Error updating legal acknowledgment: {e}")
-        return False, f"Error updating legal acknowledgment: {str(e)}"
+        return False, "Error updating legal acknowledgment. Please try again later."
 
 
 def update_user_theme(user_id: str, theme: str) -> tuple[bool, Optional[str]]:
@@ -985,7 +985,7 @@ def update_user_theme(user_id: str, theme: str) -> tuple[bool, Optional[str]]:
 
     except Exception as e:
         _safe_log_error(f"Error updating user theme: {e}")
-        return False, f"Error updating theme: {str(e)}"
+        return False, "Error updating theme. Please try again later."
 
 
 def update_user_preferences(
@@ -1056,7 +1056,7 @@ def update_user_preferences(
 
     except Exception as e:
         _safe_log_error(f"Error updating user preferences: {e}")
-        return False, f"Error updating preferences: {str(e)}"
+        return False, "Error updating preferences. Please try again later."
 
 
 def has_preferences_configured(user_id: str) -> bool:
@@ -1177,7 +1177,7 @@ def update_hemisphere_preference(
 
     except Exception as e:
         _safe_log_error(f"Error updating hemisphere preference: {e}")
-        return False, f"Error updating hemisphere: {str(e)}"
+        return False, "Error updating hemisphere. Please try again later."
 
 
 def is_premium(user_id: str) -> bool:
@@ -1715,7 +1715,7 @@ def upload_plant_photo_versions(file_bytes: bytes, user_id: str, filename: str) 
         return urls, None  # Success - return URLs and no error
 
     except Exception as e:
-        error_msg = f"Upload failed: {str(e)}"
+        error_msg = "Upload failed. Please try again later."
         _safe_log_error(f"Error uploading plant photo versions: {e}")
         return None, error_msg
 

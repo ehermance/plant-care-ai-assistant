@@ -166,7 +166,7 @@
           <div class="min-w-0">
             <a href="{{ url_for('web.index') }}" aria-label="PlantCareAI Home Banner" class="block">
               <div class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-emerald-400 via-lime-300 to-amber-300 bg-clip-text text-transparent drop-shadow-lg">
-                PlantCareAI <span aria-hidden="true" class="hidden sm:inline md:hidden lg:inline whitespace-nowrap">🪴 🌱 🌵</span>
+                PlantCareAI <span aria-hidden="true" class="hidden sm:inline whitespace-nowrap">🪴 🌱 🌵</span>
               </div>
               <p class="text-xs sm:text-sm text-amber-200/80">{% block subtitle %}Your plants deserve to thrive. <span class="whitespace-nowrap">We'll show you how.</span>{% endblock %}</p>
             </a>
@@ -174,7 +174,7 @@
         </div>
 
         <!-- Mobile Hamburger Button -->
-        <button class="md:hidden p-2 rounded-lg text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors"
+        <button class="lg:hidden p-2 rounded-lg text-slate-100 hover:text-amber-300 hover:bg-purple-900/30 transition-colors"
                 id="mobile-menu-btn"
                 aria-expanded="false"
                 aria-controls="mobile-menu-panel"
@@ -185,7 +185,7 @@
         </button>
 
         <!-- Desktop Navigation -->
-        <nav class="hidden md:flex items-center gap-3 overflow-visible" aria-label="Main navigation">
+        <nav class="hidden lg:flex items-center gap-3 overflow-visible" aria-label="Main navigation">
           {% if is_authenticated %}
             <a class="{% if request.endpoint and request.endpoint.startswith('dashboard.') %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %}"
                href="{{ url_for('dashboard.index') }}"
@@ -222,11 +222,14 @@
                    class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-emerald-600 dark:hover:text-emerald-400">
                   Account Settings
                 </a>
-                <a href="{{ url_for('auth.logout') }}"
-                   role="menuitem"
-                   class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-emerald-600 dark:hover:text-emerald-400">
-                  Log Out
-                </a>
+                <form method="POST" action="{{ url_for('auth.logout') }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit"
+                     role="menuitem"
+                     class="block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-emerald-600 dark:hover:text-emerald-400">
+                    Log Out
+                  </button>
+                </form>
               </div>
             </div>
           {% else %}
@@ -252,7 +255,7 @@
       </div>
 
       <!-- Mobile Navigation Panel -->
-      <nav class="hidden md:hidden border-t border-purple-700/30 mt-4 pt-4"
+      <nav class="hidden lg:hidden border-t border-purple-700/30 mt-4 pt-4"
            id="mobile-menu-panel"
            aria-label="Mobile navigation">
         <div class="flex flex-col gap-2">
@@ -281,8 +284,10 @@
             <a class="{% if request.endpoint == 'dashboard.account' %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %} py-3"
                href="{{ url_for('dashboard.account') }}"
                {% if request.endpoint == 'dashboard.account' %}aria-current="page"{% endif %}>Account Settings</a>
-            <a class="nav-link-cosmic py-3"
-               href="{{ url_for('auth.logout') }}">Log Out</a>
+            <form method="POST" action="{{ url_for('auth.logout') }}" class="inline">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="nav-link-cosmic py-3 w-full text-left">Log Out</button>
+            </form>
           {% else %}
             <a class="{% if request.endpoint == 'web.assistant' %}nav-link-cosmic-active{% else %}nav-link-cosmic{% endif %} py-3"
                href="{{ url_for('web.assistant') }}"
@@ -367,7 +372,7 @@
   </div>
 
   <!-- Mobile Bottom Navigation (app-like experience) -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 cosmic-header border-t border-purple-700/30 shadow-lg shadow-purple-900/50 z-40" aria-label="Mobile navigation">
+  <nav class="lg:hidden fixed bottom-0 left-0 right-0 cosmic-header border-t border-purple-700/30 shadow-lg shadow-purple-900/50 z-40" aria-label="Mobile navigation">
     <div class="flex justify-around items-center h-16">
       {% if is_authenticated %}
         {# Authenticated users: Dashboard, Assistant, Account #}
@@ -429,7 +434,7 @@
   </nav>
 
   <!-- Footer -->
-  <footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 mt-auto mb-16 md:mb-0">
+  <footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 mt-auto mb-16 lg:mb-0">
     <div class="container mx-auto px-4 py-6">
       <div class="flex flex-col gap-4 text-sm text-slate-600 dark:text-slate-400">
         <!-- Row 1: Topic-grouped navigation -->
