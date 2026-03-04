@@ -1,9 +1,9 @@
 """
 Advice engine (AI-first with safe fallback).
 
-Attempts to get guidance from OpenAI when available; otherwise falls back
-to a compact rule set. Adds a short weather hint if current temperature is known.
-OpenAI usage is isolated and failures never break the request flow.
+Attempts to get guidance from Anthropic Claude when available; otherwise falls
+back to a compact rule set. Adds a short weather hint if current temperature is
+known. AI usage is isolated and failures never break the request flow.
 """
 
 from __future__ import annotations
@@ -584,7 +584,7 @@ def _ai_advice(
     context_level: str = "plant"
 ) -> Tuple[Optional[str], Optional[str]]:
     """
-    Calls AI providers using LiteLLM Router (OpenAI primary, Gemini fallback).
+    Calls AI providers using LiteLLM Router (Anthropic Claude primary, Gemini fallback).
     Returns (response_text, provider_name) or (None, None) if all providers fail.
     The caller will use rule-based output if this returns (None, None).
 
@@ -758,7 +758,7 @@ def generate_advice(
       1) Fetch weather data (best-effort)
       2) Detect question type (plant vs diagnosis)
       3) Fetch enhanced user context with weather awareness
-      4) Try AI providers (OpenAI primary, Gemini fallback) with rich context
+      4) Try AI providers (Anthropic Claude primary, Gemini fallback) with rich context
       5) Fallback to rules if AI unavailable
 
     Args:

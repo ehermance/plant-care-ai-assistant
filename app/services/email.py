@@ -232,7 +232,7 @@ def send_legal_update_email(email: str) -> Dict[str, Any]:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PlantCareAI - We've Updated Our AI Provider</title>
+  <title>PlantCareAI - I've Updated Our AI Provider</title>
 </head>
 <body style="margin:0; padding:0; background-color:#ffffff; font-family:Arial, sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
@@ -253,8 +253,8 @@ def send_legal_update_email(email: str) -> Dict[str, Any]:
 
           <tr>
             <td style="padding:0 0 16px; font-size:14px; color:#44403c; line-height:1.6;">
-              We've made a change to how PlantCareAI generates your plant care advice. We've switched
-              our AI provider from OpenAI to <strong>Anthropic Claude</strong> &mdash; the company behind Claude AI.
+              I've made a change to how PlantCareAI generates your plant care advice. I've switched
+              the AI provider from OpenAI to <strong>Anthropic Claude</strong> &mdash; the company behind Claude AI.
             </td>
           </tr>
 
@@ -262,7 +262,7 @@ def send_legal_update_email(email: str) -> Dict[str, Any]:
             <td style="padding:0 0 16px; font-size:14px; color:#44403c; line-height:1.8;">
               <strong>What changed:</strong><br>
               &bull; Your plant questions are now processed by Anthropic's Claude instead of OpenAI's GPT<br>
-              &bull; Our Privacy Policy has been updated to reflect Anthropic as a data processor
+              &bull; The Privacy Policy has been updated to reflect Anthropic as a data processor
             </td>
           </tr>
 
@@ -270,16 +270,24 @@ def send_legal_update_email(email: str) -> Dict[str, Any]:
             <td style="padding:0 0 16px; font-size:14px; color:#44403c; line-height:1.8;">
               <strong>What didn't change:</strong><br>
               &bull; The advice quality and personalization you're used to<br>
-              &bull; How we handle your data (encrypted in transit, not used to train AI models)<br>
+              &bull; How your data is handled (encrypted in transit, not used to train AI models)<br>
               &bull; All other features work exactly the same
             </td>
           </tr>
 
           <tr>
             <td style="padding:0 0 16px; font-size:14px; color:#44403c; line-height:1.6;">
-              <strong>Why we switched:</strong><br>
-              We believe in partnering with AI companies whose values align with ours.
+              <strong>Why I switched:</strong><br>
+              I believe in partnering with AI companies whose values align with mine.
               Anthropic's commitment to AI safety made them the right choice for PlantCareAI.
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:0 0 16px; font-size:14px; color:#44403c; line-height:1.6;">
+              This migration also lets me continue improving the advice quality and accuracy you
+              receive &mdash; I'll be refining PlantCareAI's prompts and context to take full
+              advantage of Claude's strengths.
             </td>
           </tr>
 
@@ -311,7 +319,7 @@ def send_legal_update_email(email: str) -> Dict[str, Any]:
 
           <tr>
             <td style="padding:24px 0 0; font-size:12px; color:#a69d91; line-height:1.5;">
-              This is a service notification about changes to our data processing.
+              This is a service notification about changes to PlantCareAI's data processing.
               You are receiving this because you have a PlantCareAI account.
             </td>
           </tr>
@@ -327,21 +335,23 @@ def send_legal_update_email(email: str) -> Dict[str, Any]:
 
 Hi,
 
-We've made a change to how PlantCareAI generates your plant care advice. We've switched our AI provider from OpenAI to Anthropic Claude -- the company behind Claude AI.
+I've made a change to how PlantCareAI generates your plant care advice. I've switched the AI provider from OpenAI to Anthropic Claude -- the company behind Claude AI.
 
 What changed:
 - Your plant questions are now processed by Anthropic's Claude instead of OpenAI's GPT
-- Our Privacy Policy has been updated to reflect Anthropic as a data processor
+- The Privacy Policy has been updated to reflect Anthropic as a data processor
 
 What didn't change:
 - The advice quality and personalization you're used to
-- How we handle your data (encrypted in transit, not used to train AI models)
+- How your data is handled (encrypted in transit, not used to train AI models)
 - All other features work exactly the same
 
-Why we switched:
-We believe in partnering with AI companies whose values align with ours. Anthropic's commitment to AI safety made them the right choice for PlantCareAI.
+Why I switched:
+I believe in partnering with AI companies whose values align with mine. Anthropic's commitment to AI safety made them the right choice for PlantCareAI.
 
-Review our updated Privacy Policy: {app_url}/privacy
+This migration also lets me continue improving the advice quality and accuracy you receive -- I'll be refining PlantCareAI's prompts and context to take full advantage of Claude's strengths.
+
+Review the updated Privacy Policy: {app_url}/privacy
 
 When you next log in, you'll see a brief notice asking you to acknowledge the update.
 
@@ -350,7 +360,7 @@ Thanks for being part of PlantCareAI!
 -- Ellen
 
 ---
-This is a service notification about changes to our data processing.
+This is a service notification about changes to PlantCareAI's data processing.
 You are receiving this because you have a PlantCareAI account.
 """
 
@@ -364,7 +374,7 @@ You are receiving this because you have a PlantCareAI account.
             json={
                 "from": "PlantCareAI <hello@updates.plantcareai.app>",
                 "to": [email],
-                "subject": "We've updated our AI provider \u2014 your data stays safe",
+                "subject": "I've updated PlantCareAI's AI provider \u2014 your data stays safe",
                 "html": html_content,
                 "text": text_content,
             },

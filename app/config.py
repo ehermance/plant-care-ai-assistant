@@ -93,6 +93,9 @@ class BaseConfig:
 
     # Legal notification — bump this date when ToS/Privacy are materially changed
     # to re-show the in-app banner for all users.
+    # Changelog:
+    #   2026-03-04 — AI provider migration (OpenAI → Anthropic Claude)
+    #   2026-02-15 — Initial ToS + Privacy Policy publication
     LEGAL_LAST_UPDATED = "2026-03-04"
 
     # Misc
