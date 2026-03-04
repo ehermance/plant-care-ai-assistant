@@ -74,8 +74,6 @@ def _get_litellm_router():
                 "litellm_params": {
                     "model": "anthropic/claude-haiku-4-5-20251001",
                     "api_key": anthropic_key,
-                    "temperature": 0.5,  # Balanced for natural variation
-                    "max_tokens": 1500,
                 }
             })
 
@@ -86,8 +84,6 @@ def _get_litellm_router():
                 "litellm_params": {
                     "model": "gemini/gemini-flash-latest",
                     "api_key": gemini_key,
-                    "temperature": 0.5,  # Balanced for natural variation
-                    "max_tokens": 1500,
                 }
             })
 
@@ -276,27 +272,27 @@ def _get_response_guidance(question: str) -> str:
     ]):
         return (
             "Identify the most likely cause first, then suggest 2-3 solutions. "
-            "Respond in 4-6 sentences (under 700 characters)."
+            "Respond in 4-6 sentences."
         )
 
     # Simple yes/no or "should I" questions - direct answers
     if any(kw in q_lower for kw in ["should i", "can i", "is it", "when should"]):
         return (
             "Answer directly first, then briefly explain why. "
-            "Respond in 2-3 sentences (under 400 characters)."
+            "Respond in 2-3 sentences."
         )
 
     # How-to questions - clear steps
     if any(kw in q_lower for kw in ["how do i", "how to", "how often", "how much"]):
         return (
             "Provide clear, practical steps. Use a numbered list only if sequence matters. "
-            "Respond in 3-5 sentences (under 600 characters)."
+            "Respond in 3-5 sentences."
         )
 
     # General care questions - conversational tips
     return (
         "Be helpful and conversational. Use 2-4 key points if listing tips. "
-        "Respond in 4-7 sentences (under 800 characters)."
+        "Respond in 3-5 sentences."
     )
 
 
@@ -305,7 +301,10 @@ def build_system_prompt(
     context_level: str = "plant"
 ) -> str:
     """
-    Build AI system prompt with enhanced context and weather awareness.
+    Build AI system prompt with XML-structured context for Claude optimization.
+
+    Uses XML tags to clearly separate role, rules, and context sections.
+    Shared rules are defined once (not duplicated across persona variants).
 
     Args:
         user_context_data: Enhanced context from get_enhanced_user_context(),
@@ -314,51 +313,52 @@ def build_system_prompt(
         context_level: "plant" (Tier 2 default) or "diagnosis" (Tier 3 premium)
 
     Returns:
-        System prompt string with rich context and weather insights
+        System prompt string with XML-structured context
     """
-    base = (
-        "You are a friendly, knowledgeable plant care advisor—like a neighbor who's great with plants. "
-        "Give practical, actionable advice in a warm, conversational tone. "
-        "Reference the user's specific situation using the provided context. "
-        "Do not invent details about the user's plants or history that are not in the context. "
-        "If you're uncertain, say so honestly. "
-        "Only answer questions about plant care, gardening, and related topics. "
-        "Respond in plain text with short paragraphs. No markdown formatting."
+    # Select persona based on experience level
+    role_text = (
+        "You are a friendly, knowledgeable plant care advisor—like a neighbor "
+        "who's great with plants. Give practical, actionable advice in a warm, "
+        "conversational tone."
     )
 
-    if not user_context_data:
-        return base
-
-    # Check for user preferences context and adapt tone
-    user_prefs = user_context_data.get("user_preferences", {})
+    user_prefs = user_context_data.get("user_preferences", {}) if user_context_data else {}
     if user_prefs:
         experience = user_prefs.get("experience_level")
         if experience == "beginner":
-            base = (
-                "You are a patient, encouraging plant mentor helping someone new to plant care. "
-                "Explain concepts simply without jargon. Give clear, step-by-step guidance. "
-                "Reassure them that mistakes are part of learning. "
-                "Keep advice practical and achievable. "
-                "Reference the user's specific situation using the provided context. "
-                "Do not invent details not in the context. "
-                "Only answer questions about plant care, gardening, and related topics. "
-                "Respond in plain text with short paragraphs. No markdown formatting."
+            role_text = (
+                "You are a patient, encouraging plant mentor helping someone new "
+                "to plant care. Explain concepts simply without jargon. Give clear, "
+                "step-by-step guidance. Reassure them that mistakes are part of "
+                "learning. Keep advice practical and achievable."
             )
         elif experience == "expert":
-            base = (
-                "You are a fellow plant enthusiast having a knowledgeable conversation. "
-                "Use technical terminology when useful. Discuss nuances and trade-offs. "
-                "Skip basics and get to the specifics. Share insights they might not know. "
-                "Reference the user's specific situation using the provided context. "
-                "Do not invent details not in the context. "
-                "Only answer questions about plant care, gardening, and related topics. "
-                "Respond in plain text with short paragraphs. No markdown formatting."
+            role_text = (
+                "You are a fellow plant enthusiast having a knowledgeable "
+                "conversation. Use technical terminology when useful. Discuss "
+                "nuances and trade-offs. Skip basics and get to the specifics. "
+                "Share insights they might not know."
             )
 
-    # Build enhanced context summary for prompt
+    # Shared rules (single source of truth for all personas)
+    rules_text = (
+        "- Reference the user's specific situation using the provided context.\n"
+        "- Do not invent details about the user's plants or history not in the context.\n"
+        "- When the user has named their plant, use that name naturally in your response.\n"
+        "- Connect weather conditions to specific care actions when weather data is provided.\n"
+        "- If you're uncertain, say so honestly.\n"
+        "- Only answer questions about plant care, gardening, and related topics.\n"
+        "- Respond in plain text with short paragraphs. No markdown headers, bullets, or formatting."
+    )
+
+    # For requests with no context, return a compact prompt
+    if not user_context_data:
+        return f"<role>\n{role_text}\n</role>\n\n<rules>\n{rules_text}\n</rules>"
+
+    # Build context sections
     context_lines = []
 
-    # USER PREFERENCES (for personalization even without plant data)
+    # USER PREFERENCES
     if user_prefs:
         if user_prefs.get("goal_description"):
             context_lines.append(f"User goal: {user_prefs['goal_description']}")
@@ -367,49 +367,54 @@ def build_system_prompt(
         if user_prefs.get("environment_description"):
             context_lines.append(f"Environment: {user_prefs['environment_description']}")
 
-    # SEASONAL CONTEXT (proactive tips based on date/season)
+    # SEASONAL CONTEXT
     seasonal = user_context_data.get("seasonal")
     if seasonal:
         context_lines.append(f"Current timing: {seasonal.get('context_summary', '')}")
         if seasonal.get("timely_focus"):
             context_lines.append(f"Seasonal focus: {seasonal['timely_focus']}")
-        # Add top seasonal tips
         seasonal_tips = seasonal.get("seasonal_tips", [])
         if seasonal_tips:
             context_lines.append("Seasonal tips to consider:")
-            for tip in seasonal_tips[:2]:  # Limit to 2 tips
+            for tip in seasonal_tips[:2]:
                 context_lines.append(f"  - {tip}")
 
-    # WEATHER TIPS (proactive weather-based advice)
+    # WEATHER TIPS
     weather_data = user_context_data.get("weather")
     if weather_data and weather_data.get("tips"):
         weather_tips = weather_data["tips"]
         if weather_tips:
             context_lines.append("Weather-aware tips:")
-            for tip in weather_tips[:2]:  # Limit to 2 tips
+            for tip in weather_tips[:2]:
                 context_lines.append(f"  - {tip}")
 
     # PERSONALIZED GUIDANCE (for users without plant data)
     guidance = user_context_data.get("personalized_guidance", [])
     if guidance:
         context_lines.append("Personalized guidance for this user:")
-        for g in guidance[:2]:  # Limit to 2
+        for g in guidance[:2]:
             context_lines.append(f"  - {g}")
 
-    # WEATHER CONTEXT (Phase 2 - Weather-aware AI)
+    # WEATHER CONTEXT
     weather_context = user_context_data.get("weather_context")
     if weather_context:
         context_lines.append(f"Current weather: {weather_context}")
 
-    # FORECAST CONTEXT (Phase 2B - Forecast awareness for rain/temperature predictions)
+    # FORECAST CONTEXT
     forecast = user_context_data.get("forecast")
     if forecast:
         if forecast.get("precipitation_24h_inches") is not None:
             precip = forecast["precipitation_24h_inches"]
             if precip > 0.1:
-                context_lines.append(f"Forecast: {precip:.2f} inches rain expected in next 24h")
+                context_lines.append(
+                    f"Forecast: Rain expected ({precip:.2f} in, next 24h) "
+                    "-- delay watering outdoor plants"
+                )
             else:
-                context_lines.append(f"Forecast: No significant rain expected (next 24h)")
+                context_lines.append(
+                    "Forecast: No rain expected (next 24h) "
+                    "-- water outdoor plants as usual"
+                )
 
         temp_extremes = forecast.get("temperature_extremes")
         if temp_extremes:
@@ -418,11 +423,14 @@ def build_system_prompt(
             freeze_risk = temp_extremes.get("freeze_risk", False)
 
             if freeze_risk:
-                context_lines.append(f"Temperature forecast: {min_f}°F to {max_f}°F (FREEZE RISK)")
+                context_lines.append(
+                    f"Temperature forecast: {min_f}°F to {max_f}°F "
+                    "(FREEZE RISK -- bring outdoor plants inside or cover them)"
+                )
             elif min_f and max_f:
                 context_lines.append(f"Temperature forecast (48h): {min_f}°F to {max_f}°F")
 
-    # WATERING RECOMMENDATION (intelligent stress-based analysis)
+    # WATERING RECOMMENDATION
     watering_rec = user_context_data.get("watering_recommendation")
     if watering_rec:
         rec_text = watering_rec.get("recommendation", "")
@@ -435,33 +443,29 @@ def build_system_prompt(
     # USER'S PLANTS with notes and patterns
     plants = user_context_data.get("plants", [])
     if plants:
-        for p in plants[:5]:  # Limit to 5 plants
+        for p in plants[:5]:
             plant_info = p.get("name", "Unknown")
             if p.get("species"):
                 plant_info += f" ({p['species']})"
-
-            # Add notes if available
             if p.get("notes"):
                 plant_info += f" - {p['notes']}"
-
-            # Add watering pattern if available
             if p.get("watering_pattern"):
                 plant_info += f" [watered {p['watering_pattern']}]"
-
             context_lines.append(f"Plant: {plant_info}")
 
-    # SPECIFIC PLANT CONTEXT (from get_enhanced_plant_context)
+    # SPECIFIC PLANT CONTEXT
     plant_details = user_context_data.get("plant")
     if plant_details:
         plant_name = plant_details.get("name", "Plant")
-        context_lines.append(f"Selected plant: {plant_name}")
+        nickname = plant_details.get("nickname")
+        if nickname and nickname != plant_name:
+            context_lines.append(f"Selected plant: {plant_name} (nicknamed \"{nickname}\")")
+        else:
+            context_lines.append(f"Selected plant: {plant_name}")
 
-        # Add full plant notes
         if plant_details.get("notes_full"):
-            notes = plant_details["notes_full"]
-            context_lines.append(f"Plant notes: {notes}")
+            context_lines.append(f"Plant notes: {plant_details['notes_full']}")
 
-        # Add care history summary
         care_history = plant_details.get("care_history_summary", {})
         if care_history.get("avg_watering_interval_days"):
             interval = care_history["avg_watering_interval_days"]
@@ -469,16 +473,14 @@ def build_system_prompt(
             context_lines.append(f"Watering pattern: every ~{interval} days ({consistency})")
 
         if care_history.get("care_level"):
-            care_level = care_history["care_level"]
-            context_lines.append(f"Care level: {care_level}")
+            context_lines.append(f"Care level: {care_history['care_level']}")
 
         # INITIAL ASSESSMENT (baseline from when plant was added)
-        # This provides context especially for new plants without journal history
         initial = plant_details.get("initial_assessment")
         if initial:
             context_lines.append("Initial assessment (baseline when added):")
             if initial.get("health_state"):
-                context_lines.append(f"  • Starting health: {initial['health_state']}")
+                context_lines.append(f"  Starting health: {initial['health_state']}")
             if initial.get("ownership_duration"):
                 duration_map = {
                     "just_got": "just acquired",
@@ -487,45 +489,42 @@ def build_system_prompt(
                     "year_plus": "owned over a year"
                 }
                 duration = duration_map.get(initial["ownership_duration"], initial["ownership_duration"])
-                context_lines.append(f"  • When added: {duration}")
+                context_lines.append(f"  When added: {duration}")
             if initial.get("watering_schedule"):
-                context_lines.append(f"  • Original watering: {initial['watering_schedule']}")
+                context_lines.append(f"  Original watering: {initial['watering_schedule']}")
             if initial.get("concerns"):
-                context_lines.append(f"  • Initial concerns: {initial['concerns'][:100]}")
+                context_lines.append(f"  Initial concerns: {initial['concerns'][:100]}")
 
     # RECENT OBSERVATIONS with health keywords
-    # Note: These are more current indicators than initial assessment
     recent_obs = user_context_data.get("recent_observations", [])
     if recent_obs:
         context_lines.append("Recent observations:")
-        for obs in recent_obs[:3]:  # Max 3
+        for obs in recent_obs[:3]:
             days_ago = obs.get("days_ago", 0)
             note = obs.get("note_preview", "")
             if obs.get("has_concern"):
-                context_lines.append(f"  ⚠ {days_ago}d ago: {note}")
+                context_lines.append(f"  [!] {days_ago}d ago: {note}")
             else:
-                context_lines.append(f"  • {days_ago}d ago: {note}")
+                context_lines.append(f"  {days_ago}d ago: {note}")
 
-    # RECENT CARE ACTIVITIES (Phase 2B - detailed actions with dates for "When did I last..." questions)
+    # RECENT CARE ACTIVITIES
     activities = user_context_data.get("activities_detailed", [])
     if activities:
         context_lines.append("Recent care activities:")
-        for activity in activities[:10]:  # Limit to 10 most recent
+        for activity in activities[:10]:
             action_type = activity.get("action_type", "unknown")
             days_ago = activity.get("days_ago", 0)
             amount_ml = activity.get("amount_ml")
             notes = activity.get("notes")
 
-            # Format: "3d ago: watered (500ml) - soil was very dry"
             activity_str = f"  {days_ago}d ago: {action_type}"
             if amount_ml:
                 activity_str += f" ({amount_ml}ml)"
             if notes:
-                activity_str += f" - {notes[:50]}"  # Truncate notes to 50 chars
-
+                activity_str += f" - {notes[:120]}"
             context_lines.append(activity_str)
 
-    # HEALTH PATTERNS (for diagnosis context level)
+    # HEALTH PATTERNS (diagnosis context level)
     if context_level == "diagnosis":
         health_trends = user_context_data.get("health_trends")
         if health_trends:
@@ -538,7 +537,6 @@ def build_system_prompt(
             elif health_trends.get("deteriorating"):
                 context_lines.append("Trend: Deteriorating (more issues recently)")
 
-        # Comparative insights (premium)
         comparative = user_context_data.get("comparative_insights")
         if comparative:
             vs_avg = comparative.get("watering_vs_user_avg")
@@ -547,32 +545,41 @@ def build_system_prompt(
             elif vs_avg == "less_frequent_than_others":
                 context_lines.append("This plant is watered less frequently than user's other plants")
 
-    # REMINDERS (handle both dict from user context and list from plant context)
+    # REMINDERS (handle both dict and list formats)
     reminders = user_context_data.get("reminders", {})
     if reminders:
-        # Check if reminders is a dict (from get_enhanced_user_context)
-        # or a list (from get_enhanced_plant_context)
         if isinstance(reminders, dict):
             due_today = reminders.get("due_today", [])
             if due_today:
                 tasks = [r["title"] for r in due_today[:3]]
                 context_lines.append(f"Care due today: {', '.join(tasks)}")
-
             overdue = reminders.get("overdue", [])
             if overdue:
                 context_lines.append(f"Overdue tasks: {len(overdue)}")
-        elif isinstance(reminders, list):
-            # Plant-specific context returns list of reminders
-            if reminders:
-                tasks = [r.get("title", r.get("reminder_type", "task")) for r in reminders[:3]]
-                context_lines.append(f"Active reminders: {', '.join(tasks)}")
+        elif isinstance(reminders, list) and reminders:
+            tasks = [r.get("title", r.get("reminder_type", "task")) for r in reminders[:3]]
+            context_lines.append(f"Active reminders: {', '.join(tasks)}")
 
-    # Build final context section
+    # PLANT KNOWLEDGE (curated guide data for matching species)
+    plant_knowledge = user_context_data.get("plant_knowledge")
+
+    # DIAGNOSTIC REFERENCE (curated causes for matching diagnostic questions)
+    diagnostic_ref = user_context_data.get("diagnostic_reference")
+
+    # Assemble final XML-structured prompt
+    sections = [f"<role>\n{role_text}\n</role>", f"\n<rules>\n{rules_text}\n</rules>"]
+
     if context_lines:
-        context_section = "\n\nUser Context (use this to personalize your advice):\n" + "\n".join(f"- {line}" for line in context_lines)
-        return base + context_section
+        context_section = "\n".join(f"- {line}" for line in context_lines)
+        sections.append(f"\n<user-context>\n{context_section}\n</user-context>")
 
-    return base
+    if plant_knowledge:
+        sections.append(f"\n<plant-knowledge>\n{plant_knowledge}\n</plant-knowledge>")
+
+    if diagnostic_ref:
+        sections.append(f"\n<diagnostic-reference>\n{diagnostic_ref}\nUse this as reference but prioritize the user's specific context above.\n</diagnostic-reference>")
+
+    return "\n".join(sections)
 
 
 def _ai_advice(
@@ -698,8 +705,8 @@ def _ai_advice(
                 {"role": "system", "content": sys_msg},
                 {"role": "user", "content": user_msg}
             ],
-            temperature=0.7,
-            max_tokens=300,
+            temperature=0.5,
+            max_tokens=500,
         )
 
         txt = (resp.choices[0].message.content or "").strip()
@@ -889,6 +896,32 @@ def generate_advice(
             "precipitation_24h_inches": forecast_precip,
             "temperature_extremes": forecast_temps
         }
+
+    # Inject curated plant knowledge when a matching species or diagnosis exists.
+    # Runs after all context branching so it works for all visitor types:
+    #   public (no auth), authenticated (no plants), authenticated (with plants).
+    try:
+        from . import plant_knowledge
+
+        species = (
+            (user_context_data or {}).get("plant", {}).get("species")
+            or plant
+        )
+        guide_context = plant_knowledge.get_guide_for_species(species) if species else None
+        diagnostic_ref = (
+            plant_knowledge.get_diagnostic_context(question)
+            if context_level == "diagnosis" else None
+        )
+
+        if guide_context or diagnostic_ref:
+            if user_context_data is None:
+                user_context_data = {}
+            if guide_context:
+                user_context_data["plant_knowledge"] = guide_context
+            if diagnostic_ref:
+                user_context_data["diagnostic_reference"] = diagnostic_ref
+    except Exception:
+        pass  # Knowledge enrichment is best-effort
 
     # Call AI with enhanced context (context_level passed to build_system_prompt)
     ai_text, provider = _ai_advice(
