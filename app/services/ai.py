@@ -1,9 +1,9 @@
 """
 Advice engine (AI-first with safe fallback).
 
-Attempts to get guidance from OpenAI when available; otherwise falls back
-to a compact rule set. Adds a short weather hint if current temperature is known.
-OpenAI usage is isolated and failures never break the request flow.
+Attempts to get guidance from Anthropic Claude when available; otherwise falls
+back to a compact rule set. Adds a short weather hint if current temperature is
+known. AI usage is isolated and failures never break the request flow.
 """
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ def _clear_router_cache():
 
 def _get_litellm_router():
     """
-    Returns a LiteLLM Router configured with OpenAI (primary) and Gemini (fallback),
+    Returns a LiteLLM Router configured with Anthropic Claude (primary) and Gemini (fallback),
     or (None, error) if neither API key is available.
 
     Reads API keys from environment first; if a Flask app context is active,
@@ -50,16 +50,16 @@ def _get_litellm_router():
     if _ROUTER_CACHE is not None:
         return _ROUTER_CACHE, None
 
-    openai_key = os.getenv("OPENAI_API_KEY")
+    anthropic_key = os.getenv("ANTHROPIC_API_KEY")
     gemini_key = os.getenv("GEMINI_API_KEY")
 
-    if not openai_key and has_app_context():
-        openai_key = current_app.config.get("OPENAI_API_KEY")
+    if not anthropic_key and has_app_context():
+        anthropic_key = current_app.config.get("ANTHROPIC_API_KEY")
     if not gemini_key and has_app_context():
         gemini_key = current_app.config.get("GEMINI_API_KEY")
 
-    if not openai_key and not gemini_key:
-        return None, "Neither OPENAI_API_KEY nor GEMINI_API_KEY configured"
+    if not anthropic_key and not gemini_key:
+        return None, "Neither ANTHROPIC_API_KEY nor GEMINI_API_KEY configured"
 
     try:
         from litellm import Router
@@ -67,15 +67,15 @@ def _get_litellm_router():
         model_list = []
         fallbacks = {}
 
-        # Add OpenAI as primary if key exists
-        if openai_key:
+        # Add Anthropic Claude as primary if key exists
+        if anthropic_key:
             model_list.append({
-                "model_name": "primary-gpt",
+                "model_name": "primary-claude",
                 "litellm_params": {
-                    "model": "gpt-4o-mini",
-                    "api_key": openai_key,
+                    "model": "anthropic/claude-haiku-4-5-20251001",
+                    "api_key": anthropic_key,
                     "temperature": 0.5,  # Balanced for natural variation
-                    "max_tokens": 1500,  # Increased from 350 to match Gemini
+                    "max_tokens": 1500,
                 }
             })
 
@@ -87,13 +87,13 @@ def _get_litellm_router():
                     "model": "gemini/gemini-flash-latest",
                     "api_key": gemini_key,
                     "temperature": 0.5,  # Balanced for natural variation
-                    "max_tokens": 1500,  # Increased from 350 to avoid truncation
+                    "max_tokens": 1500,
                 }
             })
 
-        # Configure fallback chain: OpenAI -> Gemini
-        if openai_key and gemini_key:
-            fallbacks = [{"primary-gpt": ["fallback-gemini"]}]
+        # Configure fallback chain: Claude -> Gemini
+        if anthropic_key and gemini_key:
+            fallbacks = [{"primary-claude": ["fallback-gemini"]}]
 
         router = Router(
             model_list=model_list,
@@ -584,7 +584,7 @@ def _ai_advice(
     context_level: str = "plant"
 ) -> Tuple[Optional[str], Optional[str]]:
     """
-    Calls AI providers using LiteLLM Router (OpenAI primary, Gemini fallback).
+    Calls AI providers using LiteLLM Router (Anthropic Claude primary, Gemini fallback).
     Returns (response_text, provider_name) or (None, None) if all providers fail.
     The caller will use rule-based output if this returns (None, None).
 
@@ -685,12 +685,12 @@ def _ai_advice(
 
     try:
         # Use LiteLLM Router with automatic fallback
-        # Start with primary model (OpenAI if configured)
-        openai_key = os.getenv("OPENAI_API_KEY")
-        if not openai_key and has_app_context():
-            openai_key = current_app.config.get("OPENAI_API_KEY")
+        # Start with primary model (Claude if configured)
+        anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+        if not anthropic_key and has_app_context():
+            anthropic_key = current_app.config.get("ANTHROPIC_API_KEY")
 
-        model_to_use = "primary-gpt" if openai_key else "fallback-gemini"
+        model_to_use = "primary-claude" if anthropic_key else "fallback-gemini"
 
         resp = router.completion(
             model=model_to_use,
@@ -711,8 +711,8 @@ def _ai_advice(
                 AI_LAST_PROVIDER = "gemini"
                 return txt, "gemini"
             else:
-                AI_LAST_PROVIDER = "openai"
-                return txt, "openai"
+                AI_LAST_PROVIDER = "anthropic"
+                return txt, "anthropic"
 
         AI_LAST_ERROR = "Empty response from AI providers"
         return None, None
@@ -758,7 +758,7 @@ def generate_advice(
       1) Fetch weather data (best-effort)
       2) Detect question type (plant vs diagnosis)
       3) Fetch enhanced user context with weather awareness
-      4) Try AI providers (OpenAI primary, Gemini fallback) with rich context
+      4) Try AI providers (Anthropic Claude primary, Gemini fallback) with rich context
       5) Fallback to rules if AI unavailable
 
     Args:
@@ -770,7 +770,7 @@ def generate_advice(
         selected_plant_id: Optional specific plant ID for detailed context
 
     Returns:
-        Tuple of (answer, weather, source: "openai"|"gemini"|"rule")
+        Tuple of (answer, weather, source: "anthropic"|"gemini"|"rule")
     """
     # Fetch weather first (needed for weather-aware context)
     weather = get_weather_for_city(city) if city else None
@@ -902,7 +902,7 @@ def generate_advice(
 
     if ai_text and provider:
         answer = ai_text
-        source = provider  # "openai" or "gemini"
+        source = provider  # "anthropic" or "gemini"
     else:
         answer = _basic_plant_tip(question, plant, care_context)
         source = "rule"

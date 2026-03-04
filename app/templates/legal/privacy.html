@@ -7,7 +7,7 @@
 <div class="max-w-4xl mx-auto">
   <section class="card">
     <h1 class="page-title">Privacy Policy</h1>
-    <p class="text-sm text-slate-500 dark:text-slate-400 mb-8">Last updated: February 15, 2026</p>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mb-8">Last updated: {{ legal_last_updated }}</p>
 
     <div class="prose prose-slate dark:prose-invert max-w-none">
       <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">1. Introduction</h2>
@@ -59,7 +59,7 @@
 
       <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">5. Automated Decision-Making</h2>
       <p class="text-slate-700 dark:text-slate-300 mb-4">
-        The Service uses AI models (OpenAI GPT-4o-mini, Google Gemini) to generate plant care recommendations and weather-adjusted watering schedules.
+        The Service uses AI models (Anthropic Claude, Google Gemini) to generate plant care recommendations and weather-adjusted watering schedules.
         These are suggestions only and do not constitute legally significant automated decisions. You can always override, dismiss, or ignore any AI-generated recommendation.
         No automated profiling is performed that produces legal or similarly significant effects.
       </p>
@@ -76,7 +76,7 @@
         <li><strong>OTP Codes:</strong> One-time passcodes are hashed with SHA-256 before storage and expire after 15 minutes</li>
       </ul>
 
-      <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">7. Third-Party Services</h2>
+      <h2 id="third-party-processors" class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4 scroll-mt-20">7. Third-Party Services</h2>
       <p class="text-slate-700 dark:text-slate-300 mb-4">We use the following third-party services:</p>
       <div class="overflow-x-auto mb-4">
         <table class="w-full text-sm text-slate-700 dark:text-slate-300 border-collapse">
@@ -94,7 +94,7 @@
               <td class="py-2">Email, profile, plants, photos</td>
             </tr>
             <tr>
-              <td class="py-2 pr-4"><a href="https://openai.com/privacy" target="_blank" rel="noopener" class="text-emerald-600 dark:text-emerald-400 hover:underline">OpenAI</a></td>
+              <td class="py-2 pr-4"><a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener" class="text-emerald-600 dark:text-emerald-400 hover:underline">Anthropic</a></td>
               <td class="py-2 pr-4">Primary AI plant care recommendations</td>
               <td class="py-2">Questions, plant info, city</td>
             </tr>
@@ -127,7 +127,7 @@
         </table>
       </div>
       <p class="text-sm text-slate-600 dark:text-slate-400 p-4 bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-700 rounded-xl mb-4">
-        <strong>Important:</strong> When you ask the AI assistant a question, your question and plant information may be sent to OpenAI's API or Google Gemini (as a fallback).
+        <strong>Important:</strong> When you ask the AI assistant a question, your question and plant information may be sent to Anthropic's API or Google Gemini (as a fallback).
         These providers do not use API data to train their models. See their respective privacy policies for details.
       </p>
 
@@ -175,7 +175,7 @@
       <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">12. International Users</h2>
       <p class="text-slate-700 dark:text-slate-300 mb-4">
         The Service is hosted in the United States. If you access the Service from outside the United States, your information
-        may be transferred to, stored, and processed in the United States. Our third-party service providers (Supabase, OpenAI, Google)
+        may be transferred to, stored, and processed in the United States. Our third-party service providers (Supabase, Anthropic, Google)
         maintain Standard Contractual Clauses (SCCs) and comply with applicable data protection frameworks to safeguard international transfers.
       </p>
 

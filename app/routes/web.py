@@ -97,14 +97,14 @@ def debug_info():
     if not is_admin(user_id):
         return {"error": "Admin privileges required"}, 403
 
-    loaded_keys = [k for k in ("FLASK_SECRET_KEY", "OPENWEATHER_API_KEY", "OPENAI_API_KEY") if current_app.config.get(k)]
+    loaded_keys = [k for k in ("FLASK_SECRET_KEY", "OPENWEATHER_API_KEY", "ANTHROPIC_API_KEY") if current_app.config.get(k)]
 
     # Only provide boolean configuration status - never expose key lengths or other details
     info = {
         "loaded_env_vars": loaded_keys,
         "flask_secret_key_set": bool(current_app.secret_key),
         "weather_api_configured": bool(current_app.config.get("OPENWEATHER_API_KEY")),
-        "openai_configured": bool(current_app.config.get("OPENAI_API_KEY")),
+        "anthropic_configured": bool(current_app.config.get("ANTHROPIC_API_KEY")),
         "gemini_configured": bool(current_app.config.get("GEMINI_API_KEY")),
         "history_len": len(_get_history()),
         # Sanitize error messages - only show generic info

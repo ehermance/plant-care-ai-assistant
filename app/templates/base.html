@@ -127,7 +127,7 @@
     "description": "AI-powered plant care assistant that provides personalized, weather-aware care reminders and tips for your plants.",
     "url": "{{ APP_URL }}/",
     "featureList": [
-      "AI plant care advice powered by GPT-4o-mini",
+      "AI plant care advice powered by Anthropic Claude",
       "Weather-aware watering reminders",
       "Plant health tracking with photo journal",
       "Automated care schedule with rain detection"
@@ -351,9 +351,9 @@
       <div class="flex-1">
         <strong class="text-slate-900 dark:text-slate-100">Updated Terms &amp; Privacy Policy</strong>
         <span class="hidden sm:inline"> &mdash; </span><br class="sm:hidden">
-        Our <a href="{{ url_for('legal.terms') }}" class="underline font-medium text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300">Terms of Service</a>
-        and <a href="{{ url_for('legal.privacy') }}" class="underline font-medium text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300">Privacy Policy</a>
-        were updated on February 15, 2026. Please review the changes.
+        Our <a href="{{ url_for('legal.privacy') }}" class="underline font-medium text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300">Privacy Policy</a>
+        was updated on {{ legal_last_updated }} to reflect a change in AI provider (from OpenAI to Anthropic Claude).
+        Please <a href="{{ url_for('legal.privacy') }}#third-party-processors" class="underline font-medium text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300">review the changes</a>.
       </div>
       <button type="button"
               id="legal-acknowledge-btn"

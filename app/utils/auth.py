@@ -269,6 +269,15 @@ def inject_auth_context():
     user = get_current_user()
     user_id = user.get("id") if user else None
 
+    # Format LEGAL_LAST_UPDATED for display in templates
+    from flask import current_app
+    legal_date_raw = current_app.config.get("LEGAL_LAST_UPDATED", "")
+    try:
+        dt = datetime.strptime(legal_date_raw, "%Y-%m-%d")
+        legal_date_display = f"{dt.strftime('%B')} {dt.day}, {dt.year}"
+    except (ValueError, TypeError):
+        legal_date_display = legal_date_raw
+
     # Default values for unauthenticated users
     if not user_id:
         return {
@@ -280,6 +289,7 @@ def inject_auth_context():
             "has_premium_access": False,
             "profile": None,
             "show_legal_banner": False,
+            "legal_last_updated": legal_date_display,
         }
 
     # Fetch profile once (avoids N+1 queries)
@@ -314,7 +324,6 @@ def inject_auth_context():
             show_legal_banner = True
         else:
             try:
-                from flask import current_app
                 legal_date = current_app.config.get("LEGAL_LAST_UPDATED", "")
                 show_legal_banner = ack[:10] < legal_date
             except (TypeError, ValueError):
@@ -329,4 +338,5 @@ def inject_auth_context():
         "has_premium_access": is_premium or is_in_trial,
         "profile": profile,
         "show_legal_banner": show_legal_banner,
+        "legal_last_updated": legal_date_display,
     }

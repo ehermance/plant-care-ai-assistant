@@ -182,11 +182,11 @@ def _infer_with_ai(
 
         # Determine model to use
         import os
-        openai_key = os.getenv("OPENAI_API_KEY")
-        if not openai_key and has_app_context():
-            openai_key = current_app.config.get("OPENAI_API_KEY")
+        anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+        if not anthropic_key and has_app_context():
+            anthropic_key = current_app.config.get("ANTHROPIC_API_KEY")
 
-        model_to_use = "primary-gpt" if openai_key else "fallback-gemini"
+        model_to_use = "primary-claude" if anthropic_key else "fallback-gemini"
 
         # Call AI
         resp = router.completion(

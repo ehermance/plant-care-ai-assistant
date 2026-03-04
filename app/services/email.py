@@ -232,7 +232,7 @@ def send_legal_update_email(email: str) -> Dict[str, Any]:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PlantCareAI - Updated Terms &amp; Privacy Policy</title>
+  <title>PlantCareAI - I've Updated Our AI Provider</title>
 </head>
 <body style="margin:0; padding:0; background-color:#ffffff; font-family:Arial, sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
@@ -246,62 +246,80 @@ def send_legal_update_email(email: str) -> Dict[str, Any]:
           </tr>
 
           <tr>
-            <td style="padding:0 0 12px; font-size:16px; font-weight:bold; color:#111827;">
-              Important: We've Updated Our Terms &amp; Privacy Policy
+            <td style="padding:0 0 16px; font-size:14px; color:#44403c; line-height:1.6;">
+              Hi there,
             </td>
           </tr>
 
           <tr>
             <td style="padding:0 0 16px; font-size:14px; color:#44403c; line-height:1.6;">
-              We've made significant updates to our
-              <a href="{app_url}/terms" style="color:#059669; text-decoration:underline;">Terms of Service</a>
-              and
-              <a href="{app_url}/privacy" style="color:#059669; text-decoration:underline;">Privacy Policy</a>,
-              effective February 15, 2026. Here's a summary of the key changes:
+              I've made a change to how PlantCareAI generates your plant care advice. I've switched
+              the AI provider from OpenAI to <strong>Anthropic Claude</strong> &mdash; the company behind Claude AI.
             </td>
           </tr>
 
           <tr>
             <td style="padding:0 0 16px; font-size:14px; color:#44403c; line-height:1.8;">
-              <strong>Privacy Policy updates:</strong><br>
-              &bull; Added GDPR legal basis for each data processing activity<br>
-              &bull; Added CCPA/CPRA rights for California residents<br>
-              &bull; Expanded automated decision-making disclosure (weather-based reminders)<br>
-              &bull; Detailed cookie and session information<br>
-              &bull; Added international data transfer mechanisms<br>
-              &bull; Added third-party data sharing table
+              <strong>What changed:</strong><br>
+              &bull; Your plant questions are now processed by Anthropic's Claude instead of OpenAI's GPT<br>
+              &bull; The Privacy Policy has been updated to reflect Anthropic as a data processor
             </td>
           </tr>
 
           <tr>
             <td style="padding:0 0 16px; font-size:14px; color:#44403c; line-height:1.8;">
-              <strong>Terms of Service updates:</strong><br>
-              &bull; Added AS-IS warranty disclaimer<br>
-              &bull; Added weather adjustment disclosure<br>
-              &bull; Specified governing law (State of Texas)<br>
-              &bull; Added severability and entire agreement clauses<br>
-              &bull; Added user termination rights
+              <strong>What didn't change:</strong><br>
+              &bull; The advice quality and personalization you're used to<br>
+              &bull; How your data is handled (encrypted in transit, not used to train AI models)<br>
+              &bull; All other features work exactly the same
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:0 0 16px; font-size:14px; color:#44403c; line-height:1.6;">
+              <strong>Why I switched:</strong><br>
+              I believe in partnering with AI companies whose values align with mine.
+              Anthropic's commitment to AI safety made them the right choice for PlantCareAI.
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:0 0 16px; font-size:14px; color:#44403c; line-height:1.6;">
+              This migration also lets me continue improving the advice quality and accuracy you
+              receive &mdash; I'll be refining PlantCareAI's prompts and context to take full
+              advantage of Claude's strengths.
             </td>
           </tr>
 
           <tr>
             <td style="padding:16px; border:1px solid #e8e3dd; border-radius:6px; text-align:center;">
-              <a href="{app_url}/terms" style="display:inline-block; padding:10px 24px; background-color:#059669; color:#ffffff; text-decoration:none; border-radius:6px; font-weight:bold; font-size:14px;">
-                Review the Changes
+              <a href="{app_url}/privacy" style="display:inline-block; padding:10px 24px; background-color:#059669; color:#ffffff; text-decoration:none; border-radius:6px; font-weight:bold; font-size:14px;">
+                Review Updated Privacy Policy
               </a>
             </td>
           </tr>
 
           <tr>
-            <td style="padding:16px 0 0; font-size:13px; color:#78716c; line-height:1.5;">
-              By continuing to use PlantCareAI after February 15, 2026, you agree to the updated terms.
-              If you have questions, contact us at support@plantcareai.app.
+            <td style="padding:16px 0 0; font-size:14px; color:#44403c; line-height:1.5;">
+              When you next log in, you'll see a brief notice asking you to acknowledge the update.
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:16px 0 0; font-size:14px; color:#44403c; line-height:1.5;">
+              Thanks for being part of PlantCareAI!
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:8px 0 0; font-size:14px; color:#44403c; line-height:1.5;">
+              &mdash; Ellen
             </td>
           </tr>
 
           <tr>
             <td style="padding:24px 0 0; font-size:12px; color:#a69d91; line-height:1.5;">
-              This is a service notification about changes to our legal documents.
+              This is a service notification about changes to PlantCareAI's data processing.
               You are receiving this because you have a PlantCareAI account.
             </td>
           </tr>
@@ -315,35 +333,34 @@ def send_legal_update_email(email: str) -> Dict[str, Any]:
 
     text_content = f"""PlantCareAI
 
-Important: We've Updated Our Terms & Privacy Policy
+Hi there,
 
-We've made significant updates to our Terms of Service and Privacy Policy,
-effective February 15, 2026.
+I've made a change to how PlantCareAI generates your plant care advice. I've switched the AI provider from OpenAI to Anthropic Claude -- the company behind Claude AI.
 
-Privacy Policy updates:
-- Added GDPR legal basis for each data processing activity
-- Added CCPA/CPRA rights for California residents
-- Expanded automated decision-making disclosure (weather-based reminders)
-- Detailed cookie and session information
-- Added international data transfer mechanisms
-- Added third-party data sharing table
+What changed:
+- Your plant questions are now processed by Anthropic's Claude instead of OpenAI's GPT
+- The Privacy Policy has been updated to reflect Anthropic as a data processor
 
-Terms of Service updates:
-- Added AS-IS warranty disclaimer
-- Added weather adjustment disclosure
-- Specified governing law (State of Texas)
-- Added severability and entire agreement clauses
-- Added user termination rights
+What didn't change:
+- The advice quality and personalization you're used to
+- How your data is handled (encrypted in transit, not used to train AI models)
+- All other features work exactly the same
 
-Review the full documents:
-- Terms of Service: {app_url}/terms
-- Privacy Policy: {app_url}/privacy
+Why I switched:
+I believe in partnering with AI companies whose values align with mine. Anthropic's commitment to AI safety made them the right choice for PlantCareAI.
 
-By continuing to use PlantCareAI after February 15, 2026, you agree to the
-updated terms. If you have questions, contact us at support@plantcareai.app.
+This migration also lets me continue improving the advice quality and accuracy you receive -- I'll be refining PlantCareAI's prompts and context to take full advantage of Claude's strengths.
+
+Review the updated Privacy Policy: {app_url}/privacy
+
+When you next log in, you'll see a brief notice asking you to acknowledge the update.
+
+Thanks for being part of PlantCareAI!
+
+-- Ellen
 
 ---
-This is a service notification about changes to our legal documents.
+This is a service notification about changes to PlantCareAI's data processing.
 You are receiving this because you have a PlantCareAI account.
 """
 
@@ -357,7 +374,7 @@ You are receiving this because you have a PlantCareAI account.
             json={
                 "from": "PlantCareAI <hello@updates.plantcareai.app>",
                 "to": [email],
-                "subject": "Important: We've Updated Our Terms & Privacy Policy",
+                "subject": "I've updated PlantCareAI's AI provider \u2014 your data stays safe",
                 "html": html_content,
                 "text": text_content,
             },
