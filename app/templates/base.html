@@ -353,7 +353,7 @@
         <span class="hidden sm:inline"> &mdash; </span><br class="sm:hidden">
         Our <a href="{{ url_for('legal.terms') }}" class="underline font-medium text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300">Terms of Service</a>
         and <a href="{{ url_for('legal.privacy') }}" class="underline font-medium text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300">Privacy Policy</a>
-        were updated on February 15, 2026. Please review the changes.
+        were updated on {{ legal_last_updated }}. Please review the changes.
       </div>
       <button type="button"
               id="legal-acknowledge-btn"
