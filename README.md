@@ -1,11 +1,11 @@
 # Plant Care AI Assistant, PlantCareAI
 
 Flask application that provides plant-care guidance using a layered approach:
-rule-based tips, local weather context, and optional OpenAI answers with graceful fallback to Google Gemini or to a basic rule-based engine if neither AI providers are available. The UI is accessible and CSP-compliant, with a loading indicator and geolocation-aware presets.
+rule-based tips, local weather context, and optional Anthropic Claude answers with graceful fallback to Google Gemini or to a basic rule-based engine if neither AI providers are available. The UI is accessible and CSP-compliant, with a loading indicator and geolocation-aware presets.
 
 ## Features
 
-- Security: strict CSP, server-side validation, rate limiting, OpenAI moderation (input and output), PII redaction
+- Security: strict CSP, server-side validation, rate limiting, AI moderation (input and output), PII redaction
 - Usability: accepts “City, ST” and normalizes for weather; geocoding fallback; “thinking…” loader; responsive layout
 - Accessibility: skip link, ARIA live regions, keyboard-friendly focus behavior; no inline scripts/styles
 - Testability: app factory pattern; safe config access for calling AI without a Flask context; re-exports for legacy tests
@@ -31,5 +31,5 @@ python run.py
 
 Licensed under the [MIT License](LICENSE).
 
-© 2025 EDH Dev.  
+© 2026 EDH Dev.  
 The Plant Care AI Assistant, PlantCareAI, code is open source; the EDH Dev name and logo remain © EDH Dev.

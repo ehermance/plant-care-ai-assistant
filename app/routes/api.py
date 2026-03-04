@@ -271,7 +271,7 @@ def submit_answer_feedback():
             "plant": "...",
             "city": "...",
             "care_context": "...",
-            "ai_source": "openai" | "gemini" | "rule"
+            "ai_source": "anthropic" | "gemini" | "rule"
         }
 
     Returns:

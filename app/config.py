@@ -35,7 +35,7 @@ class BaseConfig:
 
     # Third-party keys
     OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "")
-    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+    ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
     # Supabase (Database + Auth + Storage)
@@ -93,7 +93,7 @@ class BaseConfig:
 
     # Legal notification — bump this date when ToS/Privacy are materially changed
     # to re-show the in-app banner for all users.
-    LEGAL_LAST_UPDATED = "2026-02-15"
+    LEGAL_LAST_UPDATED = "2026-03-03"
 
     # Misc
     PREFERRED_URL_SCHEME = os.getenv("PREFERRED_URL_SCHEME", "https")
