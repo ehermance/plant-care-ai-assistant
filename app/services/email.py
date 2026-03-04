@@ -247,7 +247,7 @@ def send_legal_update_email(email: str) -> Dict[str, Any]:
 
           <tr>
             <td style="padding:0 0 16px; font-size:14px; color:#44403c; line-height:1.6;">
-              Hi,
+              Hi there,
             </td>
           </tr>
 
@@ -333,7 +333,7 @@ def send_legal_update_email(email: str) -> Dict[str, Any]:
 
     text_content = f"""PlantCareAI
 
-Hi,
+Hi there,
 
 I've made a change to how PlantCareAI generates your plant care advice. I've switched the AI provider from OpenAI to Anthropic Claude -- the company behind Claude AI.
 
