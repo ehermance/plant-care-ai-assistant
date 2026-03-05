@@ -222,6 +222,10 @@ def create_app() -> Flask:
             "magnetometer=(), microphone=(), payment=(), usb=()"
         )
 
+        # Prevent non-production deployments (staging) from being indexed
+        if not is_production:
+            resp.headers["X-Robots-Tag"] = "noindex, nofollow"
+
         return resp
 
     # Blueprints
@@ -248,7 +252,12 @@ def create_app() -> Flask:
     app.jinja_env.filters["relative_date"] = relative_date
 
     # Add Jinja global for app base URL (avoids host header injection via request.url_root)
-    app.jinja_env.globals["APP_URL"] = os.getenv("APP_URL", "https://plantcareai.app").rstrip("/")
+    app_url = os.getenv("APP_URL", "https://plantcareai.app").rstrip("/")
+    app.jinja_env.globals["APP_URL"] = app_url
+
+    # Detect non-production environments for noindex (prevents staging from being indexed)
+    is_production = app_url == "https://plantcareai.app"
+    app.jinja_env.globals["IS_PRODUCTION"] = is_production
 
     # Add Jinja global for Cloudflare Web Analytics
     app.jinja_env.globals["CF_BEACON_TOKEN"] = os.getenv("CF_BEACON_TOKEN", "")
