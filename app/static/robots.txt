@@ -11,12 +11,12 @@ User-agent: anthropic-ai
 User-agent: cohere-ai
 User-agent: Bytespider
 User-agent: Amazonbot
-User-agent: FacebookBot
 User-agent: Meta-ExternalAgent
+User-agent: Applebot-Extended
 Disallow: /
 
-# ALLOW AI SEARCH & RETRIEVAL
-# These bots are allowed to cite this site in real-time answers.
+# ALLOW AI SEARCH, RETRIEVAL & SOCIAL BOTS
+# These bots are allowed to access and cite this site's content.
 # We include Disallows here to keep them out of private areas.
 User-agent: OAI-SearchBot
 User-agent: Claude-SearchBot
@@ -24,7 +24,8 @@ User-agent: PerplexityBot
 User-agent: ChatGPT-User
 User-agent: Claude-User
 User-agent: Gemini-User
-User-agent: Applebot-Extended
+User-agent: FacebookBot
+User-agent: Applebot
 Disallow: /admin/
 Disallow: /api/
 Disallow: /*?debug=
