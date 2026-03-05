@@ -1,7 +1,7 @@
 # robots.txt for PlantCareAI.app
 # https://www.robotstxt.org/
 
-# GROUP 1: AI TRAINING CRAWLERS (BLOCKED)
+# BLOCK AI TRAINING CRAWLERS
 # Blocks content from being used to train new models
 User-agent: GPTBot
 User-agent: ClaudeBot
@@ -15,8 +15,8 @@ User-agent: FacebookBot
 User-agent: Meta-ExternalAgent
 Disallow: /
 
-# GROUP 2: AI SEARCH & RETRIEVAL (ALLOWED)
-# These bots are allowed to cite your site in real-time answers.
+# ALLOW AI SEARCH & RETRIEVAL
+# These bots are allowed to cite this site in real-time answers.
 # We include Disallows here to keep them out of private areas.
 User-agent: OAI-SearchBot
 User-agent: Claude-SearchBot
@@ -35,7 +35,7 @@ Disallow: /*?question=
 Disallow: /*?utm_
 Allow: /
 
-# GROUP 3: GENERAL SEARCH & ALL OTHER BOTS
+# ALLOW GENERAL SEARCH & ALL OTHER BOTS
 # This includes Googlebot and Bingbot.
 User-agent: *
 Disallow: /admin/
