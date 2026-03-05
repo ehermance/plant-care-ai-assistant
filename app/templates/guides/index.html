@@ -20,6 +20,29 @@
 <meta name="twitter:image:alt" content="Plant Care Guides - PlantCareAI" />
 {% endblock %}
 
+{% block extra_head %}
+<!-- ItemList Structured Data for rich carousel results -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Plant Care Guides",
+  "description": "Free care guides for popular houseplants including watering, light, and troubleshooting.",
+  "numberOfItems": {{ guides | length }},
+  "itemListElement": [
+    {% for guide in guides %}
+    {
+      "@type": "ListItem",
+      "position": {{ loop.index }},
+      "name": {{ guide.name | tojson }},
+      "url": "{{ APP_URL }}{{ url_for('guides.view', slug=guide.slug) }}"
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <!-- Hero Section -->
 <section class="text-center py-12 md:py-16">

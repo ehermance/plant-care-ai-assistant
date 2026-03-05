@@ -15,7 +15,7 @@
   <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
 
   <!-- Robots (overridable per page) -->
-  {% block robots %}<meta name="robots" content="index, follow" />{% endblock %}
+  {% block robots %}{% if IS_PRODUCTION %}<meta name="robots" content="index, follow" />{% else %}<meta name="robots" content="noindex, nofollow" />{% endif %}{% endblock %}
 
   <!-- Security Meta Tags -->
   <meta name="referrer" content="strict-origin-when-cross-origin">
