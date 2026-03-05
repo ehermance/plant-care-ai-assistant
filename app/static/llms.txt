@@ -1,0 +1,40 @@
+# PlantCareAI
+
+> AI-powered plant care assistant with weather-aware watering reminders, personalized care tips, and plant health tracking.
+
+PlantCareAI helps plant owners keep their houseplants thriving with an AI assistant powered by Anthropic Claude, real-time weather integration, and curated care guides for popular species. Free to use, no ads.
+
+## Key Pages
+
+- [AI Plant Care Assistant](https://plantcareai.app/ask): Ask any plant care question and get personalized, weather-aware advice.
+- [AI Plant Doctor](https://plantcareai.app/ai-plant-doctor): Diagnose plant problems with AI-powered analysis.
+- [Plant Care Guides](https://plantcareai.app/plant-care-guides/): Free care guides for 10 popular houseplants.
+- [Plant Watering Guide](https://plantcareai.app/plant-watering-guide): Complete guide to watering houseplants.
+- [Plant Leaf Problems](https://plantcareai.app/plant-leaf-problems): Diagnosis and treatment for common leaf issues.
+
+## Plant Care Guides
+
+- [Monstera Care](https://plantcareai.app/plant-care-guides/monstera-deliciosa): Watering, light, humidity, and troubleshooting for Monstera Deliciosa.
+- [Pothos Care](https://plantcareai.app/plant-care-guides/pothos): Care guide for Golden Pothos (Devil's Ivy).
+- [Snake Plant Care](https://plantcareai.app/plant-care-guides/snake-plant): Low-maintenance Sansevieria care guide.
+- [Fiddle Leaf Fig Care](https://plantcareai.app/plant-care-guides/fiddle-leaf-fig): Ficus Lyrata care, light needs, and common problems.
+- [Peace Lily Care](https://plantcareai.app/plant-care-guides/peace-lily): Spathiphyllum care, flowering tips, and troubleshooting.
+- [Spider Plant Care](https://plantcareai.app/plant-care-guides/spider-plant): Chlorophytum Comosum care and propagation.
+- [ZZ Plant Care](https://plantcareai.app/plant-care-guides/zz-plant): Zamioculcas Zamiifolia low-light care guide.
+- [Philodendron Care](https://plantcareai.app/plant-care-guides/philodendron): Heartleaf Philodendron care and varieties.
+- [Rubber Plant Care](https://plantcareai.app/plant-care-guides/rubber-plant): Ficus Elastica care, pruning, and propagation.
+- [Aloe Vera Care](https://plantcareai.app/plant-care-guides/aloe-vera): Aloe Vera watering, light, and medicinal uses.
+
+## Troubleshooting
+
+- [Yellow Leaves](https://plantcareai.app/why-are-my-plant-leaves-turning-yellow): 9 causes and fixes for yellowing plant leaves.
+- [Drooping Leaves](https://plantcareai.app/why-are-my-plant-leaves-drooping): Why plants wilt and how to revive them.
+- [Brown Leaves](https://plantcareai.app/why-are-my-plant-leaves-turning-brown): Causes of brown tips, edges, and spots.
+- [Curling Leaves](https://plantcareai.app/why-are-my-plant-leaves-curling): Why leaves curl and how to fix it.
+- [Root Rot](https://plantcareai.app/how-to-treat-root-rot): How to identify, treat, and prevent root rot.
+- [Overwatering](https://plantcareai.app/am-i-overwatering-my-plant): Signs of overwatering and recovery steps.
+- [Fungus Gnats](https://plantcareai.app/how-to-get-rid-of-fungus-gnats): How to eliminate fungus gnats from houseplants.
+- [Plant Not Growing](https://plantcareai.app/why-is-my-plant-not-growing): Why growth stalls and how to fix it.
+- [Watering Frequency](https://plantcareai.app/how-often-should-i-water-my-plant): How to determine the right watering schedule.
+- [Water Today?](https://plantcareai.app/should-i-water-my-plant-today): When to water based on conditions.
+- [Beginner Guide](https://plantcareai.app/indoor-plant-care-for-beginners): Indoor plant care fundamentals for new plant parents.

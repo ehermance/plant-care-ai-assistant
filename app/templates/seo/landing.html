@@ -38,7 +38,11 @@
   },
   "image": "{{ url_for('static', filename='images/og/seo-' ~ page.slug ~ '.png', _external=True) }}",
   "datePublished": "{{ page.last_updated }}T00:00:00+00:00",
-  "dateModified": "{{ page.last_updated }}T00:00:00+00:00"
+  "dateModified": "{{ page.last_updated }}T00:00:00+00:00",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": ["h1", "[aria-label='Quick answer']"]
+  }
 }
 </script>
 <!-- FAQPage Structured Data -->

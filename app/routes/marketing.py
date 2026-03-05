@@ -158,6 +158,82 @@ def robots():
     return Response(content, mimetype="text/plain")
 
 
+@marketing_bp.route("/llms.txt")
+def llms_txt():
+    """Serve llms.txt for AI model discoverability."""
+    llms_path = os.path.join(current_app.static_folder, "llms.txt")
+    try:
+        with open(llms_path, "r") as f:
+            content = f.read()
+    except FileNotFoundError:
+        content = "# PlantCareAI\n\n> AI-powered plant care assistant.\n"
+    return Response(content, mimetype="text/plain; charset=utf-8")
+
+
+@marketing_bp.route("/llms-full.txt")
+def llms_full_txt():
+    """Serve llms-full.txt with detailed content for AI models.
+
+    Generated dynamically from the same JSON data files the sitemap uses,
+    so new content pages are automatically included.
+    """
+    base_url = os.getenv("APP_URL", "https://plantcareai.app")
+    lines = [
+        "# PlantCareAI",
+        "",
+        "> AI-powered plant care assistant with weather-aware watering reminders, "
+        "personalized care tips, and plant health tracking.",
+        "",
+        "PlantCareAI helps plant owners keep their houseplants thriving with an AI "
+        "assistant powered by Anthropic Claude, real-time weather integration, and "
+        "curated care guides for popular species. Free to use, no ads.",
+        "",
+        "## Key Pages",
+        "",
+        f"- [AI Plant Care Assistant]({base_url}/ask): Ask any plant care question "
+        "and get personalized, weather-aware advice from our AI assistant.",
+        f"- [AI Plant Doctor]({base_url}/ai-plant-doctor): Diagnose plant problems "
+        "with AI-powered analysis. Describe symptoms and get targeted solutions.",
+        f"- [Plant Care Guides]({base_url}/plant-care-guides/): Free care guides for "
+        f"{len(_GUIDES)} popular houseplants with watering, light, and troubleshooting.",
+        f"- [Features]({base_url}/features/): Weather-aware reminders, plant health "
+        "tracking, journal, and AI-powered care advice.",
+    ]
+
+    # Hub pages
+    if _HUB_PAGES:
+        for page in _HUB_PAGES:
+            lines.append(
+                f"- [{page['title']}]({base_url}/{page['slug']}): "
+                f"{page['meta_description']}"
+            )
+
+    # Plant care guides
+    lines.extend(["", "## Plant Care Guides", ""])
+    for guide in _GUIDES:
+        if guide.get("slug"):
+            summary = guide.get("summary", guide.get("meta_description", ""))
+            lines.append(
+                f"- [{guide['name']} Care Guide]"
+                f"({base_url}/plant-care-guides/{guide['slug']}): "
+                f"{guide.get('meta_description', summary)}"
+            )
+
+    # Troubleshooting pages
+    lines.extend(["", "## Troubleshooting", ""])
+    for page in _SEO_PAGES:
+        desc = page.get("meta_description", "")
+        quick = page.get("quick_answer", "")
+        # Use quick_answer if available (more informative), else meta_description
+        detail = quick if quick else desc
+        lines.append(
+            f"- [{page['title']}]({base_url}/{page['slug']}): {detail}"
+        )
+
+    lines.append("")
+    return Response("\n".join(lines), mimetype="text/plain; charset=utf-8")
+
+
 @marketing_bp.route("/unsubscribe/<token>")
 def unsubscribe(token: str):
     """
