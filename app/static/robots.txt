@@ -49,5 +49,5 @@ Disallow: /*?question=
 Disallow: /*?utm_
 Allow: /
 
-# Sitemap location
-Sitemap: https://plantcareai.app/sitemap.xml
+# SITEMAP LOCATION
+Sitemap: https://plantcareai.app
