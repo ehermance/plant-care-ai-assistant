@@ -29,7 +29,9 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /*?debug=
 Disallow: /*?next=
+Disallow: /*?plant=
 Disallow: /*?plant_id=
+Disallow: /*?question=
 Disallow: /*?utm_
 Allow: /
 
