@@ -50,4 +50,4 @@ Disallow: /*?utm_
 Allow: /
 
 # SITEMAP LOCATION
-Sitemap: https://plantcareai.app
+Sitemap: https://plantcareai.app/sitemap.xml
