@@ -20,7 +20,7 @@
   </h1>
   <p class="text-lg text-slate-600 dark:text-slate-400">
     {{ reminder.reminder_type|replace('_', ' ')|title }} reminder for
-    <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
+    <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="text-emerald-700 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
       {{ reminder.plants.name }}{% if reminder.plants.nickname %} "{{ reminder.plants.nickname }}"{% endif %}
     </a>
   </p>
@@ -57,7 +57,7 @@
         {% endif %}
         <div class="flex-1 min-w-0">
           <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">
-            <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="hover:text-emerald-600 dark:hover:text-emerald-400">
+            <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="hover:text-emerald-700 dark:hover:text-emerald-400">
               {{ reminder.plants.name }}
             </a>
           </h3>

@@ -15,7 +15,7 @@
     if (!max || max < 20) return; // skip tiny fields like OTP
 
     var counter = document.createElement('p');
-    counter.className = 'text-xs text-slate-400 dark:text-slate-500 text-right mt-1';
+    counter.className = 'text-xs text-slate-500 dark:text-slate-400 text-right mt-1';
     counter.setAttribute('aria-live', 'polite');
 
     function update() {
@@ -24,7 +24,7 @@
       if (remaining < max * 0.1) {
         counter.className = 'text-xs text-amber-600 dark:text-amber-400 text-right mt-1';
       } else {
-        counter.className = 'text-xs text-slate-400 dark:text-slate-500 text-right mt-1';
+        counter.className = 'text-xs text-slate-500 dark:text-slate-400 text-right mt-1';
       }
     }
 

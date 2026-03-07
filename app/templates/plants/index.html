@@ -12,7 +12,7 @@
     My Plants <span class="inline-block" aria-hidden="true">🪴</span>
   </h1>
   <p class="text-lg text-slate-600 dark:text-slate-400">
-    You're caring for <strong class="text-emerald-600 dark:text-emerald-400">{{ plant_count }}</strong> {{ 'plant' if plant_count == 1 else 'plants' }}
+    You're caring for <strong class="text-emerald-700 dark:text-emerald-400">{{ plant_count }}</strong> {{ 'plant' if plant_count == 1 else 'plants' }}
   </p>
 </div>
 
@@ -51,7 +51,7 @@
               {{ plant.name }}
             </a>
             {% if plant.nickname %}
-              <span class="text-base font-normal text-emerald-600 dark:text-emerald-400">"{{ plant.nickname }}"</span>
+              <span class="text-base font-normal text-emerald-700 dark:text-emerald-400">"{{ plant.nickname }}"</span>
             {% endif %}
           </h2>
 

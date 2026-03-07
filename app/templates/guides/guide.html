@@ -265,7 +265,7 @@
             </span>
           </div>
           {% if variety.special_note %}
-          <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-2">{{ variety.special_note }}</p>
+          <p class="text-xs text-emerald-700 dark:text-emerald-400 mt-2">{{ variety.special_note }}</p>
           {% endif %}
         </div>
         {% endfor %}
@@ -315,7 +315,7 @@
             <span class="font-medium text-slate-700 dark:text-slate-300">What to do:</span> {{ item.fix }}
           </p>
           {% if item.landing_page_slug %}
-          <a href="/{{ item.landing_page_slug }}" class="inline-flex items-center gap-1 text-sm text-emerald-600 dark:text-emerald-400 hover:underline mt-2">
+          <a href="/{{ item.landing_page_slug }}" class="inline-flex items-center gap-1 text-sm text-emerald-700 dark:text-emerald-400 hover:underline mt-2">
             Learn more: {{ item.landing_page_title }} →
           </a>
           {% endif %}
@@ -349,23 +349,23 @@
         On This Page
       </h3>
       <ul class="space-y-2 text-sm">
-        <li><a href="#watering" class="text-emerald-600 dark:text-emerald-400 hover:underline">Watering</a></li>
-        <li><a href="#light" class="text-emerald-600 dark:text-emerald-400 hover:underline">Light Requirements</a></li>
-        <li><a href="#humidity" class="text-emerald-600 dark:text-emerald-400 hover:underline">Humidity & Temperature</a></li>
-        <li><a href="#fertilizing" class="text-emerald-600 dark:text-emerald-400 hover:underline">Fertilizing</a></li>
+        <li><a href="#watering" class="text-emerald-700 dark:text-emerald-400 hover:underline">Watering</a></li>
+        <li><a href="#light" class="text-emerald-700 dark:text-emerald-400 hover:underline">Light Requirements</a></li>
+        <li><a href="#humidity" class="text-emerald-700 dark:text-emerald-400 hover:underline">Humidity & Temperature</a></li>
+        <li><a href="#fertilizing" class="text-emerald-700 dark:text-emerald-400 hover:underline">Fertilizing</a></li>
         {% if guide.propagation %}
-        <li><a href="#propagation" class="text-emerald-600 dark:text-emerald-400 hover:underline">Propagation</a></li>
+        <li><a href="#propagation" class="text-emerald-700 dark:text-emerald-400 hover:underline">Propagation</a></li>
         {% endif %}
         {% if guide.varieties %}
-        <li><a href="#varieties" class="text-emerald-600 dark:text-emerald-400 hover:underline">Popular Varieties</a></li>
+        <li><a href="#varieties" class="text-emerald-700 dark:text-emerald-400 hover:underline">Popular Varieties</a></li>
         {% endif %}
         {% if guide.care_calendar %}
-        <li><a href="#care-calendar" class="text-emerald-600 dark:text-emerald-400 hover:underline">Seasonal Care</a></li>
+        <li><a href="#care-calendar" class="text-emerald-700 dark:text-emerald-400 hover:underline">Seasonal Care</a></li>
         {% endif %}
         {% if guide.troubleshooting %}
-        <li><a href="#troubleshooting" class="text-emerald-600 dark:text-emerald-400 hover:underline">Troubleshooting</a></li>
+        <li><a href="#troubleshooting" class="text-emerald-700 dark:text-emerald-400 hover:underline">Troubleshooting</a></li>
         {% elif guide.common_problems %}
-        <li><a href="#common-problems" class="text-emerald-600 dark:text-emerald-400 hover:underline">Common Problems</a></li>
+        <li><a href="#common-problems" class="text-emerald-700 dark:text-emerald-400 hover:underline">Common Problems</a></li>
         {% endif %}
       </ul>
     </nav>
@@ -410,7 +410,7 @@
       <ul class="space-y-2 text-sm">
         {% for item in related %}
         <li>
-          <a href="/{{ item.landing_page_slug }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">
+          <a href="/{{ item.landing_page_slug }}" class="text-emerald-700 dark:text-emerald-400 hover:underline">
             {{ item.landing_page_title }}
           </a>
         </li>
@@ -425,7 +425,7 @@
       <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">
         More Guides
       </h3>
-      <a href="{{ url_for('guides.index') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline text-sm">
+      <a href="{{ url_for('guides.index') }}" class="text-emerald-700 dark:text-emerald-400 hover:underline text-sm">
         View all plant care guides →
       </a>
     </div>
