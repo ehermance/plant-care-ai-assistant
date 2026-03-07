@@ -46,14 +46,14 @@
 
         <!-- Plant Info -->
         <div class="space-y-3">
-          <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100">
+          <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">
             <a href="{{ url_for('plants.view', plant_id=plant.id) }}" class="after:absolute after:inset-0 focus:outline-none">
               {{ plant.name }}
             </a>
             {% if plant.nickname %}
               <span class="text-base font-normal text-emerald-600 dark:text-emerald-400">"{{ plant.nickname }}"</span>
             {% endif %}
-          </h3>
+          </h2>
 
           {% if plant.species %}
             <p class="text-sm text-slate-600 dark:text-slate-400 italic">{{ plant.species }}</p>

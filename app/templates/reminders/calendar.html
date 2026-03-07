@@ -85,10 +85,10 @@
         <div class="rounded-lg border {% if is_today %}border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20{% else %}border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800{% endif %} p-4">
           {% set date_parts = date_key.split('-') %}
           {% set formatted_date = '%s %s, %s'|format(('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec')[date_parts[1]|int - 1], date_parts[2]|int, date_parts[0]) %}
-          <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
+          <h2 class="font-semibold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
             {% if is_today %}<span class="inline-flex items-center justify-center px-2 h-6 text-xs bg-emerald-600 text-white rounded-full">Today</span>{% endif %}
             {{ formatted_date }}
-          </h3>
+          </h2>
           <ul class="space-y-2">
             {% for reminder in day_reminders %}
             <li>
@@ -174,7 +174,7 @@
 
 <!-- Legend -->
 <div class="card">
-  <h3 class="section-title">Reminder Types</h3>
+  <h2 class="section-title">Reminder Types</h2>
   <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
     <div class="flex items-center gap-2">
       <span class="text-2xl" aria-hidden="true">💧</span>

@@ -83,9 +83,9 @@
           <!-- Content -->
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-3 mb-2">
-              <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
+              <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
                 {{ action_type_names.get(action.action_type, action.action_type) }}
-              </h3>
+              </h2>
               {% if action.amount_ml %}
                 <span class="badge-emerald">{{ action.amount_ml }} ml</span>
               {% endif %}
@@ -119,9 +119,9 @@
   {% else %}
     <div class="empty-state">
       <div class="text-6xl mb-4">📝</div>
-      <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
+      <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
         No journal entries yet
-      </h3>
+      </h2>
       <p class="text-slate-600 dark:text-slate-400 mb-6">
         Start tracking your plant care activities to see how {{ plant.name }} is doing over time.
       </p>
