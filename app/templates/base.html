@@ -60,7 +60,8 @@
   <link rel="dns-prefetch" href="//static.cloudflareinsights.com">
 
   <!-- Google Fonts (async load to avoid render-blocking; display=swap shows fallback fonts until loaded) -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&display=swap" as="style">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&display=swap" media="print" id="google-fonts-css">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&display=swap"></noscript>
 
   <!-- Tailwind CSS (Horti-Futuristic Design System) -->
@@ -220,14 +221,14 @@
                    aria-labelledby="user-menu-btn">
                 <a href="{{ url_for('dashboard.account') }}"
                    role="menuitem"
-                   class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-emerald-600 dark:hover:text-emerald-400">
+                   class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-emerald-700 dark:hover:text-emerald-400">
                   Account Settings
                 </a>
                 <form method="POST" action="{{ url_for('auth.logout') }}">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <button type="submit"
                      role="menuitem"
-                     class="block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-emerald-600 dark:hover:text-emerald-400">
+                     class="block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-emerald-700 dark:hover:text-emerald-400">
                     Log Out
                   </button>
                 </form>
@@ -313,9 +314,9 @@
       <!-- Debug Links -->
         <div class="mt-2 pt-2 border-t border-slate-200 dark:border-slate-700">
           <p class="text-xs text-slate-500 dark:text-slate-400">
-            <a href="{{ url_for('web.healthz') }}" target="_blank" rel="noopener" class="hover:text-emerald-600 dark:hover:text-emerald-400">Health check</a>
+            <a href="{{ url_for('web.healthz') }}" target="_blank" rel="noopener" class="hover:text-emerald-700 dark:hover:text-emerald-400">Health check</a>
             <span class="mx-2">·</span>
-            <a href="{{ url_for('web.debug_info') }}" target="_blank" rel="noopener" class="hover:text-emerald-600 dark:hover:text-emerald-400">Debug info</a>
+            <a href="{{ url_for('web.debug_info') }}" target="_blank" rel="noopener" class="hover:text-emerald-700 dark:hover:text-emerald-400">Debug info</a>
           </p>
         </div>
       {% endif %}
@@ -441,14 +442,14 @@
         <!-- Row 1: Topic-grouped navigation -->
         <nav class="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 pb-4 border-b border-slate-200 dark:border-slate-700" aria-label="Footer navigation">
           <div>
-            <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-2 text-xs uppercase tracking-wider">Plant Care</h3>
+            <h2 class="font-semibold text-slate-900 dark:text-slate-100 mb-2 text-xs uppercase tracking-wider">Plant Care</h2>
             <ul class="space-y-1.5">
               <li><a href="{{ url_for('seo.watering_hub') }}" class="text-emerald-700 dark:text-emerald-400 underline decoration-emerald-700/30 dark:decoration-emerald-400/30 underline-offset-2 hover:decoration-emerald-600 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:decoration-emerald-600 dark:focus-visible:decoration-emerald-400">Watering Guide</a></li>
               <li><a href="{{ url_for('seo.leaf_problems_hub') }}" class="text-emerald-700 dark:text-emerald-400 underline decoration-emerald-700/30 dark:decoration-emerald-400/30 underline-offset-2 hover:decoration-emerald-600 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:decoration-emerald-600 dark:focus-visible:decoration-emerald-400">Leaf Problems Guide</a></li>
             </ul>
           </div>
           <div>
-            <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-2 text-xs uppercase tracking-wider">Troubleshoot</h3>
+            <h2 class="font-semibold text-slate-900 dark:text-slate-100 mb-2 text-xs uppercase tracking-wider">Troubleshoot</h2>
             <ul class="space-y-1.5">
               <li><a href="{{ url_for('seo.drooping') }}" class="text-emerald-700 dark:text-emerald-400 underline decoration-emerald-700/30 dark:decoration-emerald-400/30 underline-offset-2 hover:decoration-emerald-600 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:decoration-emerald-600 dark:focus-visible:decoration-emerald-400">Drooping Leaves</a></li>
               <li><a href="{{ url_for('seo.yellow_leaves') }}" class="text-emerald-700 dark:text-emerald-400 underline decoration-emerald-700/30 dark:decoration-emerald-400/30 underline-offset-2 hover:decoration-emerald-600 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:decoration-emerald-600 dark:focus-visible:decoration-emerald-400">Yellow Leaves</a></li>
@@ -456,7 +457,7 @@
             </ul>
           </div>
           <div>
-            <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-2 text-xs uppercase tracking-wider">Resources</h3>
+            <h2 class="font-semibold text-slate-900 dark:text-slate-100 mb-2 text-xs uppercase tracking-wider">Resources</h2>
             <ul class="space-y-1.5">
               <li><a href="{{ url_for('guides.index') }}" class="text-emerald-700 dark:text-emerald-400 underline decoration-emerald-700/30 dark:decoration-emerald-400/30 underline-offset-2 hover:decoration-emerald-600 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:decoration-emerald-600 dark:focus-visible:decoration-emerald-400">Plant Guides</a></li>
               <li><a href="{{ url_for('web.assistant') }}" class="text-emerald-700 dark:text-emerald-400 underline decoration-emerald-700/30 dark:decoration-emerald-400/30 underline-offset-2 hover:decoration-emerald-600 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:decoration-emerald-600 dark:focus-visible:decoration-emerald-400">AI Assistant</a></li>
@@ -468,15 +469,15 @@
         <!-- Row 2: Legal, social, and support links -->
         <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6">
           <div class="flex items-center gap-4">
-            <a href="{{ url_for('legal.terms') }}" class="text-slate-600 dark:text-slate-400 underline decoration-slate-400/50 dark:decoration-slate-500/50 underline-offset-2 hover:text-emerald-600 hover:decoration-emerald-600 dark:hover:text-emerald-400 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:text-emerald-600 focus-visible:decoration-emerald-600 dark:focus-visible:text-emerald-400 dark:focus-visible:decoration-emerald-400 transition-colors">Terms</a>
+            <a href="{{ url_for('legal.terms') }}" class="text-slate-600 dark:text-slate-400 underline decoration-slate-400/50 dark:decoration-slate-500/50 underline-offset-2 hover:text-emerald-700 hover:decoration-emerald-600 dark:hover:text-emerald-400 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:text-emerald-700 focus-visible:decoration-emerald-600 dark:focus-visible:text-emerald-400 dark:focus-visible:decoration-emerald-400 transition-colors">Terms</a>
             <span aria-hidden="true" class="text-slate-400 dark:text-slate-500">•</span>
-            <a href="{{ url_for('legal.privacy') }}" class="text-slate-600 dark:text-slate-400 underline decoration-slate-400/50 dark:decoration-slate-500/50 underline-offset-2 hover:text-emerald-600 hover:decoration-emerald-600 dark:hover:text-emerald-400 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:text-emerald-600 focus-visible:decoration-emerald-600 dark:focus-visible:text-emerald-400 dark:focus-visible:decoration-emerald-400 transition-colors">Privacy</a>
+            <a href="{{ url_for('legal.privacy') }}" class="text-slate-600 dark:text-slate-400 underline decoration-slate-400/50 dark:decoration-slate-500/50 underline-offset-2 hover:text-emerald-700 hover:decoration-emerald-600 dark:hover:text-emerald-400 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:text-emerald-700 focus-visible:decoration-emerald-600 dark:focus-visible:text-emerald-400 dark:focus-visible:decoration-emerald-400 transition-colors">Privacy</a>
           </div>
           <div class="flex items-center gap-3">
             <a href="https://www.instagram.com/plantcareai/"
                target="_blank"
                rel="noopener noreferrer"
-               class="text-slate-600 dark:text-slate-400 underline decoration-slate-400/50 dark:decoration-slate-500/50 underline-offset-2 hover:text-emerald-600 hover:decoration-emerald-600 dark:hover:text-emerald-400 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:text-emerald-600 focus-visible:decoration-emerald-600 dark:focus-visible:text-emerald-400 dark:focus-visible:decoration-emerald-400 transition-colors"
+               class="text-slate-600 dark:text-slate-400 underline decoration-slate-400/50 dark:decoration-slate-500/50 underline-offset-2 hover:text-emerald-700 hover:decoration-emerald-600 dark:hover:text-emerald-400 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:text-emerald-700 focus-visible:decoration-emerald-600 dark:focus-visible:text-emerald-400 dark:focus-visible:decoration-emerald-400 transition-colors"
                aria-label="PlantCareAI on Instagram">
               Instagram
             </a>
@@ -484,7 +485,7 @@
             <a href="https://www.linkedin.com/company/plantcareai/"
                target="_blank"
                rel="noopener noreferrer"
-               class="text-slate-600 dark:text-slate-400 underline decoration-slate-400/50 dark:decoration-slate-500/50 underline-offset-2 hover:text-emerald-600 hover:decoration-emerald-600 dark:hover:text-emerald-400 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:text-emerald-600 focus-visible:decoration-emerald-600 dark:focus-visible:text-emerald-400 dark:focus-visible:decoration-emerald-400 transition-colors"
+               class="text-slate-600 dark:text-slate-400 underline decoration-slate-400/50 dark:decoration-slate-500/50 underline-offset-2 hover:text-emerald-700 hover:decoration-emerald-600 dark:hover:text-emerald-400 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:text-emerald-700 focus-visible:decoration-emerald-600 dark:focus-visible:text-emerald-400 dark:focus-visible:decoration-emerald-400 transition-colors"
                aria-label="PlantCareAI on LinkedIn">
               LinkedIn
             </a>

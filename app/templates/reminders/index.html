@@ -82,12 +82,12 @@
 
       <div class="flex-1 min-w-0">
         <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
-          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">
             {{ reminder.title }}
           </a>
         </h3>
         <p class="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2 flex-wrap mb-2">
-          <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
+          <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="text-emerald-700 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
             {{ reminder.plant_name }}{% if reminder.plant_nickname %} "{{ reminder.plant_nickname }}"{% endif %}
           </a>
           {% if reminder.weather_adjustment_reason %}
@@ -134,12 +134,12 @@
 
       <div class="flex-1 min-w-0">
         <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
-          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">
             {{ reminder.title }}
           </a>
         </h3>
         <p class="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2 flex-wrap mb-2">
-          <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
+          <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="text-emerald-700 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
             {{ reminder.plant_name }}{% if reminder.plant_nickname %} "{{ reminder.plant_nickname }}"{% endif %}
           </a>
           <span aria-hidden="true">•</span>
@@ -178,12 +178,12 @@
 
       <div class="flex-1 min-w-0">
         <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
-          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">
             {{ reminder.title }}
           </a>
         </h3>
         <p class="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2 flex-wrap mb-2">
-          <a href="{{ url_for('plants.view', plant_id=reminder.plants.id) }}" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
+          <a href="{{ url_for('plants.view', plant_id=reminder.plants.id) }}" class="text-emerald-700 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
             {{ reminder.plants.name }}{% if reminder.plants.nickname %} "{{ reminder.plants.nickname }}"{% endif %}
           </a>
           <span aria-hidden="true">•</span>

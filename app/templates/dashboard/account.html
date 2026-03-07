@@ -108,22 +108,22 @@
           </tr>
           <tr class="border-b border-slate-200 dark:border-slate-700">
             <th scope="row" class="text-left py-2 px-3 font-medium text-slate-900 dark:text-slate-100">AI image diagnosis</th>
-            <td class="text-center py-2 px-3 text-slate-400"><span aria-label="Not included">—</span></td>
+            <td class="text-center py-2 px-3 text-slate-500 dark:text-slate-400"><span aria-label="Not included">—</span></td>
             <td class="text-center py-2 px-3 text-slate-700 dark:text-slate-300">Coming soon</td>
           </tr>
           <tr class="border-b border-slate-200 dark:border-slate-700">
             <th scope="row" class="text-left py-2 px-3 font-medium text-slate-900 dark:text-slate-100">CSV/PDF export</th>
-            <td class="text-center py-2 px-3 text-slate-400"><span aria-label="Not included">—</span></td>
+            <td class="text-center py-2 px-3 text-slate-500 dark:text-slate-400"><span aria-label="Not included">—</span></td>
             <td class="text-center py-2 px-3"><span aria-label="Included">✓</span></td>
           </tr>
           <tr class="border-b border-slate-200 dark:border-slate-700">
             <th scope="row" class="text-left py-2 px-3 font-medium text-slate-900 dark:text-slate-100">Seasonal task generator</th>
-            <td class="text-center py-2 px-3 text-slate-400"><span aria-label="Not included">—</span></td>
+            <td class="text-center py-2 px-3 text-slate-500 dark:text-slate-400"><span aria-label="Not included">—</span></td>
             <td class="text-center py-2 px-3"><span aria-label="Included">✓</span></td>
           </tr>
           <tr>
             <th scope="row" class="text-left py-2 px-3 font-medium text-slate-900 dark:text-slate-100">Priority support</th>
-            <td class="text-center py-2 px-3 text-slate-400"><span aria-label="Not included">—</span></td>
+            <td class="text-center py-2 px-3 text-slate-500 dark:text-slate-400"><span aria-label="Not included">—</span></td>
             <td class="text-center py-2 px-3"><span aria-label="Included">✓</span></td>
           </tr>
         </tbody>
@@ -169,10 +169,10 @@
       <p id="timezone-help" class="help-text mb-2">
         {% if profile and profile.timezone %}
         Currently set to: <strong class="text-slate-700 dark:text-slate-300">{{ profile.timezone | replace('_', ' ') }}</strong>
-        {% if profile.city %}<span class="text-slate-400">(auto-detected from {{ profile.city }})</span>{% endif %}
+        {% if profile.city %}<span class="text-slate-500 dark:text-slate-400">(auto-detected from {{ profile.city }})</span>{% endif %}
         {% else %}
         Currently using: <strong class="text-slate-700 dark:text-slate-300" id="browser-timezone-display">browser default</strong>
-        <span class="text-slate-400">(auto-detected)</span>
+        <span class="text-slate-500 dark:text-slate-400">(auto-detected)</span>
         {% endif %}
       </p>
       <select id="timezone" name="timezone" class="input" aria-describedby="timezone-help">
@@ -198,13 +198,13 @@
       <p id="hemisphere-help" class="help-text mb-2">
         {% if profile and profile.hemisphere %}
         Currently set to: <strong class="text-slate-700 dark:text-slate-300">{{ profile.hemisphere | capitalize }} Hemisphere</strong>
-        <span class="text-slate-400">(manually set)</span>
+        <span class="text-slate-500 dark:text-slate-400">(manually set)</span>
         {% elif detected_hemisphere %}
         Currently set to: <strong class="text-slate-700 dark:text-slate-300">{{ detected_hemisphere }} Hemisphere</strong>
-        {% if profile and profile.city %}<span class="text-slate-400">(auto-detected from {{ profile.city }})</span>{% endif %}
+        {% if profile and profile.city %}<span class="text-slate-500 dark:text-slate-400">(auto-detected from {{ profile.city }})</span>{% endif %}
         {% else %}
         Currently using: <strong class="text-slate-700 dark:text-slate-300">Northern Hemisphere</strong>
-        <span class="text-slate-400">(default)</span>
+        <span class="text-slate-500 dark:text-slate-400">(default)</span>
         {% endif %}
         <br>
         <span class="text-slate-500 dark:text-slate-400">Your hemisphere affects seasonal plant care advice and emails.</span>
@@ -310,7 +310,7 @@
           <input
             type="checkbox"
             name="marketing_opt_in"
-            class="mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-emerald-600 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+            class="mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
             {% if profile and profile.marketing_opt_in %}checked{% endif %}
             aria-describedby="email-pref-help marketing-desc"
           />
@@ -342,7 +342,7 @@
       <p id="plant-prefs-help" class="help-text mb-4">
         These preferences help personalize AI advice to your experience level and goals.
         {% if profile and profile.preferences_completed_at %}
-        <span class="text-emerald-600 dark:text-emerald-400 font-medium">Configured</span>
+        <span class="text-emerald-700 dark:text-emerald-400 font-medium">Configured</span>
         {% else %}
         <span class="text-amber-600 dark:text-amber-400 font-medium">Not yet configured</span>
         {% endif %}
@@ -413,7 +413,7 @@
 
   <!-- Privacy Info -->
   <details class="disclosure rounded-xl border border-slate-200 dark:border-slate-700">
-    <summary class="px-4 py-3 cursor-pointer text-sm text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors rounded-xl">
+    <summary class="px-4 py-3 cursor-pointer text-sm text-slate-600 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors rounded-xl">
       How is my location used?
     </summary>
     <div class="px-4 pb-3 pt-2 border-t border-slate-200 dark:border-slate-700">
@@ -499,7 +499,7 @@
 
 <!-- Back to Dashboard -->
 <div class="mb-8">
-  <a href="{{ url_for('dashboard.index') }}" class="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+  <a href="{{ url_for('dashboard.index') }}" class="text-slate-500 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">
     <span aria-hidden="true">←</span> Back to Dashboard
   </a>
 </div>
