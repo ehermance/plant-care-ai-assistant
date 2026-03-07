@@ -23,38 +23,38 @@
 
 <!-- Account Information -->
 <section class="card mb-8" aria-labelledby="account-info-title">
-  <h3 id="account-info-title" class="section-title">Account Information</h3>
+  <h2 id="account-info-title" class="section-title">Account Information</h2>
 
   <dl class="space-y-4">
-    <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
-      <span class="text-2xl flex-shrink-0" aria-hidden="true">📧</span>
-      <div class="flex-1">
-        <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Email Address</dt>
-        <dd class="mt-1 text-base text-slate-900 dark:text-slate-100">{{ profile.email if profile else current_user.email }}</dd>
-      </div>
+    <div class="pb-4 border-b border-slate-200 dark:border-slate-700">
+      <dt class="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+        <span class="text-2xl flex-shrink-0" aria-hidden="true">📧</span>
+        Email Address
+      </dt>
+      <dd class="mt-1 text-base text-slate-900 dark:text-slate-100 pl-11">{{ profile.email if profile else current_user.email }}</dd>
     </div>
 
-    <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
-      <span class="text-2xl flex-shrink-0" aria-hidden="true">🆔</span>
-      <div class="flex-1">
-        <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Account ID</dt>
-        <dd class="mt-1 text-base font-mono text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded inline-block">{{ current_user.id[:8] }}...</dd>
-      </div>
+    <div class="pb-4 border-b border-slate-200 dark:border-slate-700">
+      <dt class="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+        <span class="text-2xl flex-shrink-0" aria-hidden="true">🆔</span>
+        Account ID
+      </dt>
+      <dd class="mt-1 text-base font-mono text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded inline-block pl-11">{{ current_user.id[:8] }}...</dd>
     </div>
 
-    <div class="flex items-start gap-3">
-      <span class="text-2xl flex-shrink-0" aria-hidden="true">📅</span>
-      <div class="flex-1">
-        <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Member Since</dt>
-        <dd class="mt-1 text-base text-slate-900 dark:text-slate-100">{{ current_user.created_at.strftime('%B %d, %Y') if current_user.created_at else 'Recently' }}</dd>
-      </div>
+    <div>
+      <dt class="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+        <span class="text-2xl flex-shrink-0" aria-hidden="true">📅</span>
+        Member Since
+      </dt>
+      <dd class="mt-1 text-base text-slate-900 dark:text-slate-100 pl-11">{{ current_user.created_at.strftime('%B %d, %Y') if current_user.created_at else 'Recently' }}</dd>
     </div>
   </dl>
 </section>
 
 <!-- Subscription & Plan -->
 <section class="card mb-8" aria-labelledby="subscription-title">
-  <h3 id="subscription-title" class="section-title">Subscription & Plan</h3>
+  <h2 id="subscription-title" class="section-title">Subscription & Plan</h2>
 
   <!-- Current Plan Badge -->
   <div class="flex items-center gap-4 p-4 mb-4 bg-gradient-to-r from-emerald-50 to-cyan-50 dark:from-emerald-900/20 dark:to-cyan-900/20 rounded-xl border-2 border-emerald-200 dark:border-emerald-700">
@@ -134,7 +134,7 @@
 
 <!-- Preferences -->
 <section class="card mb-8" aria-labelledby="preferences-title">
-  <h3 id="preferences-title" class="section-title">Preferences</h3>
+  <h2 id="preferences-title" class="section-title">Preferences</h2>
 
   <form method="POST" action="{{ url_for('dashboard.account') }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -428,7 +428,7 @@
 
 <!-- Account Management -->
 <section class="card mb-8 border-2 border-rose-200 dark:border-rose-800" aria-labelledby="danger-title">
-  <h3 id="danger-title" class="section-title">Account Management</h3>
+  <h2 id="danger-title" class="section-title">Account Management</h2>
 
   <div class="space-y-4">
     <!-- Log Out -->

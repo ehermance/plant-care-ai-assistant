@@ -49,47 +49,47 @@
 
       <dl class="space-y-4">
         {% if plant.location %}
-          <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
-            <span class="text-2xl flex-shrink-0" aria-hidden="true">📍</span>
-            <div class="flex-1">
-              <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Location</dt>
-              <dd class="mt-1 text-base text-slate-900 dark:text-slate-100">{{ plant.location }}</dd>
-            </div>
+          <div class="pb-4 border-b border-slate-200 dark:border-slate-700">
+            <dt class="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+              <span class="text-2xl flex-shrink-0" aria-hidden="true">📍</span>
+              Location
+            </dt>
+            <dd class="mt-1 text-base text-slate-900 dark:text-slate-100 pl-11">{{ plant.location }}</dd>
           </div>
         {% endif %}
 
         {% if plant.light %}
-          <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
-            <span class="text-2xl flex-shrink-0" aria-hidden="true">☀️</span>
-            <div class="flex-1">
-              <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Light</dt>
-              <dd class="mt-1 text-base text-slate-900 dark:text-slate-100">{{ plant.light }}</dd>
-            </div>
+          <div class="pb-4 border-b border-slate-200 dark:border-slate-700">
+            <dt class="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+              <span class="text-2xl flex-shrink-0" aria-hidden="true">☀️</span>
+              Light
+            </dt>
+            <dd class="mt-1 text-base text-slate-900 dark:text-slate-100 pl-11">{{ plant.light }}</dd>
           </div>
         {% endif %}
 
         {% if plant.notes %}
-          <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
-            <span class="text-2xl flex-shrink-0" aria-hidden="true">📝</span>
-            <div class="flex-1">
-              <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Notes</dt>
-              <dd class="mt-1 text-base text-slate-900 dark:text-slate-100 whitespace-pre-wrap">{{ plant.notes }}</dd>
-            </div>
+          <div class="pb-4 border-b border-slate-200 dark:border-slate-700">
+            <dt class="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+              <span class="text-2xl flex-shrink-0" aria-hidden="true">📝</span>
+              Notes
+            </dt>
+            <dd class="mt-1 text-base text-slate-900 dark:text-slate-100 whitespace-pre-wrap pl-11">{{ plant.notes }}</dd>
           </div>
         {% endif %}
 
-        <div class="flex items-start gap-3">
-          <span class="text-2xl flex-shrink-0" aria-hidden="true">📅</span>
-          <div class="flex-1">
-            <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Added</dt>
-            <dd class="mt-1 text-base text-slate-900 dark:text-slate-100">
-              {% if plant.created_at %}
-              <time datetime="{{ plant.created_at[:10] }}">{{ plant.created_at[:10] }}</time>
-              {% else %}
-              Unknown
-              {% endif %}
-            </dd>
-          </div>
+        <div>
+          <dt class="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+            <span class="text-2xl flex-shrink-0" aria-hidden="true">📅</span>
+            Added
+          </dt>
+          <dd class="mt-1 text-base text-slate-900 dark:text-slate-100 pl-11">
+            {% if plant.created_at %}
+            <time datetime="{{ plant.created_at[:10] }}">{{ plant.created_at[:10] }}</time>
+            {% else %}
+            Unknown
+            {% endif %}
+          </dd>
         </div>
       </dl>
     </div>
@@ -109,57 +109,57 @@
 
   <dl class="space-y-4">
     {% if plant.initial_health_state %}
-      <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
-        <span class="text-2xl flex-shrink-0" aria-hidden="true">
-          {% if plant.initial_health_state == 'thriving' %}🌟
-          {% elif plant.initial_health_state == 'okay' %}👍
-          {% else %}🩹{% endif %}
-        </span>
-        <div class="flex-1">
-          <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Initial Health</dt>
-          <dd class="mt-1 text-base text-slate-900 dark:text-slate-100">
-            {% if plant.initial_health_state == 'thriving' %}Thriving
-            {% elif plant.initial_health_state == 'okay' %}Okay
-            {% elif plant.initial_health_state == 'struggling' %}Struggling
-            {% else %}{{ plant.initial_health_state }}{% endif %}
-          </dd>
-        </div>
+      <div class="pb-4 border-b border-slate-200 dark:border-slate-700">
+        <dt class="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+          <span class="text-2xl flex-shrink-0" aria-hidden="true">
+            {% if plant.initial_health_state == 'thriving' %}🌟
+            {% elif plant.initial_health_state == 'okay' %}👍
+            {% else %}🩹{% endif %}
+          </span>
+          Initial Health
+        </dt>
+        <dd class="mt-1 text-base text-slate-900 dark:text-slate-100 pl-11">
+          {% if plant.initial_health_state == 'thriving' %}Thriving
+          {% elif plant.initial_health_state == 'okay' %}Okay
+          {% elif plant.initial_health_state == 'struggling' %}Struggling
+          {% else %}{{ plant.initial_health_state }}{% endif %}
+        </dd>
       </div>
     {% endif %}
 
     {% if plant.ownership_duration %}
-      <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
-        <span class="text-2xl flex-shrink-0" aria-hidden="true">⏱️</span>
-        <div class="flex-1">
-          <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Ownership Duration</dt>
-          <dd class="mt-1 text-base text-slate-900 dark:text-slate-100">
-            {% if plant.ownership_duration == 'just_got' %}Just got it
-            {% elif plant.ownership_duration == 'few_weeks' %}A few weeks
-            {% elif plant.ownership_duration == 'few_months' %}A few months
-            {% elif plant.ownership_duration == 'year_plus' %}Over a year
-            {% else %}{{ plant.ownership_duration }}{% endif %}
-          </dd>
-        </div>
+      <div class="pb-4 border-b border-slate-200 dark:border-slate-700">
+        <dt class="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+          <span class="text-2xl flex-shrink-0" aria-hidden="true">⏱️</span>
+          Ownership Duration
+        </dt>
+        <dd class="mt-1 text-base text-slate-900 dark:text-slate-100 pl-11">
+          {% if plant.ownership_duration == 'just_got' %}Just got it
+          {% elif plant.ownership_duration == 'few_weeks' %}A few weeks
+          {% elif plant.ownership_duration == 'few_months' %}A few months
+          {% elif plant.ownership_duration == 'year_plus' %}Over a year
+          {% else %}{{ plant.ownership_duration }}{% endif %}
+        </dd>
       </div>
     {% endif %}
 
     {% if plant.current_watering_schedule %}
-      <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
-        <span class="text-2xl flex-shrink-0" aria-hidden="true">💧</span>
-        <div class="flex-1">
-          <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Watering Schedule</dt>
-          <dd class="mt-1 text-base text-slate-900 dark:text-slate-100">{{ plant.current_watering_schedule }}</dd>
-        </div>
+      <div class="pb-4 border-b border-slate-200 dark:border-slate-700">
+        <dt class="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+          <span class="text-2xl flex-shrink-0" aria-hidden="true">💧</span>
+          Watering Schedule
+        </dt>
+        <dd class="mt-1 text-base text-slate-900 dark:text-slate-100 pl-11">{{ plant.current_watering_schedule }}</dd>
       </div>
     {% endif %}
 
     {% if plant.initial_concerns %}
-      <div class="flex items-start gap-3">
-        <span class="text-2xl flex-shrink-0" aria-hidden="true">💭</span>
-        <div class="flex-1">
-          <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Initial Concerns</dt>
-          <dd class="mt-1 text-base text-slate-900 dark:text-slate-100 whitespace-pre-wrap">{{ plant.initial_concerns }}</dd>
-        </div>
+      <div>
+        <dt class="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+          <span class="text-2xl flex-shrink-0" aria-hidden="true">💭</span>
+          Initial Concerns
+        </dt>
+        <dd class="mt-1 text-base text-slate-900 dark:text-slate-100 whitespace-pre-wrap pl-11">{{ plant.initial_concerns }}</dd>
       </div>
     {% endif %}
   </dl>
@@ -223,11 +223,11 @@
         {{ reminder_icon(reminder.reminder_type, size="text-2xl") }}
 
         <div class="flex-1 min-w-0">
-          <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
+          <h2 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
             <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               {{ reminder.title }}
             </a>
-          </h3>
+          </h2>
           <p class="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2 flex-wrap">
             <span>{{ reminder_type_names.get(reminder.reminder_type, reminder.reminder_type) }}</span>
             <span aria-hidden="true">•</span>
@@ -256,9 +256,9 @@
       <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-100 to-emerald-100 dark:from-cyan-900/30 dark:to-emerald-900/30 flex items-center justify-center">
         <span class="text-4xl opacity-60" aria-hidden="true">⏰</span>
       </div>
-      <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
         No reminders yet
-      </h3>
+      </h2>
       <p class="text-slate-600 dark:text-slate-400 mb-4 max-w-sm">
         Create care reminders to stay on top of watering, fertilizing, and other tasks for {{ plant.name }}.
       </p>
@@ -316,9 +316,9 @@
       <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-100 to-emerald-100 dark:from-cyan-900/30 dark:to-emerald-900/30 flex items-center justify-center">
         <span class="text-5xl opacity-60" aria-hidden="true">📝</span>
       </div>
-      <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
+      <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
         No care history yet
-      </h3>
+      </h2>
       <p class="text-slate-600 dark:text-slate-400 mb-6 max-w-sm">
         Start logging care activities to track {{ plant.name }}'s health and growth over time.
       </p>

@@ -28,6 +28,10 @@ User-agent: FacebookBot
 User-agent: Applebot
 Disallow: /admin/
 Disallow: /api/
+Disallow: /dashboard/
+Disallow: /plants/
+Disallow: /reminders/
+Disallow: /journal/
 Disallow: /*?debug=
 Disallow: /*?next=
 Disallow: /*?plant=
@@ -41,6 +45,10 @@ Allow: /
 User-agent: *
 Disallow: /admin/
 Disallow: /api/
+Disallow: /dashboard/
+Disallow: /plants/
+Disallow: /reminders/
+Disallow: /journal/
 Disallow: /*?debug=
 Disallow: /*?next=
 Disallow: /*?plant=
