@@ -223,6 +223,10 @@ class ThemeManager {
 // Initialize theme manager immediately (before DOM loads to prevent flash)
 window.themeManager = new ThemeManager();
 
+// Activate Google Fonts (CSP-compliant alternative to inline onload handler)
+var fontsLink = document.getElementById('google-fonts-css');
+if (fontsLink) fontsLink.media = 'all';
+
 // Initialize toggle buttons after DOM loads
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {

@@ -102,7 +102,7 @@
       <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">13. User Termination</h2>
       <p class="text-slate-700 dark:text-slate-300 mb-4">
         You may terminate your account at any time by using the "Delete Account" option in your
-        <a href="{{ url_for('dashboard.account') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Account Settings</a>.
+        <a href="{{ url_for('dashboard.account') }}" class="text-emerald-700 dark:text-emerald-400 hover:underline">Account Settings</a>.
         Upon deletion, all your data will be permanently removed. You may also export your data before deleting your account.
       </p>
 
@@ -133,7 +133,7 @@
 
       <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">18. Entire Agreement</h2>
       <p class="text-slate-700 dark:text-slate-300 mb-4">
-        These Terms, together with our <a href="{{ url_for('legal.privacy') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Privacy Policy</a>,
+        These Terms, together with our <a href="{{ url_for('legal.privacy') }}" class="text-emerald-700 dark:text-emerald-400 hover:underline">Privacy Policy</a>,
         constitute the entire agreement between you and EDH Dev regarding your use of the Service and supersede
         any prior agreements or understandings.
       </p>
@@ -141,17 +141,17 @@
       <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mt-8 mb-4">19. Contact</h2>
       <p class="text-slate-700 dark:text-slate-300 mb-4">
         If you have questions about these Terms, please contact us at
-        <a href="mailto:info@plantcareai.app?subject=Terms%20Question" class="text-emerald-600 dark:text-emerald-400 hover:underline">info@plantcareai.app</a>.
+        <a href="mailto:info@plantcareai.app?subject=Terms%20Question" class="text-emerald-700 dark:text-emerald-400 hover:underline">info@plantcareai.app</a>.
       </p>
     </div>
 
     <div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700">
       {% if is_authenticated %}
-        <a href="{{ url_for('dashboard.index') }}" class="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+        <a href="{{ url_for('dashboard.index') }}" class="text-slate-500 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">
           <span aria-hidden="true">&larr;</span> Back to Dashboard
         </a>
       {% else %}
-        <a href="{{ url_for('web.index') }}" class="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+        <a href="{{ url_for('web.index') }}" class="text-slate-500 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">
           <span aria-hidden="true">&larr;</span> Back to Home
         </a>
       {% endif %}

@@ -16,9 +16,9 @@
     {% if plant_count == 0 %}
       Welcome to your plant care dashboard. Let's add your first plant!
     {% elif plant_count == 1 %}
-      You're caring for <strong class="text-emerald-600 dark:text-emerald-400">1 plant</strong>. Great start!
+      You're caring for <strong class="text-emerald-700 dark:text-emerald-400">1 plant</strong>. Great start!
     {% else %}
-      You're caring for <strong class="text-emerald-600 dark:text-emerald-400">{{ plant_count }} plants</strong>. Nice collection!
+      You're caring for <strong class="text-emerald-700 dark:text-emerald-400">{{ plant_count }} plants</strong>. Nice collection!
     {% endif %}
   </p>
 </section>
@@ -146,7 +146,7 @@
         <p class="text-sm text-slate-600 dark:text-slate-400">Here's what needs attention today</p>
       </div>
     </div>
-    <a href="{{ url_for('reminders.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+    <a href="{{ url_for('reminders.index') }}" class="text-sm text-emerald-700 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
       View all →
     </a>
   </div>
@@ -158,12 +158,12 @@
 
       <div class="flex-1 min-w-0">
         <h4 class="text-lg font-semibold mb-2">
-          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="text-slate-900 dark:text-slate-100 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <a href="{{ url_for('reminders.view', reminder_id=reminder.id) }}" class="text-slate-900 dark:text-slate-100 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">
             {{ reminder.title }}
           </a>
         </h4>
         <p class="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2 flex-wrap mb-2">
-          <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
+          <a href="{{ url_for('plants.view', plant_id=reminder.plant_id) }}" class="font-medium text-emerald-700 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
             {{ reminder.plant_name }}{% if reminder.plant_nickname %} "{{ reminder.plant_nickname }}"{% endif %}
           </a>
           {% if reminder.adjustment %}
@@ -224,7 +224,7 @@
 
   {% if due_reminders|length > 3 %}
   <div class="text-center text-sm text-slate-600 dark:text-slate-400 mt-4 pt-4 border-t border-emerald-200 dark:border-emerald-700">
-    <a href="{{ url_for('reminders.index') }}" class="font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+    <a href="{{ url_for('reminders.index') }}" class="font-medium text-emerald-700 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
       + {{ due_reminders|length - 3 }} more task{% if due_reminders|length > 4 %}s{% endif %} due today →
     </a>
   </div>
@@ -242,7 +242,7 @@
   </div>
   <p class="text-xs text-slate-500 dark:text-slate-400 italic mt-3 mb-4">💡 {{ daily_tip }}</p>
   <div>
-    <a href="{{ url_for('web.assistant') }}" class="text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+    <a href="{{ url_for('web.assistant') }}" class="text-sm font-medium text-emerald-700 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
       🤖 Ask the Care Assistant about your plants →
     </a>
   </div>
@@ -298,7 +298,7 @@
 <section class="card mb-8" aria-labelledby="plants-title">
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
     <h2 id="plants-title" class="section-title !mb-0">My Plants</h2>
-    <a href="{{ url_for('plants.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+    <a href="{{ url_for('plants.index') }}" class="text-sm text-emerald-700 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
       Manage plants →
     </a>
   </div>
@@ -327,7 +327,7 @@
       <button type="button"
               id="dashboard-scroll-left-btn"
               class="p-2 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500
-                     hover:text-emerald-600 dark:hover:text-emerald-400
+                     hover:text-emerald-700 dark:hover:text-emerald-400
                      hover:bg-emerald-50 dark:hover:bg-emerald-900/20
                      rounded-lg border border-slate-200 dark:border-slate-700
                      transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed
@@ -341,7 +341,7 @@
       <button type="button"
               id="dashboard-scroll-right-btn"
               class="p-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300
-                     hover:text-emerald-600 dark:hover:text-emerald-400
+                     hover:text-emerald-700 dark:hover:text-emerald-400
                      hover:bg-emerald-50 dark:hover:bg-emerald-900/20
                      rounded-lg border border-slate-200 dark:border-slate-700
                      transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed
@@ -389,7 +389,7 @@
         {% for plant in latest_plants %}
         <a href="{{ url_for('plants.view', plant_id=plant.id) }}"
            class="flex flex-col items-center p-2 bg-slate-50 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-200 flex-shrink-0 w-28"
-           aria-label="View {{ plant.name }}{% if plant.nickname %}, also known as {{ plant.nickname }}{% endif %}">
+>
           {% if plant.photo_url_thumb or plant.photo_url %}
             <img src="{{ plant.photo_url_thumb or plant.photo_url }}" alt="{{ plant.name }}" class="w-16 h-16 object-cover rounded-lg mb-2" loading="lazy" decoding="async">
           {% else %}
