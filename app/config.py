@@ -100,7 +100,7 @@ class BaseConfig:
 
     # Misc
     PREFERRED_URL_SCHEME = os.getenv("PREFERRED_URL_SCHEME", "https")
-    SEND_FILE_MAX_AGE_DEFAULT = int(os.getenv("SEND_FILE_MAX_AGE_DEFAULT", "3600"))
+    SEND_FILE_MAX_AGE_DEFAULT = int(os.getenv("SEND_FILE_MAX_AGE_DEFAULT", "31536000"))  # 1 year
 
 class ProdConfig(BaseConfig):
     """Production settings (selected by default if APP_CONFIG is unset)."""

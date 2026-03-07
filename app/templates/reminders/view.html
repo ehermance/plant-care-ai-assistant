@@ -73,90 +73,88 @@
       </div>
 
       <dl class="space-y-4">
-        <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
-          <dt class="text-2xl flex-shrink-0" aria-hidden="true">🔄</dt>
-          <div class="flex-1">
-            <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Frequency</dt>
-            <dd class="mt-1 text-base text-slate-900 dark:text-slate-100">
-              {{ reminder.frequency|replace('_', ' ')|title }}
-              {% if reminder.custom_interval_days %}
-              ({{ reminder.custom_interval_days }} days)
-              {% endif %}
-            </dd>
-          </div>
+        <div class="pb-4 border-b border-slate-200 dark:border-slate-700">
+          <dt class="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+            <span class="text-2xl flex-shrink-0" aria-hidden="true">🔄</span>
+            Frequency
+          </dt>
+          <dd class="mt-1 text-base text-slate-900 dark:text-slate-100 pl-11">
+            {{ reminder.frequency|replace('_', ' ')|title }}
+            {% if reminder.custom_interval_days %}
+            ({{ reminder.custom_interval_days }} days)
+            {% endif %}
+          </dd>
         </div>
 
         {% if reminder.next_due %}
-        <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
-          <dt class="text-2xl flex-shrink-0" aria-hidden="true">📅</dt>
-          <div class="flex-1">
-            <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">
-              {% if reminder.weather_adjusted_due %}Original Due Date{% else %}Next Due Date{% endif %}
-            </dt>
-            <dd class="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">
-              {{ reminder.next_due }}
-            </dd>
-          </div>
+        <div class="pb-4 border-b border-slate-200 dark:border-slate-700">
+          <dt class="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+            <span class="text-2xl flex-shrink-0" aria-hidden="true">📅</span>
+            {% if reminder.weather_adjusted_due %}Original Due Date{% else %}Next Due Date{% endif %}
+          </dt>
+          <dd class="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100 pl-11">
+            {{ reminder.next_due }}
+          </dd>
         </div>
         {% endif %}
 
         {% if reminder.weather_adjusted_due and reminder.weather_adjustment_reason %}
-        <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
-          <dt class="text-2xl flex-shrink-0" aria-hidden="true">☔</dt>
-          <div class="flex-1">
-            <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Weather Adjusted Due Date</dt>
-            <dd class="mt-1">
-              <span class="text-base font-semibold text-slate-900 dark:text-slate-100">{{ reminder.weather_adjusted_due }}</span>
-              <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">
-                {{ reminder.weather_adjustment_reason }}
-                {% if reminder.updated_at %}
-                <span class="text-slate-500 dark:text-slate-500">&middot; Adjusted {{ reminder.updated_at | relative_date }}</span>
-                {% endif %}
-              </p>
-              <form method="POST" action="{{ url_for('reminders.clear_weather', reminder_id=reminder.id) }}" class="mt-3">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="btn btn-sm btn-secondary">
-                  Clear Adjustment
-                </button>
-              </form>
-            </dd>
-          </div>
+        <div class="pb-4 border-b border-slate-200 dark:border-slate-700">
+          <dt class="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+            <span class="text-2xl flex-shrink-0" aria-hidden="true">☔</span>
+            Weather Adjusted Due Date
+          </dt>
+          <dd class="mt-1 pl-11">
+            <span class="text-base font-semibold text-slate-900 dark:text-slate-100">{{ reminder.weather_adjusted_due }}</span>
+            <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">
+              {{ reminder.weather_adjustment_reason }}
+              {% if reminder.updated_at %}
+              <span class="text-slate-500 dark:text-slate-500">&middot; Adjusted {{ reminder.updated_at | relative_date }}</span>
+              {% endif %}
+            </p>
+            <form method="POST" action="{{ url_for('reminders.clear_weather', reminder_id=reminder.id) }}" class="mt-3">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <button type="submit" class="btn btn-sm btn-secondary">
+                Clear Adjustment
+              </button>
+            </form>
+          </dd>
         </div>
         {% endif %}
 
         {% if reminder.last_completed_at %}
-        <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
-          <dt class="text-2xl flex-shrink-0" aria-hidden="true">✅</dt>
-          <div class="flex-1">
-            <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Last Completed</dt>
-            <dd class="mt-1 text-base text-slate-900 dark:text-slate-100">
-              <time datetime="{{ reminder.last_completed_at }}">{{ reminder.last_completed_at }}</time>
-            </dd>
-          </div>
+        <div class="pb-4 border-b border-slate-200 dark:border-slate-700">
+          <dt class="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+            <span class="text-2xl flex-shrink-0" aria-hidden="true">✅</span>
+            Last Completed
+          </dt>
+          <dd class="mt-1 text-base text-slate-900 dark:text-slate-100 pl-11">
+            <time datetime="{{ reminder.last_completed_at }}">{{ reminder.last_completed_at }}</time>
+          </dd>
         </div>
         {% endif %}
 
-        <div class="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
-          <dt class="text-2xl flex-shrink-0" aria-hidden="true">📊</dt>
-          <div class="flex-1">
-            <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Status</dt>
-            <dd class="mt-1">
-              {% if reminder.is_active %}
-              <span class="badge badge-emerald">Active</span>
-              {% else %}
-              <span class="badge badge-rose">Inactive</span>
-              {% endif %}
-            </dd>
-          </div>
+        <div class="pb-4 border-b border-slate-200 dark:border-slate-700">
+          <dt class="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+            <span class="text-2xl flex-shrink-0" aria-hidden="true">📊</span>
+            Status
+          </dt>
+          <dd class="mt-1 pl-11">
+            {% if reminder.is_active %}
+            <span class="badge badge-emerald">Active</span>
+            {% else %}
+            <span class="badge badge-rose">Inactive</span>
+            {% endif %}
+          </dd>
         </div>
 
         {% if reminder.notes %}
-        <div class="flex items-start gap-3">
-          <dt class="text-2xl flex-shrink-0" aria-hidden="true">📝</dt>
-          <div class="flex-1">
-            <dt class="text-sm font-medium text-slate-700 dark:text-slate-300">Notes</dt>
-            <dd class="mt-1 text-base text-slate-900 dark:text-slate-100 whitespace-pre-wrap">{{ reminder.notes }}</dd>
-          </div>
+        <div>
+          <dt class="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+            <span class="text-2xl flex-shrink-0" aria-hidden="true">📝</span>
+            Notes
+          </dt>
+          <dd class="mt-1 text-base text-slate-900 dark:text-slate-100 whitespace-pre-wrap pl-11">{{ reminder.notes }}</dd>
         </div>
         {% endif %}
       </dl>

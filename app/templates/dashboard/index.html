@@ -56,7 +56,7 @@
   <div class="flex items-center gap-3 mb-6">
     <div class="text-4xl" aria-hidden="true">🌤️</div>
     <div>
-      <h3 id="weather-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1" tabindex="-1">Weather Insights & Suggestions</h3>
+      <h2 id="weather-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1" tabindex="-1">Weather Insights & Suggestions</h2>
       <p class="text-sm text-slate-600 dark:text-slate-400">Weather conditions and recommendations for plant care</p>
     </div>
   </div>
@@ -137,12 +137,12 @@
     <div class="flex items-center gap-3">
       <div class="text-4xl" aria-hidden="true">🌱</div>
       <div>
-        <h3 id="plant-check-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1 flex items-center gap-3 flex-wrap">
+        <h2 id="plant-check-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1 flex items-center gap-3 flex-wrap">
           <span>Today's Plant Check</span>
           {% if due_reminders %}
           <span class="badge-amber">{{ due_reminders|length }}</span>
           {% endif %}
-        </h3>
+        </h2>
         <p class="text-sm text-slate-600 dark:text-slate-400">Here's what needs attention today</p>
       </div>
     </div>
@@ -236,7 +236,7 @@
   <div class="flex items-center gap-3 mb-2">
     <div class="text-4xl" aria-hidden="true">✅</div>
     <div>
-      <h3 id="all-clear-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">You're all set today</h3>
+      <h2 id="all-clear-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">You're all set today</h2>
       <p class="text-base text-slate-600 dark:text-slate-400">{{ reassurance_message }}</p>
     </div>
   </div>
@@ -254,9 +254,9 @@
     <span class="text-6xl" aria-hidden="true">🌱</span>
   </div>
 
-  <h3 id="first-plant-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+  <h2 id="first-plant-title" class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
     Let's Add Your First Plant!
-  </h3>
+  </h2>
 
   <p class="text-lg text-slate-600 dark:text-slate-400 mb-8 max-w-2xl mx-auto">
     Start your plant care journey today. We'll help you set up reminders, track care activities, and get personalized AI advice for your plants.
@@ -275,7 +275,7 @@
 
 <!-- Quick Actions -->
 <section class="card mb-8" aria-labelledby="actions-title">
-  <h3 id="actions-title" class="section-title">Quick Actions</h3>
+  <h2 id="actions-title" class="section-title">Quick Actions</h2>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
     <a href="{{ url_for('plants.add') }}" class="btn btn-primary">
@@ -297,7 +297,7 @@
 {% if plant_count > 0 %}
 <section class="card mb-8" aria-labelledby="plants-title">
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-    <h3 id="plants-title" class="section-title !mb-0">My Plants</h3>
+    <h2 id="plants-title" class="section-title !mb-0">My Plants</h2>
     <a href="{{ url_for('plants.index') }}" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
       Manage plants →
     </a>
@@ -415,9 +415,9 @@
        alt=""
        class="empty-state-illustration"
        aria-hidden="true">
-  <h3 id="empty-title" class="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
+  <h2 id="empty-title" class="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
     Ready to start your plant collection?
-  </h3>
+  </h2>
   <p class="text-slate-600 dark:text-slate-400 mb-6 max-w-md">
     Add your first plant to get personalized care reminders and track its growth.
   </p>
