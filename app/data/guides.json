@@ -1694,5 +1694,586 @@
         "landing_page_title": "Why Is My Plant Not Growing?"
       }
     ]
+  },
+  {
+    "slug": "succulents",
+    "last_updated": "2026-03-10",
+    "name": "Succulents",
+    "scientific_name": "Various genera (Echeveria, Sempervivum, Sedum, Haworthia, etc.)",
+    "emoji": "🌵",
+    "summary": "Succulents are drought-tolerant plants with thick, fleshy leaves that store water. Found on every continent except Antarctica, they range from tiny rosettes to towering columns. Their low-maintenance reputation makes them favorites for beginners, but understanding their specific needs — especially around watering and light — is the key to keeping them thriving rather than just surviving.",
+    "meta_description": "Complete succulent care guide. Learn proper watering, light needs, soil mix, propagation methods, popular varieties, and how to fix common problems like stretching and root rot.",
+    "light": "Bright direct to indirect",
+    "water": "Every 1-3 weeks",
+    "humidity_level": "Low",
+    "difficulty": "Easy",
+    "watering": "The most critical rule with succulents is to water deeply but infrequently. When the soil is completely dry — not just the surface, but all the way through — soak the pot thoroughly until water runs from the drainage holes. Then let the soil dry out entirely before watering again. In summer, this typically means every 7-10 days for indoor succulents. In winter, most succulents go semi-dormant and need water only every 3-4 weeks. Never mist succulents or water lightly on the surface — this encourages shallow roots and leaf rot. The soak-and-dry method mimics their natural desert habitat where rare rainstorms are followed by long dry periods. Always use pots with drainage holes. Standing water is the fastest way to kill a succulent. If you're unsure whether to water, wait another few days — succulents handle drought far better than excess moisture. Watch for signs: wrinkled or slightly soft leaves mean it's time to water, while translucent, mushy, or yellowing leaves mean you've overwatered.",
+    "light_details": "Most succulents need at least 6 hours of bright light daily. South- or west-facing windows are ideal for indoor growing. Many species — especially Echeveria, Sedum, and Sempervivum — can handle direct sunlight and even prefer it for developing their best colors. Succulents that don't get enough light will etiolate: they stretch toward the light source, producing elongated stems and widely spaced, pale leaves. This is the most common problem indoor growers face. If your succulents are stretching, move them closer to a window or supplement with a full-spectrum grow light for 12-14 hours daily. Some genera like Haworthia and Gasteria are exceptions — they evolved as understory plants and prefer bright indirect light. Direct sun can actually burn their leaves, causing white or brown patches. When moving any succulent to brighter conditions, acclimate it gradually over 1-2 weeks to prevent sunburn. Morning sun is gentler than afternoon sun, which can scorch even sun-loving species during peak summer heat.",
+    "humidity": "Succulents thrive in low humidity (30-40%) and actually struggle in humid environments. High humidity slows evaporation from the soil, keeping roots wet longer and increasing the risk of rot. It can also promote fungal infections on leaves and stems. Average indoor humidity in heated or air-conditioned homes is usually perfect for succulents. Avoid placing them in bathrooms, kitchens, or other high-humidity rooms unless ventilation is excellent. Good air circulation is important — stagnant, humid air around the base of rosette-type succulents can cause the lower leaves to rot. If you live in a humid climate, use a grittier soil mix (more perlite and pumice) to ensure faster drying, and consider adding a small fan near your collection. Temperature-wise, most succulents prefer 60-80°F (15-27°C) during the growing season. Many can tolerate brief cold snaps down to 40°F (4°C), and some hardy species like Sempervivum survive well below freezing. However, most common indoor succulents are not frost-hardy and should be kept above 50°F (10°C) in winter.",
+    "fertilizing": "Succulents are light feeders and can survive without fertilizer, but a little nutrition during the growing season promotes healthier growth and more vibrant colors. Use a balanced liquid fertilizer (such as 10-10-10 or a cactus-specific formula) diluted to quarter or half strength. Apply once a month from spring through early fall, always to moist soil — never fertilize dry roots. Stop fertilizing entirely in winter when most succulents are dormant or growing very slowly. Over-fertilizing is worse than under-fertilizing: it causes leggy, weak growth, can burn roots, and may leave unsightly salt deposits on the soil surface. If you see white crusty buildup, flush the soil thoroughly with plain water. For a more natural approach, worm castings mixed into the potting soil provide slow-release nutrition without the risk of burning. Some growers also use diluted fish emulsion or seaweed extract. Newly repotted succulents don't need fertilizer for the first 4-6 weeks, as fresh soil provides sufficient nutrients.",
+    "common_problems": [
+      "Stretching/etiolation: Not enough light. Move to a brighter spot or add a grow light.",
+      "Mushy, translucent leaves: Overwatering or rot. Let soil dry completely. Remove affected leaves.",
+      "Wrinkled, shriveled leaves: Underwatering. Give a thorough soak and check roots are healthy.",
+      "Brown or white patches: Sunburn from sudden bright light exposure. Acclimate gradually.",
+      "Dropping lower leaves: Normal — succulents reabsorb old leaves. Only worry if upper leaves drop."
+    ],
+    "quick_tips": [
+      "Always use pots with drainage holes — no rocks at the bottom as a substitute",
+      "Use a gritty, fast-draining soil mix: 50% potting soil + 50% perlite or pumice",
+      "Water in the morning so excess moisture evaporates during the day",
+      "Remove dead lower leaves regularly to prevent pest hiding spots and rot",
+      "Rotate plants quarterly for even, symmetrical growth"
+    ],
+    "howto": {
+      "totalTime": "PT10M",
+      "supplies": ["Gritty succulent soil mix", "Pot with drainage hole", "Cactus/succulent fertilizer"],
+      "tools": ["Watering can with narrow spout", "Chopstick or moisture meter for soil testing"]
+    },
+    "care_table": [
+      {"aspect": "Watering", "requirement": "Soak when fully dry", "frequency": "Every 7-14 days (summer), 3-4 weeks (winter)"},
+      {"aspect": "Light", "requirement": "Bright direct or indirect", "frequency": "6+ hours daily"},
+      {"aspect": "Soil", "requirement": "Fast-draining gritty mix", "frequency": "Repot every 1-2 years"},
+      {"aspect": "Fertilizing", "requirement": "Diluted balanced liquid", "frequency": "Monthly (spring-fall only)"},
+      {"aspect": "Temperature", "requirement": "60-80°F (15-27°C)", "frequency": "Keep above 50°F in winter"}
+    ],
+    "propagation": {
+      "intro": "Succulents are among the easiest plants to propagate. Many species can grow entirely new plants from a single leaf, making them incredibly rewarding for beginners. The best time to propagate is spring and early summer when succulents are actively growing. Success rates are highest with healthy, plump parent leaves — avoid using dried, damaged, or diseased material.",
+      "methods": [
+        {
+          "name": "Leaf Propagation",
+          "steps": [
+            "Gently twist a healthy, plump leaf from the stem with a clean wiggling motion — the entire base of the leaf must come off cleanly.",
+            "Lay the leaves on a tray of dry, gritty succulent soil. Do not bury them or water yet.",
+            "Place in bright indirect light and mist very lightly every 3-4 days once tiny roots appear (usually 1-2 weeks).",
+            "After 4-6 weeks, small rosettes will sprout from the base of the leaf. Begin light watering when the baby plant has visible roots.",
+            "Once the mother leaf shrivels and dries up completely, gently separate the new plant and pot it in its own container."
+          ]
+        },
+        {
+          "name": "Stem Cuttings",
+          "steps": [
+            "Use clean, sharp scissors to cut a stem 3-4 inches below a rosette head.",
+            "Remove the lower 1-2 inches of leaves from the stem to expose nodes.",
+            "Let the cutting dry for 2-5 days until the cut end forms a dry callous — this prevents rot.",
+            "Place the calloused cutting upright in dry, gritty succulent soil. Do not water for the first week.",
+            "After one week, begin light watering. Roots typically develop within 2-4 weeks. Gentle tug resistance means roots have formed."
+          ]
+        },
+        {
+          "name": "Offsets (Pups)",
+          "steps": [
+            "Wait until offsets are at least one-third the size of the mother plant and have their own root system.",
+            "Gently separate the offset from the mother plant — twist or cut the connecting stolon with a clean blade.",
+            "Let the offset dry for 1-2 days if the separation wound is large.",
+            "Plant in its own pot with fresh, dry succulent soil. Wait 3-5 days before the first watering."
+          ]
+        }
+      ],
+      "best_time": "Spring and early summer",
+      "difficulty": "Easy"
+    },
+    "varieties": [
+      {
+        "name": "Echeveria",
+        "also_known_as": "Mexican Hens and Chicks",
+        "description": "The classic rosette succulent available in hundreds of varieties from dusty blue to deep purple. Echeverias produce stunning symmetrical rosettes and can bloom with tall flower stalks in spring. They're the most popular genus for indoor collections and arrangements.",
+        "difficulty": "Easy",
+        "light_needs": "Bright direct to indirect",
+        "special_note": "Develops best colors (stress coloring) with bright light and cool nighttime temperatures."
+      },
+      {
+        "name": "Haworthia",
+        "also_known_as": "Zebra Plant (H. fasciata)",
+        "description": "Small, compact succulents with thick leaves often marked with white bands or translucent 'windows' at the tips. Haworthias stay small (2-5 inches) and are one of the few succulent genera that prefer indirect light, making them ideal for less sunny spots.",
+        "difficulty": "Easy",
+        "light_needs": "Bright indirect (avoid direct sun)",
+        "special_note": "One of the best succulents for offices and north-facing windows."
+      },
+      {
+        "name": "Sempervivum",
+        "also_known_as": "Hens and Chicks, Houseleeks",
+        "description": "Extremely cold-hardy rosette succulents that can survive temperatures well below freezing. They multiply rapidly by producing clusters of offsets ('chicks') around the mother plant ('hen'). The mother rosette dies after flowering (monocarpic) but leaves behind numerous offspring.",
+        "difficulty": "Easy",
+        "light_needs": "Full sun",
+        "special_note": "Hardy to -30°F — one of the few succulents that thrive outdoors year-round in cold climates."
+      },
+      {
+        "name": "Sedum",
+        "also_known_as": "Stonecrop",
+        "description": "A huge genus with over 400 species ranging from ground-covering creepers to upright bushy plants. Sedums are incredibly tough, drought-tolerant, and often used in green roofs and rock gardens. Many species change color with the seasons, turning red or bronze in cool weather.",
+        "difficulty": "Easy",
+        "light_needs": "Full sun to partial shade",
+        "special_note": "Trailing varieties like Sedum morganianum (Burro's Tail) are stunning in hanging baskets."
+      },
+      {
+        "name": "Crassula ovata",
+        "also_known_as": "Jade Plant, Money Plant",
+        "description": "A tree-like succulent with thick, glossy oval leaves and woody stems that can grow several feet tall over decades. Jade plants are long-lived — some specimens are over 100 years old. They're considered symbols of good luck and prosperity in many cultures.",
+        "difficulty": "Easy",
+        "light_needs": "Bright direct to indirect",
+        "special_note": "Can be shaped into bonsai forms with pruning. Develops a reddish leaf edge in bright light."
+      }
+    ],
+    "care_calendar": [
+      {
+        "season": "Spring",
+        "months": "March – May",
+        "tasks": [
+          "Resume regular watering as growth accelerates",
+          "Begin monthly fertilizing at quarter strength",
+          "Repot any root-bound plants in fresh gritty mix",
+          "Start leaf and stem cutting propagation",
+          "Gradually increase light exposure for overwintered plants"
+        ]
+      },
+      {
+        "season": "Summer",
+        "months": "June – August",
+        "tasks": [
+          "Water every 7-10 days when soil is fully dry",
+          "Watch for sunburn if moving plants outdoors",
+          "Check for mealybugs in leaf rosettes and stem joints",
+          "Continue monthly fertilizing",
+          "Ensure good air circulation to prevent fungal issues"
+        ]
+      },
+      {
+        "season": "Fall",
+        "months": "September – November",
+        "tasks": [
+          "Reduce watering frequency as growth slows",
+          "Give last fertilizer dose in early September",
+          "Bring outdoor succulents inside before first frost",
+          "Enjoy stress coloring as temperatures drop and days shorten"
+        ]
+      },
+      {
+        "season": "Winter",
+        "months": "December – February",
+        "tasks": [
+          "Water sparingly — every 3-4 weeks at most",
+          "Stop fertilizing completely",
+          "Provide maximum available light (supplement with grow lights if needed)",
+          "Keep away from cold drafts and heating vents"
+        ]
+      }
+    ],
+    "troubleshooting": [
+      {
+        "symptom": "Stretching and etiolation",
+        "causes": "The most common succulent problem. When succulents don't get enough light, they grow tall and leggy, stretching toward the nearest light source. Leaves become widely spaced along an elongated stem, and the overall shape loses its compact rosette form. The new growth is often paler and weaker than normal.",
+        "fix": "Move to a brighter location — ideally a south-facing window or under grow lights for 12-14 hours daily. An etiolated succulent won't compact back to its original shape, but new growth will be normal. You can behead the plant (cut the top rosette off), let it callous for a few days, and replant it. The stump will often produce new compact offsets.",
+        "landing_page_slug": "why-is-my-plant-not-growing",
+        "landing_page_title": "Why Is My Plant Not Growing?"
+      },
+      {
+        "symptom": "Soft, mushy, or translucent leaves",
+        "causes": "Overwatering is the cause in nearly all cases. When succulent roots sit in wet soil for too long, they rot and can no longer absorb water properly. The leaves become swollen, translucent, and mushy as cells burst from excess water. Eventually the stem may turn black and soft as rot spreads upward.",
+        "fix": "Stop watering immediately and let the soil dry completely. Remove any mushy or translucent leaves. If the stem is still firm, the plant will likely recover. If the stem is soft or black, cut above the rot to a healthy section, let it callous for 3-5 days, and replant in completely dry soil. Switch to the soak-and-dry method going forward.",
+        "landing_page_slug": "am-i-overwatering-my-plant",
+        "landing_page_title": "Am I Overwatering My Plant?"
+      },
+      {
+        "symptom": "Leaves turning yellow",
+        "causes": "Yellow leaves on succulents usually indicate overwatering, though it can also signal nutrient deficiency in long-neglected plants. Overwatered yellow leaves feel soft and swollen, while nutrient-deficient yellow leaves feel firm but lack their normal color. Some lower leaf yellowing is normal as succulents reabsorb old leaves.",
+        "fix": "Check soil moisture — if wet, reduce watering frequency. If the soil has been dry and the plant hasn't been fertilized in over a year, try a diluted feeding. If only the very lowest leaves are yellowing, this is natural reabsorption and nothing to worry about. Remove any fully dried or dead leaves to keep the plant tidy.",
+        "landing_page_slug": "why-are-my-plant-leaves-turning-yellow",
+        "landing_page_title": "Why Are My Plant Leaves Turning Yellow?"
+      },
+      {
+        "symptom": "White cottony spots (mealybugs)",
+        "causes": "Mealybugs are the most common succulent pest. They appear as white, cottony clusters in leaf axils, under leaves, and along stems. They feed on plant sap, weakening the plant and producing sticky honeydew that can attract mold. They spread quickly between plants in close proximity.",
+        "fix": "Isolate the affected plant immediately. Dab individual mealybugs with a cotton swab dipped in 70% rubbing alcohol — this kills them on contact. For larger infestations, spray the entire plant with a mix of rubbing alcohol, water, and a drop of dish soap. Repeat every 5-7 days for 3-4 weeks to catch newly hatched bugs. Check nearby plants for signs of spread.",
+        "landing_page_slug": null,
+        "landing_page_title": null
+      },
+      {
+        "symptom": "Root rot",
+        "causes": "Root rot develops when succulents sit in wet soil for extended periods, especially in pots without drainage, soil that retains too much moisture, or cool conditions where evaporation is slow. The roots turn brown or black and mushy instead of white and firm. By the time above-ground symptoms appear (yellowing, mushiness), significant root damage has already occurred.",
+        "fix": "Unpot the plant and remove all soil. Cut away any brown, black, or mushy roots with sterile scissors. Let the plant sit bare-root in a dry, shaded spot for 2-3 days so cuts can callous. Repot in completely dry, gritty succulent mix and wait a full week before the first light watering. Going forward, use pots with drainage holes and a fast-draining soil mix.",
+        "landing_page_slug": "how-to-treat-root-rot",
+        "landing_page_title": "How to Treat Root Rot"
+      }
+    ]
+  },
+  {
+    "slug": "calathea",
+    "last_updated": "2026-03-10",
+    "name": "Calathea",
+    "scientific_name": "Calathea spp. (now reclassified as Goeppertia)",
+    "emoji": "🌿",
+    "summary": "Calatheas are stunning tropical foliage plants known for their intricately patterned, colorfully painted leaves. Native to the rainforest floors of Central and South America, they belong to the prayer plant family (Marantaceae) and share the characteristic habit of folding their leaves upward at night — a phenomenon called nyctinasty. While calatheas have a reputation for being finicky, understanding their need for humidity, consistent moisture, and indirect light makes them very manageable.",
+    "meta_description": "Complete Calathea care guide. Learn watering, humidity, light requirements, propagation by division, popular varieties like Orbifolia and Medallion, and how to fix crispy edges and curling leaves.",
+    "light": "Medium indirect",
+    "water": "When top inch dry",
+    "humidity_level": "High",
+    "difficulty": "Moderate",
+    "watering": "Calatheas prefer consistently moist — but never soggy — soil. Water when the top inch of soil feels dry to the touch, which typically means every 5-7 days in the growing season and every 10-14 days in winter. Use room-temperature filtered, distilled, or rainwater whenever possible. Calatheas are notoriously sensitive to chemicals in tap water: chlorine, fluoride, and dissolved minerals can cause brown leaf tips and edges over time. If you must use tap water, let it sit uncovered overnight so chlorine can dissipate (though this doesn't remove fluoride). When watering, pour slowly and evenly over the entire soil surface until water drains from the bottom. Empty the saucer after 15 minutes — calatheas hate sitting in standing water as much as they hate drying out completely. Both extremes cause leaf curling and browning. Consistency is key: erratic watering (bone-dry followed by a drench) stresses the plant more than either condition alone.",
+    "light_details": "Calatheas evolved on the rainforest floor beneath a dense canopy, so they thrive in medium to bright indirect light. They are one of the few houseplants that genuinely does well in lower light conditions — a north-facing window or a spot several feet from an east-facing window is often perfect. Direct sunlight is their enemy: even an hour of direct afternoon sun can bleach their patterns, scorch leaf edges, and cause colors to fade. The distinctive leaf markings actually look their most vibrant in moderate indirect light. If a calathea's patterns are fading or leaves are curling during the day (beyond normal nyctinasty), the light is likely too intense. Conversely, in very low light, new leaves may be smaller and growth will slow significantly. Calatheas are excellent choices for rooms that other plants find too dim — offices with fluorescent lighting, shaded rooms, or interior spaces away from windows. If supplementing with grow lights, position them further from the plant than you would for sun-loving species.",
+    "humidity": "Humidity is the make-or-break factor for calathea success. These rainforest natives need consistently high humidity — ideally 60% or above. In most homes, especially during winter when heating dries the air, humidity typically sits around 30-40%, which is far too low. Brown, crispy leaf edges are the telltale sign of insufficient humidity. The most effective solution is a humidifier placed near (but not directly aimed at) your calatheas. Pebble trays provide a small localized boost: fill a tray with pebbles, add water to just below the top of the pebbles, and set the pot on top. Grouping tropical plants together also raises the ambient humidity through collective transpiration. Misting is debated — it provides a brief humidity boost that evaporates within minutes, and can promote fungal issues if water sits on leaves. If you do mist, use distilled water to avoid mineral spots. Bathrooms with windows can be excellent calathea locations due to naturally higher humidity. Temperature-wise, keep calatheas between 65-80°F (18-27°C). They suffer below 60°F and can be permanently damaged by cold drafts from windows, doors, or air conditioning.",
+    "fertilizing": "Calatheas are moderate feeders. During the growing season (spring through early fall), feed monthly with a balanced liquid fertilizer diluted to half strength. A general-purpose 10-10-10 or 20-20-20 formula works well. Avoid fertilizers with high fluoride content, as calatheas are especially sensitive to fluoride toxicity (which causes brown leaf tips similar to low humidity damage). Stop fertilizing completely from November through February when growth slows. Over-fertilizing causes salt buildup in the soil, which damages delicate calathea roots and can cause leaf burn. If you see white crusty deposits on the soil surface, flush the pot thoroughly with plenty of water to wash out accumulated salts. For a gentler approach, worm castings mixed into the soil during repotting provide slow-release nutrition without the risk of chemical burn. Fish emulsion is another organic option, though it has a strong smell. Always water the soil before applying liquid fertilizer to protect roots from concentrated nutrients.",
+    "common_problems": [
+      "Brown, crispy leaf edges: Usually low humidity. Run a humidifier or try a pebble tray.",
+      "Curling leaves: Could be underwatering, low humidity, or too much light.",
+      "Fading leaf patterns: Too much direct light is bleaching the colors. Move to a shadier spot.",
+      "Yellow leaves: Overwatering or cold drafts. Check soil moisture and move away from drafts.",
+      "Drooping leaves that don't recover at night: Severe underwatering or root rot."
+    ],
+    "quick_tips": [
+      "Use filtered or distilled water to avoid brown tips from tap water chemicals",
+      "Leaves fold up at night (nyctinasty) — this is completely normal, not a sign of stress",
+      "Keep humidity above 60% for best results — a humidifier is the most reliable method",
+      "Never place in direct sunlight — their delicate patterns will bleach and scorch",
+      "Clean leaves monthly with a damp cloth to remove dust and maintain their gorgeous patterns"
+    ],
+    "howto": {
+      "totalTime": "PT15M",
+      "supplies": ["Well-draining peat-based potting mix", "Filtered or distilled water", "Balanced liquid fertilizer"],
+      "tools": ["Humidifier", "Spray bottle with distilled water", "Soft damp cloth for leaf cleaning"]
+    },
+    "care_table": [
+      {"aspect": "Watering", "requirement": "When top 1\u2033 dry, use filtered water", "frequency": "Every 5-7 days (summer), 10-14 days (winter)"},
+      {"aspect": "Light", "requirement": "Medium indirect (no direct sun)", "frequency": "Consistent, avoid moving often"},
+      {"aspect": "Humidity", "requirement": "60%+ ideal", "frequency": "Run humidifier daily or use pebble tray"},
+      {"aspect": "Fertilizing", "requirement": "Balanced liquid, half strength", "frequency": "Monthly (spring-fall)"},
+      {"aspect": "Temperature", "requirement": "65-80°F (18-27°C)", "frequency": "Avoid cold drafts year-round"}
+    ],
+    "propagation": {
+      "intro": "Unlike many houseplants, calatheas cannot be propagated from leaf or stem cuttings — they must be propagated by division. This makes propagation a bit less prolific than with plants like pothos or succulents, but it's reliable and straightforward. The best time to divide is during repotting in spring, when the plant is about to enter its most active growth phase and will recover quickly.",
+      "methods": [
+        {
+          "name": "Root Division",
+          "steps": [
+            "Water the calathea thoroughly 24 hours before dividing — this hydrates roots and makes the soil easier to work with.",
+            "Remove the plant from its pot and gently shake or rinse off excess soil to expose the root system.",
+            "Identify natural divisions — calatheas grow in clumps, and you'll see separate sections with their own stems and root clusters.",
+            "Gently pull or cut the sections apart, ensuring each division has at least 2-3 stems and a healthy portion of roots.",
+            "Pot each division in a fresh, well-draining potting mix at the same depth it was growing before.",
+            "Water lightly, place in warm, humid conditions with indirect light, and avoid fertilizing for 4-6 weeks while roots establish."
+          ]
+        },
+        {
+          "name": "Water Propagation (for rooted divisions)",
+          "steps": [
+            "If a division has minimal roots, place it in a jar of filtered water with the base submerged.",
+            "Keep in warm, bright indirect light and change the water every 3-4 days.",
+            "Once new roots reach 2-3 inches long (typically 2-4 weeks), transfer to soil.",
+            "Maintain high humidity around the newly potted division for the first few weeks."
+          ]
+        }
+      ],
+      "best_time": "Spring (during repotting)",
+      "difficulty": "Moderate"
+    },
+    "varieties": [
+      {
+        "name": "Calathea orbifolia",
+        "also_known_as": "Goeppertia orbifolia",
+        "description": "One of the most coveted calatheas, featuring large, round leaves (up to 12 inches wide) with elegant silver-green and dark green stripes. The subtle, sophisticated pattern sets it apart from flashier calatheas. Grows up to 2-3 feet tall and wide.",
+        "difficulty": "Moderate",
+        "light_needs": "Medium indirect",
+        "special_note": "More tolerant of lower humidity than some calatheas, but still prefers 50%+."
+      },
+      {
+        "name": "Calathea medallion",
+        "also_known_as": "Goeppertia veitchiana 'Medallion'",
+        "description": "A showstopper with large, round leaves painted in dark green, light green, and cream feathered patterns on top, with rich burgundy-purple undersides. When the leaves fold up at night, the purple undersides create a dramatic display.",
+        "difficulty": "Moderate",
+        "light_needs": "Medium indirect",
+        "special_note": "The purple undersides are a reliable way to tell a healthy medallion — fading underside color can indicate too much light."
+      },
+      {
+        "name": "Calathea ornata",
+        "also_known_as": "Pinstripe Calathea",
+        "description": "Dark green, glossy leaves decorated with thin pink-to-white pinstripes radiating from the central vein. The stripes start pink on young leaves and gradually turn white as the leaf matures. Compact growth habit, reaching about 2 feet tall.",
+        "difficulty": "Moderate",
+        "light_needs": "Medium indirect",
+        "special_note": "Pink pinstripes are most vibrant on newer leaves and in moderate light."
+      },
+      {
+        "name": "Calathea lancifolia",
+        "also_known_as": "Rattlesnake Plant",
+        "description": "Long, narrow, wavy-edged leaves with a distinctive pattern of alternating large and small dark green spots on a light green background. The undersides are a deep purple. One of the more forgiving calathea varieties and a great starter species for the genus.",
+        "difficulty": "Easy-Moderate",
+        "light_needs": "Low to medium indirect",
+        "special_note": "More tolerant of lower light and humidity than most calatheas — a great starter variety."
+      },
+      {
+        "name": "Calathea makoyana",
+        "also_known_as": "Peacock Plant",
+        "description": "Thin, almost translucent leaves with an intricate peacock-feather pattern in light green, dark green, and cream. The pattern is visible from both sides of the leaf, and the undersides have a pinkish-purple tint. A classic collector's species.",
+        "difficulty": "Moderate-Difficult",
+        "light_needs": "Medium indirect",
+        "special_note": "More humidity-demanding than other calatheas — aim for 65%+ to prevent crispy edges."
+      }
+    ],
+    "care_calendar": [
+      {
+        "season": "Spring",
+        "months": "March – May",
+        "tasks": [
+          "Resume regular watering as new growth emerges",
+          "Begin monthly fertilizing at half strength",
+          "Repot or divide if root-bound — best time of year for division",
+          "Increase humidity as heating systems shut off"
+        ]
+      },
+      {
+        "season": "Summer",
+        "months": "June – August",
+        "tasks": [
+          "Water consistently — never let soil dry out completely",
+          "Continue monthly fertilizing",
+          "Monitor humidity, especially if running air conditioning",
+          "Watch for spider mites (common in dry summer conditions)"
+        ]
+      },
+      {
+        "season": "Fall",
+        "months": "September – November",
+        "tasks": [
+          "Gradually reduce watering frequency as growth slows",
+          "Give last fertilizer dose in early October",
+          "Move away from cold drafty windows",
+          "Start running humidifier as heating season begins"
+        ]
+      },
+      {
+        "season": "Winter",
+        "months": "December – February",
+        "tasks": [
+          "Water every 10-14 days, letting top inch dry between waterings",
+          "Stop fertilizing completely",
+          "Run humidifier consistently — indoor heating dramatically drops humidity",
+          "Keep away from radiators, heating vents, and cold windows"
+        ]
+      }
+    ],
+    "troubleshooting": [
+      {
+        "symptom": "Brown, crispy leaf edges",
+        "causes": "The most common calathea complaint, almost always caused by insufficient humidity. Indoor humidity below 50% will cause the thin, delicate leaf margins to dry out and turn brown. Tap water chemicals (fluoride, chlorine, and dissolved minerals) compound the problem. Cold drafts and overly dry soil are secondary causes.",
+        "fix": "Increase humidity with a humidifier (the most effective solution), pebble tray, or by grouping plants. Switch to filtered, distilled, or rainwater. Trim brown edges with sharp scissors following the leaf's natural shape — they won't heal but trimming improves appearance. Ensure you're watering before the soil dries out completely.",
+        "landing_page_slug": "why-are-my-plant-leaves-turning-brown",
+        "landing_page_title": "Why Are My Plant Leaves Turning Brown?"
+      },
+      {
+        "symptom": "Curling leaves",
+        "causes": "Calathea leaves curl inward (lengthwise) when the plant is stressed. The most common causes are underwatering, low humidity, too much direct light, and temperature extremes. Note that normal nyctinasty (leaves folding up at night) is different from stress curling — nyctinasty is upward folding, while stress curling is inward rolling.",
+        "fix": "Check soil moisture first — if the top inch is dry, water thoroughly with filtered water. If the soil is moist, the issue is likely environmental: increase humidity, move away from direct light, or check for cold drafts. If leaves don't uncurl after correcting the issue within 24-48 hours, check roots for rot.",
+        "landing_page_slug": "why-are-my-plant-leaves-curling",
+        "landing_page_title": "Why Are My Plant Leaves Curling?"
+      },
+      {
+        "symptom": "Yellow leaves",
+        "causes": "Yellow leaves on calatheas typically indicate overwatering. When roots stay too wet for too long, they begin to rot and can no longer absorb nutrients, causing leaves to turn yellow and wilt. Cold temperatures, sudden drafts, and over-fertilizing can also cause yellowing. Some lower leaf yellowing is natural as the plant sheds its oldest leaves.",
+        "fix": "Check the soil — if it's soggy, let it dry out more between waterings. Ensure the pot has drainage holes and the soil drains well. If multiple leaves are yellowing rapidly, unpot and inspect the roots for rot (healthy roots are white and firm; rotted roots are brown and mushy). Trim dead roots, repot in fresh mix, and adjust watering.",
+        "landing_page_slug": "why-are-my-plant-leaves-turning-yellow",
+        "landing_page_title": "Why Are My Plant Leaves Turning Yellow?"
+      },
+      {
+        "symptom": "Drooping or limp leaves",
+        "causes": "Calathea leaves naturally rise and fall with the day-night cycle. However, persistent drooping that doesn't recover at night usually means underwatering or root rot. Severely underwatered calatheas droop dramatically as their leaves lose turgor pressure. Root rot can cause the same symptom because damaged roots can't transport water to the leaves.",
+        "fix": "If the soil is dry, water thoroughly and the leaves should perk up within a few hours. If the soil is wet and the plant is still drooping, root rot is likely. Unpot, remove any mushy brown roots, repot in fresh well-draining soil, and water more carefully going forward. Calatheas recover from underwatering much more easily than from overwatering.",
+        "landing_page_slug": "why-are-my-plant-leaves-drooping",
+        "landing_page_title": "Why Are My Plant Leaves Drooping?"
+      }
+    ]
+  },
+  {
+    "slug": "string-of-pearls",
+    "last_updated": "2026-03-10",
+    "name": "String of Pearls",
+    "scientific_name": "Curio rowleyanus (formerly Senecio rowleyanus)",
+    "emoji": "📿",
+    "summary": "String of Pearls is a striking trailing succulent native to the dry regions of southwest Africa. Its cascading stems of perfectly round, pea-shaped leaves can grow several feet long, making it a dramatic choice for hanging baskets, high shelves, or trailing over the edge of a pot. Each bead-like leaf has a translucent 'window' that lets light penetrate deep into the leaf for photosynthesis — an adaptation to its arid homeland. While it has a reputation as a tricky plant, success comes down to bright light, sparse watering, and well-draining soil.",
+    "meta_description": "Complete String of Pearls care guide. Learn watering, light needs, soil mix, propagation from cuttings, popular string succulent varieties, and how to fix shriveling, mushy, or dropping pearls.",
+    "light": "Bright indirect to direct",
+    "water": "Every 1-2 weeks",
+    "humidity_level": "Low",
+    "difficulty": "Moderate",
+    "watering": "String of Pearls stores water in its spherical leaves, so it needs much less water than most houseplants. Water thoroughly when the soil is completely dry — push your finger about an inch into the soil, and if it feels dry, it's time. In summer, this is typically every 7-10 days. In winter, stretch to every 2-3 weeks. The key sign that your String of Pearls needs water is the pearls themselves: plump, round pearls mean the plant is well-hydrated, while slightly oval or wrinkled pearls indicate it's thirsty. This visual cue is more reliable than any watering schedule. When you water, soak the soil thoroughly until water runs from the drainage holes, then let it drain completely. Never let the pot sit in a saucer of water. Bottom watering works particularly well for String of Pearls — sit the pot in a few inches of water for 10-15 minutes, then remove and let drain. This avoids wetting the crown and stems, which reduces rot risk. Use room-temperature water and avoid getting the pearls themselves wet, especially the dense crown where stems emerge from the soil — moisture trapped there is the primary cause of crown rot.",
+    "light_details": "String of Pearls needs bright light — 6-8 hours daily is ideal. An east- or west-facing window works perfectly, providing bright light without the intensity of midday summer sun. South-facing windows can work but may need sheer curtain filtering during peak summer months, as intense direct afternoon sun can scorch the pearls, turning them brown and dry. That said, String of Pearls handles more direct light than many indoor plants. Morning sun is ideal: it's bright enough to keep the plant compact and healthy without the scorching intensity of afternoon rays. In too little light, the stems will stretch with large gaps between pearls (etiolation), and the pearls themselves become smaller and paler. The plant may also stop trailing and start growing upward, reaching for light. If you notice any of these signs, move to a brighter spot immediately. In winter, when daylight hours are shorter, supplement with a grow light if your String of Pearls starts stretching. The plant needs consistent brightness year-round, not just in summer.",
+    "humidity": "String of Pearls prefers low to average humidity — 30-50% is ideal, which is typical of most indoor environments. Unlike tropical houseplants, it does not benefit from misting, pebble trays, or humidifiers. In fact, high humidity (above 60%) is detrimental: it slows soil drying, increases rot risk, and can promote fungal issues on the delicate pearl-like leaves. Good air circulation is far more important than humidity for this plant. A gentle air flow around the trailing stems helps moisture evaporate from the soil surface and crown area, reducing the risk of the rot that kills more String of Pearls than any other factor. Avoid placing the plant in bathrooms or kitchens where humidity spikes regularly. Temperature-wise, String of Pearls prefers 60-80°F (15-27°C) during the growing season. It can tolerate brief dips to 50°F (10°C) but prolonged cold causes the water-filled pearls to burst and turn mushy. Keep away from cold windows in winter and hot radiators year-round.",
+    "fertilizing": "String of Pearls is a light feeder. During the growing season (spring through early fall), feed once a month with a balanced liquid fertilizer diluted to quarter strength — this plant is sensitive to over-fertilizing, and a quarter-strength dose is safer than half-strength. A standard houseplant fertilizer (10-10-10 or similar) or a cactus/succulent formula both work well. Apply to moist soil only — never fertilize dry roots. Stop fertilizing completely from November through February. Over-fertilizing causes rapid, weak growth that's more susceptible to rot and pest damage. It can also burn the delicate roots and cause pearl drop (healthy-looking pearls suddenly falling off the stems). If you notice salt buildup on the soil surface (white crusty deposits), flush the soil thoroughly with plain water. For an organic alternative, diluted worm casting tea provides gentle nutrition without burn risk. Newly repotted plants don't need fertilizer for the first 6-8 weeks.",
+    "common_problems": [
+      "Shriveling/wrinkling pearls: Underwatering — the pearls deflate when the plant is thirsty. Water thoroughly.",
+      "Mushy, translucent pearls: Overwatering or rot. Let soil dry out completely and check crown for rot.",
+      "Large gaps between pearls: Not enough light (etiolation). Move to a brighter location.",
+      "Pearls falling off: Overwatering, over-fertilizing, or physical damage. Check roots and reduce water.",
+      "Flat or elongated pearls (not round): A sign of chronic underwatering or poor root health."
+    ],
+    "quick_tips": [
+      "Bottom water to avoid wetting the crown — the #1 cause of String of Pearls death is crown rot",
+      "Use a very gritty soil mix: 50% cactus soil + 25% perlite + 25% pumice or coarse sand",
+      "Hang in bright light for the most dramatic trailing effect",
+      "Trim leggy stems to encourage fuller growth — use trimmings for propagation",
+      "Watch the pearls: plump and round = happy, wrinkled = thirsty, mushy = overwatered"
+    ],
+    "howto": {
+      "totalTime": "PT10M",
+      "supplies": ["Very gritty succulent/cactus soil mix", "Small pot with drainage hole", "Diluted cactus fertilizer"],
+      "tools": ["Watering can with narrow spout or shallow tray for bottom watering", "Sharp clean scissors for pruning"]
+    },
+    "care_table": [
+      {"aspect": "Watering", "requirement": "When soil is fully dry (bottom water preferred)", "frequency": "Every 7-10 days (summer), 2-3 weeks (winter)"},
+      {"aspect": "Light", "requirement": "Bright indirect to some direct (morning sun ideal)", "frequency": "6-8 hours daily"},
+      {"aspect": "Soil", "requirement": "Very gritty, fast-draining mix", "frequency": "Repot every 1-2 years in spring"},
+      {"aspect": "Fertilizing", "requirement": "Quarter-strength balanced liquid", "frequency": "Monthly (spring-fall only)"},
+      {"aspect": "Temperature", "requirement": "60-80°F (15-27°C)", "frequency": "Keep above 50°F year-round"}
+    ],
+    "propagation": {
+      "intro": "String of Pearls is one of the easiest succulents to propagate — stem cuttings root readily and quickly. This is also the best way to rejuvenate a leggy or sparse plant: trim healthy stems and root them to create a fuller pot. Spring and summer are ideal, but cuttings can root any time the plant is actively growing.",
+      "methods": [
+        {
+          "name": "Stem Cuttings in Soil",
+          "steps": [
+            "Cut 4-6 inch healthy stem sections with sharp, clean scissors. Each cutting should have at least 5-6 pearls.",
+            "Remove the pearls from the bottom 1-2 inches of the stem to expose the nodes — this is where roots will emerge.",
+            "Let the cut ends dry for 1-2 days until calloused.",
+            "Lay the cuttings on top of moist, gritty succulent soil with the stripped nodes touching the surface. You can gently press nodes into the soil or use bobby pins to hold them in place.",
+            "Place in bright indirect light. Mist the soil lightly every 2-3 days — keep it barely moist, not wet.",
+            "Roots develop in 2-4 weeks. Once you feel resistance when gently tugging a cutting, it's rooted. Begin normal watering."
+          ]
+        },
+        {
+          "name": "Stem Cuttings in Water",
+          "steps": [
+            "Cut 4-6 inch stem sections and strip pearls from the bottom 1-2 inches.",
+            "Place the stems in a small jar of water with only the stripped nodes submerged — keep pearls above water.",
+            "Place in bright indirect light and change the water every 3-4 days.",
+            "Roots will appear in 1-3 weeks. Once roots are about an inch long, transfer to gritty, slightly moist soil.",
+            "Water lightly for the first two weeks as the plant transitions from water to soil roots."
+          ]
+        },
+        {
+          "name": "Coiling Method (for fuller pots)",
+          "steps": [
+            "Take long stem cuttings (8-12 inches) and coil them on top of moist, gritty soil in a pot.",
+            "Pin the coiled stems to the soil surface with bobby pins or small wire staples at several points along the stem.",
+            "Ensure multiple nodes are in contact with the soil — each node can produce roots.",
+            "Mist lightly every few days and keep in bright indirect light. Roots form at multiple points along the coiled stem.",
+            "After 3-4 weeks, the entire coil will be rooted, creating a much fuller plant than individual cuttings."
+          ]
+        }
+      ],
+      "best_time": "Spring and summer",
+      "difficulty": "Easy"
+    },
+    "varieties": [
+      {
+        "name": "Curio rowleyanus (Classic)",
+        "also_known_as": "String of Pearls",
+        "description": "The original and most popular variety with perfectly round, pea-sized green pearls on thin trailing stems. Each pearl has a small translucent 'window' stripe that allows light to reach the interior for photosynthesis. Can trail 2-3 feet in ideal conditions.",
+        "difficulty": "Moderate",
+        "light_needs": "Bright indirect to some direct",
+        "special_note": "Produces small, white, cinnamon-scented flowers in fall if given enough light."
+      },
+      {
+        "name": "Curio rowleyanus 'Variegata'",
+        "also_known_as": "Variegated String of Pearls",
+        "description": "A striking variegated form with pearls in mixes of green, cream, and pink. The variegation is most vivid in bright light and cool conditions. Grows slightly slower than the standard green form due to reduced chlorophyll in variegated areas.",
+        "difficulty": "Moderate-Difficult",
+        "light_needs": "Bright indirect (needs more light than green form)",
+        "special_note": "Reverts to solid green if light is insufficient — prune reverted stems to maintain variegation."
+      },
+      {
+        "name": "Curio herreanus",
+        "also_known_as": "String of Watermelons, String of Beads",
+        "description": "Oval-shaped rather than round beads with purple-striped markings resembling tiny watermelons. Slightly more compact growth than String of Pearls with shorter internodes. Often easier to care for than the classic variety.",
+        "difficulty": "Easy-Moderate",
+        "light_needs": "Bright indirect",
+        "special_note": "More forgiving of watering mistakes than true String of Pearls."
+      },
+      {
+        "name": "Curio radicans",
+        "also_known_as": "String of Bananas",
+        "description": "Banana-shaped (crescent) leaves instead of round pearls, giving a very different look while requiring identical care. Tends to grow faster and more vigorously than String of Pearls, with thicker stems that are more resistant to rot. An excellent alternative for those who struggle with the classic variety.",
+        "difficulty": "Easy",
+        "light_needs": "Bright indirect to direct",
+        "special_note": "More drought-tolerant and generally more forgiving than String of Pearls — great for beginners."
+      },
+      {
+        "name": "Curio citriformis",
+        "also_known_as": "String of Tears, String of Raindrops",
+        "description": "Teardrop-shaped leaves with a pointed tip, slightly larger than classic pearls. The leaves have a blue-green tint and a more pronounced translucent window. Grows in a tighter, more compact trailing pattern.",
+        "difficulty": "Moderate",
+        "light_needs": "Bright indirect",
+        "special_note": "The teardrop shape allows slightly more water storage than round pearls, making it a bit more drought-tolerant."
+      }
+    ],
+    "care_calendar": [
+      {
+        "season": "Spring",
+        "months": "March – May",
+        "tasks": [
+          "Resume regular watering as new growth begins",
+          "Begin monthly feeding at quarter strength",
+          "Take stem cuttings to propagate or fill in sparse areas",
+          "Repot if root-bound (only go up one pot size)"
+        ]
+      },
+      {
+        "season": "Summer",
+        "months": "June – August",
+        "tasks": [
+          "Water every 7-10 days when fully dry",
+          "Protect from intense afternoon direct sun (morning sun is fine)",
+          "Continue monthly fertilizing",
+          "Trim leggy or bare stems to encourage branching"
+        ]
+      },
+      {
+        "season": "Fall",
+        "months": "September – November",
+        "tasks": [
+          "Reduce watering as growth slows",
+          "Give last fertilizer dose in early September",
+          "Watch for small white flowers (cinnamon-scented) if light was adequate",
+          "Ensure good air circulation as indoor humidity may rise"
+        ]
+      },
+      {
+        "season": "Winter",
+        "months": "December – February",
+        "tasks": [
+          "Water sparingly — every 2-3 weeks at most",
+          "Stop fertilizing completely",
+          "Provide maximum light (supplement with grow light if stretching)",
+          "Keep away from cold windows and heating vents"
+        ]
+      }
+    ],
+    "troubleshooting": [
+      {
+        "symptom": "Shriveling, wrinkled pearls",
+        "causes": "The pearls shrivel and wrinkle when the plant is running low on stored water. This is the most reliable indicator that it's time to water. Minor wrinkling is easy to fix, but if the entire plant is severely shriveled with dried stems, the roots may have died from being too dry for too long, meaning the plant can no longer absorb water even when offered.",
+        "fix": "Water thoroughly using the bottom-watering method — sit the pot in a few inches of water for 15 minutes. Plump pearls should recover within 24-48 hours. If the pearls don't plump back up after watering, check the roots: if they're dried out and brittle, trim dead roots, repot in fresh gritty soil, and water carefully. In severe cases, take healthy stem cuttings and propagate a new plant.",
+        "landing_page_slug": "how-often-should-i-water-my-plant",
+        "landing_page_title": "How Often Should I Water My Plant?"
+      },
+      {
+        "symptom": "Mushy, translucent pearls",
+        "causes": "Mushy, see-through pearls are a sure sign of overwatering. The cells inside the pearls have burst from absorbing too much water. If only a few pearls are affected, the problem is early stage. If entire stems are mushy and the crown (where stems meet the soil) is soft and brown, crown rot has set in — this is the #1 killer of String of Pearls plants.",
+        "fix": "Remove all mushy stems immediately — they won't recover and can spread rot. If the crown area is still firm, let the soil dry out completely and reduce watering going forward. If the crown is mushy, the plant is likely lost at that spot. Salvage any healthy stems above the rot, let them callous for 2 days, and propagate in fresh, dry gritty soil. Going forward, bottom water and use a very gritty soil mix.",
+        "landing_page_slug": "am-i-overwatering-my-plant",
+        "landing_page_title": "Am I Overwatering My Plant?"
+      },
+      {
+        "symptom": "Gaps between pearls (etiolation)",
+        "causes": "When String of Pearls doesn't get enough light, it stretches toward the nearest light source. The stems grow longer with increasingly large gaps between pearls, and the pearls themselves become smaller and paler. The plant loses its characteristic dense, beaded appearance and looks sparse and leggy.",
+        "fix": "Move to a much brighter location — an east or west-facing window is ideal. Once stems have stretched, they won't compact back. Trim the leggy portions, let the cuttings callous, and propagate them in a brighter spot to start fresh. The original plant will often branch from where you cut, creating a denser top growth. Supplement with a grow light if natural light is insufficient, especially in winter.",
+        "landing_page_slug": "why-is-my-plant-not-growing",
+        "landing_page_title": "Why Is My Plant Not Growing?"
+      },
+      {
+        "symptom": "Pearls falling off",
+        "causes": "Pearl drop can result from several causes: overwatering (excess water pressure causes pearls to detach), over-fertilizing (salt buildup damages the connection between pearl and stem), physical handling (the pearl-stem connection is delicate), or severe stress from temperature swings or transplant shock.",
+        "fix": "First, rule out overwatering — check that the soil is drying fully between waterings. If you recently fertilized, flush the soil with plain water to remove excess salts. Handle the plant as little as possible — String of Pearls is fragile. Fallen pearls won't reroot, but they indicate the plant is stressed. Address the underlying cause and new growth should be firmly attached.",
+        "landing_page_slug": "why-are-my-plant-leaves-drooping",
+        "landing_page_title": "Why Are My Plant Leaves Drooping?"
+      }
+    ]
   }
 ]
