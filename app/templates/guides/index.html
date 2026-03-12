@@ -1,41 +1,63 @@
 {% extends "base.html" %}
 
-{% block title %}Plant Care Guides - How to Care for Popular Houseplants | PlantCareAI{% endblock %}
+{% block title %}Plant Care Guides & Troubleshooting | PlantCareAI{% endblock %}
 
-{% block description %}Free plant care guides for popular houseplants. Learn how to water, fertilize, and care for Monstera, Pothos, Snake Plant, and more.{% endblock %}
+{% block description %}Free plant care guides, troubleshooting tips, and expert advice for popular houseplants. Solve leaf problems, watering issues, and more.{% endblock %}
 
-{% block og_title %}Plant Care Guides - How to Care for Popular Houseplants{% endblock %}
-{% block og_description %}Detailed care guides for the most popular houseplants. Get tips on watering, light requirements, humidity, and troubleshooting common problems.{% endblock %}
+{% block og_title %}Plant Care Guides & Troubleshooting | PlantCareAI{% endblock %}
+{% block og_description %}Free plant care guides, troubleshooting tips, and expert advice. Solve common problems like yellow leaves, overwatering, root rot, and more.{% endblock %}
 
 {% block og_image %}
 <meta property="og:image" content="{{ url_for('static', filename='images/og/guides-index.png', _external=True) }}" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="Plant Care Guides - PlantCareAI" />
+<meta property="og:image:alt" content="Plant Care Guides & Troubleshooting - PlantCareAI" />
 {% endblock %}
-{% block twitter_title %}Plant Care Guides | PlantCareAI{% endblock %}
-{% block twitter_description %}Learn how to care for popular houseplants with our free guides.{% endblock %}
+{% block twitter_title %}Plant Care Guides & Troubleshooting | PlantCareAI{% endblock %}
+{% block twitter_description %}Free plant care guides, troubleshooting tips, and expert advice for popular houseplants.{% endblock %}
 {% block twitter_image %}
 <meta name="twitter:image" content="{{ url_for('static', filename='images/og/guides-index.png', _external=True) }}" />
-<meta name="twitter:image:alt" content="Plant Care Guides - PlantCareAI" />
+<meta name="twitter:image:alt" content="Plant Care Guides & Troubleshooting - PlantCareAI" />
 {% endblock %}
 
 {% block extra_head %}
-<!-- ItemList Structured Data for rich carousel results -->
+<!-- ItemList Structured Data — all content pages for rich carousel results -->
+{% set all_landing_pages = [] %}
+{% for group in landing_page_groups %}
+  {% for page in group.pages %}
+    {% if all_landing_pages.append(page) %}{% endif %}
+  {% endfor %}
+{% endfor %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  "name": "Plant Care Guides",
-  "description": "Free care guides for popular houseplants including watering, light, and troubleshooting.",
-  "numberOfItems": {{ guides | length }},
+  "name": "Plant Care Guides & Troubleshooting",
+  "description": "Free care guides for popular houseplants including species guides, comprehensive care guides, and troubleshooting.",
+  "numberOfItems": {{ hub_pages | length + guides | length + all_landing_pages | length }},
   "itemListElement": [
-    {% for guide in guides %}
+    {% for hub in hub_pages %}
     {
       "@type": "ListItem",
       "position": {{ loop.index }},
-      "name": {{ guide.name | tojson }},
+      "name": {{ hub.title | tojson }},
+      "url": "{{ APP_URL }}{{ url_for('seo.' ~ hub.route_name) }}"
+    },
+    {% endfor %}
+    {% for guide in guides %}
+    {
+      "@type": "ListItem",
+      "position": {{ hub_pages | length + loop.index }},
+      "name": {{ guide.name ~ " Care Guide" | tojson }},
       "url": "{{ APP_URL }}{{ url_for('guides.view', slug=guide.slug) }}"
+    },
+    {% endfor %}
+    {% for page in all_landing_pages %}
+    {
+      "@type": "ListItem",
+      "position": {{ hub_pages | length + guides | length + loop.index }},
+      "name": {{ page.title | tojson }},
+      "url": "{{ APP_URL }}{{ url_for('seo.' ~ page.route_name) }}"
     }{% if not loop.last %},{% endif %}
     {% endfor %}
   ]
@@ -52,7 +74,7 @@
       Plant Care Guides
     </h1>
     <p class="text-xl md:text-2xl text-slate-600 dark:text-slate-400 mb-8 max-w-2xl mx-auto">
-      Free, detailed guides for popular houseplants. Learn watering schedules, light requirements, and how to keep your plants thriving.
+      Free, detailed guides for popular houseplants. Learn watering schedules, light requirements, and how to troubleshoot common problems.
     </p>
     <a href="{{ url_for('web.assistant') }}" class="btn btn-primary">
       Or ask our AI for personalized advice
@@ -60,8 +82,42 @@
   </div>
 </section>
 
-<!-- Guides Grid -->
+<!-- Comprehensive Guides (Hub/Pillar Pages) -->
+{% if hub_pages %}
 <section class="py-8">
+  <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2 text-center">
+    Comprehensive Guides
+  </h2>
+  <p class="text-slate-600 dark:text-slate-400 text-center mb-6 max-w-2xl mx-auto">
+    In-depth guides covering everything you need to know.
+  </p>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+    {% for hub in hub_pages %}
+    <a href="{{ url_for('seo.' ~ hub.route_name) }}"
+       class="card bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-200 dark:border-emerald-700 hover:shadow-lg hover:border-emerald-400 dark:hover:border-emerald-500 transition-all group">
+      <div class="text-center">
+        <div class="text-5xl mb-3" aria-hidden="true">{{ hub.emoji }}</div>
+        <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+          {{ hub.title }}
+        </h3>
+        <p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
+          {{ hub.meta_description }}
+        </p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Plant Care by Species -->
+<section class="py-8 border-t border-slate-200 dark:border-slate-700">
+  <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2 text-center">
+    Plant Care by Species
+  </h2>
+  <p class="text-slate-600 dark:text-slate-400 text-center mb-6 max-w-2xl mx-auto">
+    Detailed care instructions for popular houseplants.
+  </p>
   {% if guides %}
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for guide in guides %}
@@ -70,9 +126,9 @@
       <div class="flex items-start gap-4">
         <div class="text-5xl flex-shrink-0" aria-hidden="true">{{ guide.emoji }}</div>
         <div class="min-w-0">
-          <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-1 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+          <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-1 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
             {{ guide.name }}
-          </h2>
+          </h3>
           <p class="text-sm text-slate-500 dark:text-slate-400 italic mb-2">{{ guide.scientific_name }}</p>
           <p class="text-slate-600 dark:text-slate-400 text-sm line-clamp-2">
             {{ guide.summary }}
@@ -107,49 +163,42 @@
   {% endif %}
 </section>
 
-<!-- Common Plant Problems Section -->
+<!-- Troubleshooting & Tips (data-driven, grouped by hub) -->
+{% if landing_page_groups %}
 <section class="py-8 border-t border-slate-200 dark:border-slate-700">
-  <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6 text-center">
-    Common Plant Problems
+  <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2 text-center">
+    Troubleshooting & Tips
   </h2>
   <p class="text-slate-600 dark:text-slate-400 text-center mb-8 max-w-2xl mx-auto">
-    Troubleshooting guides for the most common plant care issues.
+    Solve common plant care problems with our step-by-step guides.
   </p>
-  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
-    <a href="{{ url_for('seo.drooping') }}" class="card hover:shadow-lg transition-shadow p-4">
-      <span class="text-2xl mb-2 block" aria-hidden="true">🥀</span>
-      <span class="font-medium text-slate-900 dark:text-slate-100">Why Are My Leaves Drooping?</span>
-    </a>
-    <a href="{{ url_for('seo.yellow_leaves') }}" class="card hover:shadow-lg transition-shadow p-4">
-      <span class="text-2xl mb-2 block" aria-hidden="true">🍂</span>
-      <span class="font-medium text-slate-900 dark:text-slate-100">Why Are Leaves Turning Yellow?</span>
-    </a>
-    <a href="{{ url_for('seo.overwatering') }}" class="card hover:shadow-lg transition-shadow p-4">
-      <span class="text-2xl mb-2 block" aria-hidden="true">💧</span>
-      <span class="font-medium text-slate-900 dark:text-slate-100">Am I Overwatering?</span>
-    </a>
-    <a href="{{ url_for('seo.watering_frequency') }}" class="card hover:shadow-lg transition-shadow p-4">
-      <span class="text-2xl mb-2 block" aria-hidden="true">🚿</span>
-      <span class="font-medium text-slate-900 dark:text-slate-100">How Often Should I Water?</span>
-    </a>
-    <a href="{{ url_for('seo.water_today') }}" class="card hover:shadow-lg transition-shadow p-4">
-      <span class="text-2xl mb-2 block" aria-hidden="true">🤔</span>
-      <span class="font-medium text-slate-900 dark:text-slate-100">Should I Water Today?</span>
-    </a>
-    <a href="{{ url_for('seo.not_growing') }}" class="card hover:shadow-lg transition-shadow p-4">
-      <span class="text-2xl mb-2 block" aria-hidden="true">🌱</span>
-      <span class="font-medium text-slate-900 dark:text-slate-100">Why Is My Plant Not Growing?</span>
-    </a>
-    <a href="{{ url_for('seo.beginners_guide') }}" class="card hover:shadow-lg transition-shadow p-4">
-      <span class="text-2xl mb-2 block" aria-hidden="true">🪴</span>
-      <span class="font-medium text-slate-900 dark:text-slate-100">Indoor Plant Care for Beginners</span>
-    </a>
-    <a href="{{ url_for('seo.curling_leaves') }}" class="card hover:shadow-lg transition-shadow p-4">
-      <span class="text-2xl mb-2 block" aria-hidden="true">🍃</span>
-      <span class="font-medium text-slate-900 dark:text-slate-100">Why Are My Leaves Curling?</span>
-    </a>
+  <div class="max-w-5xl mx-auto space-y-8">
+    {% for group in landing_page_groups %}
+    <div>
+      <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
+        {% if group.hub %}
+        <a href="{{ url_for('seo.' ~ group.hub.route_name) }}"
+           class="hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">
+          {{ group.label }} &rarr;
+        </a>
+        {% else %}
+        {{ group.label }}
+        {% endif %}
+      </h3>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for page in group.pages %}
+        <a href="{{ url_for('seo.' ~ page.route_name) }}"
+           class="card hover:shadow-lg transition-shadow p-4">
+          <span class="text-2xl mb-2 block" aria-hidden="true">{{ page.emoji }}</span>
+          <span class="font-medium text-slate-900 dark:text-slate-100">{{ page.title }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
   </div>
 </section>
+{% endif %}
 
 <!-- CTA Section -->
 <section class="py-12 text-center bg-white dark:bg-slate-800 -mx-4 px-4 rounded-2xl mt-8">

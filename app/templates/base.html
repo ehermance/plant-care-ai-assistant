@@ -86,7 +86,11 @@
     "@type": "Organization",
     "name": "PlantCareAI",
     "url": "{{ APP_URL }}/",
-    "description": "AI-powered plant care assistant with weather-aware reminders and personalized tips."
+    "description": "AI-powered plant care assistant with weather-aware reminders and personalized tips.",
+    "logo": "{{ APP_URL }}/static/images/icons/custom-leaf.png",
+    "sameAs": [
+      "https://www.instagram.com/plantcareai.app/"
+    ]
   }
   </script>
 
@@ -446,6 +450,7 @@
             <ul class="space-y-1.5">
               <li><a href="{{ url_for('seo.watering_hub') }}" class="text-emerald-700 dark:text-emerald-400 underline decoration-emerald-700/30 dark:decoration-emerald-400/30 underline-offset-2 hover:decoration-emerald-600 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:decoration-emerald-600 dark:focus-visible:decoration-emerald-400">Watering Guide</a></li>
               <li><a href="{{ url_for('seo.leaf_problems_hub') }}" class="text-emerald-700 dark:text-emerald-400 underline decoration-emerald-700/30 dark:decoration-emerald-400/30 underline-offset-2 hover:decoration-emerald-600 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:decoration-emerald-600 dark:focus-visible:decoration-emerald-400">Leaf Problems Guide</a></li>
+              <li><a href="{{ url_for('seo.beginners_hub') }}" class="text-emerald-700 dark:text-emerald-400 underline decoration-emerald-700/30 dark:decoration-emerald-400/30 underline-offset-2 hover:decoration-emerald-600 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:decoration-emerald-600 dark:focus-visible:decoration-emerald-400">Beginner's Guide</a></li>
             </ul>
           </div>
           <div>
@@ -454,6 +459,7 @@
               <li><a href="{{ url_for('seo.drooping') }}" class="text-emerald-700 dark:text-emerald-400 underline decoration-emerald-700/30 dark:decoration-emerald-400/30 underline-offset-2 hover:decoration-emerald-600 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:decoration-emerald-600 dark:focus-visible:decoration-emerald-400">Drooping Leaves</a></li>
               <li><a href="{{ url_for('seo.yellow_leaves') }}" class="text-emerald-700 dark:text-emerald-400 underline decoration-emerald-700/30 dark:decoration-emerald-400/30 underline-offset-2 hover:decoration-emerald-600 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:decoration-emerald-600 dark:focus-visible:decoration-emerald-400">Yellow Leaves</a></li>
               <li><a href="{{ url_for('seo.overwatering') }}" class="text-emerald-700 dark:text-emerald-400 underline decoration-emerald-700/30 dark:decoration-emerald-400/30 underline-offset-2 hover:decoration-emerald-600 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:decoration-emerald-600 dark:focus-visible:decoration-emerald-400">Overwatering</a></li>
+              <li><a href="{{ url_for('seo.pest_identification') }}" class="text-emerald-700 dark:text-emerald-400 underline decoration-emerald-700/30 dark:decoration-emerald-400/30 underline-offset-2 hover:decoration-emerald-600 dark:hover:decoration-emerald-400 focus-visible:outline-none focus-visible:decoration-emerald-600 dark:focus-visible:decoration-emerald-400">Pest Identification</a></li>
             </ul>
           </div>
           <div>

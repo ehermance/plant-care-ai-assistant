@@ -29,7 +29,7 @@ STATIC_PAGE_DATES = {
     "/": "2026-02-21",
     "/ask": "2026-01-30",
     "/ai-plant-doctor": "2025-12-18",
-    "/plant-care-guides/": "2026-02-21",
+    "/plant-care-guides/": "2026-03-12",
     "/features/": "2026-01-30",
 }
 

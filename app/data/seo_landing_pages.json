@@ -883,10 +883,22 @@
         "cta_text": "Ask PlantCareAI about your gnat problem",
         "cta_question": "How do I get rid of fungus gnats on my plants?",
         "related_pages": ["am-i-overwatering-my-plant", "how-often-should-i-water-my-plant"],
-        "last_updated": "2026-02-23",
+        "last_updated": "2026-03-12",
         "quick_answer": "Fungus gnats breed in moist topsoil. To eliminate them: let the top 2 inches of soil dry between waterings, use yellow sticky traps for adults, and apply a hydrogen peroxide soil drench (1 part H2O2 to 4 parts water) weekly to kill larvae.",
         "h2_causes": "9 Proven Ways to Eliminate Fungus Gnats",
-        "h2_bottom_line": "The Bottom Line on Fungus Gnats"
+        "h2_bottom_line": "The Bottom Line on Fungus Gnats",
+        "howto": {
+            "totalTime": "P21D",
+            "steps": [
+                "Let the soil dry out between waterings — the top 1-2 inches should be completely dry",
+                "Place yellow sticky traps near the soil surface to catch adult gnats",
+                "Apply a hydrogen peroxide drench (1 part 3% H2O2 to 4 parts water) to kill larvae",
+                "Add a 1/2-inch layer of sand or perlite on top of the soil to deter egg-laying",
+                "Consider using Bti (Mosquito Bits) in watering water for persistent infestations",
+                "Repot in fresh, well-draining potting mix if the infestation is severe",
+                "Maintain drier watering habits going forward to prevent recurrence"
+            ]
+        }
     },
     {
         "slug": "why-are-my-plant-leaves-turning-brown",
@@ -1090,9 +1102,351 @@
         "cta_text": "Ask PlantCareAI for help saving your plant",
         "cta_question": "My plant has root rot, how do I save it?",
         "related_pages": ["am-i-overwatering-my-plant", "why-are-my-plant-leaves-turning-yellow"],
-        "last_updated": "2026-02-23",
+        "last_updated": "2026-03-12",
         "quick_answer": "Root rot is caused by overwatering and poor drainage. To save your plant: unpot and inspect roots, trim all mushy brown roots, treat with hydrogen peroxide, repot in fresh well-draining soil, and water only when the top 1–2 inches are dry going forward.",
         "h2_causes": "9 Steps to Identify, Treat & Prevent Root Rot",
-        "h2_bottom_line": "The Bottom Line on Root Rot Recovery"
+        "h2_bottom_line": "The Bottom Line on Root Rot Recovery",
+        "howto": {
+            "totalTime": "P28D",
+            "steps": [
+                "Recognize the warning signs: wilting despite wet soil, yellowing leaves, musty smell",
+                "Unpot the plant and gently rinse all soil from the roots under lukewarm water",
+                "Trim away all mushy, brown, or black roots with sterilized scissors — keep only firm white roots",
+                "Soak remaining roots in a 1:4 hydrogen peroxide to water solution for 10 minutes",
+                "Repot in fresh, well-draining potting mix in a clean pot with drainage holes",
+                "Water sparingly for the first 2 weeks — let the soil dry out between waterings",
+                "Place in bright indirect light and monitor for new growth over 3-4 weeks"
+            ]
+        }
+    },
+    {
+        "slug": "how-to-revive-a-dying-plant",
+        "route_name": "revive_dying_plant",
+        "title": "How to Revive a Dying Plant (Step-by-Step Rescue Guide)",
+        "meta_description": "Think your plant is dying? Don't give up yet. Follow this 9-step rescue guide to diagnose the problem, revive your plant, and prevent it from happening again.",
+        "emoji": "\ud83c\udf31",
+        "intro": "Before you toss that wilted, yellowed, or crispy plant into the bin — stop. Most houseplants are far more resilient than they look, and what appears to be death is often just severe stress. Plants can bounce back from surprisingly rough shape if you catch the problem and act quickly. This guide walks you through exactly how to assess, treat, and nurse your struggling plant back to health.",
+        "causes": [
+            {
+                "title": "Assess whether your plant is actually dead",
+                "description": "A plant that looks terrible may still be alive. Check for green under the bark by gently scratching the stem with your fingernail — green or white means living tissue. Check the roots: firm white or tan roots are alive; mushy brown or black roots are dead. Flexible stems are alive; brittle snap-in-half stems are dead. Even a completely leafless plant can recover if the roots and stems are still viable.",
+                "fix": "Do the scratch test on multiple stems. If you find any green, your plant has a chance. If all stems are brittle and roots are mush, it's truly gone — time to compost and start fresh."
+            },
+            {
+                "title": "Identify what went wrong",
+                "description": "Before you can fix the problem, you need to know the cause. The most common killers are overwatering (mushy stems, soggy soil, yellow leaves), underwatering (crispy leaves, bone-dry soil, wilting), too little light (leggy growth, pale leaves, dropping foliage), root rot (foul-smelling soil, black roots), and pest damage (sticky residue, webbing, visible insects). Each requires a different rescue approach.",
+                "fix": "Check the soil moisture, inspect roots, look at stems and leaves for clues, and examine leaf undersides for pests. The symptoms tell you the story — treat the specific cause, not just the visible damage."
+            },
+            {
+                "title": "Trim away dead growth",
+                "description": "Dead leaves and stems drain energy from the parts of the plant that are still alive. Removing them lets the plant redirect all its resources toward recovery. Cut dead stems back to the nearest node with green tissue. Remove completely yellow, brown, or mushy leaves at the base. Don't remove leaves that are only partially damaged — they're still photosynthesizing.",
+                "fix": "Use clean, sharp scissors or pruning shears. Wipe blades with rubbing alcohol between cuts if you suspect disease. Don't remove more than one-third of the remaining foliage at once — the plant needs some leaves to produce energy for recovery."
+            },
+            {
+                "title": "Fix the root system",
+                "description": "Roots are the foundation of recovery. If the plant was overwatered, gently remove it from the pot and inspect the roots. Healthy roots are firm and white or light tan. Rotting roots are brown, black, mushy, and may smell. Even a few healthy roots can save the plant if you act fast.",
+                "fix": "Trim all dead and rotting roots with sterile scissors. Dip remaining healthy roots in a diluted hydrogen peroxide solution (1 part 3% hydrogen peroxide to 2 parts water) to kill pathogens. Let roots air-dry for an hour before replanting."
+            },
+            {
+                "title": "Repot in fresh, well-draining soil",
+                "description": "Old, waterlogged, or depleted soil is often part of the problem. Fresh soil provides nutrients, proper drainage, and a clean environment free from pathogens. Choose a pot with drainage holes — never repot a struggling plant into a pot without them. Size down if you've removed significant roots — a too-large pot holds excess moisture around weakened roots.",
+                "fix": "Use a quality potting mix appropriate for your plant type. Add perlite (20-30% by volume) for extra drainage. Place in a pot only slightly larger than the remaining root ball. Water lightly after repotting — just enough to settle the soil."
+            },
+            {
+                "title": "Adjust watering immediately",
+                "description": "Whether the plant was drowning or dehydrated, now is the time to reset your watering habits. A recovering plant needs consistent, appropriate moisture — not a flood after a drought or total dryness after root rot. The roots are compromised, so they can't handle extremes.",
+                "fix": "For a previously overwatered plant: water sparingly and only when the top 2 inches of soil are dry. For a previously underwatered plant: water thoroughly but let soil dry slightly between waterings. Don't let a recovering plant sit in standing water."
+            },
+            {
+                "title": "Provide the right light (but not too much)",
+                "description": "A stressed plant needs light to photosynthesize and rebuild, but direct sun can overwhelm one that's already weak. Think of it like a patient recovering in a hospital — they need gentle conditions, not a marathon. Bright indirect light is the sweet spot for most recovering houseplants.",
+                "fix": "Move the plant to a spot with bright indirect light (near a window but not in the direct sun beam). If the plant was in very low light, increase exposure gradually over a week rather than going straight to bright light."
+            },
+            {
+                "title": "Hold off on fertilizer",
+                "description": "It's tempting to feed a struggling plant, but fertilizer on damaged roots causes chemical burn and makes things worse. A recovering plant can't absorb nutrients efficiently, and salt buildup from fertilizer in stressed root systems can be fatal. Wait until you see active new growth before feeding.",
+                "fix": "No fertilizer for at least 4-6 weeks after rescue. When the plant starts producing new leaves, resume feeding at half the recommended strength. Gradually return to normal fertilizing as the plant regains vigor."
+            },
+            {
+                "title": "Be patient and monitor recovery",
+                "description": "Plant recovery is measured in weeks and months, not days. You may not see new growth for 2-6 weeks depending on the species and the severity of the damage. During this time, the plant is rebuilding its root system underground — even if nothing visible is happening above soil level. This is normal and doesn't mean your efforts aren't working.",
+                "fix": "Check in weekly but resist the urge to repot, move, or fuss with the plant during recovery. Each disruption sets it back. You'll know recovery is working when you see a new leaf unfurling or fresh root tips emerging from the drainage holes."
+            }
+        ],
+        "faqs": [
+            {
+                "question": "Can a completely wilted plant be saved?",
+                "answer": "Usually yes, if the stems and roots are still alive. Water thoroughly, move to indirect light, and wait 24-48 hours. Most underwatered plants perk up noticeably within hours."
+            },
+            {
+                "question": "How long does it take to revive a dying plant?",
+                "answer": "It depends on the damage. Underwatered plants can recover in hours to days. Overwatered plants with root rot take 2-6 weeks. Severely stressed plants may need 2-3 months to show real recovery."
+            },
+            {
+                "question": "Should I repot a dying plant?",
+                "answer": "Only if the soil is waterlogged, compacted, or you suspect root rot. If the problem is underwatering or light, repotting adds unnecessary stress. Fix the actual cause first."
+            },
+            {
+                "question": "Why is my plant still dying after I fixed the problem?",
+                "answer": "Plants drop damaged leaves even after the cause is fixed — this is normal. Look for new growth as the sign of recovery, not the old damaged leaves. It can take weeks for the plant to stabilize."
+            },
+            {
+                "question": "Can I save a plant with root rot?",
+                "answer": "Yes, if caught early. Remove the plant from soil, trim all mushy roots, treat with diluted hydrogen peroxide, and repot in fresh well-draining soil. The key is having some healthy roots remaining."
+            }
+        ],
+        "comparison_table": {
+            "title": "Underwatered vs. Overwatered: How to Tell the Difference",
+            "intro": "The first step in reviving a dying plant is diagnosing the cause. Since watering issues are responsible for 80% of plant deaths, here's how to tell them apart:",
+            "headers": ["Symptom", "Underwatered", "Overwatered"],
+            "rows": [
+                ["Leaves", "Crispy, dry, curling edges", "Yellow, soft, mushy"],
+                ["Stems", "Thin, sometimes shriveled", "Soft, mushy at base"],
+                ["Soil", "Bone dry, pulling from pot edges", "Soggy, stays wet for days"],
+                ["Roots", "Dry but firm and light-colored", "Brown, mushy, foul-smelling"],
+                ["Pot weight", "Very light when lifted", "Heavy, waterlogged"],
+                ["Recovery speed", "Hours after thorough watering", "Weeks with proper drainage"]
+            ]
+        },
+        "related_guides": [
+            {"slug": "pothos", "name": "Pothos"},
+            {"slug": "snake-plant", "name": "Snake Plant"},
+            {"slug": "peace-lily", "name": "Peace Lily"},
+            {"slug": "spider-plant", "name": "Spider Plant"}
+        ],
+        "bottom_line": "Most dying plants can be saved if you act quickly and correctly. The key is accurate diagnosis — figure out what went wrong (usually watering), fix the root cause, then give the plant time and gentle conditions to recover. Don't try to speed things up with fertilizer or drastic changes. Patience and consistency are your best tools.",
+        "cta_text": "Ask PlantCareAI how to save your plant",
+        "cta_question": "My plant is dying, how do I save it?",
+        "related_pages": ["am-i-overwatering-my-plant", "how-to-treat-root-rot", "why-are-my-plant-leaves-turning-yellow"],
+        "last_updated": "2026-03-12",
+        "quick_answer": "Don't give up yet — check for life by scratching the stem (green = alive) and inspecting roots (firm = alive). Trim dead growth, fix the root system, repot in fresh soil, adjust watering, provide bright indirect light, skip fertilizer, and be patient. Most plants recover in 2-6 weeks.",
+        "h2_causes": "9 Steps to Revive a Dying Houseplant",
+        "h2_bottom_line": "The Bottom Line on Saving Struggling Plants",
+        "howto": {
+            "totalTime": "P42D",
+            "steps": [
+                "Check for life: scratch the stem with a fingernail — green underneath means alive",
+                "Inspect roots by gently removing from the pot — firm roots mean the plant is viable",
+                "Trim all dead leaves, stems, and mushy roots with sterilized scissors",
+                "Identify the cause: overwatering, underwatering, light, pests, or root rot",
+                "Repot in fresh, well-draining potting mix if the soil is degraded or waterlogged",
+                "Place in bright indirect light and water only when the top inch of soil is dry",
+                "Skip fertilizer for 4-6 weeks — stressed plants can't process nutrients",
+                "Be patient and consistent — most plants show new growth within 2-6 weeks"
+            ]
+        }
+    },
+    {
+        "slug": "plant-pest-identification",
+        "route_name": "pest_identification",
+        "title": "Plant Pest Identification Guide: Spot & Treat Common Bugs",
+        "meta_description": "Tiny bugs on your houseplant? Identify the 9 most common indoor plant pests — from spider mites to fungus gnats — with symptoms, photos tips, and treatment.",
+        "emoji": "\ud83d\udd0d",
+        "intro": "Something is eating your plant, but what? Indoor plant pests are sneaky — many are nearly invisible to the naked eye, and by the time you notice damage, they've often been feeding for weeks. The good news: once you identify the culprit, treatment is usually straightforward. This guide covers the most common houseplant pests, how to spot them, and exactly how to get rid of them.",
+        "causes": [
+            {
+                "title": "Fungus gnats",
+                "description": "Tiny black flies hovering around the soil surface, especially when you water. The adults are harmless but annoying — it's their larvae living in the top inch of soil that damage roots. They thrive in consistently moist soil and are by far the most common indoor plant pest. You'll see them flying up when you disturb the soil.",
+                "fix": "Let the soil dry out completely between waterings — this kills the larvae. Top-dress soil with a 1/2 inch layer of sand or diatomaceous earth. Yellow sticky traps catch adults. For severe infestations, drench soil with a solution of 1 part 3% hydrogen peroxide to 4 parts water."
+            },
+            {
+                "title": "Spider mites",
+                "description": "Nearly invisible specks (smaller than a pinhead) that create fine webbing between leaves and stems. You'll notice stippling — tiny yellow or white dots on leaf surfaces where they've been feeding. Hold a leaf over white paper and tap it — if tiny dots move, you have spider mites. They thrive in hot, dry conditions and spread fast.",
+                "fix": "Spray the entire plant with a strong stream of water to dislodge them. Follow up with neem oil or insecticidal soap every 5-7 days for 3 weeks (to catch newly hatched mites). Increase humidity around the plant — spider mites hate moisture."
+            },
+            {
+                "title": "Mealybugs",
+                "description": "White, cottony clusters in leaf joints, along stems, and on the undersides of leaves. They look like tiny pieces of cotton or white fuzz. Mealybugs suck sap and excrete sticky honeydew that can lead to sooty mold. They spread slowly but are persistent — you'll often find them hiding where leaves meet stems.",
+                "fix": "Dab individual bugs with a cotton swab dipped in 70% rubbing alcohol — this kills them on contact. For larger infestations, spray with insecticidal soap or neem oil weekly for 3-4 weeks. Isolate affected plants immediately to prevent spread."
+            },
+            {
+                "title": "Scale insects",
+                "description": "Small brown, tan, or white bumps attached to stems and leaf undersides. They look like they're part of the plant — many people mistake them for natural growths. Scale insects hide under a waxy shell and feed on plant sap. A severe infestation causes yellowing leaves, leaf drop, and sticky honeydew on surfaces below the plant.",
+                "fix": "Scrape off individual scale insects with a fingernail or old toothbrush. Apply rubbing alcohol with a cotton swab to kill remaining ones. For heavy infestations, use horticultural oil spray. Check weekly and retreat — scale reproduces under the shell."
+            },
+            {
+                "title": "Aphids",
+                "description": "Small soft-bodied insects (green, black, white, or pink) that cluster on new growth, stems, and flower buds. They reproduce incredibly fast — a single aphid can produce dozens of offspring in a week. Look for curling new leaves, sticky residue (honeydew), and clusters of tiny insects on tender growth tips.",
+                "fix": "Blast them off with a strong spray of water. Spray with insecticidal soap, focusing on leaf undersides and growing tips. For persistent infestations, neem oil every 7-10 days. Ladybugs are natural predators if you have a greenhouse or outdoor plants."
+            },
+            {
+                "title": "Thrips",
+                "description": "Tiny slender insects (1-2mm) that are hard to see without magnification. They scrape leaf surfaces and suck the released sap, leaving silvery streaks or patches on leaves. You may also notice tiny black dots (their droppings) on leaves. Thrips are especially attracted to flowering plants and can spread plant viruses.",
+                "fix": "Spray with insecticidal soap or spinosad-based spray. Blue sticky traps are effective for monitoring and catching adults. Repeat treatment every 5-7 days for at least 3 cycles. Remove heavily damaged leaves to reduce the population."
+            },
+            {
+                "title": "Whiteflies",
+                "description": "Tiny white moth-like insects that fly up in a cloud when you disturb the plant. They cluster on leaf undersides and, like aphids, suck sap and produce honeydew. Whiteflies are more common on outdoor plants but can infest indoor herbs, hibiscus, and other flowering houseplants. Heavy infestations cause leaf yellowing and drop.",
+                "fix": "Yellow sticky traps are very effective for whiteflies. Spray leaf undersides with insecticidal soap every 5-7 days. Neem oil is also effective as a systemic treatment. Remove and dispose of heavily infested leaves."
+            },
+            {
+                "title": "Root mealybugs",
+                "description": "A hidden pest you won't see unless you unpot the plant. Root mealybugs live in the soil and feed on roots, causing unexplained wilting, yellowing, and slow decline despite proper care. When you unpot, you'll see white cottony masses on the roots and inside the pot. They're often mistaken for fungus.",
+                "fix": "Unpot the plant, rinse all soil off the roots, and soak roots in a diluted insecticidal soap solution for 15 minutes. Repot in completely fresh soil in a clean pot. Drench the soil with a systemic insecticide labeled for mealybugs. Discard the old soil."
+            },
+            {
+                "title": "Springtails",
+                "description": "Tiny white or grey jumping insects on the soil surface. When disturbed, they spring into the air — hence the name. Despite their alarming appearance, springtails are mostly harmless. They feed on decaying organic matter in the soil, not on your plant. They're a sign of overly moist soil but aren't a true pest.",
+                "fix": "Reduce watering frequency to let the soil dry between waterings. Springtails disappear on their own when the moisture level drops. No pesticide treatment is needed — they're actually beneficial decomposers in most cases."
+            }
+        ],
+        "faqs": [
+            {
+                "question": "How do indoor plants get pests?",
+                "answer": "Pests arrive on new plants from nurseries, through open windows, in contaminated soil, or on clothing. Always quarantine new plants for 2 weeks and inspect them before placing near existing plants."
+            },
+            {
+                "question": "Can I use dish soap to kill plant pests?",
+                "answer": "A diluted solution (1 teaspoon per quart of water) works in a pinch, but true insecticidal soap is gentler on plants. Dish soap can strip protective leaf coatings. Never use antibacterial dish soap."
+            },
+            {
+                "question": "How do I prevent pests on indoor plants?",
+                "answer": "Inspect new plants before bringing them home, quarantine newcomers for 2 weeks, maintain proper watering (avoid soggy soil), increase air circulation, and regularly check leaf undersides during watering."
+            },
+            {
+                "question": "Are neem oil and insecticidal soap safe for all plants?",
+                "answer": "Most plants tolerate them well, but test on one leaf first and wait 24 hours. Some sensitive plants like ferns, calatheas, and succulents can be damaged. Apply in the evening to avoid sun burn."
+            },
+            {
+                "question": "When should I throw away a pest-infested plant?",
+                "answer": "Consider discarding if the infestation is severe and spreading to other plants despite repeated treatment, or if the plant is too damaged to recover. It's not worth risking your entire collection."
+            }
+        ],
+        "comparison_table": {
+            "title": "Quick Pest Identification Reference",
+            "intro": "Use this table to quickly identify which pest you're dealing with based on the visible symptoms:",
+            "headers": ["Pest", "What You See", "Where to Look"],
+            "rows": [
+                ["Fungus gnats", "Tiny black flies near soil", "Soil surface, flying when watered"],
+                ["Spider mites", "Fine webbing, stippled leaves", "Leaf undersides, between stems"],
+                ["Mealybugs", "White cottony clusters", "Leaf joints, stem crevices"],
+                ["Scale", "Brown/tan bumps on stems", "Stems, leaf midribs, undersides"],
+                ["Aphids", "Clusters of soft-bodied insects", "New growth tips, flower buds"],
+                ["Thrips", "Silver streaks, black dots", "Leaf surfaces, inside flowers"],
+                ["Whiteflies", "White flies in a cloud", "Leaf undersides"]
+            ]
+        },
+        "related_guides": [
+            {"slug": "monstera-deliciosa", "name": "Monstera"},
+            {"slug": "fiddle-leaf-fig", "name": "Fiddle Leaf Fig"},
+            {"slug": "calathea", "name": "Calathea"},
+            {"slug": "succulents", "name": "Succulents"}
+        ],
+        "bottom_line": "Plant pest control comes down to three things: early detection, correct identification, and consistent treatment. Check your plants weekly (especially leaf undersides), quarantine new arrivals, and treat infestations immediately before they spread. Most pests are manageable with insecticidal soap, neem oil, and good plant hygiene — no toxic chemicals needed.",
+        "cta_text": "Ask PlantCareAI to identify your plant pest",
+        "cta_question": "I found bugs on my plant, what are they and how do I treat them?",
+        "related_pages": ["how-to-get-rid-of-fungus-gnats", "why-are-my-plant-leaves-turning-yellow", "how-to-revive-a-dying-plant"],
+        "last_updated": "2026-03-12",
+        "quick_answer": "Identify the pest first: fungus gnats (tiny black flies near soil), spider mites (fine webbing, stippled leaves), mealybugs (white cottony clusters), scale (brown bumps), or aphids (clusters on new growth). Treat with insecticidal soap or neem oil, repeat every 5-7 days for 3 weeks, and isolate affected plants.",
+        "h2_causes": "9 Common Houseplant Pests: How to Identify & Treat Them",
+        "h2_bottom_line": "The Bottom Line on Plant Pest Control"
+    },
+    {
+        "slug": "best-low-light-houseplants",
+        "route_name": "low_light_plants",
+        "title": "Best Low Light Houseplants (15 Plants That Thrive in Shade)",
+        "meta_description": "No bright windows? No problem. These 15 low light houseplants genuinely thrive in dim rooms, north-facing windows, and offices — tested picks, not guesswork.",
+        "emoji": "\ud83c\udf11",
+        "intro": "Not every home has sun-drenched south-facing windows. If your space has north-facing windows, basement rooms, or corners far from natural light, you need plants that have evolved to thrive in the understory of forests — not just survive, but actually look good. Here are the best true low-light houseplants, ranked by how well they handle dim conditions.",
+        "causes": [
+            {
+                "title": "Snake plant (Sansevieria / Dracaena trifasciata)",
+                "description": "The ultimate low-light survivor. Snake plants are native to rocky, shaded habitats in West Africa and have evolved to photosynthesize efficiently in minimal light. They also tolerate irregular watering, dry air, and temperature swings. Available in dozens of varieties from compact 6-inch rosettes to 4-foot tall specimens.",
+                "fix": "Place anywhere from deep shade to bright indirect light. Water every 2-3 weeks, allowing soil to dry completely. The main risk is overwatering — in low light, they use even less water. Skip fertilizer in winter entirely."
+            },
+            {
+                "title": "Pothos (Epipremnum aureum)",
+                "description": "Often called the 'cubicle plant' because it thrives under fluorescent office lighting. Pothos grows as a trailing vine with heart-shaped leaves. In low light, it grows slower and the leaves may be smaller, but it stays healthy and attractive. Golden, neon, and marble queen varieties all handle shade well.",
+                "fix": "Let the top inch of soil dry between waterings. Trim vines that get leggy to encourage bushier growth. Pothos can even grow in water alone if you prefer a soil-free option."
+            },
+            {
+                "title": "ZZ plant (Zamioculcas zamiifolia)",
+                "description": "The ZZ plant's thick rhizomes store water underground, making it incredibly drought-tolerant. Its glossy dark green leaves reflect light efficiently, which is an adaptation to low-light forest floors. It grows slowly in shade but maintains its lush appearance with almost no care. The 'Raven' variety has dramatic near-black foliage.",
+                "fix": "Water only when the soil is completely dry — every 2-4 weeks depending on conditions. ZZ plants in low light need even less water. Wipe leaves with a damp cloth occasionally to keep them glossy and dust-free."
+            },
+            {
+                "title": "Cast iron plant (Aspidistra elatior)",
+                "description": "Named for its toughness, the cast iron plant has been a low-light favorite since the Victorian era when homes had far less natural light than modern ones. It tolerates deep shade, drought, temperature fluctuations, and neglect. Broad dark green leaves grow slowly but form an elegant, dense clump over time.",
+                "fix": "Water when the top 2 inches of soil are dry. Avoid direct sunlight — it actually burns the leaves. Fertilize sparingly (twice a year at most). This plant truly thrives on benign neglect."
+            },
+            {
+                "title": "Peace lily (Spathiphyllum)",
+                "description": "One of the few low-light plants that actually flowers indoors. Peace lilies produce elegant white spathes even in relatively dim conditions. They're also excellent air purifiers. The trade-off: they're more dramatic about watering — they wilt visibly when thirsty, but perk right back up after a drink.",
+                "fix": "Keep soil lightly moist but never soggy. Peace lilies will tell you exactly when they need water by drooping. Wipe leaves to prevent dust buildup that blocks light absorption in already dim conditions."
+            },
+            {
+                "title": "Chinese evergreen (Aglaonema)",
+                "description": "One of the most decorative low-light options with leaves in combinations of green, silver, pink, and red. Native to tropical forest understories in Southeast Asia, aglaonemas have evolved for shade. Newer varieties with more vibrant colors need slightly more light, but classic green-and-silver types do well in dim rooms.",
+                "fix": "Keep soil lightly moist. Avoid cold drafts — aglaonemas are sensitive to temperatures below 60°F. Choose solid green or silver varieties for the lowest light situations. Pink and red varieties need medium indirect light."
+            },
+            {
+                "title": "Parlor palm (Chamaedorea elegans)",
+                "description": "A true palm that thrives in low light — a rarity in the palm family. Parlor palms have been popular houseplants since the Victorian era precisely because they do well in dim parlors. They grow slowly to about 3-4 feet tall with graceful arching fronds. Unlike many palms, they don't need bright light or high humidity.",
+                "fix": "Water when the top inch of soil is dry. Avoid overwatering, which causes root rot. Parlor palms prefer to be slightly root-bound. Don't repot until roots are visibly crowding the pot."
+            },
+            {
+                "title": "Philodendron (heartleaf and others)",
+                "description": "Heartleaf philodendron (Philodendron hederaceum) is one of the easiest trailing plants for low light. Its heart-shaped leaves stay a rich dark green even in dim conditions. It trails beautifully from shelves or hangs elegantly in baskets. For a more upright option, the philodendron 'Brasil' has striking yellow-green variegation.",
+                "fix": "Water when the top inch of soil dries. Trim trailing stems to the desired length. In very low light, the 'Brasil' variety may lose some of its yellow variegation — this is normal and harmless."
+            },
+            {
+                "title": "Dracaena (multiple species)",
+                "description": "The dracaena family includes several excellent low-light species. Dracaena marginata (dragon tree) has spiky palm-like leaves on a slim trunk. Dracaena fragrans (corn plant) has broad arching leaves. Dracaena 'Janet Craig' has dark glossy leaves and is nearly indestructible in office settings. All tolerate neglect and shade.",
+                "fix": "Let the top half of soil dry between waterings. Use filtered water if your tap water has fluoride — dracaenas are sensitive to it and develop brown leaf tips. Remove lower yellowing leaves as needed — this is normal growth."
+            }
+        ],
+        "faqs": [
+            {
+                "question": "What counts as 'low light' for plants?",
+                "answer": "Low light means areas more than 8 feet from a window, north-facing windows, or spaces lit mainly by artificial light. You can still read a book comfortably, but the area never gets direct sun."
+            },
+            {
+                "question": "Can any plant survive in a room with no windows?",
+                "answer": "Not for long with zero light. But plants like snake plants and ZZ plants can survive for months in a windowless room with fluorescent or LED lighting on for 8+ hours daily."
+            },
+            {
+                "question": "Do low-light plants need less water?",
+                "answer": "Yes. Plants in low light photosynthesize and grow slower, so they use less water. Overwatering is the most common mistake with low-light plants. Always check soil before watering."
+            },
+            {
+                "question": "Why is my low-light plant getting leggy?",
+                "answer": "The plant is stretching toward any available light source. This is a sign it needs slightly more light, or you can rotate it regularly. Trim leggy stems to encourage bushier growth."
+            },
+            {
+                "question": "Can I use a grow light instead of natural sunlight?",
+                "answer": "Absolutely. A full-spectrum LED grow light running 10-12 hours daily can replace natural light for most houseplants. Position it 12-24 inches above the plant depending on the light's intensity."
+            }
+        ],
+        "comparison_table": {
+            "title": "Low Light Plant Comparison",
+            "intro": "Choosing the right low-light plant depends on your space, style, and how much care you want to provide:",
+            "headers": ["Plant", "Light Tolerance", "Watering", "Growth Form"],
+            "rows": [
+                ["Snake plant", "Very low to bright", "Every 2-3 weeks", "Upright, architectural"],
+                ["Pothos", "Low to bright indirect", "Weekly", "Trailing vine"],
+                ["ZZ plant", "Very low to bright", "Every 2-4 weeks", "Upright, glossy"],
+                ["Cast iron plant", "Very low (deep shade)", "Every 2 weeks", "Low clumping"],
+                ["Peace lily", "Low to medium", "When it droops", "Bushy, flowering"],
+                ["Chinese evergreen", "Low to medium", "When top inch dry", "Bushy, colorful"],
+                ["Parlor palm", "Low to medium", "When top inch dry", "Upright, arching fronds"],
+                ["Philodendron", "Low to bright indirect", "When top inch dry", "Trailing or climbing"],
+                ["Dracaena", "Low to bright indirect", "When top half dry", "Tree-like, upright"]
+            ]
+        },
+        "related_guides": [
+            {"slug": "snake-plant", "name": "Snake Plant"},
+            {"slug": "pothos", "name": "Pothos"},
+            {"slug": "zz-plant", "name": "ZZ Plant"},
+            {"slug": "peace-lily", "name": "Peace Lily"},
+            {"slug": "philodendron", "name": "Philodendron"}
+        ],
+        "bottom_line": "Low light doesn't mean no plants. Snake plants, pothos, ZZ plants, and cast iron plants genuinely thrive in dim conditions — they're not just surviving, they're adapted for it. The key in low light is to water less frequently (plants use less water when they photosynthesize less) and choose species with dark green leaves, which capture light more efficiently than variegated ones.",
+        "cta_text": "Ask PlantCareAI for low-light plant recommendations",
+        "cta_question": "What are the best plants for a room with very little natural light?",
+        "related_pages": ["indoor-plant-care-for-beginners", "why-is-my-plant-not-growing", "why-are-my-plant-leaves-turning-yellow"],
+        "last_updated": "2026-03-12",
+        "quick_answer": "The best low-light houseplants are snake plants, pothos, ZZ plants, cast iron plants, and peace lilies. These species have evolved to thrive in shaded forest understories and do well in north-facing windows, corners far from windows, and rooms with mainly artificial light. Water less frequently in low light.",
+        "h2_causes": "9 Best Houseplants for Low Light Rooms",
+        "h2_bottom_line": "The Bottom Line on Low Light Plant Care"
     }
 ]
