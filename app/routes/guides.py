@@ -1,10 +1,8 @@
 """
-Plant Care Guides for SEO.
+Plant Care Guides — unified content hub.
 
-Static guides for popular houseplants targeting long-tail keywords like
-"monstera care guide", "how to water pothos", etc.
-
-Each guide links to /ask for personalized AI advice.
+Serves the /plant-care-guides/ index (species guides, hub pages, and
+troubleshooting landing pages) plus individual guide pages.
 """
 
 from __future__ import annotations
@@ -51,15 +49,54 @@ def _get_guide_by_slug(slug: str) -> Optional[dict]:
     return None
 
 
+def _build_landing_page_groups() -> list[dict]:
+    """Group SEO landing pages by their parent hub for the index page.
+
+    Returns a list of dicts, each with:
+      - label: section heading (e.g. "Watering Issues")
+      - hub: parent hub page dict or None
+      - pages: list of landing page dicts in this group
+    """
+    from app.routes.seo import LANDING_PAGES, HUB_PAGES
+
+    assigned: set[str] = set()
+    groups: list[dict] = []
+
+    for hub in HUB_PAGES.values():
+        pages = []
+        for slug in hub.get("spoke_pages", []):
+            if slug in LANDING_PAGES and slug not in assigned:
+                pages.append(LANDING_PAGES[slug])
+                assigned.add(slug)
+        if pages:
+            groups.append({"label": hub["title"], "hub": hub, "pages": pages})
+
+    # Collect any landing pages not assigned to a hub
+    remaining = [
+        page for slug, page in LANDING_PAGES.items() if slug not in assigned
+    ]
+    if remaining:
+        groups.append({"label": "More Guides", "hub": None, "pages": remaining})
+
+    return groups
+
+
 @guides_bp.route("/")
 def index():
     """
-    Plant care guides index page.
-
-    Lists all available guides organized by category.
+    Unified content hub — species guides, hub pages, and troubleshooting.
     """
+    from app.routes.seo import HUB_PAGES
+
     guides = _load_guides()
-    return render_template("guides/index.html", guides=guides)
+    hub_pages = list(HUB_PAGES.values())
+    landing_page_groups = _build_landing_page_groups()
+    return render_template(
+        "guides/index.html",
+        guides=guides,
+        hub_pages=hub_pages,
+        landing_page_groups=landing_page_groups,
+    )
 
 
 @guides_bp.route("/<slug>")
