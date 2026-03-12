@@ -41,7 +41,7 @@
   "dateModified": "{{ page.last_updated }}T00:00:00+00:00",
   "speakable": {
     "@type": "SpeakableSpecification",
-    "cssSelector": ["h1", "header p"]
+    "cssSelector": ["h1", "[aria-label='Quick answer']"]
   }
 }
 </script>
@@ -64,6 +64,18 @@
     {{ page.intro }}
   </p>
 </header>
+
+<!-- Quick Answer (targets featured snippets and AI citation) -->
+{% if page.quick_answer %}
+<section class="max-w-3xl mx-auto mb-8" aria-label="Quick answer">
+  <div class="card bg-emerald-50 dark:bg-emerald-900/20 border-l-4 border-emerald-500">
+    <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+      <strong class="text-slate-900 dark:text-slate-100">Quick Answer:</strong>
+      {{ page.quick_answer }}
+    </p>
+  </div>
+</section>
+{% endif %}
 
 {% macro section_id(title) %}{{ title | lower | replace(' ', '-') | replace('&', 'and') | replace(':', '') | replace('.', '') | truncate(40, false, '') }}{% endmacro %}
 

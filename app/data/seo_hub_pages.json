@@ -44,9 +44,10 @@
             "should-i-water-my-plant-today",
             "how-to-get-rid-of-fungus-gnats"
         ],
+        "quick_answer": "Check the soil before every watering — stick your finger 1-2 inches deep. If dry, water thoroughly until it drains from the bottom. If still moist, wait. This single habit prevents the #1 cause of houseplant death: overwatering.",
         "cta_text": "Get personalized watering advice for your plants",
         "cta_question": "How should I water my plants?",
-        "last_updated": "2026-02-21"
+        "last_updated": "2026-03-12"
     },
     {
         "slug": "plant-leaf-problems",
@@ -94,8 +95,69 @@
             "why-are-my-plant-leaves-turning-brown",
             "how-to-treat-root-rot"
         ],
+        "quick_answer": "Leaf color and texture changes are your plant's way of telling you something is wrong. Yellow leaves usually mean overwatering; brown crispy edges mean low humidity; drooping means a water imbalance; curling means stress. Check the soil moisture first — it's the cause of most leaf problems.",
         "cta_text": "Get AI diagnosis for your plant's symptoms",
         "cta_question": "What's wrong with my plant's leaves?",
-        "last_updated": "2026-02-21"
+        "last_updated": "2026-03-12"
+    },
+    {
+        "slug": "houseplant-care-for-beginners-guide",
+        "route_name": "beginners_hub",
+        "title": "Beginner's Complete Guide to Houseplants",
+        "meta_description": "Everything you need to know to start growing houseplants successfully. From choosing your first plant to watering, light, soil, and troubleshooting — a complete beginner's resource.",
+        "emoji": "\ud83c\udf31",
+        "intro": "Starting your houseplant journey doesn't require a green thumb, expensive equipment, or years of experience. It just takes a few fundamentals done right. This guide brings together everything a beginner needs — from picking the right first plant to keeping it alive and thriving — all in one place.",
+        "sections": [
+            {
+                "title": "Choose Forgiving First Plants",
+                "content": "Your first plants should tolerate the mistakes you'll inevitably make. Pothos, snake plants, ZZ plants, and spider plants handle irregular watering, imperfect light, and general neglect. Start with 2-3 easy species and build confidence before adding demanding plants like fiddle leaf figs or calatheas. A thriving easy plant teaches you more than a dying hard one.",
+                "icon": "\ud83e\udeb4"
+            },
+            {
+                "title": "Understand Light Basics",
+                "content": "Light is the single most important factor for plant health — more than watering, soil, or fertilizer. South-facing windows give the most light, north-facing the least. 'Bright indirect light' means near a window but not in the direct sun beam. Most popular houseplants are tropical understory species that want bright indirect light. When in doubt, more light (not direct) is usually better.",
+                "icon": "\u2600\ufe0f"
+            },
+            {
+                "title": "Master Watering (the #1 Skill)",
+                "content": "Overwatering kills more houseplants than anything else. Forget schedules — instead, check the soil with your finger before every watering. If the top 1-2 inches are dry, water thoroughly until it drains from the bottom. If still moist, wait. This simple habit prevents 80% of common plant problems. Every plant has a different rhythm, and that rhythm changes with the seasons.",
+                "icon": "\ud83d\udca7"
+            },
+            {
+                "title": "Get the Right Soil & Pots",
+                "content": "Standard potting mix works for most houseplants, but adding 20-30% perlite improves drainage dramatically. Always use pots with drainage holes — decorative pots without holes are the #2 cause of plant death after overwatering. If you love a pot with no holes, use it as a cachepot (decorative outer pot) with a plain nursery pot inside.",
+                "icon": "\ud83e\udea3"
+            },
+            {
+                "title": "Humidity & Temperature",
+                "content": "Most houseplants are tropical and prefer 50-60% humidity, but many (pothos, snake plants, ZZ plants) adapt to normal home humidity of 30-40%. If you notice brown leaf tips on calatheas or ferns, low humidity is likely the cause. Grouping plants together, using pebble trays, or running a humidifier helps. Keep plants away from heating vents and cold drafts.",
+                "icon": "\ud83c\udf21\ufe0f"
+            },
+            {
+                "title": "Feeding Your Plants",
+                "content": "Plants need nutrients to grow, but less is more — especially for beginners. Feed with a balanced liquid fertilizer (like 10-10-10) at half the recommended strength during the growing season (spring through early fall). Stop fertilizing in winter when growth slows. Over-fertilizing burns roots and causes salt buildup — it's worse than not feeding at all.",
+                "icon": "\ud83c\udf3e"
+            },
+            {
+                "title": "Common Beginner Mistakes",
+                "content": "Overwatering is #1. Other frequent mistakes: not enough light (far from windows), repotting too often or into too-large pots, over-fertilizing, ignoring pests until they spread, and panicking over normal leaf drop. One yellowing lower leaf isn't a crisis — multiple yellowing leaves across the plant is. Learn to observe and respond rather than preemptively fussing.",
+                "icon": "\u26a0\ufe0f"
+            },
+            {
+                "title": "When to Repot",
+                "content": "Repot only when necessary — when roots circle the pot or grow out of drainage holes, when water runs straight through without being absorbed, or when the plant is visibly top-heavy. Spring is the best time. Move up only one pot size (1-2 inches wider). Repotting into too-large a pot leads to waterlogged soil and root rot because the excess soil holds moisture the roots can't use.",
+                "icon": "\ud83e\udeb5"
+            }
+        ],
+        "spoke_pages": [
+            "indoor-plant-care-for-beginners",
+            "best-low-light-houseplants",
+            "how-to-revive-a-dying-plant",
+            "am-i-overwatering-my-plant"
+        ],
+        "quick_answer": "Start with forgiving plants like pothos, snake plants, or ZZ plants. Use pots with drainage holes and standard potting mix with added perlite. Check soil before watering — if the top 1-2 inches are dry, water thoroughly. Place near a bright window but out of direct sun. That's 90% of what you need to succeed.",
+        "cta_text": "Get personalized beginner plant advice",
+        "cta_question": "I'm new to houseplants, what should I start with?",
+        "last_updated": "2026-03-12"
     }
 ]

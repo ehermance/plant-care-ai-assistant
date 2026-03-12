@@ -153,6 +153,24 @@ def root_rot():
     return _render_landing("how-to-treat-root-rot")
 
 
+@seo_bp.route("/how-to-revive-a-dying-plant")
+def revive_dying_plant():
+    """How to revive a dying plant landing page."""
+    return _render_landing("how-to-revive-a-dying-plant")
+
+
+@seo_bp.route("/plant-pest-identification")
+def pest_identification():
+    """Plant pest identification guide landing page."""
+    return _render_landing("plant-pest-identification")
+
+
+@seo_bp.route("/best-low-light-houseplants")
+def low_light_plants():
+    """Best low light houseplants landing page."""
+    return _render_landing("best-low-light-houseplants")
+
+
 # --- Hub (Pillar) Pages ---
 
 
@@ -168,5 +186,13 @@ def watering_hub():
 def leaf_problems_hub():
     """Plant leaf problems diagnosis & treatment — hub page."""
     page = _get_hub_page("plant-leaf-problems")
+    spoke_pages = _get_spoke_pages(page["spoke_pages"])
+    return render_template("seo/hub.html", page=page, spoke_pages=spoke_pages)
+
+
+@seo_bp.route("/houseplant-care-for-beginners-guide")
+def beginners_hub():
+    """Beginner's complete guide to houseplants — hub page."""
+    page = _get_hub_page("houseplant-care-for-beginners-guide")
     spoke_pages = _get_spoke_pages(page["spoke_pages"])
     return render_template("seo/hub.html", page=page, spoke_pages=spoke_pages)

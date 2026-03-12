@@ -39,7 +39,11 @@
   },
   "image": "{{ url_for('static', filename='images/og/guide-' ~ guide.slug ~ '.png', _external=True) }}",
   "datePublished": "{{ guide.last_updated }}T00:00:00+00:00",
-  "dateModified": "{{ guide.last_updated }}T00:00:00+00:00"
+  "dateModified": "{{ guide.last_updated }}T00:00:00+00:00",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": ["h1", ".summary"]
+  }
 }
 </script>
 <!-- HowTo Structured Data -->
@@ -113,7 +117,7 @@
       <p class="text-lg text-slate-500 dark:text-slate-400 italic">{{ guide.scientific_name }}</p>
     </div>
   </div>
-  <p class="text-xl text-slate-600 dark:text-slate-400 max-w-3xl">
+  <p class="summary text-xl text-slate-600 dark:text-slate-400 max-w-3xl">
     {{ guide.summary }}
   </p>
 </header>

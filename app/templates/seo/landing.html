@@ -71,6 +71,27 @@
   ]
 }
 </script>
+{% if page.howto %}
+<!-- HowTo Structured Data for instructional pages -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": {{ page.title | tojson }},
+  "description": {{ page.meta_description | tojson }},
+  "totalTime": {{ page.howto.totalTime | tojson }},
+  "step": [
+    {% for step in page.howto.steps %}
+    {
+      "@type": "HowToStep",
+      "position": {{ loop.index }},
+      "text": {{ step | tojson }}
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endif %}
 {% endblock %}
 
 {% block content %}
