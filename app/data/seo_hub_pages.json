@@ -5,6 +5,7 @@
         "title": "Complete Guide to Watering Houseplants",
         "meta_description": "Master the art of watering houseplants. Learn when to water, how much, and what to watch for—from soil checks to seasonal adjustments and common mistakes.",
         "emoji": "\ud83d\udca7",
+        "tags": ["comprehensive", "watering"],
         "intro": "Watering is the single most important plant care skill—and the one most people get wrong. There's no universal schedule that works for every plant. Instead, successful watering comes down to understanding your plant's signals, your environment, and a few reliable techniques.",
         "sections": [
             {
@@ -55,6 +56,7 @@
         "title": "Plant Leaf Problems: Diagnosis & Treatment Guide",
         "meta_description": "Yellow, brown, drooping, or curling leaves? Use this visual diagnosis guide to identify what's wrong with your plant and learn exactly how to fix it.",
         "emoji": "\ud83c\udf3f",
+        "tags": ["comprehensive", "leaf-problems"],
         "intro": "Your plant's leaves are its voice. When something is wrong—too much water, not enough light, pests, or nutrient issues—leaves show it first. This guide helps you decode what your plant is telling you and take the right action.",
         "sections": [
             {
@@ -106,6 +108,7 @@
         "title": "Beginner's Complete Guide to Houseplants",
         "meta_description": "Everything you need to know to start growing houseplants successfully. From choosing your first plant to watering, light, soil, and troubleshooting — a complete beginner's resource.",
         "emoji": "\ud83c\udf31",
+        "tags": ["comprehensive", "beginner"],
         "intro": "Starting your houseplant journey doesn't require a green thumb, expensive equipment, or years of experience. It just takes a few fundamentals done right. This guide brings together everything a beginner needs — from picking the right first plant to keeping it alive and thriving — all in one place.",
         "sections": [
             {

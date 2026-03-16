@@ -148,7 +148,10 @@
       searchQuery = q;
     }
     if (tag) {
-      setActiveChip(tag);
+      var validTags = Array.from(chips).map(function(c) { return c.getAttribute('data-tag'); });
+      if (validTags.indexOf(tag) !== -1) {
+        setActiveChip(tag);
+      }
     }
     if (q || tag) applyFilters();
   }

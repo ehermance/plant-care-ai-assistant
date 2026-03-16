@@ -327,7 +327,9 @@
   /* === FILTER CHIPS === */
   .guide-chip {
     @apply px-3 py-1.5 text-sm font-medium rounded-full border
-           transition-colors cursor-pointer;
+           transition-colors cursor-pointer
+           focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1
+           dark:focus-visible:ring-offset-slate-900;
   }
 
   /* === SECTION === */
