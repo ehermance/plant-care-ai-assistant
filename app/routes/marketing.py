@@ -29,7 +29,7 @@ STATIC_PAGE_DATES = {
     "/": "2026-02-21",
     "/ask": "2026-01-30",
     "/ai-plant-doctor": "2025-12-18",
-    "/plant-care-guides/": "2026-03-12",
+    "/plant-care-guides/": "2026-03-15",
     "/features/": "2026-01-30",
 }
 
@@ -160,14 +160,61 @@ def robots():
 
 @marketing_bp.route("/llms.txt")
 def llms_txt():
-    """Serve llms.txt for AI model discoverability."""
-    llms_path = os.path.join(current_app.static_folder, "llms.txt")
-    try:
-        with open(llms_path, "r") as f:
-            content = f.read()
-    except FileNotFoundError:
-        content = "# PlantCareAI\n\n> AI-powered plant care assistant.\n"
-    return Response(content, mimetype="text/plain; charset=utf-8")
+    """Serve llms.txt for AI model discoverability.
+
+    Generated dynamically from the same JSON data files the sitemap uses,
+    so new content pages are automatically included.  This is the concise
+    version; llms-full.txt has expanded descriptions.
+    """
+    base_url = os.getenv("APP_URL", "https://plantcareai.app")
+    lines = [
+        "# PlantCareAI",
+        "",
+        "> AI-powered plant care assistant with weather-aware watering "
+        "reminders, personalized care tips, and plant health tracking.",
+        "",
+        "PlantCareAI helps plant owners keep their houseplants thriving with "
+        "an AI assistant powered by Anthropic Claude, real-time weather "
+        "integration, and curated care guides for popular species. "
+        "Free to use, no ads.",
+        "",
+        "## Key Pages",
+        "",
+        f"- [AI Plant Care Assistant]({base_url}/ask): Ask any plant care "
+        "question and get personalized, weather-aware advice.",
+        f"- [AI Plant Doctor]({base_url}/ai-plant-doctor): Diagnose plant "
+        "problems with AI-powered analysis.",
+        f"- [Plant Care Guides]({base_url}/plant-care-guides/): Free care "
+        f"guides for {len(_GUIDES)} popular houseplants.",
+    ]
+
+    # Hub pages
+    for page in _HUB_PAGES:
+        lines.append(
+            f"- [{page['title']}]({base_url}/{page['slug']}): "
+            f"{page['meta_description']}"
+        )
+
+    # Plant care guides
+    lines.extend(["", "## Plant Care Guides", ""])
+    for guide in _GUIDES:
+        if guide.get("slug"):
+            lines.append(
+                f"- [{guide['name']} Care]"
+                f"({base_url}/plant-care-guides/{guide['slug']}): "
+                f"{guide.get('meta_description', '')}"
+            )
+
+    # Troubleshooting / landing pages
+    lines.extend(["", "## Troubleshooting", ""])
+    for page in _SEO_PAGES:
+        lines.append(
+            f"- [{page['title']}]({base_url}/{page['slug']}): "
+            f"{page.get('meta_description', '')}"
+        )
+
+    lines.append("")
+    return Response("\n".join(lines), mimetype="text/plain; charset=utf-8")
 
 
 @marketing_bp.route("/llms-full.txt")
