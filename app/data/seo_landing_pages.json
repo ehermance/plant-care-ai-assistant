@@ -93,7 +93,7 @@
         "cta_text": "Ask PlantCareAI why your plant is drooping",
         "cta_question": "Why is my plant drooping?",
         "related_pages": ["am-i-overwatering-my-plant", "why-are-my-plant-leaves-turning-yellow"],
-        "last_updated": "2026-02-23",
+        "last_updated": "2026-03-15",
         "quick_answer": "Plant leaves usually droop from underwatering, overwatering, or temperature stress. Check the soil first — if the top 2 inches are dry, water thoroughly. If it's soggy, stop watering and let it dry out.",
         "h2_causes": "8 Common Causes of Drooping Plant Leaves",
         "h2_bottom_line": "The Bottom Line on Drooping Leaves"
@@ -193,7 +193,7 @@
         "cta_text": "Get personalized watering advice for your plant",
         "cta_question": "How often should I water my plant?",
         "related_pages": ["how-often-should-i-water-my-plant", "why-are-my-plant-leaves-drooping"],
-        "last_updated": "2026-02-23",
+        "last_updated": "2026-03-15",
         "quick_answer": "Signs of overwatering include yellow lower leaves, mushy stems, soil that stays wet for days, and fungus gnats. Let the soil dry out between waterings and ensure your pot has drainage holes.",
         "h2_causes": "8 Signs You're Overwatering Your Plant",
         "h2_bottom_line": "The Bottom Line on Overwatering"
@@ -292,7 +292,7 @@
         "cta_text": "Get a personalized watering recommendation",
         "cta_question": "When should I water my plant?",
         "related_pages": ["am-i-overwatering-my-plant", "should-i-water-my-plant-today"],
-        "last_updated": "2026-02-23",
+        "last_updated": "2026-03-15",
         "quick_answer": "Most houseplants need water every 1–2 weeks, but the real answer is: check the soil. Stick your finger 1–2 inches in — if it's dry, water thoroughly. Frequency depends on light, humidity, pot type, soil, and season.",
         "h2_causes": "8 Factors That Affect How Often to Water",
         "h2_bottom_line": "The Bottom Line on Watering Frequency"
@@ -392,7 +392,7 @@
         "cta_text": "Ask PlantCareAI to diagnose your yellow leaves",
         "cta_question": "Why are my plant's leaves turning yellow?",
         "related_pages": ["am-i-overwatering-my-plant", "why-are-my-plant-leaves-drooping"],
-        "last_updated": "2026-02-23",
+        "last_updated": "2026-03-15",
         "quick_answer": "Yellow leaves are most often caused by overwatering or natural aging. If lower leaves yellow and feel soft with soggy soil, reduce watering. If only old leaves yellow while the plant looks healthy, it's normal leaf turnover.",
         "h2_causes": "8 Common Causes of Yellow Leaves",
         "h2_bottom_line": "The Bottom Line on Yellow Leaves"
@@ -486,7 +486,7 @@
         "cta_text": "Get a weather-aware watering recommendation",
         "cta_question": "Should I water my plant today?",
         "related_pages": ["how-often-should-i-water-my-plant", "am-i-overwatering-my-plant"],
-        "last_updated": "2026-02-23",
+        "last_updated": "2026-03-15",
         "quick_answer": "Check the top 1–2 inches of soil with your finger. If it's dry, water thoroughly until it drains from the bottom. If it's still moist, wait another day or two. When in doubt, wait — most plants handle drought better than overwatering.",
         "h2_causes": "8 Ways to Tell If Your Plant Needs Water",
         "h2_bottom_line": "The Bottom Line on Watering Today"
@@ -585,7 +585,7 @@
         "cta_text": "Ask PlantCareAI why your plant stopped growing",
         "cta_question": "Why is my plant not growing?",
         "related_pages": ["how-often-should-i-water-my-plant", "why-are-my-plant-leaves-turning-yellow"],
-        "last_updated": "2026-02-23",
+        "last_updated": "2026-03-15",
         "quick_answer": "Slow or stalled plant growth is usually caused by insufficient light, seasonal dormancy (fall/winter), or a root-bound pot. If it's growing season and your plant looks healthy but isn't growing, check light levels and pot size first.",
         "h2_causes": "8 Common Reasons Your Plant Stopped Growing",
         "h2_bottom_line": "The Bottom Line on Slow Plant Growth"
@@ -691,7 +691,7 @@
         "cta_text": "Get personalized advice for your first plants",
         "cta_question": "I'm new to plants, what should I know?",
         "related_pages": ["how-often-should-i-water-my-plant", "am-i-overwatering-my-plant"],
-        "last_updated": "2026-02-23",
+        "last_updated": "2026-03-15",
         "quick_answer": "Start with low-maintenance plants like pothos, snake plants, or ZZ plants. Water only when the top inch of soil is dry (not on a schedule), choose pots with drainage holes, and place plants near bright indirect light.",
         "h2_causes": "9 Essential Indoor Plant Care Tips for Beginners",
         "h2_bottom_line": "The Bottom Line for New Plant Parents"
@@ -790,7 +790,7 @@
         "cta_text": "Ask PlantCareAI to diagnose your curling leaves",
         "cta_question": "Why are my plant's leaves curling?",
         "related_pages": ["why-are-my-plant-leaves-drooping", "why-are-my-plant-leaves-turning-yellow"],
-        "last_updated": "2026-02-23",
+        "last_updated": "2026-03-15",
         "quick_answer": "Leaf curling is usually a stress response to underwatering, low humidity, or too much direct sun. Check the direction: inward curling means moisture stress, downward curling means heat/light stress, and distorted curling means pests.",
         "h2_causes": "8 Common Causes of Curling Plant Leaves",
         "h2_bottom_line": "The Bottom Line on Leaf Curling"
@@ -892,7 +892,7 @@
         "cta_text": "Ask PlantCareAI about your gnat problem",
         "cta_question": "How do I get rid of fungus gnats on my plants?",
         "related_pages": ["am-i-overwatering-my-plant", "how-often-should-i-water-my-plant"],
-        "last_updated": "2026-03-12",
+        "last_updated": "2026-03-15",
         "quick_answer": "Fungus gnats breed in moist topsoil. To eliminate them: let the top 2 inches of soil dry between waterings, use yellow sticky traps for adults, and apply a hydrogen peroxide soil drench (1 part H2O2 to 4 parts water) weekly to kill larvae.",
         "h2_causes": "9 Proven Ways to Eliminate Fungus Gnats",
         "h2_bottom_line": "The Bottom Line on Fungus Gnats",
@@ -1011,7 +1011,7 @@
         "cta_text": "Ask PlantCareAI to diagnose your brown leaves",
         "cta_question": "Why are my plant's leaves turning brown?",
         "related_pages": ["why-are-my-plant-leaves-turning-yellow", "why-are-my-plant-leaves-curling"],
-        "last_updated": "2026-02-23",
+        "last_updated": "2026-03-15",
         "quick_answer": "The pattern of browning reveals the cause: crispy brown edges mean low humidity, soft dark spots mean overwatering, bleached patches mean sunburn, and brown tips mean tap water minerals or fertilizer burn.",
         "h2_causes": "9 Common Causes of Brown Leaves on Plants",
         "h2_bottom_line": "The Bottom Line on Brown Leaves"
@@ -1113,7 +1113,7 @@
         "cta_text": "Ask PlantCareAI for help saving your plant",
         "cta_question": "My plant has root rot, how do I save it?",
         "related_pages": ["am-i-overwatering-my-plant", "why-are-my-plant-leaves-turning-yellow"],
-        "last_updated": "2026-03-12",
+        "last_updated": "2026-03-15",
         "quick_answer": "Root rot is caused by overwatering and poor drainage. To save your plant: unpot and inspect roots, trim all mushy brown roots, treat with hydrogen peroxide, repot in fresh well-draining soil, and water only when the top 1–2 inches are dry going forward.",
         "h2_causes": "9 Steps to Identify, Treat & Prevent Root Rot",
         "h2_bottom_line": "The Bottom Line on Root Rot Recovery",
@@ -1230,7 +1230,7 @@
         "cta_text": "Ask PlantCareAI how to save your plant",
         "cta_question": "My plant is dying, how do I save it?",
         "related_pages": ["am-i-overwatering-my-plant", "how-to-treat-root-rot", "why-are-my-plant-leaves-turning-yellow"],
-        "last_updated": "2026-03-12",
+        "last_updated": "2026-03-15",
         "quick_answer": "Don't give up yet — check for life by scratching the stem (green = alive) and inspecting roots (firm = alive). Trim dead growth, fix the root system, repot in fresh soil, adjust watering, provide bright indirect light, skip fertilizer, and be patient. Most plants recover in 2-6 weeks.",
         "h2_causes": "9 Steps to Revive a Dying Houseplant",
         "h2_bottom_line": "The Bottom Line on Saving Struggling Plants",
@@ -1349,7 +1349,7 @@
         "cta_text": "Ask PlantCareAI to identify your plant pest",
         "cta_question": "I found bugs on my plant, what are they and how do I treat them?",
         "related_pages": ["how-to-get-rid-of-fungus-gnats", "why-are-my-plant-leaves-turning-yellow", "how-to-revive-a-dying-plant"],
-        "last_updated": "2026-03-12",
+        "last_updated": "2026-03-15",
         "quick_answer": "Identify the pest first: fungus gnats (tiny black flies near soil), spider mites (fine webbing, stippled leaves), mealybugs (white cottony clusters), scale (brown bumps), or aphids (clusters on new growth). Treat with insecticidal soap or neem oil, repeat every 5-7 days for 3 weeks, and isolate affected plants.",
         "h2_causes": "9 Common Houseplant Pests: How to Identify & Treat Them",
         "h2_bottom_line": "The Bottom Line on Plant Pest Control"
@@ -1458,7 +1458,7 @@
         "cta_text": "Ask PlantCareAI for low-light plant recommendations",
         "cta_question": "What are the best plants for a room with very little natural light?",
         "related_pages": ["indoor-plant-care-for-beginners", "why-is-my-plant-not-growing", "why-are-my-plant-leaves-turning-yellow"],
-        "last_updated": "2026-03-12",
+        "last_updated": "2026-03-15",
         "quick_answer": "The best low-light houseplants are snake plants, pothos, ZZ plants, cast iron plants, and peace lilies. These species have evolved to thrive in shaded forest understories and do well in north-facing windows, corners far from windows, and rooms with mainly artificial light. Water less frequently in low light.",
         "h2_causes": "9 Best Houseplants for Low Light Rooms",
         "h2_bottom_line": "The Bottom Line on Low Light Plant Care"
