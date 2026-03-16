@@ -48,7 +48,7 @@
     {
       "@type": "ListItem",
       "position": {{ hub_pages | length + loop.index }},
-      "name": {{ guide.name ~ " Care Guide" | tojson }},
+      "name": {{ (guide.name ~ " Care Guide") | tojson }},
       "url": "{{ APP_URL }}{{ url_for('guides.view', slug=guide.slug) }}"
     }{% if not loop.last or all_landing_pages %},{% endif %}
     {% endfor %}
@@ -64,23 +64,6 @@
 }
 </script>
 {% endblock %}
-
-{# --- Tag mappings for search/filter chips --- #}
-{% set hub_tag_map = {
-  'plant-watering-guide': 'comprehensive,watering',
-  'plant-leaf-problems': 'comprehensive,leaf-problems',
-  'houseplant-care-for-beginners-guide': 'comprehensive,beginner'
-} %}
-{% set hub_slug_to_tag = {
-  'plant-watering-guide': 'watering',
-  'plant-leaf-problems': 'leaf-problems',
-  'houseplant-care-for-beginners-guide': 'beginner'
-} %}
-{% set landing_extra_tags = {
-  'how-to-get-rid-of-fungus-gnats': 'pests',
-  'plant-pest-identification': 'pests',
-  'best-low-light-houseplants': 'low-light'
-} %}
 
 {% block content %}
 <!-- Hero Section -->
@@ -100,7 +83,7 @@
 </section>
 
 <!-- Search & Filter -->
-<section class="py-6">
+<section class="py-6" role="search" aria-label="Search plant care guides">
   <div class="max-w-3xl mx-auto">
     <div class="relative">
       <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -146,7 +129,7 @@
     <a href="{{ url_for('seo.' ~ hub.route_name) }}"
        class="guide-card card bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-200 dark:border-emerald-700 hover:shadow-lg hover:border-emerald-400 dark:hover:border-emerald-500 transition-all group"
        data-search="{{ (hub.title ~ ' ' ~ hub.meta_description) | lower }}"
-       data-tags="{{ hub_tag_map.get(hub.slug, 'comprehensive') }}">
+       data-tags="{{ hub.tags | join(',') if hub.tags else 'comprehensive' }}">
       <div class="text-center">
         <div class="text-5xl mb-3" aria-hidden="true">{{ hub.emoji }}</div>
         <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
@@ -244,13 +227,10 @@
       </h3>
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {% for page in group.pages %}
-        {% set hub_tag = hub_slug_to_tag.get(group.hub.slug, 'troubleshooting') if group.hub else 'troubleshooting' %}
-        {% set extra = landing_extra_tags.get(page.slug, '') %}
-        {% set page_tags = 'troubleshooting,' ~ hub_tag ~ (',' ~ extra if extra else '') %}
         <a href="{{ url_for('seo.' ~ page.route_name) }}"
            class="guide-card card hover:shadow-lg transition-shadow p-4"
            data-search="{{ (page.title ~ ' ' ~ page.meta_description) | lower }}"
-           data-tags="{{ page_tags }}">
+           data-tags="{{ page.tags | join(',') if page.tags else 'troubleshooting' }}">
           <span class="text-2xl mb-2 block" aria-hidden="true">{{ page.emoji }}</span>
           <span class="font-medium text-slate-900 dark:text-slate-100">{{ page.title }}</span>
         </a>
