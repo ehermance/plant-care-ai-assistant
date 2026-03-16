@@ -42,7 +42,7 @@
       "position": {{ loop.index }},
       "name": {{ hub.title | tojson }},
       "url": "{{ APP_URL }}{{ url_for('seo.' ~ hub.route_name) }}"
-    },
+    }{% if not loop.last or guides or all_landing_pages %},{% endif %}
     {% endfor %}
     {% for guide in guides %}
     {
@@ -50,7 +50,7 @@
       "position": {{ hub_pages | length + loop.index }},
       "name": {{ guide.name ~ " Care Guide" | tojson }},
       "url": "{{ APP_URL }}{{ url_for('guides.view', slug=guide.slug) }}"
-    },
+    }{% if not loop.last or all_landing_pages %},{% endif %}
     {% endfor %}
     {% for page in all_landing_pages %}
     {
@@ -64,6 +64,23 @@
 }
 </script>
 {% endblock %}
+
+{# --- Tag mappings for search/filter chips --- #}
+{% set hub_tag_map = {
+  'plant-watering-guide': 'comprehensive,watering',
+  'plant-leaf-problems': 'comprehensive,leaf-problems',
+  'houseplant-care-for-beginners-guide': 'comprehensive,beginner'
+} %}
+{% set hub_slug_to_tag = {
+  'plant-watering-guide': 'watering',
+  'plant-leaf-problems': 'leaf-problems',
+  'houseplant-care-for-beginners-guide': 'beginner'
+} %}
+{% set landing_extra_tags = {
+  'how-to-get-rid-of-fungus-gnats': 'pests',
+  'plant-pest-identification': 'pests',
+  'best-low-light-houseplants': 'low-light'
+} %}
 
 {% block content %}
 <!-- Hero Section -->
@@ -82,9 +99,42 @@
   </div>
 </section>
 
+<!-- Search & Filter -->
+<section class="py-6">
+  <div class="max-w-3xl mx-auto">
+    <div class="relative">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+      </svg>
+      <input type="search" id="guides-search" class="input pl-10 pr-10"
+             placeholder="Search guides..." aria-label="Search plant care guides"
+             autocomplete="off">
+      <button type="button" id="guides-clear-btn"
+              class="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hidden"
+              aria-label="Clear search">
+        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <div class="flex flex-wrap gap-2 mt-4" role="group" aria-label="Filter by category">
+      <button type="button" class="guide-chip bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-600" data-tag="all" aria-pressed="true">All</button>
+      <button type="button" class="guide-chip bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700" data-tag="species" aria-pressed="false">Species</button>
+      <button type="button" class="guide-chip bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700" data-tag="watering" aria-pressed="false">Watering</button>
+      <button type="button" class="guide-chip bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700" data-tag="leaf-problems" aria-pressed="false">Leaf Problems</button>
+      <button type="button" class="guide-chip bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700" data-tag="beginner" aria-pressed="false">Beginner</button>
+      <button type="button" class="guide-chip bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700" data-tag="pests" aria-pressed="false">Pests</button>
+      <button type="button" class="guide-chip bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700" data-tag="low-light" aria-pressed="false">Low Light</button>
+    </div>
+    <p id="guides-results-count" class="text-sm text-slate-500 dark:text-slate-400 mt-3" aria-live="polite" role="status">
+      Showing {{ hub_pages | length + guides | length + all_landing_pages | length }} of {{ hub_pages | length + guides | length + all_landing_pages | length }} results
+    </p>
+  </div>
+</section>
+
 <!-- Comprehensive Guides (Hub/Pillar Pages) -->
 {% if hub_pages %}
-<section class="py-8">
+<section class="py-8" id="section-comprehensive" data-guide-section>
   <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2 text-center">
     Comprehensive Guides
   </h2>
@@ -94,7 +144,9 @@
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
     {% for hub in hub_pages %}
     <a href="{{ url_for('seo.' ~ hub.route_name) }}"
-       class="card bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-200 dark:border-emerald-700 hover:shadow-lg hover:border-emerald-400 dark:hover:border-emerald-500 transition-all group">
+       class="guide-card card bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-200 dark:border-emerald-700 hover:shadow-lg hover:border-emerald-400 dark:hover:border-emerald-500 transition-all group"
+       data-search="{{ (hub.title ~ ' ' ~ hub.meta_description) | lower }}"
+       data-tags="{{ hub_tag_map.get(hub.slug, 'comprehensive') }}">
       <div class="text-center">
         <div class="text-5xl mb-3" aria-hidden="true">{{ hub.emoji }}</div>
         <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
@@ -111,7 +163,7 @@
 {% endif %}
 
 <!-- Plant Care by Species -->
-<section class="py-8 border-t border-slate-200 dark:border-slate-700">
+<section class="py-8 border-t border-slate-200 dark:border-slate-700" id="section-species" data-guide-section>
   <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2 text-center">
     Plant Care by Species
   </h2>
@@ -121,8 +173,13 @@
   {% if guides %}
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for guide in guides %}
+    {% set guide_tags = ['species'] %}
+    {% if guide.difficulty in ['Very Easy', 'Easy'] %}{% if guide_tags.append('beginner') %}{% endif %}{% endif %}
+    {% if 'Low' in guide.light %}{% if guide_tags.append('low-light') %}{% endif %}{% endif %}
     <a href="{{ url_for('guides.view', slug=guide.slug) }}"
-       class="card hover:shadow-lg hover:border-emerald-300 dark:hover:border-emerald-600 transition-all group">
+       class="guide-card card hover:shadow-lg hover:border-emerald-300 dark:hover:border-emerald-600 transition-all group"
+       data-search="{{ (guide.name ~ ' ' ~ guide.scientific_name ~ ' ' ~ guide.summary ~ ' ' ~ guide.light ~ ' ' ~ guide.water ~ ' ' ~ guide.difficulty) | lower }}"
+       data-tags="{{ guide_tags | join(',') }}">
       <div class="flex items-start gap-4">
         <div class="text-5xl flex-shrink-0" aria-hidden="true">{{ guide.emoji }}</div>
         <div class="min-w-0">
@@ -165,7 +222,7 @@
 
 <!-- Troubleshooting & Tips (data-driven, grouped by hub) -->
 {% if landing_page_groups %}
-<section class="py-8 border-t border-slate-200 dark:border-slate-700">
+<section class="py-8 border-t border-slate-200 dark:border-slate-700" id="section-troubleshooting" data-guide-section>
   <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2 text-center">
     Troubleshooting & Tips
   </h2>
@@ -174,7 +231,7 @@
   </p>
   <div class="max-w-5xl mx-auto space-y-8">
     {% for group in landing_page_groups %}
-    <div>
+    <div class="landing-subgroup">
       <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
         {% if group.hub %}
         <a href="{{ url_for('seo.' ~ group.hub.route_name) }}"
@@ -187,8 +244,13 @@
       </h3>
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {% for page in group.pages %}
+        {% set hub_tag = hub_slug_to_tag.get(group.hub.slug, 'troubleshooting') if group.hub else 'troubleshooting' %}
+        {% set extra = landing_extra_tags.get(page.slug, '') %}
+        {% set page_tags = 'troubleshooting,' ~ hub_tag ~ (',' ~ extra if extra else '') %}
         <a href="{{ url_for('seo.' ~ page.route_name) }}"
-           class="card hover:shadow-lg transition-shadow p-4">
+           class="guide-card card hover:shadow-lg transition-shadow p-4"
+           data-search="{{ (page.title ~ ' ' ~ page.meta_description) | lower }}"
+           data-tags="{{ page_tags }}">
           <span class="text-2xl mb-2 block" aria-hidden="true">{{ page.emoji }}</span>
           <span class="font-medium text-slate-900 dark:text-slate-100">{{ page.title }}</span>
         </a>
@@ -199,6 +261,13 @@
   </div>
 </section>
 {% endif %}
+
+<!-- No Results Message (hidden by default) -->
+<div id="guides-no-results" class="text-center py-12 hidden" role="status" aria-live="polite">
+  <div class="text-5xl mb-4" aria-hidden="true">🔍</div>
+  <p class="text-lg text-slate-600 dark:text-slate-400 mb-2">No guides match your search.</p>
+  <button type="button" id="guides-clear-all" class="btn btn-secondary btn-sm mt-2">Clear filters</button>
+</div>
 
 <!-- CTA Section -->
 <section class="py-12 text-center bg-white dark:bg-slate-800 -mx-4 px-4 rounded-2xl mt-8">
@@ -217,4 +286,8 @@
     </a>
   </div>
 </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/guides-search.js') }}"></script>
 {% endblock %}
