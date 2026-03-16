@@ -324,6 +324,12 @@
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
+  /* === FILTER CHIPS === */
+  .guide-chip {
+    @apply px-3 py-1.5 text-sm font-medium rounded-full border
+           transition-colors cursor-pointer;
+  }
+
   /* === SECTION === */
   .section {
     @apply py-12 sm:py-16 lg:py-20;
