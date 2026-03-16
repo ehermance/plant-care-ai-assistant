@@ -5,6 +5,7 @@
         "title": "Why Are My Plant Leaves Drooping? (And What to Do)",
         "meta_description": "Drooping leaves are stressful to see. Learn the 8 most common causes — from watering issues to light problems — and how to fix each one fast.",
         "emoji": "\ud83e\udd40",
+        "tags": ["troubleshooting", "leaf-problems"],
         "intro": "Nothing's more disheartening than seeing your once-perky plant suddenly slumping over. Don't panic — drooping leaves are one of the most common plant problems, and they're usually fixable once you identify the cause. The tricky part is that many different issues can look the same, so you'll need to play detective. Here's a comprehensive guide to figuring out what's wrong and getting your plant back to its upright self.",
         "causes": [
             {
@@ -103,6 +104,7 @@
         "title": "Am I Overwatering My Plant? Signs & Fixes",
         "meta_description": "Overwatering kills more houseplants than anything else. Learn the telltale signs you're giving your plant too much water and how to fix it.",
         "emoji": "\ud83d\udca7",
+        "tags": ["troubleshooting", "watering"],
         "intro": "Here's a hard truth: overwatering kills more houseplants than neglect ever will. It's easy to do — we want to show our plants love, and watering feels like caring. But too much of a good thing can drown your plant's roots and invite fungal diseases. Learning to recognize the signs early is the single most important skill in plant care.",
         "causes": [
             {
@@ -202,6 +204,7 @@
         "title": "How Often Should I Water My Plant? (Stop Guessing)",
         "meta_description": "There's no universal watering schedule. Learn the 8 factors that determine how often your plant needs water — based on soil, light, humidity, and season.",
         "emoji": "\ud83d\udebf",
+        "tags": ["troubleshooting", "watering"],
         "intro": "\"Water once a week\" is the most common — and most misleading — plant care advice out there. The truth is, watering frequency depends on your specific plant, pot, soil, light, humidity, and even the weather outside. A monstera in a south-facing window in July needs water far more often than a snake plant in a dim corner in December. Here's how to figure out the right rhythm for your plants.",
         "causes": [
             {
@@ -300,6 +303,7 @@
         "title": "Why Are My Plant Leaves Turning Yellow?",
         "meta_description": "Yellow leaves can mean many things — from simple aging to serious problems. Learn the 8 most common causes and how to diagnose what's wrong with your plant.",
         "emoji": "\ud83c\udf42",
+        "tags": ["troubleshooting", "leaf-problems"],
         "intro": "Yellow leaves are your plant's way of waving a little flag that says \"something's off.\" The tricky part? Yellowing can have many different causes, and figuring out which one applies to your plant takes some detective work. The good news is that the pattern of yellowing — which leaves, how fast, and what they feel like — gives you strong clues about the problem.",
         "causes": [
             {
@@ -399,6 +403,7 @@
         "title": "Should I Water My Plant Today?",
         "meta_description": "Not sure if it's time to water? Learn the 8 quick checks that tell you whether your plant needs water right now — plus how weather and season affect watering.",
         "emoji": "\ud83e\udd14",
+        "tags": ["troubleshooting", "watering"],
         "intro": "You're staring at your plant, watering can in hand, wondering: \"Do you need this or not?\" We've all been there. The good news is that there are several reliable ways to check — and once you learn them, you'll never have to guess again. Here are the methods plant experts actually use.",
         "causes": [
             {
@@ -492,6 +497,7 @@
         "title": "Why Is My Plant Not Growing? Common Causes",
         "meta_description": "Your plant seems stuck? Learn the 8 most common reasons houseplants stop growing — from dormancy to root problems — and how to get them thriving again.",
         "emoji": "\ud83c\udf31",
+        "tags": ["troubleshooting"],
         "intro": "You've been watering, feeding, and waiting — but your plant hasn't put out a new leaf in weeks (or months). Before you worry, know that stalled growth is incredibly common and usually has a straightforward explanation. Plants grow in response to specific conditions, and when any key factor is off, they'll pause and wait for better times.",
         "causes": [
             {
@@ -590,6 +596,7 @@
         "title": "Indoor Plant Care for Beginners (Simple Guide)",
         "meta_description": "New to houseplants? This beginner-friendly guide covers 9 essentials — watering, light, soil, common mistakes, and the best starter plants to build your confidence.",
         "emoji": "\ud83e\udeb4",
+        "tags": ["troubleshooting", "beginner"],
         "intro": "Welcome to the world of houseplants. It's easier than you think — most plants are surprisingly forgiving, and you definitely don't need a green thumb to keep them alive. The secret that experienced plant parents know? Most plant problems come from doing too much (overwatering, overfertilizing) rather than too little. Here are the fundamentals that will set you up for success from day one.",
         "causes": [
             {
@@ -695,6 +702,7 @@
         "title": "Why Are My Plant Leaves Curling?",
         "meta_description": "Curling leaves are a sign your plant is stressed. Learn the 8 most common causes — from watering and humidity to pests — and how to fix each one.",
         "emoji": "\ud83c\udf43",
+        "tags": ["troubleshooting", "leaf-problems"],
         "intro": "When your plant's leaves start curling inward, outward, or crisping at the edges, it's telling you something is off in its environment. The direction of the curl actually matters — leaves curling inward usually signal a moisture problem, while curling downward often points to heat or light stress. The good news? Curling is usually reversible once you figure out the trigger.",
         "causes": [
             {
@@ -793,6 +801,7 @@
         "title": "How to Get Rid of Fungus Gnats on Houseplants",
         "meta_description": "Tiny flies buzzing around your plants? Fungus gnats thrive in moist soil. Learn 9 proven methods to eliminate them fast and prevent them from coming back.",
         "emoji": "\ud83e\udeb0",
+        "tags": ["troubleshooting", "watering", "pests"],
         "intro": "If you see tiny dark flies hovering around your houseplants or zigzagging near the soil surface, you're dealing with fungus gnats. They're more annoying than dangerous to mature plants, but their larvae feed on organic matter in the soil — and sometimes young roots. The key to beating them is understanding their life cycle: adults live only about a week but lay up to 200 eggs in moist topsoil. Here's how to break that cycle and get rid of them for good.",
         "causes": [
             {
@@ -906,6 +915,7 @@
         "title": "Why Are My Plant Leaves Turning Brown? Causes & Fixes",
         "meta_description": "Brown leaves can mean many things — from low humidity to sunburn to root issues. Learn to identify the 9 most common patterns and fix each one.",
         "emoji": "\ud83c\udf42",
+        "tags": ["troubleshooting", "leaf-problems"],
         "intro": "Brown spots, crispy edges, or entire leaves turning brown? The pattern matters — a lot. Where and how the browning appears tells you exactly what's going wrong. A leaf with brown crispy edges has a completely different cause than one with dark mushy spots. Let's decode what your plant is trying to say so you can fix it fast.",
         "causes": [
             {
@@ -1012,6 +1022,7 @@
         "title": "How to Treat Root Rot (Step-by-Step Recovery Guide)",
         "meta_description": "Root rot doesn't have to kill your plant. Follow these 9 steps to identify root rot early, treat it effectively, and prevent it from coming back.",
         "emoji": "\ud83e\udeb5",
+        "tags": ["troubleshooting", "leaf-problems"],
         "intro": "Root rot is one of the most common killers of houseplants — but catching it early gives your plant a fighting chance. If your plant is wilting despite moist soil, has yellowing leaves, or smells musty at the base, root rot could be the culprit. This guide walks you through identification, treatment, and prevention so you can save your plant and stop root rot from happening again.",
         "causes": [
             {
@@ -1125,6 +1136,7 @@
         "title": "How to Revive a Dying Plant (Step-by-Step Rescue Guide)",
         "meta_description": "Think your plant is dying? Don't give up yet. Follow this 9-step rescue guide to diagnose the problem, revive your plant, and prevent it from happening again.",
         "emoji": "\ud83c\udf31",
+        "tags": ["troubleshooting", "beginner"],
         "intro": "Before you toss that wilted, yellowed, or crispy plant into the bin — stop. Most houseplants are far more resilient than they look, and what appears to be death is often just severe stress. Plants can bounce back from surprisingly rough shape if you catch the problem and act quickly. This guide walks you through exactly how to assess, treat, and nurse your struggling plant back to health.",
         "causes": [
             {
@@ -1242,6 +1254,7 @@
         "title": "Plant Pest Identification Guide: Spot & Treat Common Bugs",
         "meta_description": "Tiny bugs on your houseplant? Identify the 9 most common indoor plant pests — from spider mites to fungus gnats — with symptoms, photos tips, and treatment.",
         "emoji": "\ud83d\udd0d",
+        "tags": ["troubleshooting", "pests"],
         "intro": "Something is eating your plant, but what? Indoor plant pests are sneaky — many are nearly invisible to the naked eye, and by the time you notice damage, they've often been feeding for weeks. The good news: once you identify the culprit, treatment is usually straightforward. This guide covers the most common houseplant pests, how to spot them, and exactly how to get rid of them.",
         "causes": [
             {
@@ -1347,6 +1360,7 @@
         "title": "Best Low Light Houseplants (15 Plants That Thrive in Shade)",
         "meta_description": "No bright windows? No problem. These 15 low light houseplants genuinely thrive in dim rooms, north-facing windows, and offices — tested picks, not guesswork.",
         "emoji": "\ud83c\udf11",
+        "tags": ["troubleshooting", "beginner", "low-light"],
         "intro": "Not every home has sun-drenched south-facing windows. If your space has north-facing windows, basement rooms, or corners far from natural light, you need plants that have evolved to thrive in the understory of forests — not just survive, but actually look good. Here are the best true low-light houseplants, ranked by how well they handle dim conditions.",
         "causes": [
             {
